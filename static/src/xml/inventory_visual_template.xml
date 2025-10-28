@@ -146,15 +146,6 @@
                                 <span class="metric-value" t-esc="formatNumber(product.available_qty)"></span>
                             </div>
                         </div>
-
-                        <!-- Tercera columna: Total m² -->
-                        <div class="metrics-column metrics-total">
-                            <div class="column-header">Total</div>
-                            <div class="total-value">
-                                <span class="value" t-esc="formatNumber(product.total_qty)"></span>
-                                <span class="unit">m²</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
