@@ -113,81 +113,80 @@
                             
                             <div class="metric-row">
                                 <span class="metric-label">Stock:</span>
-                                <span class="metric-value stock" t-esc="product.stock_plates"></span>
+                                <span class="metric-value" t-esc="product.stock_plates || 0"></span>
                             </div>
                             
                             <div class="metric-row">
-                                <span class="metric-label">Comprometido:</span>
-                                <span class="metric-value committed" t-esc="product.committed_plates"></span>
+                                <span class="metric-label">Apartadas:</span>
+                                <span class="metric-value" t-esc="product.committed_plates || 0"></span>
                             </div>
                             
-                            <div class="metric-row">
-                                <span class="metric-label">Disponible:</span>
-                                <span class="metric-value available" t-esc="product.available_plates"></span>
+                            <div class="metric-row metric-available">
+                                <span class="metric-label">Disponibles:</span>
+                                <span class="metric-value" t-esc="product.available_plates || 0"></span>
                             </div>
                         </div>
 
-                        <!-- Segunda columna: Metros cuadrados -->
-                        <div class="metrics-column metrics-m2">
-                            <div class="column-header">m²</div>
+                        <!-- Segunda columna: Metros -->
+                        <div class="metrics-column metrics-metros">
+                            <div class="column-header">Metros (m²)</div>
                             
                             <div class="metric-row">
                                 <span class="metric-label">Stock:</span>
-                                <span class="metric-value stock" t-esc="formatNumber(product.stock_qty)"></span>
+                                <span class="metric-value" t-esc="formatNumber(product.stock_qty)"></span>
                             </div>
                             
                             <div class="metric-row">
-                                <span class="metric-label">Comprometido:</span>
-                                <span class="metric-value committed" t-esc="formatNumber(product.committed_qty)"></span>
+                                <span class="metric-label">Apartados:</span>
+                                <span class="metric-value" t-esc="formatNumber(product.committed_qty)"></span>
                             </div>
                             
-                            <div class="metric-row">
-                                <span class="metric-label">Disponible:</span>
-                                <span class="metric-value available" t-esc="formatNumber(product.available_qty)"></span>
+                            <div class="metric-row metric-available">
+                                <span class="metric-label">Disponibles:</span>
+                                <span class="metric-value" t-esc="formatNumber(product.available_qty)"></span>
                             </div>
                         </div>
 
-                        <!-- Tercera columna: Información adicional -->
-                        <div class="metrics-column metrics-info">
-                            <div class="column-header">Información</div>
-                            
-                            <div class="metric-row">
-                                <span class="metric-label">Categoría:</span>
-                                <span class="metric-value" t-esc="product.categ_name || 'N/A'"></span>
-                            </div>
-                            
-                            <div class="metric-row">
-                                <span class="metric-label">Formato:</span>
-                                <span class="metric-value" t-esc="product.formato || 'N/A'"></span>
+                        <!-- Tercera columna: Total m² -->
+                        <div class="metrics-column metrics-total">
+                            <div class="column-header">Total</div>
+                            <div class="total-value">
+                                <span class="value" t-esc="formatNumber(product.total_qty)"></span>
+                                <span class="unit">m²</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Botón expandir/colapsar -->
                 <div class="product-actions">
-                    <button class="btn-expand" type="button">
+                    <button 
+                        type="button" 
+                        class="btn-expand"
+                        title="Ver detalles de placas"
+                    >
                         <i class="fa fa-chevron-down expand-icon"></i>
-                        <span class="expand-text">Ver detalle</span>
+                        <span t-if="!isProductExpanded(product.product_id)">Detalles</span>
+                        <span t-else="">Ocultar</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Detalle expandido (tabla completa con NUEVA ESTRUCTURA) -->
-            <div class="o_inventory_product_details" t-if="isProductExpanded(product.product_id)">
-                <t t-call="inventory_visual_enhanced.ProductDetailsTable">
+            <!-- Detalles expandibles del producto -->
+            <t t-if="isProductExpanded(product.product_id)">
+                <t t-call="inventory_visual_enhanced.ProductDetails">
                     <t t-set="details" t-value="getProductDetails(product.product_id)"/>
-                    <t t-set="uom_name" t-value="product.uom_name"/>
                 </t>
-            </div>
+            </t>
         </div>
     </t>
 
-    <!-- Template de tabla de detalles - NUEVA ESTRUCTURA -->
-    <t t-name="inventory_visual_enhanced.ProductDetailsTable" owl="1">
-        <t t-if="details.length === 0">
+    <!-- Template de detalles del producto (tabla) -->
+    <t t-name="inventory_visual_enhanced.ProductDetails" owl="1">
+        <t t-if="!details || details.length === 0">
             <div class="table-loading">
                 <div class="spinner"></div>
-                <div class="loading-text">Cargando detalles...</div>
+                <div class="loading-text">Cargando placas...</div>
             </div>
         </t>
         <t t-else="">
@@ -326,17 +325,20 @@
                                     </button>
                                 </td>
 
-                                <!-- 9. Estado (Hold/SO) -->
+                                <!-- 9. Estado (Hold/SO) - ACTUALIZADO CON HOLD CLICKEABLE -->
                                 <td class="col-icon col-state" data-label="E">
                                     <div class="state-cell">
-                                        <!-- Apartado/Hold -->
-                                        <span 
-                                            class="state-icon hold-icon" 
-                                            t-if="detail.esta_reservado and !detail.en_orden_venta"
-                                            title="Apartado"
-                                        >
-                                            <i class="fa fa-hand-paper-o"></i>
-                                        </span>
+                                        <!-- Apartado/Hold - CLICKEABLE si tiene hold -->
+                                        <t t-if="detail.tiene_hold">
+                                            <button 
+                                                class="icon-btn state-icon hold-icon"
+                                                t-on-click="() => this.onHoldClick(detail.id, detail.hold_info)"
+                                                type="button"
+                                                title="Ver detalles de reserva"
+                                            >
+                                                <i class="fa fa-hand-paper-o"></i>
+                                            </button>
+                                        </t>
                                         
                                         <!-- Sales Order -->
                                         <span 

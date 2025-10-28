@@ -439,6 +439,35 @@ class InventoryVisualController extends Component {
         */
     }
 
+    /**
+     * Manejar clic en el icono de hold
+     * Muestra información de la reserva manual
+     */
+    onHoldClick(detailId, holdInfo) {
+        console.log('Ver detalles de hold:', detailId, holdInfo);
+        
+        if (!holdInfo || !holdInfo.id) {
+            this.notification.add(
+                "No hay información de hold disponible",
+                { type: "info" }
+            );
+            return;
+        }
+
+        let message = `Reservado para: ${holdInfo.partner_name}\n`;
+        message += `Fecha de inicio: ${holdInfo.fecha_inicio}\n`;
+        message += `Fecha de expiración: ${holdInfo.fecha_expiracion}`;
+        if (holdInfo.notas) {
+            message += `\nNotas: ${holdInfo.notas}`;
+        }
+
+        this.notification.add(message, {
+            type: "info",
+            title: "Información de Reserva (Hold)",
+            sticky: false,
+        });
+    }
+
     // ========================================
     // FUNCIONES HELPER PARA MODALS (FUTURAS)
     // ========================================
@@ -627,12 +656,7 @@ class InventoryVisualController extends Component {
 InventoryVisualController.template = "inventory_visual_enhanced.MainView";
 
 // Props estándar que Odoo pasa a los componentes de acción
-InventoryVisualController.props = {
-    action: { type: Object, optional: true },
-    actionId: { type: Number, optional: true },
-    updateActionState: { type: Function, optional: true },
-    className: { type: String, optional: true },
-};
+InventoryVisualController.props = {};
 
-// Registrar la acción cliente
+// Registrar el componente como una acción en Odoo
 registry.category("actions").add("inventory_visual_enhanced", InventoryVisualController);

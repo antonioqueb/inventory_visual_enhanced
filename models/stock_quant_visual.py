@@ -182,14 +182,34 @@ class StockQuantVisual(models.Model):
                 en_orden_entrega = bool(delivery_moves)
             
             # Verificar si está en orden de venta (buscar en movimientos con sale_line_id)
+            # COMENTADO TEMPORALMENTE - Solo mostrar holds por ahora
             en_orden_venta = False
+            # if quant.lot_id:
+            #     sale_moves = self.env['stock.move'].search([
+            #         ('lot_ids', 'in', [quant.lot_id.id]),
+            #         ('sale_line_id', '!=', False),
+            #         ('state', 'in', ['confirmed', 'assigned', 'done'])
+            #     ], limit=1)
+            #     en_orden_venta = bool(sale_moves)
+            
+            # Verificar si tiene hold activo
+            tiene_hold = False
+            hold_info = {}
             if quant.lot_id:
-                sale_moves = self.env['stock.move'].search([
-                    ('lot_ids', 'in', [quant.lot_id.id]),
-                    ('sale_line_id', '!=', False),
-                    ('state', 'in', ['confirmed', 'assigned', 'done'])
+                hold = self.env['stock.lot.hold'].search([
+                    ('quant_id', '=', quant.id),
+                    ('estado', '=', 'activo')
                 ], limit=1)
-                en_orden_venta = bool(sale_moves)
+                
+                if hold:
+                    tiene_hold = True
+                    hold_info = {
+                        'id': hold.id,
+                        'partner_name': hold.partner_id.name,
+                        'fecha_inicio': hold.fecha_inicio.strftime('%d/%m/%Y %H:%M') if hold.fecha_inicio else '',
+                        'fecha_expiracion': hold.fecha_expiracion.strftime('%d/%m/%Y %H:%M') if hold.fecha_expiracion else '',
+                        'notas': hold.notas or '',
+                    }
             
             # Verificar si tiene detalles especiales
             tiene_detalles = getattr(quant, 'x_tiene_detalles', False) or False
@@ -242,6 +262,8 @@ class StockQuantVisual(models.Model):
                 'en_orden_entrega': en_orden_entrega,
                 'en_orden_venta': en_orden_venta,
                 'tiene_detalles': tiene_detalles,
+                'tiene_hold': tiene_hold,
+                'hold_info': hold_info,
                 
                 # Multimedia y notas
                 'cantidad_fotos': cantidad_fotos,
