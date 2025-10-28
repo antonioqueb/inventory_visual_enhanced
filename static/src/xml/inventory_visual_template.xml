@@ -98,11 +98,29 @@
                 <div class="product-info">
                     <div class="product-main">
                         <h3 class="product-title" t-esc="product.product_name"></h3>
-                        <span 
-                            class="product-code" 
-                            t-if="product.product_code"
-                            t-esc="product.product_code"
-                        ></span>
+                        <div class="product-meta">
+                            <span 
+                                class="product-code" 
+                                t-if="product.product_code"
+                            >
+                                <i class="fa fa-tag"></i>
+                                <t t-esc="product.product_code"/>
+                            </span>
+                            <span 
+                                class="product-category" 
+                                t-if="product.categ_name"
+                            >
+                                <i class="fa fa-folder-o"></i>
+                                <t t-esc="product.categ_name"/>
+                            </span>
+                            <span 
+                                class="product-format" 
+                                t-if="product.formato"
+                            >
+                                <i class="fa fa-square-o"></i>
+                                <t t-esc="product.formato"/>
+                            </span>
+                        </div>
                     </div>
 
                     <!-- Métricas organizadas en columnas -->

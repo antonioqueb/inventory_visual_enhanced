@@ -59,9 +59,16 @@ class StockQuantVisual(models.Model):
                     except (ValueError, TypeError):
                         plate_area = 0.0
             
+            # Verificar si tiene hold activo
+            hold_activo = self.env['stock.lot.hold'].search([
+                ('quant_id', '=', quant.id),
+                ('estado', '=', 'activo')
+            ], limit=1)
+            
             # Calcular métricas
             total_m2 = quant.quantity
-            committed_m2 = quant.reserved_quantity
+            # CORREGIDO: Solo contar como apartado si tiene hold activo
+            committed_m2 = total_m2 if hold_activo else 0.0
             stock_m2 = total_m2
             available_m2 = total_m2 - committed_m2
             
@@ -73,7 +80,8 @@ class StockQuantVisual(models.Model):
             
             if plate_area > 0:
                 total_plates = int(round(total_m2 / plate_area))
-                committed_plates = int(round(committed_m2 / plate_area))
+                # CORREGIDO: Solo contar placa como apartada si tiene hold
+                committed_plates = 1 if hold_activo else 0
                 stock_plates = total_plates
                 available_plates = stock_plates - committed_plates
             
