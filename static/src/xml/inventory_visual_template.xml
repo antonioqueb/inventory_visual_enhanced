@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    
+    <!-- Template principal del componente -->
+    <t t-name="inventory_visual_enhanced.MainView" owl="1">
+        <div class="o_inventory_visual_container d-flex flex-column vh-100" t-ref="root">
+            
+            <!-- Barra de búsqueda superior (sticky) -->
+            <div class="o_inventory_visual_searchbar flex-shrink-0 sticky-top">
+            <div class="searchbar-inner container d-flex align-items-center justify-content-between gap-2">
+
+                <!-- Wrapper centrado con Bootstrap -->
+                <div class="searchbar-input-wrapper mx-auto col-12 col-md-8 col-lg-6 px-0 position-relative">
+                <i class="fa fa-search search-icon"></i>
+                <input 
+                    type="text"
+                    class="form-control"
+                    placeholder="Buscar por producto, código o familia (ej: Tajmahal)..."
+                    t-model="state.searchTerm"
+                    t-on-input="onSearchInput"
+                    t-att-disabled="state.isLoading"
+                />
+                <button 
+                    class="clear-search btn btn-link p-0"
+                    t-att-class="{ visible: state.searchTerm.length > 0 }"
+                    t-on-click="clearSearch"
+                >
+                    <i class="fa fa-times"></i>
+                </button>
+                </div>
+
+                <!-- Métrica a la derecha -->
+                <div class="searchbar-info text-nowrap ms-auto" t-if="state.hasSearched">
+                <span class="count" t-esc="state.totalProducts"></span>
+                <span t-if="state.totalProducts === 1"> producto</span>
+                <span t-else=""> productos</span>
+                </div>
+            </div>
+            </div>
+
+
+            <!-- Contenido principal con scroll -->
+            <div class="o_inventory_visual_content flex-grow-1 overflow-auto">
+                
+                <!-- Estado inicial: sin búsqueda -->
+                <div class="o_inventory_visual_empty" t-if="!state.hasSearched and !state.isLoading">
+                    <i class="fa fa-search empty-icon"></i>
+                    <h2 class="empty-title">Busca para visualizar tu inventario</h2>
+                    <p class="empty-subtitle">
+                        Escribe el nombre de un producto, código o familia en el buscador superior
+                        para ver el inventario agrupado con métricas detalladas.
+                    </p>
+                </div>
+
+                <!-- Loading -->
+                <div class="o_inventory_loading" t-if="state.isLoading">
+                    <div class="spinner"></div>
+                    <div class="loading-text">Cargando inventario...</div>
+                </div>
+
+                <!-- Error -->
+                <div class="o_inventory_error" t-if="state.error">
+                    <i class="fa fa-exclamation-triangle error-icon"></i>
+                    <div class="error-message" t-esc="state.error"></div>
+                </div>
+
+                <!-- Sin resultados -->
+                <div class="o_inventory_no_results" t-if="state.hasSearched and state.products.length === 0 and !state.isLoading">
+                    <i class="fa fa-inbox no-results-icon"></i>
+                    <h3 class="no-results-title">No se encontraron productos</h3>
+                    <p class="no-results-message">
+                        Intenta con otro término de búsqueda o verifica el inventario disponible.
+                    </p>
+                </div>
+
+                <!-- Lista de productos -->
+                <div class="o_inventory_products_list" t-if="state.products.length > 0 and !state.isLoading">
+                    <t t-foreach="state.products" t-as="product" t-key="product.product_id">
+                        <t t-call="inventory_visual_enhanced.ProductCard">
+                            <t t-set="product" t-value="product"/>
+                        </t>
+                    </t>
+                </div>
+
+            </div>
+
+        </div>
+    </t>
+
+    <!-- Template de tarjeta de producto (SIN CAMBIOS) -->
+    <t t-name="inventory_visual_enhanced.ProductCard" owl="1">
+        <div 
+            class="o_inventory_product_card"
+            t-att-class="{ expanded: isProductExpanded(product.product_id) }"
+        >
+            <!-- Header del producto (clickeable) -->
+            <div class="product-header" t-on-click="() => this.toggleProduct(product.product_id, product.quant_ids)">
+                <div class="product-info">
+                    <div class="product-main">
+                        <h3 class="product-title" t-esc="product.product_name"></h3>
+                        <span 
+                            class="product-code" 
+                            t-if="product.product_code"
+                            t-esc="product.product_code"
+                        ></span>
+                    </div>
+
+                    <!-- Métricas organizadas en columnas -->
+                    <div class="product-metrics-grid">
+                        <!-- Primera columna: Placas -->
+                        <div class="metrics-column metrics-placas">
+                            <div class="column-header">Piezas</div>
+                            
+                            <div class="metric-row">
+                                <span class="metric-label">Stock:</span>
+                                <span class="metric-value stock" t-esc="product.stock_plates"></span>
+                            </div>
+                            
+                            <div class="metric-row">
+                                <span class="metric-label">Comprometido:</span>
+                                <span class="metric-value committed" t-esc="product.committed_plates"></span>
+                            </div>
+                            
+                            <div class="metric-row">
+                                <span class="metric-label">Disponible:</span>
+                                <span class="metric-value available" t-esc="product.available_plates"></span>
+                            </div>
+                        </div>
+
+                        <!-- Segunda columna: Metros cuadrados -->
+                        <div class="metrics-column metrics-m2">
+                            <div class="column-header">m²</div>
+                            
+                            <div class="metric-row">
+                                <span class="metric-label">Stock:</span>
+                                <span class="metric-value stock" t-esc="formatNumber(product.stock_qty)"></span>
+                            </div>
+                            
+                            <div class="metric-row">
+                                <span class="metric-label">Comprometido:</span>
+                                <span class="metric-value committed" t-esc="formatNumber(product.committed_qty)"></span>
+                            </div>
+                            
+                            <div class="metric-row">
+                                <span class="metric-label">Disponible:</span>
+                                <span class="metric-value available" t-esc="formatNumber(product.available_qty)"></span>
+                            </div>
+                        </div>
+
+                        <!-- Tercera columna: Información adicional -->
+                        <div class="metrics-column metrics-info">
+                            <div class="column-header">Información</div>
+                            
+                            <div class="metric-row">
+                                <span class="metric-label">Categoría:</span>
+                                <span class="metric-value" t-esc="product.categ_name || 'N/A'"></span>
+                            </div>
+                            
+                            <div class="metric-row">
+                                <span class="metric-label">Formato:</span>
+                                <span class="metric-value" t-esc="product.formato || 'N/A'"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-actions">
+                    <button class="btn-expand" type="button">
+                        <i class="fa fa-chevron-down expand-icon"></i>
+                        <span class="expand-text">Ver detalle</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Detalle expandido (tabla completa con NUEVA ESTRUCTURA) -->
+            <div class="o_inventory_product_details" t-if="isProductExpanded(product.product_id)">
+                <t t-call="inventory_visual_enhanced.ProductDetailsTable">
+                    <t t-set="details" t-value="getProductDetails(product.product_id)"/>
+                    <t t-set="uom_name" t-value="product.uom_name"/>
+                </t>
+            </div>
+        </div>
+    </t>
+
+    <!-- Template de tabla de detalles - NUEVA ESTRUCTURA -->
+    <t t-name="inventory_visual_enhanced.ProductDetailsTable" owl="1">
+        <t t-if="details.length === 0">
+            <div class="table-loading">
+                <div class="spinner"></div>
+                <div class="loading-text">Cargando detalles...</div>
+            </div>
+        </t>
+        <t t-else="">
+            <div class="table-wrapper overflow-auto">
+                <table class="o_inventory_details_table">
+                    <thead>
+                        <tr>
+                            <!-- 1. Lote -->
+                            <th class="col-lot"><strong>Lote</strong></th>
+                            
+                            <!-- 2. Bloque -->
+                            <th class="col-bloque"><strong>Bloque</strong></th>
+                            
+                            <!-- 3. Ubicación -->
+                            <th class="col-location"><strong>Ubicación</strong></th>
+                            
+                            <!-- 4. Dimensiones -->
+                            <th class="col-dimensions"><strong>Dimensiones</strong></th>
+                            
+                            <!-- 5. P (Pick/Foto) -->
+                            <th class="col-icon"><strong>P</strong></th>
+                            
+                            <!-- 6. N (Notas) -->
+                            <th class="col-icon"><strong>N</strong></th>
+                            
+                            <!-- 7. D (Detalles) -->
+                            <th class="col-icon"><strong>D</strong></th>
+                            
+                            <!-- 8. SP (Sales Person) -->
+                            <th class="col-icon"><strong>SP</strong></th>
+                            
+                            <!-- 9. Estado (Hold/SO) -> E -->
+                            <th class="col-icon" title="Estado"><strong>E</strong></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="details" t-as="detail" t-key="detail.id">
+                            <tr>
+                                <!-- 1. Lote -->
+                                <td class="col-lot cell-strong" data-label="Lote">
+                                    <t t-if="detail.lot_name">
+                                        <strong t-esc="detail.lot_name"/>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="text-muted">-</span>
+                                    </t>
+                                </td>
+
+                                <!-- 2. Bloque -->
+                                <td class="col-bloque cell-strong" data-label="Bloque">
+                                    <t t-if="detail.bloque">
+                                        <strong t-esc="detail.bloque"/>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="text-muted">-</span>
+                                    </t>
+                                </td>
+
+                                <!-- 3. Ubicación -->
+                                <td class="col-location cell-strong" data-label="Ubicación">
+                                    <i class="fa fa-map-marker location-icon"></i>
+                                    <strong t-esc="detail.location_name"/>
+                                </td>
+
+                                <!-- 4. Dimensiones (medidas + m²) -->
+                                <td class="col-dimensions cell-strong" data-label="Dimensiones">
+                                    <div class="dimensions-cell">
+                                        <div class="dimensions-measures">
+                                            <t t-if="detail.grosor or detail.alto or detail.ancho">
+                                                <t t-if="detail.grosor">
+                                                    <strong><t t-esc="detail.grosor"/></strong>cm × 
+                                                </t>
+                                                <t t-if="detail.alto">
+                                                    <strong><t t-esc="detail.alto"/></strong>m × 
+                                                </t>
+                                                <t t-if="detail.ancho">
+                                                    <strong><t t-esc="detail.ancho"/></strong>m
+                                                </t>
+                                            </t>
+                                            <span t-else="" class="text-muted">-</span>
+                                        </div>
+                                        <div class="dimensions-total" t-if="detail.quantity">
+                                            <strong class="m2-value" t-esc="formatNumber(detail.quantity)"/> m²
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- 5. P (Pick/Foto) -->
+                                <td class="col-icon col-photo" data-label="Foto">
+                                    <button 
+                                        class="icon-btn"
+                                        t-att-class="detail.cantidad_fotos ? 'has-content' : 'no-content'"
+                                        t-on-click="() => this.onPhotoClick(detail.id)"
+                                        type="button"
+                                        title="Ver fotos"
+                                    >
+                                        <i class="fa fa-camera"></i>
+                                    </button>
+                                </td>
+
+                                <!-- 6. N (Notas) -->
+                                <td class="col-icon col-notes" data-label="Notas">
+                                    <button 
+                                        class="icon-btn"
+                                        t-att-class="detail.detalles_placa ? 'has-alert' : 'no-content'"
+                                        t-on-click="() => this.onNotesClick(detail.id)"
+                                        type="button"
+                                        title="Ver notas"
+                                    >
+                                        <i class="fa fa-info-circle"></i>
+                                    </button>
+                                </td>
+
+                                <!-- 7. D (Detalles) -->
+                                <td class="col-icon col-details" data-label="Detalles">
+                                    <button 
+                                        class="icon-btn has-content"
+                                        t-on-click="() => this.onDetailsClick(detail.id)"
+                                        type="button"
+                                        title="Ver historial y detalles"
+                                    >
+                                        <i class="fa fa-list-alt"></i>
+                                    </button>
+                                </td>
+
+                                <!-- 8. SP (Sales Person) -->
+                                <td class="col-icon col-salesperson" data-label="Cliente/Vendedor">
+                                    <button 
+                                        class="icon-btn"
+                                        t-att-class="detail.sales_person ? 'has-content' : 'no-content'"
+                                        t-on-click="() => this.onSalesPersonClick(detail.id)"
+                                        type="button"
+                                        title="Ver cliente y vendedor"
+                                    >
+                                        <i class="fa fa-user"></i>
+                                    </button>
+                                </td>
+
+                                <!-- 9. Estado (Hold/SO) -->
+                                <td class="col-icon col-state" data-label="E">
+                                    <div class="state-cell">
+                                        <!-- Apartado/Hold -->
+                                        <span 
+                                            class="state-icon hold-icon" 
+                                            t-if="detail.esta_reservado and !detail.en_orden_venta"
+                                            title="Apartado"
+                                        >
+                                            <i class="fa fa-hand-paper-o"></i>
+                                        </span>
+                                        
+                                        <!-- Sales Order -->
+                                        <span 
+                                            class="state-icon so-icon" 
+                                            t-if="detail.en_orden_venta"
+                                            title="En orden de venta"
+                                        >
+                                            SO
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </t>
+
+</templates>

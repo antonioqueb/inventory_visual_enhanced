@@ -1,0 +1,787 @@
+/**
+ * Inventario Visual Avanzado — Theme Update
+ * Paleta Odoo + fondos claros
+ */
+
+/* ================================
+   COLOR THEME SWATCHES (Referencia)
+   ================================ */
+
+/* Hex */
+$Odoo-Theme-1-hex: #714B67;
+$Odoo-Theme-2-hex: #8F8F8F;
+$Odoo-Theme-3-hex: #017E84;
+$Odoo-Theme-4-hex: #E46E78;
+$Odoo-Theme-5-hex: #21B799;
+$Odoo-Theme-6-hex: #5B899E;
+$Odoo-Theme-7-hex: #E4A900;
+
+/* RGBA */
+$Odoo-Theme-1-rgba: rgba(113,75,103, 1);
+$Odoo-Theme-2-rgba: rgba(143,143,143, 1);
+$Odoo-Theme-3-rgba: rgba(1,126,132, 1);
+$Odoo-Theme-4-rgba: rgba(228,110,120, 1);
+$Odoo-Theme-5-rgba: rgba(33,183,153, 1);
+$Odoo-Theme-6-rgba: rgba(91,137,158, 1);
+$Odoo-Theme-7-rgba: rgba(228,169,0, 1);
+
+/* HSLA */
+$Odoo-Theme-1-hsla: hsla(315, 20, 36, 1);
+$Odoo-Theme-2-hsla: hsla(0, 0, 56, 1);
+$Odoo-Theme-3-hsla: hsla(182, 98, 26, 1);
+$Odoo-Theme-4-hsla: hsla(354, 68, 66, 1);
+$Odoo-Theme-5-hsla: hsla(167, 69, 42, 1);
+$Odoo-Theme-6-hsla: hsla(198, 26, 48, 1);
+$Odoo-Theme-7-hsla: hsla(44, 100, 44, 1);
+
+/**
+ * Estilos principales para Inventario Visual Avanzado
+ * Alphaqueb Consulting SAS
+ */
+
+/* ========================================
+   VARIABLES DE DISEÑO (Tokens de UI)
+   ======================================== */
+
+$primary-color:  $Odoo-Theme-3-hex !default; // Teal
+$primary-hover:  darken($primary-color, 12%) !default;
+$primary-light:  mix(#fff, $primary-color, 88%) !default;
+
+$secondary-color: $Odoo-Theme-1-hex !default; // Morado
+$success-color:   $Odoo-Theme-5-hex !default; // Verde éxito
+$warning-color:   $Odoo-Theme-7-hex !default; // Amarillo
+$danger-color:    $Odoo-Theme-4-hex !default; // Rosa/rojo sutil
+$info-color:      $Odoo-Theme-6-hex !default; // Azul grisáceo
+
+/* Métricas de inventario */
+$stock-color:      $info-color !default;
+$committed-color:  $warning-color !default;
+$available-color:  $success-color !default;
+
+/* Fondos claros forzados */
+$background-primary:   #ffffff !default;
+$background-secondary: mix(#fff, $info-color, 94%) !default;   // muy claro
+$background-hover:     mix(#fff, $primary-color, 90%) !default;
+
+$border-color:       mix(#fff, $Odoo-Theme-2-hex, 85%) !default; // gris muy claro
+$border-color-dark:  mix(#fff, $Odoo-Theme-2-hex, 70%) !default;
+$divider-color:      mix(#fff, $Odoo-Theme-2-hex, 88%) !default;
+
+$icon-gray: #999 !default;
+$icon-red:  $danger-color !default;
+
+$font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !default;
+$font-family-monospace: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace !default;
+
+$font-size-base: 14px !default;
+$font-size-small: 12px !default;
+$font-size-large: 16px !default;
+$font-size-xlarge: 18px !default;
+$font-size-xxlarge: 24px !default;
+
+$font-weight-normal: 400 !default;
+$font-weight-medium: 500 !default;
+$font-weight-semibold: 600 !default;
+$font-weight-bold: 700 !default;
+
+$line-height-base: 1.5 !default;
+$line-height-tight: 1.3 !default;
+
+$spacing-xs: 4px !default;
+$spacing-sm: 8px !default;
+$spacing-md: 16px !default;
+$spacing-lg: 24px !default;
+$spacing-xl: 32px !default;
+$spacing-xxl: 48px !default;
+
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08) !default;
+$shadow-md: 0 2px 8px rgba(0, 0, 0, 0.1) !default;
+$shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12) !default;
+$shadow-hover: 0 4px 12px rgba($primary-color, 0.18) !default;
+
+$border-radius-sm: 4px !default;
+$border-radius-md: 6px !default;
+$border-radius-lg: 8px !default;
+$border-radius-pill: 50px !default;
+
+$transition-fast: 150ms ease !default;
+$transition-base: 250ms ease !default;
+$transition-all: all $transition-base !default;
+
+$container-max-width: 1600px !default;
+
+$z-index-searchbar: 100 !default;
+
+$breakpoint-md: 992px !default;
+$breakpoint-lg: 1200px !default;
+
+$animation-duration-base: 300ms !default;
+$ease-out: cubic-bezier(0, 0, 0.2, 1) !default;
+
+/* ========================================
+   CONTENEDOR PRINCIPAL
+   ======================================== */
+
+.o_inventory_visual_container {
+  width: 100%;
+  background: $background-secondary;
+  padding: 0;
+  margin: 0;
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  color: #333;
+  overflow: hidden;
+}
+
+/* ========================================
+   BARRA DE BÚSQUEDA SUPERIOR - STICKY
+   ======================================== */
+
+.o_inventory_visual_searchbar {
+  z-index: $z-index-searchbar;
+  background: $background-primary;
+  border-bottom: 2px solid $border-color;
+  padding: $spacing-md $spacing-xl;
+  box-shadow: $shadow-sm;
+  transition: $transition-all;
+
+  &.scrolled { box-shadow: $shadow-md; }
+
+  .searchbar-inner {
+    max-width: $container-max-width;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+  }
+
+  .searchbar-label {
+    font-size: $font-size-large;
+    font-weight: $font-weight-semibold;
+    color: $primary-color;
+    white-space: nowrap;
+    min-width: 180px;
+
+    .icon { margin-right: $spacing-sm; color: $primary-color; }
+  }
+
+  .searchbar-input-wrapper {
+    flex: 1;
+    position: relative;
+    max-width: 600px;
+
+    .search-icon {
+      position: absolute;
+      left: $spacing-md;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #999;
+      font-size: $font-size-large;
+      pointer-events: none;
+      transition: color $transition-fast;
+    }
+
+    input {
+      width: 100%;
+      height: 44px;
+      padding: 0 $spacing-md 0 48px;
+      border: 2px solid $border-color;
+      border-radius: $border-radius-lg;
+      font-size: $font-size-base;
+      font-family: $font-family-base;
+      background: $background-secondary;
+      transition: $transition-all;
+      outline: none;
+
+      &::placeholder { color: #999; font-weight: $font-weight-normal; }
+
+      &:focus {
+        border-color: $primary-color;
+        background: $background-primary;
+        box-shadow: 0 0 0 3px $primary-light;
+        ~ .search-icon { color: $primary-color; }
+      }
+
+      &:disabled {
+        background: #f5f5f5;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+    }
+
+    .clear-search {
+      position: absolute;
+      right: $spacing-md;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: #999;
+      cursor: pointer;
+      padding: $spacing-xs;
+      border-radius: $border-radius-sm;
+      transition: $transition-all;
+      display: none;
+
+      &.visible { display: block; }
+
+      &:hover {
+        color: $danger-color;
+        background: rgba($danger-color, 0.1);
+      }
+    }
+  }
+
+  .searchbar-info {
+    font-size: $font-size-small;
+    color: #666;
+    white-space: nowrap;
+
+    .count { font-weight: $font-weight-semibold; color: $primary-color; }
+  }
+}
+
+/* ========================================
+   MENSAJE DE ESTADO INICIAL
+   ======================================== */
+
+.o_inventory_visual_empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+  padding: $spacing-xxl;
+  text-align: center;
+
+  .empty-icon {
+    font-size: 80px;
+    color: #ddd;
+    margin-bottom: $spacing-lg;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .empty-title {
+    font-size: $font-size-xxlarge;
+    font-weight: $font-weight-semibold;
+    color: #666;
+    margin-bottom: $spacing-sm;
+  }
+
+  .empty-subtitle {
+    font-size: $font-size-base;
+    color: #999;
+    max-width: 400px;
+    line-height: $line-height-base;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* ========================================
+   CONTENEDOR DE PRODUCTOS - CON SCROLL
+   ======================================== */
+
+.o_inventory_visual_content {
+  max-width: $container-max-width;
+  margin: 0 auto;
+  padding: $spacing-lg $spacing-xl;
+  width: 100%;
+}
+
+.o_inventory_products_list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  padding-bottom: $spacing-lg;
+}
+
+/* ========================================
+   TARJETA DE PRODUCTO - ANCHO COMPLETO
+   ======================================== */
+
+.o_inventory_product_card {
+  background: $background-primary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  transition: $transition-all;
+  box-shadow: $shadow-sm;
+
+  &:hover { box-shadow: $shadow-hover; }
+
+  &.expanded {
+    box-shadow: $shadow-lg;
+    border-color: $primary-color;
+  }
+
+  .product-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: $spacing-lg $spacing-xl;
+    cursor: pointer;
+    transition: $transition-all;
+    border-left: 4px solid transparent;
+
+    &:hover {
+      background: $background-hover;
+      border-left-color: $primary-color;
+      .product-title { color: $primary-color; }
+    }
+
+    .product-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-md;
+    }
+
+    .product-main { flex: 1; min-width: 0; }
+
+    .product-title {
+      font-size: $font-size-large;
+      font-weight: $font-weight-semibold;
+      color: #333;
+      margin: 0 0 $spacing-xs 0;
+      transition: color $transition-fast;
+      line-height: $line-height-tight;
+    }
+
+    .product-code {
+      display: inline-block;
+      font-size: $font-size-small;
+      font-family: $font-family-monospace;
+      color: #666;
+      background: $background-secondary;
+      padding: 2px 8px;
+      border-radius: $border-radius-sm;
+      margin-top: $spacing-xs;
+    }
+
+    .product-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: $spacing-lg;
+      margin-top: $spacing-md;
+    }
+
+    .metrics-column {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-sm;
+      padding-right: $spacing-md;
+      border-right: 1px solid $divider-color;
+
+      &:last-child { border-right: none; padding-right: 0; }
+
+      .column-header {
+        font-size: $font-size-small;
+        font-weight: $font-weight-semibold;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: $spacing-xs;
+      }
+
+      .metric-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: $font-size-small;
+
+        .metric-label { color: #666; }
+
+        .metric-value {
+          font-weight: $font-weight-semibold;
+          font-size: $font-size-base;
+
+          &.stock { color: $stock-color; }
+          &.committed { color: darken($committed-color, 15%); }
+          &.available { color: $available-color; }
+        }
+      }
+    }
+
+    .product-actions {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+    }
+
+    .btn-expand {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      padding: $spacing-sm $spacing-md;
+      background: $primary-light;
+      color: $primary-color;
+      border: 1px solid $primary-color;
+      border-radius: $border-radius-md;
+      font-size: $font-size-small;
+      font-weight: $font-weight-medium;
+      cursor: pointer;
+      transition: $transition-all;
+      white-space: nowrap;
+
+      .expand-icon { font-size: 14px; transition: transform $transition-base; }
+
+      &:hover { background: $primary-color; color: #fff; }
+    }
+  }
+
+  &.expanded { .btn-expand .expand-icon { transform: rotate(180deg); } }
+}
+
+/* ========================================
+   DETALLES DEL PRODUCTO - TABLA
+   ======================================== */
+
+.o_inventory_product_details {
+  border-top: 2px solid $divider-color;
+  background: $background-secondary;
+  padding: 0;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  max-height: 600px;
+}
+
+.o_inventory_details_table {
+  width: 100%;
+  background: $background-primary;
+  border-collapse: collapse;
+  font-size: $font-size-small;
+
+  thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: $background-secondary;
+    border-bottom: 2px solid $border-color-dark;
+
+    th {
+      padding: $spacing-md;
+      text-align: left;
+      font-weight: $font-weight-semibold;
+      color: #333;
+      font-size: $font-size-small;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      border-bottom: 2px solid $border-color-dark;
+
+      &:first-child { padding-left: $spacing-xl; }
+      &:last-child  { padding-right: $spacing-xl; }
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid $border-color;
+      transition: background-color $transition-fast;
+
+      &:hover { background: $background-hover; }
+      &:last-child { border-bottom: none; }
+    }
+
+    td {
+      padding: $spacing-md;
+      vertical-align: middle;
+      color: #333;
+
+      &:first-child { padding-left: $spacing-xl; }
+      &:last-child  { padding-right: $spacing-xl; }
+    }
+  }
+
+  /* Helper para marcar celdas en negritas desde el DOM si se usa */
+  .cell-strong { font-weight: $font-weight-semibold; }
+
+  /* Columnas específicas */
+  .col-lot {
+    min-width: 120px;   /* antes 150px */
+    max-width: 160px;
+    font-family: $font-family-monospace;
+    color: #333;
+    font-weight: $font-weight-semibold; /* negritas */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    span {
+      display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      vertical-align: bottom;
+    }
+  }
+
+  .col-bloque {
+    min-width: 120px;
+    text-align: center;
+    font-family: $font-family-monospace;
+    font-weight: $font-weight-semibold; /* negritas */
+    color: #333;
+  }
+
+  .col-location {
+    min-width: 180px;
+    font-weight: $font-weight-semibold; /* negritas */
+    color: #333;
+
+    .location-icon { color: $primary-color; margin-right: $spacing-xs; }
+  }
+
+  .col-dimensions {
+    min-width: 200px;
+    font-weight: $font-weight-semibold; /* negritas */
+    color: #333;
+    
+    .dimensions-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .dimensions-measures { font-size: $font-size-small; }
+
+    .dimensions-total {
+      font-weight: $font-weight-bold;
+      color: $primary-color;
+
+      .m2-value { font-size: $font-size-base; }
+    }
+  }
+
+  /* Columnas de iconos (súper compactas) — mantienen ancho p/ “E” */
+  .col-icon {
+    width: 50px;
+    min-width: 50px;
+    max-width: 50px;
+    text-align: center;
+    padding: $spacing-sm !important;
+  }
+
+  .icon-btn {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: $border-radius-sm;
+    cursor: pointer;
+    transition: $transition-all;
+    background: transparent;
+    font-size: 16px;
+
+    &.no-content {
+      color: $icon-gray;
+      background: transparent;
+      cursor: default;
+      opacity: 0.5;
+      &:hover { background: transparent; }
+    }
+
+    &.has-content {
+      color: $primary-color;
+      background: rgba($primary-color, 0.1);
+      &:hover { background: $primary-color; color: #fff; transform: scale(1.1); }
+    }
+
+    &.has-alert {
+      color: $icon-red;
+      background: rgba($icon-red, 0.1);
+      &:hover { background: $icon-red; color: #fff; transform: scale(1.1); }
+    }
+  }
+
+  /* Estado específico */
+  .col-state {
+    .state-cell {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .state-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: $border-radius-sm;
+      font-weight: $font-weight-semibold;
+      font-size: 14px;
+
+      &.hold-icon {
+        color: $committed-color;
+        background: rgba($committed-color, 0.1);
+        i { font-size: 18px; }
+      }
+
+      &.so-icon {
+        color: $success-color;
+        background: rgba($success-color, 0.1);
+        font-size: 11px; /* “SO” cabe sin desbordar */
+      }
+    }
+  }
+}
+
+/* Loading dentro de tabla */
+.table-loading {
+  padding: $spacing-xl;
+  text-align: center;
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid $primary-light;
+    border-top-color: $primary-color;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto $spacing-md;
+  }
+
+  .loading-text { color: #666; font-size: $font-size-base; }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ========================================
+   LOADING Y MENSAJES
+   ======================================== */
+
+.o_inventory_loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid $primary-light;
+    border-top-color: $primary-color;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  .loading-text { color: #666; font-size: $font-size-base; font-weight: $font-weight-medium; }
+}
+
+.o_inventory_error {
+  background: rgba($danger-color, 0.1);
+  border: 1px solid $danger-color;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  margin: $spacing-lg;
+  text-align: center;
+
+  .error-icon { font-size: 48px; color: $danger-color; margin-bottom: $spacing-md; }
+  .error-message { color: $danger-color; font-weight: $font-weight-medium; }
+}
+
+.o_inventory_no_results {
+  text-align: center;
+  padding: $spacing-xxl;
+
+  .no-results-icon { font-size: 64px; color: #ddd; margin-bottom: $spacing-md; }
+  .no-results-title { font-size: $font-size-large; font-weight: $font-weight-semibold; color: #666; margin-bottom: $spacing-sm; }
+  .no-results-message { color: #999; }
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: $breakpoint-lg) {
+  .o_inventory_visual_searchbar {
+    padding: $spacing-md;
+    .searchbar-inner { flex-wrap: wrap; }
+    .searchbar-label { min-width: auto; }
+    .searchbar-input-wrapper { max-width: 100%; flex: 1 1 100%; }
+  }
+
+  .o_inventory_product_card .product-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-md;
+
+    .product-info { width: 100%; }
+    .product-metrics-grid { grid-template-columns: 1fr; gap: $spacing-md; }
+
+    .metrics-column {
+      border-right: none !important;
+      border-bottom: 1px solid $divider-color;
+      padding-right: 0;
+      padding-bottom: $spacing-md;
+
+      &:last-child { border-bottom: none; }
+    }
+
+    .product-actions {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .o_inventory_visual_content { padding: $spacing-md; }
+
+  .o_inventory_details_table {
+    display: block;
+    overflow-x: auto;
+
+    thead, tbody, tr, th, td { display: block; }
+    thead { display: none; }
+
+    tbody tr {
+      margin-bottom: $spacing-md;
+      border: 1px solid $border-color;
+      border-radius: $border-radius-md;
+      padding: $spacing-md;
+    }
+
+    tbody td {
+      padding: $spacing-xs 0;
+      &::before {
+        content: attr(data-label);
+        font-weight: $font-weight-semibold;
+        display: inline-block;
+        width: 150px;
+        margin-right: $spacing-sm;
+      }
+    }
+  }
+}
+
+/* ========================================
+   SCROLLBAR PERSONALIZADO
+   ======================================== */
+
+.o_inventory_visual_content,
+.o_inventory_product_details,
+.table-wrapper {
+  scrollbar-width: thin;
+  scrollbar-color: $border-color-dark $background-secondary;
+
+  &::-webkit-scrollbar { width: 10px; height: 10px; }
+  &::-webkit-scrollbar-track { background: $background-secondary; }
+  &::-webkit-scrollbar-thumb {
+    background: $border-color-dark;
+    border-radius: $border-radius-pill;
+    &:hover { background: #999; }
+  }
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Menú principal en Inventario - Primera posición -->
+    <menuitem 
+        id="menu_inventory_visual_main"
+        name="Gestión Integral"
+        parent="stock.menu_stock_root"
+        action="action_inventory_visual_main"
+        sequence="-10"/>
+</odoo>
