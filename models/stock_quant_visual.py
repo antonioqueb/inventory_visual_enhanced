@@ -153,6 +153,7 @@ class StockQuantVisual(models.Model):
             # Obtener dimensiones
             grosor = getattr(quant, 'x_grosor', None) or ''
             alto = getattr(quant, 'x_alto', None) or ''
+            atado = getattr(quant, 'x_atado', None) or ''
             ancho = getattr(quant, 'x_ancho', None) or ''
             
             # Obtener bloque y formato
@@ -263,6 +264,7 @@ class StockQuantVisual(models.Model):
                 
                 # Información adicional
                 'bloque': bloque,
+                'atado': atado,
                 'formato': formato,
                 
                 # Estados

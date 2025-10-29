@@ -209,25 +209,28 @@
                             <!-- 2. Bloque -->
                             <th class="col-bloque"><strong>Bloque</strong></th>
                             
-                            <!-- 3. Ubicación -->
+                            <!-- 3. Atado -->
+                            <th class="col-atado"><strong>Atado</strong></th>
+                            
+                            <!-- 4. Ubicación -->
                             <th class="col-location"><strong>Ubicación</strong></th>
                             
-                            <!-- 4. Dimensiones -->
+                            <!-- 5. Dimensiones -->
                             <th class="col-dimensions"><strong>Dimensiones</strong></th>
                             
-                            <!-- 5. P (Pick/Foto) -->
+                            <!-- 6. P (Pick/Foto) -->
                             <th class="col-icon"><strong>P</strong></th>
                             
-                            <!-- 6. N (Notas) -->
+                            <!-- 7. N (Notas) -->
                             <th class="col-icon"><strong>N</strong></th>
                             
-                            <!-- 7. D (Detalles) -->
+                            <!-- 8. D (Detalles) -->
                             <th class="col-icon"><strong>D</strong></th>
                             
-                            <!-- 8. SP (Sales Person) -->
+                            <!-- 9. SP (Sales Person) -->
                             <th class="col-icon"><strong>SP</strong></th>
                             
-                            <!-- 9. Estado (Hold/SO) -> E -->
+                            <!-- 10. Estado (Hold/SO) -> E -->
                             <th class="col-icon" title="Estado"><strong>E</strong></th>
                         </tr>
                     </thead>
@@ -254,13 +257,23 @@
                                     </t>
                                 </td>
 
-                                <!-- 3. Ubicación -->
+                                <!-- 3. Atado -->
+                                <td class="col-atado cell-strong" data-label="Atado">
+                                    <t t-if="detail.atado">
+                                        <strong t-esc="detail.atado"/>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="text-muted">-</span>
+                                    </t>
+                                </td>
+
+                                <!-- 4. Ubicación -->
                                 <td class="col-location cell-strong" data-label="Ubicación">
                                     <i class="fa fa-map-marker location-icon"></i>
                                     <strong t-esc="detail.location_name"/>
                                 </td>
 
-                                <!-- 4. Dimensiones (medidas + m²) -->
+                                <!-- 5. Dimensiones (medidas + m²) -->
                                 <td class="col-dimensions cell-strong" data-label="Dimensiones">
                                     <div class="dimensions-cell">
                                         <div class="dimensions-measures">
@@ -283,7 +296,7 @@
                                     </div>
                                 </td>
 
-                                <!-- 5. P (Pick/Foto) -->
+                                <!-- 6. P (Pick/Foto) -->
                                 <td class="col-icon col-photo" data-label="Foto">
                                     <button 
                                         class="icon-btn"
@@ -296,7 +309,7 @@
                                     </button>
                                 </td>
 
-                                <!-- 6. N (Notas) -->
+                                <!-- 7. N (Notas) -->
                                 <td class="col-icon col-notes" data-label="Notas">
                                     <button 
                                         class="icon-btn"
@@ -309,7 +322,7 @@
                                     </button>
                                 </td>
 
-                                <!-- 7. D (Detalles) -->
+                                <!-- 8. D (Detalles) -->
                                 <td class="col-icon col-details" data-label="Detalles">
                                     <button 
                                         class="icon-btn has-content"
@@ -321,7 +334,7 @@
                                     </button>
                                 </td>
 
-                                <!-- 8. SP (Sales Person) -->
+                                <!-- 9. SP (Sales Person) -->
                                 <td class="col-icon col-salesperson" data-label="Cliente/Vendedor">
                                     <button 
                                         class="icon-btn"
@@ -334,7 +347,7 @@
                                     </button>
                                 </td>
 
-                                <!-- 9. Estado (Hold/SO) - ACTUALIZADO CON HOLD CLICKEABLE -->
+                                <!-- 10. Estado (Hold/SO) - ACTUALIZADO CON HOLD CLICKEABLE -->
                                 <td class="col-icon col-state" data-label="E">
                                     <div class="state-cell">
                                         <!-- Apartado/Hold - CLICKEABLE si tiene hold -->
