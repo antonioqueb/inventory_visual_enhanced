@@ -816,3 +816,131 @@ class StockQuantVisual(models.Model):
         except Exception as e:
             _logger.error(f"ERROR in get_lot_history: {str(e)}", exc_info=True)
             return {'error': f'Error interno: {str(e)}'}
+
+    @api.model
+    def create_lot_hold(self, quant_id=None, partner_id=None, notas=''):
+        """
+        Crea un hold/apartado para un lote desde la vista visual.
+        
+        Args:
+            quant_id: ID del quant
+            partner_id: ID del cliente/partner
+            notas: Notas adicionales
+            
+        Returns:
+            dict: Resultado de la operación
+        """
+        _logger.info(f"=== create_lot_hold called ===")
+        _logger.info(f"quant_id: {quant_id}, partner_id: {partner_id}")
+        
+        # Normalizar quant_id
+        if isinstance(quant_id, list):
+            quant_id = quant_id[0] if quant_id else False
+        
+        if not quant_id:
+            _logger.warning("quant_id is empty or False")
+            return {'error': 'ID de quant inválido'}
+        
+        if not partner_id:
+            _logger.warning("partner_id is empty or False")
+            return {'error': 'Debe seleccionar un cliente'}
+        
+        try:
+            quant = self.browse(quant_id)
+            _logger.info(f"Browsed quant: {quant}, exists: {quant.exists()}")
+            
+            if not quant.exists():
+                _logger.warning(f"Quant {quant_id} does not exist")
+                return {'error': 'Quant no encontrado'}
+            
+            if not quant.lot_id:
+                _logger.warning(f"Quant {quant_id} does not have a lot assigned")
+                return {'error': 'Este quant no tiene un lote asignado'}
+            
+            # Verificar si ya existe un hold activo
+            hold_existente = self.env['stock.lot.hold'].search([
+                ('quant_id', '=', quant.id),
+                ('estado', '=', 'activo')
+            ], limit=1)
+            
+            if hold_existente:
+                return {
+                    'error': f'Este lote ya tiene una reserva activa para {hold_existente.partner_id.name}'
+                }
+            
+            # Crear el hold
+            hold = self.env['stock.lot.hold'].create({
+                'lot_id': quant.lot_id.id,
+                'quant_id': quant.id,
+                'partner_id': partner_id,
+                'notas': notas or '',
+            })
+            
+            _logger.info(f"Hold created successfully with id: {hold.id}")
+            
+            return {
+                'success': True,
+                'hold_id': hold.id,
+                'message': f'Lote {quant.lot_id.name} apartado para {hold.partner_id.name} hasta {hold.fecha_expiracion.strftime("%d/%m/%Y")}'
+            }
+            
+        except Exception as e:
+            _logger.error(f"ERROR in create_lot_hold: {str(e)}", exc_info=True)
+            return {'error': f'Error al crear apartado: {str(e)}'}
+
+    @api.model
+    def search_partners(self, name=''):
+        """
+        Busca clientes/partners para el selector de apartados.
+        
+        Args:
+            name: Término de búsqueda
+            
+        Returns:
+            list: Lista de partners encontrados
+        """
+        _logger.info(f"=== search_partners called with name: '{name}' ===")
+        
+        if not name or name.strip() == '':
+            domain = [
+                ('active', '=', True),
+                '|', '|',
+                ('customer_rank', '>', 0),
+                ('supplier_rank', '>', 0),
+                ('is_company', '=', True)
+            ]
+        else:
+            search_term = name.strip()
+            domain = [
+                ('active', '=', True),
+                '|', '|', '|', '|',
+                ('name', 'ilike', search_term),
+                ('ref', 'ilike', search_term),
+                ('vat', 'ilike', search_term),
+                ('email', 'ilike', search_term),
+                ('phone', 'ilike', search_term)
+            ]
+        
+        partners = self.env['res.partner'].search(domain, limit=50, order='name')
+        _logger.info(f"Found {len(partners)} partners in database")
+        
+        result = []
+        for partner in partners:
+            display_parts = [partner.name]
+            if partner.ref:
+                display_parts.append(f"[{partner.ref}]")
+            if partner.vat:
+                display_parts.append(f"RFC: {partner.vat}")
+            
+            display_name = ' '.join(display_parts)
+            
+            result.append({
+                'id': partner.id,
+                'name': partner.name,
+                'ref': partner.ref or '',
+                'vat': partner.vat or '',
+                'display_name': display_name
+            })
+        
+        _logger.info(f"Returning {len(result)} partners")
+        return result

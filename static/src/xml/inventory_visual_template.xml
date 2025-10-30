@@ -7,38 +7,37 @@
             
             <!-- Barra de búsqueda superior (sticky) -->
             <div class="o_inventory_visual_searchbar flex-shrink-0 sticky-top">
-            <div class="searchbar-inner container d-flex align-items-center justify-content-between gap-2">
-
-                <!-- Wrapper centrado con Bootstrap -->
-                <div class="searchbar-input-wrapper mx-auto col-12 col-md-8 col-lg-6 px-0 position-relative">
-                <i class="fa fa-search search-icon"></i>
-                <input 
-                    type="text"
-                    class="form-control"
-                    placeholder="Buscar por producto, código o familia (ej: Tajmahal)..."
-                    t-model="state.searchTerm"
-                    t-on-input="onSearchInput"
-                    t-att-disabled="state.isLoading"
-                />
-                <button 
-                    class="clear-search btn btn-link p-0"
-                    t-att-class="{ visible: state.searchTerm.length > 0 }"
-                    t-on-click="clearSearch"
-                >
-                    <i class="fa fa-times"></i>
-                </button>
-                </div>
-
-                <!-- Métrica a la derecha -->
-                <div class="searchbar-info text-nowrap ms-auto" t-if="state.hasSearched">
-                <span class="count" t-esc="state.totalProducts"></span>
-                <span t-if="state.totalProducts === 1"> producto</span>
-                <span t-else=""> productos</span>
+                <div class="searchbar-inner container d-flex align-items-center justify-content-between gap-2">
+                    
+                    <!-- Wrapper centrado con Bootstrap -->
+                    <div class="searchbar-input-wrapper mx-auto col-12 col-md-8 col-lg-6 px-0 position-relative">
+                        <i class="fa fa-search search-icon"></i>
+                        <input 
+                            type="text"
+                            class="form-control"
+                            placeholder="Buscar por producto, código o familia (ej: Tajmahal)..."
+                            t-model="state.searchTerm"
+                            t-on-input="onSearchInput"
+                            t-att-disabled="state.isLoading"
+                        />
+                        <button 
+                            class="clear-search btn btn-link p-0"
+                            t-att-class="{ visible: state.searchTerm.length > 0 }"
+                            t-on-click="clearSearch"
+                        >
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Métrica a la derecha -->
+                    <div class="searchbar-info text-nowrap ms-auto" t-if="state.hasSearched">
+                        <span class="count" t-esc="state.totalProducts"></span>
+                        <span t-if="state.totalProducts === 1"> producto</span>
+                        <span t-else=""> productos</span>
+                    </div>
                 </div>
             </div>
-            </div>
-
-
+            
             <!-- Contenido principal con scroll -->
             <div class="o_inventory_visual_content flex-grow-1 overflow-auto">
                 
@@ -51,19 +50,19 @@
                         para ver el inventario agrupado con métricas detalladas.
                     </p>
                 </div>
-
+                
                 <!-- Loading -->
                 <div class="o_inventory_loading" t-if="state.isLoading">
                     <div class="spinner"></div>
                     <div class="loading-text">Cargando inventario...</div>
                 </div>
-
+                
                 <!-- Error -->
                 <div class="o_inventory_error" t-if="state.error">
                     <i class="fa fa-exclamation-triangle error-icon"></i>
                     <div class="error-message" t-esc="state.error"></div>
                 </div>
-
+                
                 <!-- Sin resultados -->
                 <div class="o_inventory_no_results" t-if="state.hasSearched and state.products.length === 0 and !state.isLoading">
                     <i class="fa fa-inbox no-results-icon"></i>
@@ -72,7 +71,7 @@
                         Intenta con otro término de búsqueda o verifica el inventario disponible.
                     </p>
                 </div>
-
+                
                 <!-- Lista de productos -->
                 <div class="o_inventory_products_list" t-if="state.products.length > 0 and !state.isLoading">
                     <t t-foreach="state.products" t-as="product" t-key="product.product_id">
@@ -81,13 +80,11 @@
                         </t>
                     </t>
                 </div>
-
             </div>
-
         </div>
     </t>
-
-    <!-- Template de tarjeta de producto (SIN CAMBIOS) -->
+    
+    <!-- Template de tarjeta de producto -->
     <t t-name="inventory_visual_enhanced.ProductCard" owl="1">
         <div 
             class="o_inventory_product_card"
@@ -122,43 +119,37 @@
                             </span>
                         </div>
                     </div>
-
+                    
                     <!-- Métricas organizadas en columnas -->
                     <div class="product-metrics-grid">
                         <!-- Primera columna: Placas -->
                         <div class="metrics-column metrics-placas">
                             <div class="column-header">Piezas</div>
-                            
                             <div class="metric-row">
                                 <span class="metric-label">Stock:</span>
                                 <span class="metric-value" t-esc="product.stock_plates || 0"></span>
                             </div>
-                            
                             <div class="metric-row">
                                 <span class="metric-label">Apartadas:</span>
                                 <span class="metric-value" t-esc="product.committed_plates || 0"></span>
                             </div>
-                            
                             <div class="metric-row metric-available">
                                 <span class="metric-label">Disponibles:</span>
                                 <span class="metric-value" t-esc="product.available_plates || 0"></span>
                             </div>
                         </div>
-
+                        
                         <!-- Segunda columna: Metros -->
                         <div class="metrics-column metrics-metros">
                             <div class="column-header">Metros (m²)</div>
-                            
                             <div class="metric-row">
                                 <span class="metric-label">Stock:</span>
                                 <span class="metric-value" t-esc="formatNumber(product.stock_qty)"></span>
                             </div>
-                            
                             <div class="metric-row">
                                 <span class="metric-label">Apartados:</span>
                                 <span class="metric-value" t-esc="formatNumber(product.committed_qty)"></span>
                             </div>
-                            
                             <div class="metric-row metric-available">
                                 <span class="metric-label">Disponibles:</span>
                                 <span class="metric-value" t-esc="formatNumber(product.available_qty)"></span>
@@ -166,7 +157,7 @@
                         </div>
                     </div>
                 </div>
-
+                
                 <!-- Botón expandir/colapsar -->
                 <div class="product-actions">
                     <button 
@@ -180,7 +171,7 @@
                     </button>
                 </div>
             </div>
-
+            
             <!-- Detalles expandibles del producto -->
             <t t-if="isProductExpanded(product.product_id)">
                 <t t-call="inventory_visual_enhanced.ProductDetails">
@@ -189,7 +180,7 @@
             </t>
         </div>
     </t>
-
+    
     <!-- Template de detalles del producto (tabla) -->
     <t t-name="inventory_visual_enhanced.ProductDetails" owl="1">
         <t t-if="!details || details.length === 0">
@@ -205,31 +196,22 @@
                         <tr>
                             <!-- 1. Lote -->
                             <th class="col-lot"><strong>Lote</strong></th>
-                            
                             <!-- 2. Bloque -->
                             <th class="col-bloque"><strong>Bloque</strong></th>
-                            
                             <!-- 3. Atado -->
                             <th class="col-atado"><strong>Atado</strong></th>
-                            
                             <!-- 4. Ubicación -->
                             <th class="col-location"><strong>Ubicación</strong></th>
-                            
                             <!-- 5. Dimensiones -->
                             <th class="col-dimensions"><strong>Dimensiones</strong></th>
-                            
                             <!-- 6. P (Pick/Foto) -->
                             <th class="col-icon"><strong>P</strong></th>
-                            
                             <!-- 7. N (Notas) -->
                             <th class="col-icon"><strong>N</strong></th>
-                            
                             <!-- 8. D (Detalles) -->
                             <th class="col-icon"><strong>D</strong></th>
-                            
                             <!-- 9. SP (Sales Person) -->
                             <th class="col-icon"><strong>SP</strong></th>
-                            
                             <!-- 10. Estado (Hold/SO) -> E -->
                             <th class="col-icon" title="Estado"><strong>E</strong></th>
                         </tr>
@@ -246,7 +228,7 @@
                                         <span class="text-muted">-</span>
                                     </t>
                                 </td>
-
+                                
                                 <!-- 2. Bloque -->
                                 <td class="col-bloque cell-strong" data-label="Bloque">
                                     <t t-if="detail.bloque">
@@ -256,7 +238,7 @@
                                         <span class="text-muted">-</span>
                                     </t>
                                 </td>
-
+                                
                                 <!-- 3. Atado -->
                                 <td class="col-atado cell-strong" data-label="Atado">
                                     <t t-if="detail.atado">
@@ -266,13 +248,13 @@
                                         <span class="text-muted">-</span>
                                     </t>
                                 </td>
-
+                                
                                 <!-- 4. Ubicación -->
                                 <td class="col-location cell-strong" data-label="Ubicación">
                                     <i class="fa fa-map-marker location-icon"></i>
                                     <strong t-esc="detail.location_name"/>
                                 </td>
-
+                                
                                 <!-- 5. Dimensiones (medidas + m²) -->
                                 <td class="col-dimensions cell-strong" data-label="Dimensiones">
                                     <div class="dimensions-cell">
@@ -295,7 +277,7 @@
                                         </div>
                                     </div>
                                 </td>
-
+                                
                                 <!-- 6. P (Pick/Foto) -->
                                 <td class="col-icon col-photo" data-label="Foto">
                                     <button 
@@ -308,7 +290,7 @@
                                         <i class="fa fa-camera"></i>
                                     </button>
                                 </td>
-
+                                
                                 <!-- 7. N (Notas) -->
                                 <td class="col-icon col-notes" data-label="Notas">
                                     <button 
@@ -321,7 +303,7 @@
                                         <i class="fa fa-info-circle"></i>
                                     </button>
                                 </td>
-
+                                
                                 <!-- 8. D (Detalles) -->
                                 <td class="col-icon col-details" data-label="Detalles">
                                     <button 
@@ -333,7 +315,7 @@
                                         <i class="fa fa-list-alt"></i>
                                     </button>
                                 </td>
-
+                                
                                 <!-- 9. SP (Sales Person) -->
                                 <td class="col-icon col-salesperson" data-label="Cliente/Vendedor">
                                     <button 
@@ -346,21 +328,19 @@
                                         <i class="fa fa-user"></i>
                                     </button>
                                 </td>
-
-                                <!-- 10. Estado (Hold/SO) - ACTUALIZADO CON HOLD CLICKEABLE -->
+                                
+                                <!-- 10. Estado (Hold/SO) - SIEMPRE CLICKEABLE -->
                                 <td class="col-icon col-state" data-label="E">
                                     <div class="state-cell">
-                                        <!-- Apartado/Hold - CLICKEABLE si tiene hold -->
-                                        <t t-if="detail.tiene_hold">
-                                            <button 
-                                                class="icon-btn state-icon hold-icon"
-                                                t-on-click="() => this.onHoldClick(detail.id, detail.hold_info)"
-                                                type="button"
-                                                title="Ver detalles de reserva"
-                                            >
-                                                <i class="fa fa-hand-paper-o"></i>
-                                            </button>
-                                        </t>
+                                        <!-- BOTÓN APARTADO - Siempre visible, cambia según estado -->
+                                        <button 
+                                            class="icon-btn state-icon hold-icon"
+                                            t-att-class="detail.tiene_hold ? 'has-alert' : 'has-content'"
+                                            t-on-click="() => this.onHoldClick(detail.id, detail.hold_info)"
+                                            type="button"
+                                        >
+                                            <i class="fa fa-hand-paper-o"></i>
+                                        </button>
                                         
                                         <!-- Sales Order -->
                                         <span 
@@ -379,5 +359,5 @@
             </div>
         </t>
     </t>
-
+    
 </templates>

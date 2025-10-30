@@ -882,50 +882,35 @@ $breakpoint-lg: 1200px !default;
     }
 
     &.has-content {
-      color: $primary-color;
+      // Color destacado permanente (como el hover anterior)
       background: linear-gradient(135deg, 
-        rgba($primary-color, 0.12) 0%, 
-        rgba($primary-color, 0.08) 100%);
-      border: 1px solid rgba($primary-color, 0.2);
+        $primary-color 0%, 
+        $primary-dark 100%);
+      color: #fff;
+      border: 1px solid $primary-dark;
+      box-shadow: $shadow-xs;
       
       &:hover {
-        background: linear-gradient(135deg, 
-          $primary-color 0%, 
-          $primary-dark 100%);
-        color: #fff;
-        border-color: $primary-dark;
-        transform: scale(1.1);
-        box-shadow: $shadow-sm;
+        transform: scale(1.15);
+        box-shadow: $shadow-md;
+        filter: brightness(1.1);
       }
     }
 
     &.has-alert {
-      color: $icon-alert;
+      // Color de alerta permanente (como el hover anterior)
       background: linear-gradient(135deg, 
-        rgba($icon-alert, 0.12) 0%, 
-        rgba($icon-alert, 0.08) 100%);
-      border: 1px solid rgba($icon-alert, 0.2);
-      animation: pulse 2s ease-in-out infinite;
+        $icon-alert 0%, 
+        darken($icon-alert, 10%) 100%);
+      color: #fff;
+      border: 1px solid darken($icon-alert, 10%);
+      box-shadow: $shadow-xs;
       
       &:hover {
-        background: linear-gradient(135deg, 
-          $icon-alert 0%, 
-          darken($icon-alert, 10%) 100%);
-        color: #fff;
-        border-color: darken($icon-alert, 10%);
-        transform: scale(1.1);
-        box-shadow: $shadow-sm;
-        animation: none;
+        transform: scale(1.15);
+        box-shadow: $shadow-md;
+        filter: brightness(1.1);
       }
-    }
-  }
-
-  @keyframes pulse {
-    0%, 100% {
-      box-shadow: 0 0 0 0 rgba($marble-terracotta-rgba, 0.4);
-    }
-    50% {
-      box-shadow: 0 0 0 4px rgba($marble-terracotta-rgba, 0);
     }
   }
 
@@ -951,11 +936,13 @@ $breakpoint-lg: 1200px !default;
       transition: $transition-all;
 
       &.hold-icon {
-        color: $committed-color;
+        // Color destacado permanente para hold con información
         background: linear-gradient(135deg, 
-          rgba($committed-color, 0.12) 0%, 
-          rgba($committed-color, 0.08) 100%);
-        border-color: rgba($committed-color, 0.2);
+          $committed-color 0%, 
+          darken($committed-color, 10%) 100%);
+        color: #fff;
+        border: 1px solid darken($committed-color, 10%);
+        box-shadow: $shadow-xs;
         cursor: pointer;
         
         i { 
@@ -964,13 +951,29 @@ $breakpoint-lg: 1200px !default;
         }
         
         &:hover { 
+          transform: scale(1.15);
+          box-shadow: $shadow-md;
+          filter: brightness(1.1);
+        }
+
+        // Cuando NO tiene hold (has-content), mantener estilo más sutil pero clickeable
+        &.has-content {
           background: linear-gradient(135deg, 
-            $committed-color 0%, 
-            darken($committed-color, 10%) 100%);
-          color: #fff;
-          border-color: darken($committed-color, 10%);
-          transform: scale(1.1);
-          box-shadow: $shadow-sm;
+            rgba($committed-color, 0.12) 0%, 
+            rgba($committed-color, 0.08) 100%);
+          color: $committed-color;
+          border-color: rgba($committed-color, 0.2);
+          box-shadow: none;
+          
+          &:hover {
+            background: linear-gradient(135deg, 
+              $committed-color 0%, 
+              darken($committed-color, 10%) 100%);
+            color: #fff;
+            border-color: darken($committed-color, 10%);
+            transform: scale(1.15);
+            box-shadow: $shadow-md;
+          }
         }
       }
 

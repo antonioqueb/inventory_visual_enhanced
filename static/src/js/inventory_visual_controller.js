@@ -554,17 +554,20 @@ class InventoryVisualController extends Component {
         );
     }
 
-    onHoldClick(detailId, holdInfo) {
-        console.log('Ver detalles de hold:', detailId, holdInfo);
+    // ========================================
+    // FUNCIONALIDAD DE HOLDS/APARTADOS
+    // ========================================
+
+    async onHoldClick(detailId, holdInfo) {
+        console.log('Hold click:', detailId, holdInfo);
         
+        // Si NO tiene hold, abrir diálogo para crear
         if (!holdInfo || !holdInfo.id) {
-            this.notification.add(
-                "No hay información de hold disponible",
-                { type: "info" }
-            );
+            await this.openCreateHoldDialog(detailId);
             return;
         }
 
+        // Si SÍ tiene hold, mostrar información (comportamiento actual)
         let message = `Reservado para: ${holdInfo.partner_name}\n`;
         message += `Fecha de inicio: ${holdInfo.fecha_inicio}\n`;
         message += `Fecha de expiración: ${holdInfo.fecha_expiracion}`;
@@ -577,6 +580,144 @@ class InventoryVisualController extends Component {
             title: "Información de Reserva (Hold)",
             sticky: false,
         });
+    }
+
+    async openCreateHoldDialog(detailId) {
+        const self = this;
+        
+        try {
+            // Buscar el detail completo
+            let detailData = null;
+            for (const [productId, details] of Object.entries(this.state.productDetails)) {
+                const detail = details.find(d => d.id === detailId);
+                if (detail) {
+                    detailData = detail;
+                    break;
+                }
+            }
+            
+            if (!detailData) {
+                this.notification.add("No se encontró información del lote", { type: "danger" });
+                return;
+            }
+            
+            class CreateHoldDialog extends Component {
+                setup() {
+                    this.detailData = detailData;
+                    this.detailId = detailId;
+                    this.orm = useService("orm");
+                    this.notification = useService("notification");
+                    
+                    this.state = useState({
+                        searchTerm: '',
+                        partners: [],
+                        selectedPartnerId: null,
+                        selectedPartnerName: '',
+                        notas: '',
+                        isCreating: false,
+                    });
+                    
+                    this.searchTimeout = null;
+                }
+                
+                formatNumber(num) {
+                    if (num === null || num === undefined) return "0";
+                    return new Intl.NumberFormat('es-MX', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                    }).format(num);
+                }
+                
+                onSearchPartner(ev) {
+                    const value = ev.target.value;
+                    this.state.searchTerm = value;
+                    
+                    if (this.searchTimeout) {
+                        clearTimeout(this.searchTimeout);
+                    }
+                    
+                    this.searchTimeout = setTimeout(() => {
+                        this.searchPartners();
+                    }, 300);
+                }
+                
+                async searchPartners() {
+                    try {
+                        const partners = await this.orm.call(
+                            "stock.quant",
+                            "search_partners",
+                            [],
+                            {
+                                name: this.state.searchTerm.trim()
+                            }
+                        );
+                        
+                        this.state.partners = partners;
+                    } catch (error) {
+                        console.error("Error buscando clientes:", error);
+                        this.notification.add("Error al buscar clientes", { type: "danger" });
+                    }
+                }
+                
+                selectPartner(partner) {
+                    this.state.selectedPartnerId = partner.id;
+                    this.state.selectedPartnerName = partner.display_name;
+                }
+                
+                onNotasChange(ev) {
+                    this.state.notas = ev.target.value;
+                }
+                
+                async createHold() {
+                    if (!this.state.selectedPartnerId) {
+                        this.notification.add("Debe seleccionar un cliente", { type: "warning" });
+                        return;
+                    }
+                    
+                    this.state.isCreating = true;
+                    
+                    try {
+                        const result = await this.orm.call(
+                            "stock.quant",
+                            "create_lot_hold",
+                            [],
+                            {
+                                quant_id: this.detailId,
+                                partner_id: this.state.selectedPartnerId,
+                                notas: this.state.notas
+                            }
+                        );
+                        
+                        if (result.error) {
+                            this.notification.add(result.error, { type: "danger" });
+                        } else if (result.success) {
+                            this.notification.add(result.message, { type: "success" });
+                            this.props.close();
+                            
+                            // Recargar detalles del producto
+                            await self.reloadProductDetailsForDetail(this.detailId);
+                        }
+                    } catch (error) {
+                        console.error("Error creando apartado:", error);
+                        this.notification.add("Error al crear apartado", { type: "danger" });
+                    } finally {
+                        this.state.isCreating = false;
+                    }
+                }
+            }
+            
+            CreateHoldDialog.template = "inventory_visual_enhanced.CreateHoldDialog";
+            CreateHoldDialog.components = { Dialog };
+            
+            this.dialog.add(CreateHoldDialog, {
+                title: `Crear Apartado - ${detailData.lot_name}`,
+                size: 'lg',
+            });
+            
+        } catch (error) {
+            console.error("Error abriendo diálogo:", error);
+            this.notification.add("Error al abrir diálogo de apartado", { type: "danger" });
+        }
     }
 }
 
