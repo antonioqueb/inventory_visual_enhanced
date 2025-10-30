@@ -546,3 +546,273 @@ class StockQuantVisual(models.Model):
         
         _logger.info(f"Returning {len(details)} detail records")
         return details
+
+    @api.model
+    def get_lot_history(self, quant_id=None):
+        """
+        Obtiene el historial completo y detallado de un lote.
+        
+        Args:
+            quant_id: ID del quant
+            
+        Returns:
+            dict: Información completa del historial del lote
+        """
+        _logger.info(f"=== get_lot_history called ===")
+        _logger.info(f"quant_id: {quant_id} (type: {type(quant_id)})")
+        
+        # Normalizar quant_id
+        if isinstance(quant_id, list):
+            quant_id = quant_id[0] if quant_id else False
+        
+        if not quant_id:
+            _logger.warning("quant_id is empty or False")
+            return {'error': 'ID de quant inválido'}
+        
+        try:
+            quant = self.browse(quant_id)
+            _logger.info(f"Browsed quant: {quant}, exists: {quant.exists()}")
+            
+            if not quant.exists():
+                _logger.warning(f"Quant {quant_id} does not exist")
+                return {'error': 'Quant no encontrado'}
+            
+            if not quant.lot_id:
+                _logger.warning(f"Quant {quant_id} does not have a lot assigned")
+                return {'error': 'Este quant no tiene un lote asignado'}
+            
+            lot = quant.lot_id
+            
+            # ===== INFORMACIÓN GENERAL =====
+            general_info = {
+                'lot_name': lot.name,
+                'product_name': quant.product_id.name,
+                'product_code': quant.product_id.default_code or '',
+                'fecha_creacion': lot.create_date.strftime('%d/%m/%Y %H:%M') if lot.create_date else '',
+                'estado_actual': 'Disponible',
+                'cantidad_actual': quant.quantity,
+                'cantidad_reservada': quant.reserved_quantity,
+                'cantidad_disponible': quant.quantity - quant.reserved_quantity,
+                'ubicacion_actual': quant.location_id.complete_name,
+            }
+            
+            # Determinar estado
+            if quant.reserved_quantity > 0:
+                general_info['estado_actual'] = 'Reservado'
+            
+            hold_activo = self.env['stock.lot.hold'].search([
+                ('quant_id', '=', quant.id),
+                ('estado', '=', 'activo')
+            ], limit=1)
+            
+            if hold_activo:
+                general_info['estado_actual'] = 'Apartado (Hold)'
+            
+            # ===== INFORMACIÓN DE COMPRA =====
+            purchase_info = []
+            
+            # Buscar movimientos de entrada asociados a este lote
+            incoming_moves = self.env['stock.move.line'].search([
+                ('lot_id', '=', lot.id),
+                ('picking_id.picking_type_id.code', '=', 'incoming')
+            ])
+            
+            # Obtener las órdenes de compra desde los movimientos
+            po_line_ids = set()
+            for move_line in incoming_moves:
+                if move_line.move_id and move_line.move_id.purchase_line_id:
+                    po_line_ids.add(move_line.move_id.purchase_line_id.id)
+            
+            if po_line_ids:
+                purchase_lines = self.env['purchase.order.line'].browse(list(po_line_ids))
+                
+                # Filtrar por estado y ordenar
+                valid_lines = [pl for pl in purchase_lines if pl.order_id and pl.order_id.state in ['purchase', 'done']]
+                valid_lines.sort(key=lambda x: x.order_id.date_order if x.order_id.date_order else fields.Datetime.now(), reverse=True)
+                
+                for po_line in valid_lines[:5]:  # Limitar a 5 registros
+                    purchase_info.append({
+                        'orden_compra': po_line.order_id.name,
+                        'proveedor': po_line.order_id.partner_id.name,
+                        'fecha_orden': po_line.order_id.date_order.strftime('%d/%m/%Y') if po_line.order_id.date_order else '',
+                        'cantidad': po_line.product_qty,
+                        'precio_unitario': po_line.price_unit,
+                        'total': po_line.price_subtotal,
+                        'moneda': po_line.order_id.currency_id.symbol,
+                        'estado': dict(po_line.order_id._fields['state'].selection).get(po_line.order_id.state),
+                    })
+            
+            # ===== HISTORIAL DE MOVIMIENTOS =====
+            movements = []
+            
+            # Buscar todos los movimientos relacionados con este lote
+            stock_moves = self.env['stock.move.line'].search([
+                ('lot_id', '=', lot.id)
+            ], order='date desc', limit=50)
+            
+            for move in stock_moves:
+                movement_type = 'Otro'
+                icon = 'fa-exchange'
+                color = 'secondary'
+                
+                # Determinar tipo de movimiento
+                if move.picking_id:
+                    picking_code = move.picking_id.picking_type_id.code
+                    if picking_code == 'incoming':
+                        movement_type = 'Entrada'
+                        icon = 'fa-arrow-down'
+                        color = 'success'
+                    elif picking_code == 'outgoing':
+                        movement_type = 'Salida'
+                        icon = 'fa-arrow-up'
+                        color = 'danger'
+                    elif picking_code == 'internal':
+                        movement_type = 'Movimiento Interno'
+                        icon = 'fa-exchange'
+                        color = 'info'
+                
+                movements.append({
+                    'fecha': move.date.strftime('%d/%m/%Y %H:%M') if move.date else '',
+                    'tipo': movement_type,
+                    'icon': icon,
+                    'color': color,
+                    'origen': move.location_id.name,
+                    'destino': move.location_dest_id.name,
+                    'cantidad': move.qty_done,
+                    'referencia': move.picking_id.name if move.picking_id else move.reference or '-',
+                    'usuario': move.create_uid.name if move.create_uid else '-',
+                })
+            
+            # ===== ÓRDENES DE VENTA =====
+            sales_orders = []
+            
+            # Buscar movimientos de salida asociados a este lote
+            outgoing_moves = self.env['stock.move.line'].search([
+                ('lot_id', '=', lot.id),
+                ('picking_id.picking_type_id.code', '=', 'outgoing')
+            ])
+            
+            # Obtener las órdenes de venta desde los movimientos
+            so_line_ids = set()
+            for move_line in outgoing_moves:
+                if move_line.move_id and move_line.move_id.sale_line_id:
+                    so_line_ids.add(move_line.move_id.sale_line_id.id)
+            
+            if so_line_ids:
+                sale_lines = self.env['sale.order.line'].browse(list(so_line_ids))
+                
+                # Filtrar por estado y ordenar
+                valid_lines = [sl for sl in sale_lines if sl.order_id and sl.order_id.state in ['sale', 'done']]
+                valid_lines.sort(key=lambda x: x.order_id.date_order if x.order_id.date_order else fields.Datetime.now(), reverse=True)
+                
+                for so_line in valid_lines[:10]:  # Limitar a 10 registros
+                    sales_orders.append({
+                        'orden_venta': so_line.order_id.name,
+                        'cliente': so_line.order_id.partner_id.name,
+                        'vendedor': so_line.order_id.user_id.name if so_line.order_id.user_id else '-',
+                        'fecha_orden': so_line.order_id.date_order.strftime('%d/%m/%Y') if so_line.order_id.date_order else '',
+                        'cantidad': so_line.product_uom_qty,
+                        'precio_unitario': so_line.price_unit,
+                        'total': so_line.price_subtotal,
+                        'moneda': so_line.order_id.currency_id.symbol,
+                        'estado': dict(so_line.order_id._fields['state'].selection).get(so_line.order_id.state),
+                    })
+            
+            # ===== RESERVAS Y APARTADOS =====
+            reservations = []
+            
+            # Buscar todos los holds (activos e históricos)
+            holds = self.env['stock.lot.hold'].search([
+                ('quant_id', '=', quant.id)
+            ], order='fecha_inicio desc')
+            
+            for hold in holds:
+                reservations.append({
+                    'tipo': 'Apartado (Hold)',
+                    'partner': hold.partner_id.name,
+                    'fecha_inicio': hold.fecha_inicio.strftime('%d/%m/%Y %H:%M') if hold.fecha_inicio else '',
+                    'fecha_expiracion': hold.fecha_expiracion.strftime('%d/%m/%Y %H:%M') if hold.fecha_expiracion else '',
+                    'estado': 'Activo' if hold.estado == 'activo' else 'Liberado',
+                    'notas': hold.notas or '',
+                    'color': 'warning' if hold.estado == 'activo' else 'secondary'
+                })
+            
+            # Buscar reservas de stock a través de stock.move.line
+            # En Odoo 18, las reservas se manejan directamente en stock.move.line
+            reserved_move_lines = self.env['stock.move.line'].search([
+                ('product_id', '=', quant.product_id.id),
+                ('lot_id', '=', lot.id),
+                ('state', 'in', ['assigned', 'partially_available']),
+                ('quantity', '>', 0)  # Odoo 18 usa 'quantity' en lugar de 'product_qty'
+            ])
+            
+            for move_line in reserved_move_lines:
+                partner_name = '-'
+                move = move_line.move_id
+                
+                if move:
+                    if move.sale_line_id and move.sale_line_id.order_id:
+                        partner_name = move.sale_line_id.order_id.partner_id.name
+                    elif move.picking_id and move.picking_id.partner_id:
+                        partner_name = move.picking_id.partner_id.name
+                
+                reservations.append({
+                    'tipo': 'Reserva de Stock',
+                    'partner': partner_name,
+                    'fecha_inicio': move_line.date.strftime('%d/%m/%Y %H:%M') if move_line.date else '',
+                    'fecha_expiracion': '-',
+                    'estado': 'Activo',
+                    'notas': move_line.picking_id.name if move_line.picking_id else move_line.reference or '',
+                    'color': 'info'
+                })
+            
+            # ===== ENTREGAS =====
+            deliveries = []
+            
+            # Buscar entregas (outgoing pickings)
+            delivery_moves = self.env['stock.move.line'].search([
+                ('lot_id', '=', lot.id),
+                ('picking_id.picking_type_id.code', '=', 'outgoing')
+            ], order='date desc')
+            
+            for move in delivery_moves:
+                picking = move.picking_id
+                if picking:
+                    deliveries.append({
+                        'referencia': picking.name,
+                        'cliente': picking.partner_id.name if picking.partner_id else '-',
+                        'fecha_programada': picking.scheduled_date.strftime('%d/%m/%Y') if picking.scheduled_date else '',
+                        'fecha_efectiva': picking.date_done.strftime('%d/%m/%Y %H:%M') if picking.date_done else '-',
+                        'cantidad': move.qty_done,
+                        'estado': dict(picking._fields['state'].selection).get(picking.state),
+                        'origen': picking.origin or '-',
+                        'color': 'success' if picking.state == 'done' else 'warning' if picking.state == 'assigned' else 'secondary'
+                    })
+            
+            # ===== ESTADÍSTICAS =====
+            statistics = {
+                'total_movimientos': len(movements),
+                'total_entradas': len([m for m in movements if m['tipo'] == 'Entrada']),
+                'total_salidas': len([m for m in movements if m['tipo'] == 'Salida']),
+                'total_ventas': len(sales_orders),
+                'total_apartados': len(reservations),
+                'total_entregas': len(deliveries),
+                'dias_en_inventario': (fields.Datetime.now() - lot.create_date).days if lot.create_date else 0,
+            }
+            
+            result = {
+                'general_info': general_info,
+                'purchase_info': purchase_info,
+                'movements': movements,
+                'sales_orders': sales_orders,
+                'reservations': reservations,
+                'deliveries': deliveries,
+                'statistics': statistics,
+            }
+            
+            _logger.info(f"Returning history with {len(movements)} movements, {len(sales_orders)} sales, {len(purchase_info)} purchases, {len(reservations)} reservations")
+            return result
+            
+        except Exception as e:
+            _logger.error(f"ERROR in get_lot_history: {str(e)}", exc_info=True)
+            return {'error': f'Error interno: {str(e)}'}

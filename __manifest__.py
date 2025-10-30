@@ -24,6 +24,8 @@
     'depends': [
         'stock',
         'web',
+        'purchase',
+        'sale',
     ],
     'data': [
         'security/ir.model.access.csv',

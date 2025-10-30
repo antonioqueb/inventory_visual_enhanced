@@ -327,4 +327,525 @@
         </Dialog>
     </t>
 
+    <!-- Template para el diálogo de historial detallado -->
+    <t t-name="inventory_visual_enhanced.HistoryDialog" owl="1">
+        <Dialog size="'xl'" contentClass="'h-100'">
+            <div class="o_history_dialog d-flex flex-column h-100">
+                
+                <!-- Header con información general resumida -->
+                <div class="alert alert-primary border-start border-4 border-primary mb-3">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="mb-2 fw-bold">
+                                <i class="fa fa-cube fa-lg text-primary me-2"></i>
+                                <t t-esc="history.general_info.product_name"/>
+                            </h5>
+                            <div class="d-flex gap-3 flex-wrap">
+                                <small class="text-muted">
+                                    <i class="fa fa-barcode me-1"></i>
+                                    Lote: <strong t-esc="history.general_info.lot_name"></strong>
+                                </small>
+                                <small class="text-muted" t-if="history.general_info.product_code">
+                                    <i class="fa fa-tag me-1"></i>
+                                    Código: <strong t-esc="history.general_info.product_code"></strong>
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <div class="mb-2">
+                                <span class="badge bg-success fs-6 px-3 py-2">
+                                    <i class="fa fa-calendar me-1"></i>
+                                    <t t-esc="history.statistics.dias_en_inventario"/> días en inventario
+                                </span>
+                            </div>
+                            <div>
+                                <span class="badge bg-info fs-6 px-3 py-2">
+                                    Estado: <strong t-esc="history.general_info.estado_actual"></strong>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navegación por pestañas -->
+                <ul class="nav nav-tabs mb-3" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button 
+                            class="nav-link"
+                            t-att-class="{ active: isActiveTab('general') }"
+                            t-on-click="() => this.switchTab('general')"
+                            type="button"
+                        >
+                            <i class="fa fa-info-circle me-2"></i>
+                            General
+                            <span class="badge bg-primary ms-2">1</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button 
+                            class="nav-link"
+                            t-att-class="{ active: isActiveTab('purchase') }"
+                            t-on-click="() => this.switchTab('purchase')"
+                            type="button"
+                        >
+                            <i class="fa fa-shopping-cart me-2"></i>
+                            Compras
+                            <span class="badge bg-success ms-2" t-esc="history.purchase_info.length"></span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button 
+                            class="nav-link"
+                            t-att-class="{ active: isActiveTab('movements') }"
+                            t-on-click="() => this.switchTab('movements')"
+                            type="button"
+                        >
+                            <i class="fa fa-exchange me-2"></i>
+                            Movimientos
+                            <span class="badge bg-info ms-2" t-esc="history.statistics.total_movimientos"></span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button 
+                            class="nav-link"
+                            t-att-class="{ active: isActiveTab('sales') }"
+                            t-on-click="() => this.switchTab('sales')"
+                            type="button"
+                        >
+                            <i class="fa fa-usd me-2"></i>
+                            Ventas
+                            <span class="badge bg-warning ms-2" t-esc="history.sales_orders.length"></span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button 
+                            class="nav-link"
+                            t-att-class="{ active: isActiveTab('reservations') }"
+                            t-on-click="() => this.switchTab('reservations')"
+                            type="button"
+                        >
+                            <i class="fa fa-hand-paper-o me-2"></i>
+                            Apartados
+                            <span class="badge bg-danger ms-2" t-esc="history.reservations.length"></span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button 
+                            class="nav-link"
+                            t-att-class="{ active: isActiveTab('deliveries') }"
+                            t-on-click="() => this.switchTab('deliveries')"
+                            type="button"
+                        >
+                            <i class="fa fa-truck me-2"></i>
+                            Entregas
+                            <span class="badge bg-secondary ms-2" t-esc="history.deliveries.length"></span>
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Contenido de las pestañas -->
+                <div class="tab-content flex-grow-1 overflow-auto">
+                    
+                    <!-- PESTAÑA: GENERAL -->
+                    <div t-if="isActiveTab('general')" class="tab-pane fade show active">
+                        <div class="row g-3">
+                            <!-- Información básica -->
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header bg-primary text-white">
+                                        <h6 class="mb-0">
+                                            <i class="fa fa-info-circle me-2"></i>
+                                            Información Básica
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <table class="table table-sm">
+                                            <tr>
+                                                <td class="fw-bold">Fecha de creación:</td>
+                                                <td t-esc="history.general_info.fecha_creacion"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-bold">Estado actual:</td>
+                                                <td>
+                                                    <span class="badge bg-success" t-esc="history.general_info.estado_actual"></span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-bold">Ubicación actual:</td>
+                                                <td t-esc="history.general_info.ubicacion_actual"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-bold">Días en inventario:</td>
+                                                <td t-esc="history.statistics.dias_en_inventario"></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Cantidades -->
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header bg-success text-white">
+                                        <h6 class="mb-0">
+                                            <i class="fa fa-cubes me-2"></i>
+                                            Cantidades (m²)
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <table class="table table-sm">
+                                            <tr>
+                                                <td class="fw-bold">Cantidad actual:</td>
+                                                <td class="text-end">
+                                                    <span class="badge bg-primary fs-6" t-esc="formatNumber(history.general_info.cantidad_actual)"></span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-bold">Cantidad reservada:</td>
+                                                <td class="text-end">
+                                                    <span class="badge bg-warning fs-6" t-esc="formatNumber(history.general_info.cantidad_reservada)"></span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-bold">Cantidad disponible:</td>
+                                                <td class="text-end">
+                                                    <span class="badge bg-success fs-6" t-esc="formatNumber(history.general_info.cantidad_disponible)"></span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Estadísticas -->
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header bg-info text-white">
+                                        <h6 class="mb-0">
+                                            <i class="fa fa-bar-chart me-2"></i>
+                                            Estadísticas Generales
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-3 text-center">
+                                            <div class="col-md-2">
+                                                <div class="p-3 bg-light rounded">
+                                                    <h3 class="text-primary mb-1" t-esc="history.statistics.total_movimientos"></h3>
+                                                    <small class="text-muted">Movimientos</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="p-3 bg-light rounded">
+                                                    <h3 class="text-success mb-1" t-esc="history.statistics.total_entradas"></h3>
+                                                    <small class="text-muted">Entradas</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="p-3 bg-light rounded">
+                                                    <h3 class="text-danger mb-1" t-esc="history.statistics.total_salidas"></h3>
+                                                    <small class="text-muted">Salidas</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="p-3 bg-light rounded">
+                                                    <h3 class="text-warning mb-1" t-esc="history.statistics.total_ventas"></h3>
+                                                    <small class="text-muted">Ventas</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="p-3 bg-light rounded">
+                                                    <h3 class="text-info mb-1" t-esc="history.statistics.total_apartados"></h3>
+                                                    <small class="text-muted">Apartados</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="p-3 bg-light rounded">
+                                                    <h3 class="text-secondary mb-1" t-esc="history.statistics.total_entregas"></h3>
+                                                    <small class="text-muted">Entregas</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PESTAÑA: COMPRAS -->
+                    <div t-if="isActiveTab('purchase')" class="tab-pane fade show active">
+                        <t t-if="history.purchase_info.length === 0">
+                            <div class="text-center py-5">
+                                <i class="fa fa-shopping-cart" style="font-size: 64px; color: #ccc;"></i>
+                                <p class="text-muted mt-3">No hay información de compras para este lote</p>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <t t-foreach="history.purchase_info" t-as="purchase" t-key="purchase_index">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-success text-white">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6 class="mb-0">
+                                                <i class="fa fa-file-text-o me-2"></i>
+                                                <t t-esc="purchase.orden_compra"/>
+                                            </h6>
+                                            <span class="badge bg-light text-dark" t-esc="purchase.estado"></span>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p class="mb-2">
+                                                    <strong>Proveedor:</strong> <t t-esc="purchase.proveedor"/>
+                                                </p>
+                                                <p class="mb-2">
+                                                    <strong>Fecha de orden:</strong> <t t-esc="purchase.fecha_orden"/>
+                                                </p>
+                                            </div>
+                                            <div class="col-md-6 text-end">
+                                                <p class="mb-2">
+                                                    <strong>Cantidad:</strong> <t t-esc="formatNumber(purchase.cantidad)"/> m²
+                                                </p>
+                                                <p class="mb-2">
+                                                    <strong>Precio unitario:</strong> <t t-esc="formatCurrency(purchase.precio_unitario, purchase.moneda)"/>
+                                                </p>
+                                                <p class="mb-0">
+                                                    <strong>Total:</strong> 
+                                                    <span class="fs-5 text-success fw-bold">
+                                                        <t t-esc="formatCurrency(purchase.total, purchase.moneda)"/>
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </t>
+                    </div>
+
+                    <!-- PESTAÑA: MOVIMIENTOS -->
+                    <div t-if="isActiveTab('movements')" class="tab-pane fade show active">
+                        <t t-if="history.movements.length === 0">
+                            <div class="text-center py-5">
+                                <i class="fa fa-exchange" style="font-size: 64px; color: #ccc;"></i>
+                                <p class="text-muted mt-3">No hay movimientos registrados</p>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Tipo</th>
+                                            <th>Origen</th>
+                                            <th>Destino</th>
+                                            <th class="text-end">Cantidad</th>
+                                            <th>Referencia</th>
+                                            <th>Usuario</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="history.movements" t-as="movement" t-key="movement_index">
+                                            <tr>
+                                                <td>
+                                                    <small t-esc="movement.fecha"></small>
+                                                </td>
+                                                <td>
+                                                    <span class="badge" t-att-class="`bg-${movement.color}`">
+                                                        <i class="fa" t-att-class="movement.icon"></i>
+                                                        <t t-esc="movement.tipo"/>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <small t-esc="movement.origen"></small>
+                                                </td>
+                                                <td>
+                                                    <small t-esc="movement.destino"></small>
+                                                </td>
+                                                <td class="text-end">
+                                                    <strong t-esc="formatNumber(movement.cantidad)"></strong>
+                                                </td>
+                                                <td>
+                                                    <small t-esc="movement.referencia"></small>
+                                                </td>
+                                                <td>
+                                                    <small t-esc="movement.usuario"></small>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+                    </div>
+
+                    <!-- PESTAÑA: VENTAS -->
+                    <div t-if="isActiveTab('sales')" class="tab-pane fade show active">
+                        <t t-if="history.sales_orders.length === 0">
+                            <div class="text-center py-5">
+                                <i class="fa fa-usd" style="font-size: 64px; color: #ccc;"></i>
+                                <p class="text-muted mt-3">No hay órdenes de venta para este lote</p>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <t t-foreach="history.sales_orders" t-as="sale" t-key="sale_index">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-warning">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6 class="mb-0">
+                                                <i class="fa fa-file-text-o me-2"></i>
+                                                <t t-esc="sale.orden_venta"/>
+                                            </h6>
+                                            <span class="badge bg-light text-dark" t-esc="sale.estado"></span>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p class="mb-2">
+                                                    <strong>Cliente:</strong> <t t-esc="sale.cliente"/>
+                                                </p>
+                                                <p class="mb-2">
+                                                    <strong>Vendedor:</strong> <t t-esc="sale.vendedor"/>
+                                                </p>
+                                                <p class="mb-2">
+                                                    <strong>Fecha de orden:</strong> <t t-esc="sale.fecha_orden"/>
+                                                </p>
+                                            </div>
+                                            <div class="col-md-6 text-end">
+                                                <p class="mb-2">
+                                                    <strong>Cantidad:</strong> <t t-esc="formatNumber(sale.cantidad)"/> m²
+                                                </p>
+                                                <p class="mb-2">
+                                                    <strong>Precio unitario:</strong> <t t-esc="formatCurrency(sale.precio_unitario, sale.moneda)"/>
+                                                </p>
+                                                <p class="mb-0">
+                                                    <strong>Total:</strong> 
+                                                    <span class="fs-5 text-success fw-bold">
+                                                        <t t-esc="formatCurrency(sale.total, sale.moneda)"/>
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </t>
+                    </div>
+
+                    <!-- PESTAÑA: APARTADOS/RESERVAS -->
+                    <div t-if="isActiveTab('reservations')" class="tab-pane fade show active">
+                        <t t-if="history.reservations.length === 0">
+                            <div class="text-center py-5">
+                                <i class="fa fa-hand-paper-o" style="font-size: 64px; color: #ccc;"></i>
+                                <p class="text-muted mt-3">No hay apartados o reservas</p>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <t t-foreach="history.reservations" t-as="reservation" t-key="reservation_index">
+                                <div class="card mb-3">
+                                    <div class="card-header" t-att-class="`bg-${reservation.color} text-white`">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6 class="mb-0">
+                                                <i class="fa fa-hand-paper-o me-2"></i>
+                                                <t t-esc="reservation.tipo"/>
+                                            </h6>
+                                            <span class="badge bg-light text-dark" t-esc="reservation.estado"></span>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="mb-2">
+                                            <strong>Cliente/Partner:</strong> <t t-esc="reservation.partner"/>
+                                        </p>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p class="mb-2">
+                                                    <strong>Fecha inicio:</strong> <t t-esc="reservation.fecha_inicio"/>
+                                                </p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p class="mb-2">
+                                                    <strong>Fecha expiración:</strong> <t t-esc="reservation.fecha_expiracion"/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <t t-if="reservation.notas">
+                                            <hr/>
+                                            <p class="mb-0">
+                                                <strong>Notas:</strong><br/>
+                                                <t t-esc="reservation.notas"/>
+                                            </p>
+                                        </t>
+                                    </div>
+                                </div>
+                            </t>
+                        </t>
+                    </div>
+
+                    <!-- PESTAÑA: ENTREGAS -->
+                    <div t-if="isActiveTab('deliveries')" class="tab-pane fade show active">
+                        <t t-if="history.deliveries.length === 0">
+                            <div class="text-center py-5">
+                                <i class="fa fa-truck" style="font-size: 64px; color: #ccc;"></i>
+                                <p class="text-muted mt-3">No hay entregas registradas</p>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Referencia</th>
+                                            <th>Cliente</th>
+                                            <th>Fecha Programada</th>
+                                            <th>Fecha Efectiva</th>
+                                            <th class="text-end">Cantidad</th>
+                                            <th>Origen</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="history.deliveries" t-as="delivery" t-key="delivery_index">
+                                            <tr>
+                                                <td>
+                                                    <strong t-esc="delivery.referencia"></strong>
+                                                </td>
+                                                <td>
+                                                    <t t-esc="delivery.cliente"/>
+                                                </td>
+                                                <td>
+                                                    <small t-esc="delivery.fecha_programada"></small>
+                                                </td>
+                                                <td>
+                                                    <small t-esc="delivery.fecha_efectiva"></small>
+                                                </td>
+                                                <td class="text-end">
+                                                    <strong t-esc="formatNumber(delivery.cantidad)"></strong>
+                                                </td>
+                                                <td>
+                                                    <small t-esc="delivery.origen"></small>
+                                                </td>
+                                                <td>
+                                                    <span class="badge" t-att-class="`bg-${delivery.color}`" t-esc="delivery.estado"></span>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+                    </div>
+
+                </div>
+            </div>
+
+            <t t-set-slot="footer">
+                <button class="btn btn-secondary btn-lg" t-on-click="props.close">
+                    <i class="fa fa-times me-2"></i>
+                    Cerrar
+                </button>
+            </t>
+        </Dialog>
+    </t>
+
 </templates>

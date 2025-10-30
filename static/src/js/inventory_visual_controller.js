@@ -476,12 +476,74 @@ class InventoryVisualController extends Component {
         }
     }
 
-    onDetailsClick(detailId) {
-        console.log('Ver detalles completos de lote:', detailId);
-        this.notification.add(
-            "Funcionalidad de historial detallado en desarrollo",
-            { type: "info" }
-        );
+    async onDetailsClick(detailId) {
+        try {
+            const history = await this.orm.call(
+                "stock.quant",
+                "get_lot_history",
+                [],
+                {
+                    quant_id: detailId
+                }
+            );
+            
+            if (history.error) {
+                this.notification.add(history.error, { type: "warning" });
+                return;
+            }
+            
+            this.openHistoryModal(history);
+            
+        } catch (error) {
+            console.error("Error al cargar historial:", error);
+            this.notification.add("Error al cargar historial del lote", { type: "danger" });
+        }
+    }
+
+    openHistoryModal(history) {
+        const self = this;
+        
+        class HistoryDialog extends Component {
+            setup() {
+                this.history = history;
+                this.orm = useService("orm");
+                this.notification = useService("notification");
+                
+                this.state = useState({
+                    currentTab: 'general', // general, purchase, movements, sales, reservations, deliveries
+                });
+            }
+            
+            switchTab(tabName) {
+                this.state.currentTab = tabName;
+            }
+            
+            isActiveTab(tabName) {
+                return this.state.currentTab === tabName;
+            }
+            
+            formatCurrency(amount, symbol) {
+                return `${symbol} ${new Intl.NumberFormat('es-MX', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                }).format(amount)}`;
+            }
+            
+            formatNumber(num) {
+                return new Intl.NumberFormat('es-MX', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                }).format(num);
+            }
+        }
+        
+        HistoryDialog.template = "inventory_visual_enhanced.HistoryDialog";
+        HistoryDialog.components = { Dialog };
+        
+        this.dialog.add(HistoryDialog, {
+            title: `Historial Detallado - ${history.general_info.lot_name}`,
+            size: 'xl',
+        });
     }
 
     onSalesPersonClick(detailId) {
