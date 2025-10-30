@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    
+    <!-- Template para el diálogo de galería de fotos -->
+    <t t-name="inventory_visual_enhanced.PhotoGalleryDialog" owl="1">
+        <Dialog size="'xl'" contentClass="'h-100'">
+            <div class="o_photo_gallery_dialog d-flex flex-column h-100">
+                
+                <!-- SI HAY FOTOS: Mostrar visor grande -->
+                <t t-if="hasPhotos">
+                    <div class="photo-viewer-section flex-grow-1 d-flex flex-column mb-3" style="min-height: 0;">
+                        <div class="position-relative flex-grow-1 d-flex flex-column" style="min-height: 0;">
+                            <!-- Imagen principal grande (ocupa casi toda la pantalla) -->
+                            <div class="text-center bg-dark rounded p-2 flex-grow-1 d-flex align-items-center justify-content-center" style="min-height: 0; overflow: hidden;">
+                                <img 
+                                    t-att-src="`data:image/png;base64,${currentPhoto.image}`"
+                                    class="img-fluid rounded shadow-lg"
+                                    style="max-height: calc(100vh - 350px); max-width: 100%; object-fit: contain; cursor: pointer;"
+                                    t-on-click="() => this.openImageInNewTab(currentPhoto.image)"
+                                    t-att-alt="currentPhoto.name"
+                                    title="Click para ver en tamaño completo"
+                                />
+                            </div>
+                            
+                            <!-- Botones de navegación -->
+                            <t t-if="photosData.photos.length > 1">
+                                <button 
+                                    class="btn btn-light position-absolute top-50 start-0 translate-middle-y ms-3 shadow-lg"
+                                    style="z-index: 10; opacity: 0.9; width: 50px; height: 50px;"
+                                    t-on-click="prevPhoto"
+                                    t-att-disabled="state.currentImageIndex === 0"
+                                >
+                                    <i class="fa fa-chevron-left fa-lg"></i>
+                                </button>
+                                <button 
+                                    class="btn btn-light position-absolute top-50 end-0 translate-middle-y me-3 shadow-lg"
+                                    style="z-index: 10; opacity: 0.9; width: 50px; height: 50px;"
+                                    t-on-click="nextPhoto"
+                                    t-att-disabled="state.currentImageIndex === photosData.photos.length - 1"
+                                >
+                                    <i class="fa fa-chevron-right fa-lg"></i>
+                                </button>
+                            </t>
+                            
+                            <!-- Contador de imágenes -->
+                            <div class="position-absolute top-0 end-0 m-3">
+                                <span class="badge bg-dark bg-opacity-75 px-3 py-2 fs-6">
+                                    <i class="fa fa-image me-2"></i>
+                                    <strong><t t-esc="state.currentImageIndex + 1"/> / <t t-esc="photosData.photos.length"/></strong>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Información de la foto actual (compacta) -->
+                        <div class="mt-2 p-2 bg-light rounded">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">
+                                        <i class="fa fa-tag text-primary me-2"></i>
+                                        <strong t-esc="currentPhoto.name"></strong>
+                                    </h6>
+                                    <div class="d-flex gap-3">
+                                        <small class="text-muted">
+                                            <i class="fa fa-calendar me-1"></i>
+                                            <t t-esc="currentPhoto.fecha_captura"/>
+                                        </small>
+                                        <small t-if="currentPhoto.notas" class="text-muted flex-grow-1" t-esc="currentPhoto.notas"></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Miniaturas (si hay más de 1 foto) - versión compacta -->
+                        <t t-if="photosData.photos.length > 1">
+                            <div class="d-flex gap-2 mt-2 overflow-auto pb-2" style="max-height: 100px;">
+                                <t t-foreach="photosData.photos" t-as="photo" t-key="photo.id">
+                                    <div 
+                                        class="border rounded p-1 flex-shrink-0"
+                                        t-att-class="{ 'border-primary border-3': photo_index === state.currentImageIndex }"
+                                        t-on-click="() => this.state.currentImageIndex = photo_index"
+                                        style="cursor: pointer; width: 80px; height: 80px;"
+                                    >
+                                        <img 
+                                            t-att-src="`data:image/png;base64,${photo.image}`"
+                                            class="img-fluid rounded"
+                                            style="width: 100%; height: 100%; object-fit: cover;"
+                                            t-att-alt="photo.name"
+                                        />
+                                    </div>
+                                </t>
+                            </div>
+                        </t>
+                    </div>
+                    
+                    <hr class="my-2"/>
+                </t>
+                
+                <!-- SI NO HAY FOTOS: Mostrar mensaje -->
+                <t t-if="!hasPhotos">
+                    <div class="text-center py-5 mb-3">
+                        <i class="fa fa-camera" style="font-size: 64px; color: #ccc;"></i>
+                        <p class="text-muted mt-3 mb-0">No hay fotografías para este lote</p>
+                    </div>
+                    
+                    <hr class="my-2"/>
+                </t>
+
+                <!-- Botón para mostrar formulario de agregar foto -->
+                <div class="text-center mb-2">
+                    <button 
+                        class="btn btn-primary"
+                        t-on-click="toggleUploadForm"
+                        t-if="!state.showUploadForm"
+                    >
+                        <i class="fa fa-plus-circle me-2"></i>
+                        Agregar Nueva Fotografía
+                    </button>
+                    <button 
+                        class="btn btn-secondary"
+                        t-on-click="toggleUploadForm"
+                        t-if="state.showUploadForm"
+                    >
+                        <i class="fa fa-times me-2"></i>
+                        Cancelar
+                    </button>
+                </div>
+
+                <!-- Formulario para agregar nueva foto (solo visible si showUploadForm es true) -->
+                <t t-if="state.showUploadForm">
+                    <div class="card bg-light">
+                        <div class="card-body p-3">
+                            <h6 class="card-title mb-3">
+                                <i class="fa fa-upload text-primary"></i>
+                                Agregar Nueva Fotografía
+                            </h6>
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <input 
+                                        type="text" 
+                                        class="form-control"
+                                        placeholder="Nombre de la foto"
+                                        t-model="state.photoName"
+                                        t-on-input="onPhotoNameChange"
+                                    />
+                                </div>
+                                <div class="col-md-6">
+                                    <input 
+                                        type="file" 
+                                        class="form-control"
+                                        accept="image/*"
+                                        t-on-change="onFileSelected"
+                                    />
+                                </div>
+                                <div class="col-md-2">
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-success w-100"
+                                        t-on-click="uploadPhoto"
+                                        t-att-disabled="state.isUploading"
+                                    >
+                                        <t t-if="!state.isUploading">
+                                            <i class="fa fa-upload"></i> Subir
+                                        </t>
+                                        <t t-else="">
+                                            <i class="fa fa-spinner fa-spin"></i> Subiendo...
+                                        </t>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </div>
+
+            <t t-set-slot="footer">
+                <button class="btn btn-secondary" t-on-click="props.close">
+                    Cerrar
+                </button>
+            </t>
+        </Dialog>
+    </t>
+
+    <!-- Template para el diálogo de notas - VERSIÓN MEJORADA -->
+    <t t-name="inventory_visual_enhanced.NotesDialog" owl="1">
+        <Dialog size="'lg'">
+            <div class="o_notes_dialog">
+                <!-- Header con información del producto - MÁS PROMINENTE -->
+                <div class="alert alert-info border-start border-4 border-primary mb-4">
+                    <div class="d-flex align-items-center">
+                        <i class="fa fa-cube fa-2x text-primary me-3"></i>
+                        <div>
+                            <h5 class="mb-1 fw-bold">
+                                <t t-esc="notesData.product_name"/>
+                            </h5>
+                            <small class="text-muted">
+                                <i class="fa fa-barcode me-1"></i>
+                                Lote: <strong t-esc="notesData.lot_name"></strong>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- MODO VISUALIZACIÓN (cuando hay notas y no está editando) -->
+                <t t-if="hasNotes and !state.isEditing">
+                    <!-- Notas con formato destacado y legible -->
+                    <div class="card border-warning mb-4">
+                        <div class="card-header bg-warning bg-opacity-10 border-bottom border-warning">
+                            <h5 class="mb-0">
+                                <i class="fa fa-exclamation-triangle text-warning me-2"></i>
+                                <strong>Notas y Detalles Especiales</strong>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Contenido de las notas con formato mejorado -->
+                            <div 
+                                class="p-4 bg-light rounded border border-warning"
+                                style="
+                                    white-space: pre-wrap; 
+                                    font-size: 20px; 
+                                    line-height: 1.8; 
+                                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                                    min-height: 200px;
+                                    max-height: 400px;
+                                    overflow-y: auto;
+                                "
+                            >
+                                <t t-esc="state.notes"/>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Botón de edición prominente -->
+                    <div class="text-center">
+                        <button 
+                            class="btn btn-warning btn-lg px-5"
+                            t-on-click="toggleEdit"
+                        >
+                            <i class="fa fa-edit me-2"></i>
+                            Editar Notas
+                        </button>
+                    </div>
+                </t>
+                
+                <!-- MODO EDICIÓN (cuando no hay notas o está editando) -->
+                <t t-if="!hasNotes or state.isEditing">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold fs-5 mb-3">
+                            <i class="fa fa-edit text-primary me-2"></i> 
+                            <t t-if="hasNotes">Editar Notas y Detalles Especiales:</t>
+                            <t t-else="">Agregar Notas y Detalles Especiales:</t>
+                        </label>
+                        
+                        <!-- Textarea con mejor diseño -->
+                        <textarea 
+                            class="form-control form-control-lg border-2 border-primary"
+                            rows="12"
+                            placeholder="Ej: 
+                            - Placa con barreno
+                            - Release en esquina superior
+                            - Placa rota en un extremo
+                            - Veta pronunciada diagonal
+                            - Manchas de óxido
+                            - Color irregular..."
+                            t-model="state.notes"
+                            t-on-input="onNotesChange"
+                            style="
+                                font-size: 16px; 
+                                line-height: 1.8;
+                                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                            "
+                        ></textarea>
+                        
+                        <!-- Ayuda contextual mejorada -->
+                        <div class="alert alert-light border mt-3 mb-0">
+                            <div class="d-flex align-items-start">
+                                <i class="fa fa-info-circle text-info me-2 mt-1"></i>
+                                <div>
+                                    <strong class="d-block mb-2">¿Qué puedes incluir?</strong>
+                                    <ul class="mb-0 ps-3">
+                                        <li>Defectos físicos (roturas, barrenos, grietas)</li>
+                                        <li>Características visuales (vetas, manchas, colores irregulares)</li>
+                                        <li>Estado general de la placa</li>
+                                        <li>Observaciones del proceso de corte</li>
+                                        <li>Cualquier detalle relevante para producción o venta</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </div>
+
+            <t t-set-slot="footer">
+                <!-- Si está en modo visualización -->
+                <t t-if="hasNotes and !state.isEditing">
+                    <button class="btn btn-secondary btn-lg" t-on-click="props.close">
+                        <i class="fa fa-times me-2"></i>
+                        Cerrar
+                    </button>
+                </t>
+                
+                <!-- Si está en modo edición -->
+                <t t-if="!hasNotes or state.isEditing">
+                    <button 
+                        class="btn btn-secondary btn-lg" 
+                        t-on-click="hasNotes ? toggleEdit : props.close"
+                    >
+                        <i class="fa fa-times me-2"></i>
+                        Cancelar
+                    </button>
+                    <button 
+                        class="btn btn-primary btn-lg"
+                        t-on-click="saveNotes"
+                        t-att-disabled="state.isSaving"
+                    >
+                        <t t-if="!state.isSaving">
+                            <i class="fa fa-save me-2"></i> 
+                            Guardar Notas
+                        </t>
+                        <t t-else="">
+                            <i class="fa fa-spinner fa-spin me-2"></i> 
+                            Guardando...
+                        </t>
+                    </button>
+                </t>
+            </t>
+        </Dialog>
+    </t>
+
+</templates>

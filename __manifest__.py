@@ -35,6 +35,7 @@
             'inventory_visual_enhanced/static/src/scss/inventory_visual.scss',
             'inventory_visual_enhanced/static/src/js/inventory_visual_controller.js',
             'inventory_visual_enhanced/static/src/xml/inventory_visual_template.xml',
+            'inventory_visual_enhanced/static/src/xml/inventory_visual_dialogs.xml',
         ],
     },
     'installable': True,

@@ -521,7 +521,7 @@ $breakpoint-lg: 1200px !default;
       }
 
       .column-header {
-        font-size: 11px;
+        font-size: 16px;
         font-weight: $font-weight-bold;
         color: $text-secondary;
         text-transform: uppercase;
@@ -563,13 +563,13 @@ $breakpoint-lg: 1200px !default;
 
         .metric-label { 
           color: $text-secondary;
-          font-size: 11px;
+          font-size: 16px;
           font-weight: $font-weight-medium;
         }
 
         .metric-value {
           font-weight: $font-weight-bold;
-          font-size: $font-size-small;
+          font-size: 18px;
           font-family: $font-family-monospace;
         }
 
