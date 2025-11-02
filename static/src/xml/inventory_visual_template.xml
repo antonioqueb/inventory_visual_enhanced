@@ -72,116 +72,126 @@
                     </p>
                 </div>
                 
-                <!-- Lista de productos -->
-                <div class="o_inventory_products_list" t-if="state.products.length > 0 and !state.isLoading">
-                    <t t-foreach="state.products" t-as="product" t-key="product.product_id">
-                        <t t-call="inventory_visual_enhanced.ProductCard">
-                            <t t-set="product" t-value="product"/>
-                        </t>
-                    </t>
+                <!-- DATA GRID - Lista de productos -->
+                <div class="o_inventory_data_grid" t-if="state.products.length > 0 and !state.isLoading">
+                    <table class="o_inventory_grid_table">
+                        <thead>
+                            <tr>
+                                <th class="col-product-name">Product Name (SKU)</th>
+                                <th class="col-inventory">Inventory</th>
+                                <th class="col-type">Type</th>
+                                <th class="col-category">Category</th>
+                                <th class="col-format">Format</th>
+                                <th class="col-actions">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="state.products" t-as="product" t-key="product.product_id">
+                                <t t-call="inventory_visual_enhanced.ProductRow">
+                                    <t t-set="product" t-value="product"/>
+                                </t>
+                            </t>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </t>
     
-    <!-- Template de tarjeta de producto -->
-    <t t-name="inventory_visual_enhanced.ProductCard" owl="1">
-        <div 
-            class="o_inventory_product_card"
-            t-att-class="{ expanded: isProductExpanded(product.product_id) }"
-        >
-            <!-- Header del producto (clickeable) -->
-            <div class="product-header" t-on-click="() => this.toggleProduct(product.product_id, product.quant_ids)">
-                <div class="product-info">
-                    <div class="product-main">
-                        <h3 class="product-title" t-esc="product.product_name"></h3>
-                        <div class="product-meta">
-                            <span 
-                                class="product-code" 
-                                t-if="product.product_code"
-                            >
-                                <i class="fa fa-tag"></i>
-                                <t t-esc="product.product_code"/>
-                            </span>
-                            <span 
-                                class="product-category" 
-                                t-if="product.categ_name"
-                            >
-                                <i class="fa fa-folder-o"></i>
-                                <t t-esc="product.categ_name"/>
-                            </span>
-                            <span 
-                                class="product-format" 
-                                t-if="product.formato"
-                            >
-                                <i class="fa fa-square-o"></i>
-                                <t t-esc="product.formato"/>
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <!-- Métricas organizadas en columnas -->
-                    <div class="product-metrics-grid">
-                        <!-- Primera columna: Placas -->
-                        <div class="metrics-column metrics-placas">
-                            <div class="column-header">Piezas</div>
-                            <div class="metric-row">
-                                <span class="metric-label">Stock:</span>
-                                <span class="metric-value" t-esc="product.stock_plates || 0"></span>
-                            </div>
-                            <div class="metric-row">
-                                <span class="metric-label">Apartadas:</span>
-                                <span class="metric-value" t-esc="product.committed_plates || 0"></span>
-                            </div>
-                            <div class="metric-row metric-available">
-                                <span class="metric-label">Disponibles:</span>
-                                <span class="metric-value" t-esc="product.available_plates || 0"></span>
-                            </div>
-                        </div>
-                        
-                        <!-- Segunda columna: Metros -->
-                        <div class="metrics-column metrics-metros">
-                            <div class="column-header">Metros (m²)</div>
-                            <div class="metric-row">
-                                <span class="metric-label">Stock:</span>
-                                <span class="metric-value" t-esc="formatNumber(product.stock_qty)"></span>
-                            </div>
-                            <div class="metric-row">
-                                <span class="metric-label">Apartados:</span>
-                                <span class="metric-value" t-esc="formatNumber(product.committed_qty)"></span>
-                            </div>
-                            <div class="metric-row metric-available">
-                                <span class="metric-label">Disponibles:</span>
-                                <span class="metric-value" t-esc="formatNumber(product.available_qty)"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Botón expandir/colapsar -->
-                <div class="product-actions">
-                    <button 
-                        type="button" 
-                        class="btn-expand"
-                        title="Ver detalles de placas"
-                    >
-                        <i class="fa fa-chevron-down expand-icon"></i>
-                        <span t-if="!isProductExpanded(product.product_id)">Detalles</span>
-                        <span t-else="">Ocultar</span>
-                    </button>
-                </div>
-            </div>
+    <!-- Template de fila de producto - DATA GRID STYLE -->
+    <t t-name="inventory_visual_enhanced.ProductRow" owl="1">
+        <tr class="o_inventory_product_row" t-att-class="{ expanded: isProductExpanded(product.product_id) }">
             
-            <!-- Detalles expandibles del producto -->
-            <t t-if="isProductExpanded(product.product_id)">
+            <!-- Columna 1: Product Name (SKU) -->
+            <td class="col-product-name">
+                <div class="product-name-cell">
+                    <div class="product-title" t-esc="product.product_name"></div>
+                    <div class="product-sku" t-if="product.product_code" t-esc="product.product_code"></div>
+                </div>
+            </td>
+            
+            <!-- Columna 2: Inventory (Sub-grid 4x2) -->
+            <td class="col-inventory">
+                <div class="inventory-subgrid">
+                    <!-- Fila 1: In Stock -->
+                    <div class="inventory-row">
+                        <span class="inventory-label">In Stock</span>
+                        <span class="inventory-value inventory-units" t-esc="product.stock_plates || 0"></span>
+                        <span class="inventory-value inventory-measure">
+                            <t t-esc="formatNumber(product.stock_qty)"/> M²
+                        </span>
+                    </div>
+                    <!-- Fila 2: On Hold -->
+                    <div class="inventory-row">
+                        <span class="inventory-label">On Hold</span>
+                        <span class="inventory-value inventory-units" t-esc="product.hold_plates || 0"></span>
+                        <span class="inventory-value inventory-measure">
+                            <t t-esc="formatNumber(product.hold_qty)"/> M²
+                        </span>
+                    </div>
+                    <!-- Fila 3: Committed (NUEVA) -->
+                    <div class="inventory-row">
+                        <span class="inventory-label">Committed</span>
+                        <span class="inventory-value inventory-units" t-esc="product.committed_plates || 0"></span>
+                        <span class="inventory-value inventory-measure">
+                            <t t-esc="formatNumber(product.committed_qty)"/> M²
+                        </span>
+                    </div>
+                    <!-- Fila 4: Available -->
+                    <div class="inventory-row">
+                        <span class="inventory-label">Available</span>
+                        <span class="inventory-value inventory-units" t-esc="product.available_plates || 0"></span>
+                        <span class="inventory-value inventory-measure">
+                            <t t-esc="formatNumber(product.available_qty)"/> M²
+                        </span>
+                    </div>
+                </div>
+            </td>
+            
+            <!-- Columna 3: Type -->
+            <td class="col-type">
+                <span t-if="product.formato">
+                    <t t-if="product.formato.includes('Placa')">Placa</t>
+                    <t t-else="" t-esc="product.formato"/>
+                </span>
+                <span t-else="" class="text-muted">-</span>
+            </td>
+            
+            <!-- Columna 4: Category -->
+            <td class="col-category">
+                <span t-if="product.categ_name" t-esc="product.categ_name"/>
+                <span t-else="" class="text-muted">-</span>
+            </td>
+            
+            <!-- Columna 5: Format -->
+            <td class="col-format">
+                <span t-if="product.formato" t-esc="product.formato"/>
+                <span t-else="" class="text-muted">-</span>
+            </td>
+            
+            <!-- Columna 6: Actions -->
+            <td class="col-actions">
+                <button 
+                    type="button" 
+                    class="btn-expand-details"
+                    t-on-click="() => this.toggleProduct(product.product_id, product.quant_ids)"
+                >
+                    <i class="fa fa-chevron-down" t-att-class="{ 'fa-chevron-up': isProductExpanded(product.product_id) }"></i>
+                </button>
+            </td>
+        </tr>
+        
+        <!-- Fila expandible con detalles de placas -->
+        <tr class="o_inventory_details_row" t-if="isProductExpanded(product.product_id)">
+            <td colspan="6" class="details-cell">
                 <t t-call="inventory_visual_enhanced.ProductDetails">
                     <t t-set="details" t-value="getProductDetails(product.product_id)"/>
                 </t>
-            </t>
-        </div>
+            </td>
+        </tr>
     </t>
     
-    <!-- Template de detalles del producto (tabla) -->
+    <!-- Template de detalles del producto (tabla anidada) -->
     <t t-name="inventory_visual_enhanced.ProductDetails" owl="1">
         <t t-if="!details || details.length === 0">
             <div class="table-loading">
@@ -190,166 +200,142 @@
             </div>
         </t>
         <t t-else="">
-            <div class="table-wrapper overflow-auto">
+            <div class="details-wrapper">
                 <table class="o_inventory_details_table">
                     <thead>
                         <tr>
-                            <!-- 1. Lote -->
-                            <th class="col-lot"><strong>Lote</strong></th>
-                            <!-- 2. Bloque -->
-                            <th class="col-bloque"><strong>Bloque</strong></th>
-                            <!-- 3. Atado -->
-                            <th class="col-atado"><strong>Atado</strong></th>
-                            <!-- 4. Ubicación -->
-                            <th class="col-location"><strong>Ubicación</strong></th>
-                            <!-- 5. Dimensiones -->
-                            <th class="col-dimensions"><strong>Dimensiones</strong></th>
-                            <!-- 6. P (Pick/Foto) -->
-                            <th class="col-icon"><strong>P</strong></th>
-                            <!-- 7. N (Notas) -->
-                            <th class="col-icon"><strong>N</strong></th>
-                            <!-- 8. D (Detalles) -->
-                            <th class="col-icon"><strong>D</strong></th>
-                            <!-- 9. SP (Sales Person) -->
-                            <th class="col-icon"><strong>SP</strong></th>
-                            <!-- 10. Estado (Hold/SO) -> E -->
-                            <th class="col-icon" title="Estado"><strong>E</strong></th>
+                            <th class="col-lot">Lote</th>
+                            <th class="col-bloque">Bloque</th>
+                            <th class="col-atado">Atado</th>
+                            <th class="col-location">Ubicación</th>
+                            <th class="col-dimensions">Dimensiones</th>
+                            <th class="col-icon">P</th>
+                            <th class="col-icon">N</th>
+                            <th class="col-icon">D</th>
+                            <th class="col-icon">SP</th>
+                            <th class="col-icon">E</th>
                         </tr>
                     </thead>
                     <tbody>
                         <t t-foreach="details" t-as="detail" t-key="detail.id">
                             <tr>
                                 <!-- 1. Lote -->
-                                <td class="col-lot cell-strong" data-label="Lote">
-                                    <t t-if="detail.lot_name">
-                                        <strong t-esc="detail.lot_name"/>
-                                    </t>
-                                    <t t-else="">
-                                        <span class="text-muted">-</span>
-                                    </t>
+                                <td class="col-lot" data-label="Lote">
+                                    <t t-if="detail.lot_name" t-esc="detail.lot_name"/>
+                                    <span t-else="" class="text-muted">-</span>
                                 </td>
                                 
                                 <!-- 2. Bloque -->
-                                <td class="col-bloque cell-strong" data-label="Bloque">
-                                    <t t-if="detail.bloque">
-                                        <strong t-esc="detail.bloque"/>
-                                    </t>
-                                    <t t-else="">
-                                        <span class="text-muted">-</span>
-                                    </t>
+                                <td class="col-bloque" data-label="Bloque">
+                                    <t t-if="detail.bloque" t-esc="detail.bloque"/>
+                                    <span t-else="" class="text-muted">-</span>
                                 </td>
                                 
                                 <!-- 3. Atado -->
-                                <td class="col-atado cell-strong" data-label="Atado">
-                                    <t t-if="detail.atado">
-                                        <strong t-esc="detail.atado"/>
-                                    </t>
-                                    <t t-else="">
-                                        <span class="text-muted">-</span>
-                                    </t>
+                                <td class="col-atado" data-label="Atado">
+                                    <t t-if="detail.atado" t-esc="detail.atado"/>
+                                    <span t-else="" class="text-muted">-</span>
                                 </td>
                                 
                                 <!-- 4. Ubicación -->
-                                <td class="col-location cell-strong" data-label="Ubicación">
-                                    <i class="fa fa-map-marker location-icon"></i>
-                                    <strong t-esc="detail.location_name"/>
+                                <td class="col-location" data-label="Ubicación">
+                                    <i class="fa fa-map-marker"></i>
+                                    <t t-esc="detail.location_name"/>
                                 </td>
                                 
-                                <!-- 5. Dimensiones (medidas + m²) -->
-                                <td class="col-dimensions cell-strong" data-label="Dimensiones">
+                                <!-- 5. Dimensiones -->
+                                <td class="col-dimensions" data-label="Dimensiones">
                                     <div class="dimensions-cell">
                                         <div class="dimensions-measures">
                                             <t t-if="detail.grosor or detail.alto or detail.ancho">
                                                 <t t-if="detail.grosor">
-                                                    <strong><t t-esc="detail.grosor"/></strong>cm × 
+                                                    <t t-esc="detail.grosor"/>cm × 
                                                 </t>
                                                 <t t-if="detail.alto">
-                                                    <strong><t t-esc="detail.alto"/></strong>m × 
+                                                    <t t-esc="detail.alto"/>m × 
                                                 </t>
                                                 <t t-if="detail.ancho">
-                                                    <strong><t t-esc="detail.ancho"/></strong>m
+                                                    <t t-esc="detail.ancho"/>m
                                                 </t>
                                             </t>
                                             <span t-else="" class="text-muted">-</span>
                                         </div>
                                         <div class="dimensions-total" t-if="detail.quantity">
-                                            <strong class="m2-value" t-esc="formatNumber(detail.quantity)"/> m²
+                                            <t t-esc="formatNumber(detail.quantity)"/> m²
                                         </div>
                                     </div>
                                 </td>
                                 
-                                <!-- 6. P (Pick/Foto) -->
-                                <td class="col-icon col-photo" data-label="Foto">
+                                <!-- 6. Fotos (P) - Dorado cuando hay contenido -->
+                                <td class="col-icon" data-label="Foto">
                                     <button 
                                         class="icon-btn"
-                                        t-att-class="detail.cantidad_fotos ? 'has-content' : 'no-content'"
+                                        t-att-class="detail.cantidad_fotos ? 'has-photos' : 'no-content'"
                                         t-on-click="() => this.onPhotoClick(detail.id)"
                                         type="button"
-                                        title="Ver fotos"
                                     >
                                         <i class="fa fa-camera"></i>
                                     </button>
                                 </td>
                                 
-                                <!-- 7. N (Notas) -->
-                                <td class="col-icon col-notes" data-label="Notas">
+                                <!-- 7. Notas (N) - Rosa/Learning cuando hay contenido -->
+                                <td class="col-icon" data-label="Notas">
                                     <button 
                                         class="icon-btn"
-                                        t-att-class="detail.detalles_placa ? 'has-alert' : 'no-content'"
+                                        t-att-class="detail.detalles_placa ? 'has-notes' : 'no-content'"
                                         t-on-click="() => this.onNotesClick(detail.id)"
                                         type="button"
-                                        title="Ver notas"
                                     >
                                         <i class="fa fa-info-circle"></i>
                                     </button>
                                 </td>
                                 
-                                <!-- 8. D (Detalles) -->
-                                <td class="col-icon col-details" data-label="Detalles">
+                                <!-- 8. Detalles (D) - Morado siempre activo -->
+                                <td class="col-icon" data-label="Detalles">
                                     <button 
-                                        class="icon-btn has-content"
+                                        class="icon-btn has-details"
                                         t-on-click="() => this.onDetailsClick(detail.id)"
                                         type="button"
-                                        title="Ver historial y detalles"
                                     >
                                         <i class="fa fa-list-alt"></i>
                                     </button>
                                 </td>
                                 
-                                <!-- 9. SP (Sales Person) -->
-                                <td class="col-icon col-salesperson" data-label="Cliente/Vendedor">
+                                <!-- 9. Sales Person (SP) - Silver/Azul cuando hay contenido -->
+                                <td class="col-icon" data-label="Cliente/Vendedor">
                                     <button 
                                         class="icon-btn"
-                                        t-att-class="detail.sales_person ? 'has-content' : 'no-content'"
+                                        t-att-class="detail.sales_person ? 'has-sales-person' : 'no-content'"
                                         t-on-click="() => this.onSalesPersonClick(detail.id)"
                                         type="button"
-                                        title="Ver cliente y vendedor"
                                     >
                                         <i class="fa fa-user"></i>
                                     </button>
                                 </td>
                                 
-                                <!-- 10. Estado (Hold/SO) - SIEMPRE CLICKEABLE -->
-                                <td class="col-icon col-state" data-label="E">
+                                <!-- 10. Estado (E) - Hold o SO -->
+                                <td class="col-icon" data-label="Estado">
                                     <div class="state-cell">
-                                        <!-- BOTÓN APARTADO - Siempre visible, cambia según estado -->
+                                        <!-- Botón de Hold - Verde si activo, Dorado si disponible -->
                                         <button 
-                                            class="icon-btn state-icon hold-icon"
-                                            t-att-class="detail.tiene_hold ? 'has-alert' : 'has-content'"
+                                            class="icon-btn"
+                                            t-if="!detail.en_orden_venta"
+                                            t-att-class="detail.tiene_hold ? 'has-hold-active' : (detail.puede_hold ? 'has-hold-available' : 'no-content')"
                                             t-on-click="() => this.onHoldClick(detail.id, detail.hold_info)"
                                             type="button"
                                         >
                                             <i class="fa fa-hand-paper-o"></i>
                                         </button>
                                         
-                                        <!-- Sales Order -->
-                                        <span 
-                                            class="state-icon so-icon" 
+                                        <!-- Badge SO (Sale Order) - Verde cuando está en orden de venta -->
+                                        <button 
+                                            class="so-badge-btn"
                                             t-if="detail.en_orden_venta"
-                                            title="En orden de venta"
+                                            t-on-click="() => this.onSaleOrderClick(detail.id, detail.sale_order_ids)"
+                                            type="button"
                                         >
-                                            SO
-                                        </span>
+                                            <strong>SO</strong>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>

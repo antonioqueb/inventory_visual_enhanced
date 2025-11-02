@@ -136,15 +136,18 @@ class InventoryVisualController extends Component {
 
     calculateTotals() {
         let totalAvailable = 0;
-        let totalReserved = 0;
+        let totalHold = 0;
+        let totalCommitted = 0;
 
         this.state.products.forEach(product => {
             totalAvailable += product.available_qty || 0;
-            totalReserved += product.reserved_qty || 0;
+            totalHold += product.hold_qty || 0;
+            totalCommitted += product.committed_qty || 0;
         });
 
         this.state.totalAvailable = totalAvailable;
-        this.state.totalReserved = totalReserved;
+        this.state.totalHold = totalHold;
+        this.state.totalCommitted = totalCommitted;
     }
 
     clearSearch() {
@@ -404,7 +407,7 @@ class InventoryVisualController extends Component {
                     notes: notesData.notes || '',
                     originalNotes: notesData.notes || '',
                     isSaving: false,
-                    isEditing: !notesData.notes // Si no hay notas, comenzar en modo edición
+                    isEditing: !notesData.notes
                 });
             }
             
@@ -415,7 +418,6 @@ class InventoryVisualController extends Component {
             toggleEdit() {
                 this.state.isEditing = !this.state.isEditing;
                 if (!this.state.isEditing) {
-                    // Si cancela, restaurar notas originales
                     this.state.notes = this.state.originalNotes;
                 }
             }
@@ -510,7 +512,7 @@ class InventoryVisualController extends Component {
                 this.notification = useService("notification");
                 
                 this.state = useState({
-                    currentTab: 'general', // general, purchase, movements, sales, reservations, deliveries
+                    currentTab: 'general',
                 });
             }
             
@@ -561,13 +563,11 @@ class InventoryVisualController extends Component {
     async onHoldClick(detailId, holdInfo) {
         console.log('Hold click:', detailId, holdInfo);
         
-        // Si NO tiene hold, abrir diálogo para crear
         if (!holdInfo || !holdInfo.id) {
             await this.openCreateHoldDialog(detailId);
             return;
         }
 
-        // Si SÍ tiene hold, mostrar información (comportamiento actual)
         let message = `Reservado para: ${holdInfo.partner_name}\n`;
         message += `Fecha de inicio: ${holdInfo.fecha_inicio}\n`;
         message += `Fecha de expiración: ${holdInfo.fecha_expiracion}`;
@@ -586,7 +586,6 @@ class InventoryVisualController extends Component {
         const self = this;
         
         try {
-            // Buscar el detail completo
             let detailData = null;
             for (const [productId, details] of Object.entries(this.state.productDetails)) {
                 const detail = details.find(d => d.id === detailId);
@@ -694,7 +693,6 @@ class InventoryVisualController extends Component {
                             this.notification.add(result.message, { type: "success" });
                             this.props.close();
                             
-                            // Recargar detalles del producto
                             await self.reloadProductDetailsForDetail(this.detailId);
                         }
                     } catch (error) {
@@ -718,6 +716,79 @@ class InventoryVisualController extends Component {
             console.error("Error abriendo diálogo:", error);
             this.notification.add("Error al abrir diálogo de apartado", { type: "danger" });
         }
+    }
+
+    // ========================================
+    // FUNCIONALIDAD DE ÓRDENES DE VENTA
+    // ========================================
+
+    async onSaleOrderClick(detailId, saleOrderIds) {
+        console.log('Sale order click:', detailId, saleOrderIds);
+        
+        if (!saleOrderIds || saleOrderIds.length === 0) {
+            this.notification.add("No hay órdenes de venta asociadas", { type: "info" });
+            return;
+        }
+
+        try {
+            const soInfo = await this.orm.call(
+                "stock.quant",
+                "get_sale_order_info",
+                [],
+                {
+                    sale_order_ids: saleOrderIds
+                }
+            );
+            
+            if (soInfo.error) {
+                this.notification.add(soInfo.error, { type: "warning" });
+                return;
+            }
+            
+            this.openSaleOrderModal(soInfo);
+            
+        } catch (error) {
+            console.error("Error al cargar info de órdenes de venta:", error);
+            this.notification.add("Error al cargar información de órdenes de venta", { type: "danger" });
+        }
+    }
+
+    openSaleOrderModal(soInfo) {
+        const self = this;
+        
+        class SaleOrderDialog extends Component {
+            setup() {
+                this.soInfo = soInfo;
+                this.orm = useService("orm");
+                this.notification = useService("notification");
+            }
+            
+            formatCurrency(amount, symbol) {
+                return `${symbol} ${new Intl.NumberFormat('es-MX', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                }).format(amount)}`;
+            }
+            
+            getStateBadgeClass(state) {
+                const stateClasses = {
+                    'draft': 'bg-secondary',
+                    'sent': 'bg-info',
+                    'sale': 'bg-success',
+                    'done': 'bg-dark',
+                    'cancel': 'bg-danger',
+                };
+                return stateClasses[state] || 'bg-secondary';
+            }
+        }
+        
+        SaleOrderDialog.template = "inventory_visual_enhanced.SaleOrderDialog";
+        SaleOrderDialog.components = { Dialog };
+        
+        this.dialog.add(SaleOrderDialog, {
+            title: `Órdenes de Venta (${soInfo.count})`,
+            size: 'lg',
+        });
     }
 }
 

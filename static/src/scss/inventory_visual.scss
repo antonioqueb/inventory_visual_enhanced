@@ -1,151 +1,108 @@
 /**
- * Inventario Visual Avanzado — Marble Inspired Theme
- * Paleta de mármol marrón + diseño moderno y sofisticado
+ * Inventario Visual Avanzado — DATA GRID STYLE
+ * Diseño compacto tipo tabla densa con sub-grid en celda de inventario
  * Alphaqueb Consulting SAS
  */
 
-/* ================================
-   MARBLE COLOR PALETTE
-   ================================ */
+$odoo-primary: #714B67;
+$odoo-gray: #8F8F8F;
+$odoo-secondary: #017E84;
+$odoo-learning: #E46E78;
+$odoo-ready: #21B799;
+$odoo-silver: #5B899E;
+$odoo-gold: #E4A900;
 
-/* Hex Colors */
-$marble-cream: #D9D0C5;      // Color 1: Crema claro (acentos suaves)
-$marble-sand: #BFA995;       // Color 2: Arena (bordes y secundarios)
-$marble-copper: #A66946;     // Color 3: Cobre (primario principal)
-$marble-terracotta: #A65132; // Color 4: Terracota (énfasis y alertas)
-$marble-espresso: #734432;   // Color 5: Espresso (textos oscuros)
+$primary-color: $odoo-primary;
+$primary-hover: darken($odoo-primary, 10%);
+$primary-light: mix(#fff, $odoo-primary, 90%);
+$primary-dark: darken($odoo-primary, 15%);
 
-/* RGBA */
-$marble-cream-rgba: rgba(216, 207, 197, 1);
-$marble-sand-rgba: rgba(191, 168, 149, 1);
-$marble-copper-rgba: rgba(165, 104, 69, 1);
-$marble-terracotta-rgba: rgba(165, 80, 49, 1);
-$marble-espresso-rgba: rgba(114, 67, 50, 1);
+$secondary-color: $odoo-secondary;
+$accent-color: $odoo-gold;
+$neutral-color: $odoo-gray;
 
-/* HSLA */
-$marble-cream-hsla: hsla(33, 20, 81, 1);
-$marble-sand-hsla: hsla(28, 24, 66, 1);
-$marble-copper-hsla: hsla(22, 40, 46, 1);
-$marble-terracotta-hsla: hsla(16, 53, 42, 1);
-$marble-espresso-hsla: hsla(16, 38, 32, 1);
+$success-color: $odoo-ready;
+$warning-color: $odoo-gold;
+$danger-color: $odoo-learning;
+$info-color: $odoo-silver;
 
-/**
- * Estilos principales para Inventario Visual Avanzado
- * Theme: Marble Elegance
- */
+$stock-color: $odoo-gray;
+$committed-color: $odoo-learning;
+$available-color: $odoo-ready;
 
-/* ========================================
-   VARIABLES DE DISEÑO (Design Tokens)
-   ======================================== */
+$background-primary: #FFFFFF;
+$background-secondary: #FAFAFA;
+$background-tertiary: #F5F5F5;
+$background-hover: mix(#fff, $odoo-gray, 95%);
+$background-elevated: #FFFFFF;
 
-// Colores primarios del sistema (SOLO PALETA MÁRMOL)
-$primary-color: $marble-copper !default;              // Cobre como primario
-$primary-hover: darken($marble-copper, 10%) !default;
-$primary-light: mix(#fff, $marble-copper, 90%) !default;
-$primary-dark: darken($marble-copper, 15%) !default;
+$border-color: #E0E0E0;
+$border-color-medium: #CCCCCC;
+$border-color-dark: $odoo-gray;
+$divider-color: #F0F0F0;
 
-$secondary-color: $marble-espresso !default;          // Espresso como secundario
-$accent-color: $marble-terracotta !default;           // Terracota para acentos
-$neutral-color: $marble-sand !default;                // Arena para neutros
+$text-primary: #2C2C2C;
+$text-secondary: #7a7a7a;
+$text-tertiary: $odoo-gray;
+$text-muted: #808080;
 
-// Colores semánticos (SOLO TONOS MARRONES)
-$success-color: $marble-copper !default;              // Cobre para éxito
-$warning-color: $marble-terracotta !default;          // Terracota para warning
-$danger-color: $marble-terracotta !default;           // Terracota para peligro
-$info-color: $marble-sand !default;                   // Arena para info
+$icon-default: $odoo-gray;
+$icon-active: $odoo-primary;
+$icon-alert: $odoo-learning;
 
-// Métricas de inventario (TONOS MARRONES)
-$stock-color: $marble-sand !default;                  // Arena
-$committed-color: $marble-terracotta !default;        // Terracota
-$available-color: $marble-copper !default;            // Cobre
+$font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-family-monospace: "SF Mono", Monaco, Consolas, "Courier New", monospace;
 
-// Fondos - BLANCO PURO
-$background-primary: #FFFFFF !default;                // Blanco puro
-$background-secondary: #FAFAFA !default;              // Gris muy claro
-$background-tertiary: #F5F5F5 !default;               // Gris claro
-$background-hover: mix(#fff, $marble-cream, 85%) !default; // Hover muy sutil
-$background-elevated: #FFFFFF !default;               // Blanco puro elevado
+$font-size-base: 13px;
+$font-size-small: 12px;
+$font-size-xsmall: 11px;
+$font-size-large: 16px;
+$font-size-xlarge: 18px;
+$font-size-xxlarge: 24px;
 
-// Bordes y divisores sutiles
-$border-color: mix(#fff, $marble-sand, 80%) !default;
-$border-color-medium: mix(#fff, $marble-sand, 60%) !default;
-$border-color-dark: $marble-sand !default;
-$divider-color: mix(#fff, $marble-cream, 50%) !default;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
 
-// Textos con jerarquía clara
-$text-primary: $marble-espresso !default;
-$text-secondary: mix($marble-espresso, $marble-sand, 70%) !default;
-$text-tertiary: $marble-sand !default;
-$text-muted: mix($marble-sand, #999, 50%) !default;
+$line-height-base: 1.5;
+$line-height-tight: 1.3;
+$line-height-compact: 1;
 
-// Iconos
-$icon-default: $marble-sand !default;
-$icon-active: $marble-copper !default;
-$icon-alert: $marble-terracotta !default;
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 12px;
+$spacing-lg: 16px;
+$spacing-xl: 24px;
+$spacing-xxl: 48px;
 
-// Tipografía
-$font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !default;
-$font-family-monospace: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace !default;
-$font-family-display: "Inter", -apple-system, sans-serif !default;
+$shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.06);
+$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+$shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.08);
+$shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);
+$shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.14), 0 6px 12px rgba(0, 0, 0, 0.1);
+$shadow-hover: 0 6px 16px rgba($odoo-primary, 0.2), 0 3px 8px rgba($odoo-primary, 0.12);
+$shadow-focus: 0 0 0 3px rgba($odoo-primary, 0.15);
 
-$font-size-base: 14px !default;
-$font-size-small: 12px !default;
-$font-size-large: 16px !default;
-$font-size-xlarge: 18px !default;
-$font-size-xxlarge: 24px !default;
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+$border-radius-lg: 12px;
+$border-radius-xl: 16px;
+$border-radius-pill: 50px;
 
-$font-weight-normal: 400 !default;
-$font-weight-medium: 500 !default;
-$font-weight-semibold: 600 !default;
-$font-weight-bold: 700 !default;
+$transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-all: all $transition-base;
 
-$line-height-base: 1.5 !default;
-$line-height-tight: 1.3 !default;
-$line-height-compact: 1.2 !default;
-
-// Espaciado (sistema de 4px)
-$spacing-xs: 4px !default;
-$spacing-sm: 8px !default;
-$spacing-md: 16px !default;
-$spacing-lg: 24px !default;
-$spacing-xl: 32px !default;
-$spacing-xxl: 48px !default;
-
-// Sombras sofisticadas con tintes cálidos
-$shadow-xs: 0 1px 2px rgba($marble-espresso-rgba, 0.06) !default;
-$shadow-sm: 0 2px 4px rgba($marble-espresso-rgba, 0.08), 0 1px 2px rgba($marble-espresso-rgba, 0.06) !default;
-$shadow-md: 0 4px 8px rgba($marble-espresso-rgba, 0.1), 0 2px 4px rgba($marble-espresso-rgba, 0.08) !default;
-$shadow-lg: 0 8px 16px rgba($marble-espresso-rgba, 0.12), 0 4px 8px rgba($marble-espresso-rgba, 0.08) !default;
-$shadow-xl: 0 12px 24px rgba($marble-espresso-rgba, 0.14), 0 6px 12px rgba($marble-espresso-rgba, 0.1) !default;
-$shadow-hover: 0 6px 16px rgba($marble-copper-rgba, 0.2), 0 3px 8px rgba($marble-copper-rgba, 0.12) !default;
-$shadow-focus: 0 0 0 3px rgba($marble-copper-rgba, 0.15) !default;
-
-// Border radius
-$border-radius-sm: 4px !default;
-$border-radius-md: 8px !default;
-$border-radius-lg: 12px !default;
-$border-radius-xl: 16px !default;
-$border-radius-pill: 50px !default;
-
-// Transiciones suaves
-$transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1) !default;
-$transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1) !default;
-$transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1) !default;
-$transition-all: all $transition-base !default;
-
-$container-max-width: 1600px !default;
-$z-index-searchbar: 100 !default;
-
-$breakpoint-md: 992px !default;
-$breakpoint-lg: 1200px !default;
-
-/* ========================================
-   CONTENEDOR PRINCIPAL
-   ======================================== */
+$container-max-width: 1600px;
+$z-index-searchbar: 100;
+$breakpoint-md: 992px;
+$breakpoint-lg: 1200px;
 
 .o_inventory_visual_container {
   width: 100%;
-  background: $background-primary; // Blanco puro
+  background: $background-primary;
   padding: 0;
   margin: 0;
   font-family: $font-family-base;
@@ -155,23 +112,18 @@ $breakpoint-lg: 1200px !default;
   min-height: 100vh;
 }
 
-/* ========================================
-   BARRA DE BÚSQUEDA SUPERIOR - STICKY
-   ======================================== */
-
 .o_inventory_visual_searchbar {
   position: sticky;
   top: 0;
   z-index: $z-index-searchbar;
   background: rgba($background-elevated, 0.95);
   backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid $border-color;
-  padding: $spacing-md $spacing-xl;
+  padding: $spacing-lg $spacing-xl;
   box-shadow: $shadow-sm;
   transition: $transition-all;
 
-  &.scrolled { 
+  &.scrolled {
     box-shadow: $shadow-md;
     background: rgba($background-elevated, 0.98);
   }
@@ -182,20 +134,6 @@ $breakpoint-lg: 1200px !default;
     display: flex;
     align-items: center;
     gap: $spacing-md;
-  }
-
-  .searchbar-label {
-    font-size: $font-size-large;
-    font-weight: $font-weight-semibold;
-    color: $primary-color;
-    white-space: nowrap;
-    min-width: 180px;
-
-    .icon { 
-      margin-right: $spacing-sm; 
-      color: $primary-color;
-      filter: drop-shadow(0 2px 4px rgba($marble-copper-rgba, 0.2));
-    }
   }
 
   .searchbar-input-wrapper {
@@ -209,7 +147,7 @@ $breakpoint-lg: 1200px !default;
       top: 50%;
       transform: translateY(-50%);
       color: $text-muted;
-      font-size: $font-size-large;
+      font-size: 14px;
       pointer-events: none;
       transition: color $transition-fast;
     }
@@ -219,7 +157,7 @@ $breakpoint-lg: 1200px !default;
       height: 48px;
       padding: 0 $spacing-md 0 48px;
       border: 2px solid $border-color;
-      border-radius: $border-radius-lg;
+      border-radius: $border-radius-md;
       font-size: $font-size-base;
       font-family: $font-family-base;
       background: $background-primary;
@@ -228,7 +166,7 @@ $breakpoint-lg: 1200px !default;
       outline: none;
       box-shadow: $shadow-xs;
 
-      &::placeholder { 
+      &::placeholder {
         color: $text-muted;
         font-weight: $font-weight-normal;
       }
@@ -264,8 +202,8 @@ $breakpoint-lg: 1200px !default;
       &.visible { display: block; }
 
       &:hover {
-        color: $marble-terracotta;
-        background: rgba($marble-terracotta, 0.1);
+        color: $danger-color;
+        background: rgba($danger-color, 0.1);
         transform: translateY(-50%) scale(1.1);
       }
     }
@@ -277,36 +215,31 @@ $breakpoint-lg: 1200px !default;
     white-space: nowrap;
     font-weight: $font-weight-medium;
 
-    .count { 
+    .count {
       font-weight: $font-weight-bold;
       color: $primary-color;
     }
   }
 }
 
-/* ========================================
-   MENSAJE DE ESTADO INICIAL
-   ======================================== */
-
 .o_inventory_visual_empty {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 500px;
+  min-height: 400px;
   padding: $spacing-xxl;
   text-align: center;
 
   .empty-icon {
-    font-size: 80px;
-    color: $marble-sand;
+    font-size: 64px;
+    color: $neutral-color;
     margin-bottom: $spacing-lg;
     animation: float 3s ease-in-out infinite;
-    filter: drop-shadow(0 4px 8px rgba($marble-sand-rgba, 0.3));
   }
 
   .empty-title {
-    font-size: $font-size-xxlarge;
+    font-size: 20px;
     font-weight: $font-weight-semibold;
     color: $text-secondary;
     margin-bottom: $spacing-sm;
@@ -316,7 +249,6 @@ $breakpoint-lg: 1200px !default;
     font-size: $font-size-base;
     color: $text-muted;
     max-width: 400px;
-    line-height: $line-height-base;
   }
 }
 
@@ -324,703 +256,6 @@ $breakpoint-lg: 1200px !default;
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
 }
-
-/* ========================================
-   CONTENEDOR DE PRODUCTOS - CON SCROLL
-   ======================================== */
-
-.o_inventory_visual_content {
-  max-width: $container-max-width;
-  margin: 0 auto;
-  padding: $spacing-md $spacing-xl;
-  width: 100%;
-  background: $background-primary; // Blanco puro
-}
-
-.o_inventory_products_list {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-sm;
-  padding-bottom: $spacing-md;
-}
-
-/* ========================================
-   TARJETA DE PRODUCTO - DISEÑO MODERNO
-   ======================================== */
-
-.o_inventory_product_card {
-  background: $background-primary;
-  border: 1px solid $border-color;
-  border-radius: $border-radius-lg;
-  overflow: hidden;
-  transition: $transition-all;
-  box-shadow: $shadow-sm;
-  position: relative;
-
-  // Efecto de borde superior sutil
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, 
-      transparent 0%, 
-      $primary-color 50%, 
-      transparent 100%);
-    opacity: 0;
-    transition: opacity $transition-base;
-  }
-
-  &:hover {
-    box-shadow: $shadow-hover;
-    transform: translateY(-2px);
-    border-color: $border-color-medium;
-    
-    &::before {
-      opacity: 1;
-    }
-  }
-
-  &.expanded {
-    box-shadow: $shadow-lg;
-    border-color: $primary-color;
-    
-    &::before {
-      opacity: 1;
-      background: linear-gradient(90deg, 
-        $primary-color 0%, 
-        $marble-terracotta 100%);
-    }
-  }
-
-  .product-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: $spacing-md $spacing-lg;
-    cursor: pointer;
-    transition: $transition-all;
-    border-left: 3px solid transparent;
-    background: linear-gradient(to right, 
-      transparent 0%, 
-      rgba($background-hover, 0) 100%);
-
-    &:hover {
-      background: linear-gradient(to right, 
-        rgba($background-hover, 0.5) 0%, 
-        rgba($background-hover, 0) 100%);
-      border-left-color: $primary-color;
-      
-      .product-title { 
-        color: $primary-color;
-        transform: translateX(4px);
-      }
-    }
-
-    .product-info {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: $spacing-sm;
-    }
-
-    .product-main { 
-      flex: 1; 
-      min-width: 0; 
-    }
-
-    .product-title {
-      font-size: $font-size-large;
-      font-weight: $font-weight-bold;
-      color: $text-primary;
-      margin: 0 0 $spacing-xs 0;
-      transition: all $transition-base;
-      line-height: $line-height-compact;
-      letter-spacing: -0.01em;
-    }
-
-    .product-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: $spacing-sm;
-      align-items: center;
-      margin-top: 2px;
-
-      span {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        font-size: $font-size-small;
-        color: $text-secondary;
-        padding: 3px 10px;
-        border-radius: $border-radius-pill;
-        background: $background-secondary;
-        white-space: nowrap;
-        font-weight: $font-weight-medium;
-        border: 1px solid transparent;
-        transition: $transition-fast;
-
-        i {
-          font-size: 12px;
-          opacity: 0.8;
-        }
-
-        &:hover {
-          border-color: $border-color-medium;
-          transform: translateY(-1px);
-          box-shadow: $shadow-xs;
-        }
-      }
-
-      .product-code {
-        font-family: $font-family-monospace;
-        background: linear-gradient(135deg, 
-          rgba($marble-sand, 0.15) 0%, 
-          rgba($marble-sand, 0.08) 100%);
-        color: $marble-espresso;
-        font-weight: $font-weight-semibold;
-      }
-
-      .product-category {
-        background: linear-gradient(135deg, 
-          rgba($marble-espresso, 0.12) 0%, 
-          rgba($marble-espresso, 0.08) 100%);
-        color: $marble-espresso;
-      }
-
-      .product-format {
-        background: linear-gradient(135deg, 
-          rgba($primary-color, 0.12) 0%, 
-          rgba($primary-color, 0.08) 100%);
-        color: $primary-dark;
-        font-weight: $font-weight-semibold;
-      }
-    }
-
-    .product-metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: $spacing-md;
-      margin-top: $spacing-sm;
-    }
-
-    .metrics-column {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      padding-right: $spacing-md;
-      border-right: 1px solid $divider-color;
-      position: relative;
-
-      &:last-child { 
-        border-right: none; 
-        padding-right: 0; 
-      }
-
-      .column-header {
-        font-size: 16px;
-        font-weight: $font-weight-bold;
-        color: $text-secondary;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
-        margin-bottom: $spacing-xs;
-        padding-bottom: 4px;
-        border-bottom: 2px solid $divider-color;
-      }
-
-      .metric-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: $spacing-xs $spacing-sm;
-        border-radius: $border-radius-sm;
-        transition: $transition-fast;
-        position: relative;
-        overflow: hidden;
-
-        &::before {
-          content: '';
-          position: absolute;
-          left: 0;
-          top: 0;
-          bottom: 0;
-          width: 3px;
-          background: currentColor;
-          opacity: 0;
-          transition: opacity $transition-fast;
-        }
-
-        &:hover {
-          transform: translateX(4px);
-          
-          &::before {
-            opacity: 0.6;
-          }
-        }
-
-        .metric-label { 
-          color: $text-secondary;
-          font-size: 16px;
-          font-weight: $font-weight-medium;
-        }
-
-        .metric-value {
-          font-weight: $font-weight-bold;
-          font-size: 18px;
-          font-family: $font-family-monospace;
-        }
-
-        // Stock - Arena
-        &:nth-child(1) {
-          background: linear-gradient(90deg, 
-            rgba($stock-color, 0.08) 0%, 
-            rgba($stock-color, 0.04) 100%);
-          
-          .metric-value {
-            color: darken($stock-color, 20%);
-          }
-        }
-
-        // Apartadas - Terracota
-        &:nth-child(2) {
-          background: linear-gradient(90deg, 
-            rgba($committed-color, 0.08) 0%, 
-            rgba($committed-color, 0.04) 100%);
-          
-          .metric-value {
-            color: darken($committed-color, 10%);
-          }
-        }
-
-        // Disponibles - Cobre
-        &:nth-child(3) {
-          background: linear-gradient(90deg, 
-            rgba($available-color, 0.08) 0%, 
-            rgba($available-color, 0.04) 100%);
-          
-          .metric-value {
-            color: darken($available-color, 10%);
-          }
-        }
-      }
-    }
-
-    .product-actions {
-      display: flex;
-      align-items: center;
-      gap: $spacing-sm;
-    }
-
-    .btn-expand {
-      display: flex;
-      align-items: center;
-      gap: $spacing-xs;
-      padding: $spacing-xs $spacing-sm;
-      background: linear-gradient(135deg, 
-        rgba($primary-color, 0.08) 0%, 
-        rgba($primary-color, 0.12) 100%);
-      color: $primary-color;
-      border: 1px solid rgba($primary-color, 0.3);
-      border-radius: $border-radius-md;
-      font-size: $font-size-small;
-      font-weight: $font-weight-semibold;
-      cursor: pointer;
-      transition: $transition-all;
-      white-space: nowrap;
-      box-shadow: $shadow-xs;
-
-      .expand-icon { 
-        font-size: 13px;
-        transition: transform $transition-base;
-      }
-
-      &:hover {
-        background: linear-gradient(135deg, 
-          $primary-color 0%, 
-          $primary-dark 100%);
-        color: #fff;
-        border-color: $primary-dark;
-        box-shadow: $shadow-sm;
-        transform: translateY(-1px);
-      }
-
-      &:active {
-        transform: translateY(0);
-        box-shadow: $shadow-xs;
-      }
-    }
-  }
-
-  &.expanded {
-    .btn-expand {
-      .expand-icon { 
-        transform: rotate(180deg);
-      }
-    }
-  }
-}
-
-/* ========================================
-   DETALLES DEL PRODUCTO - TABLA ELEGANTE
-   ======================================== */
-
-.o_inventory_product_details {
-  border-top: 1px solid $divider-color;
-  background: $background-secondary;
-  padding: 0;
-}
-
-.table-wrapper {
-  overflow-x: auto;
-  max-height: 600px;
-}
-
-.o_inventory_details_table {
-  width: 100%;
-  background: $background-primary;
-  border-collapse: collapse;
-  font-size: $font-size-small;
-
-  thead {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: linear-gradient(to bottom, 
-      $background-elevated 0%, 
-      $background-secondary 100%);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-bottom: 2px solid $border-color-medium;
-    box-shadow: $shadow-sm;
-
-    th {
-      padding: $spacing-md;
-      text-align: left;
-      font-weight: $font-weight-bold;
-      color: $text-primary;
-      font-size: $font-size-small;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      white-space: nowrap;
-      border-bottom: 2px solid $border-color-medium;
-
-      &:first-child { padding-left: $spacing-xl; }
-      &:last-child  { padding-right: $spacing-xl; }
-    }
-  }
-
-  tbody {
-    tr {
-      border-bottom: 1px solid $border-color;
-      transition: all $transition-fast;
-      position: relative;
-
-      &::after {
-        content: '';
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        height: 1px;
-        background: linear-gradient(90deg, 
-          transparent 0%, 
-          $primary-color 50%, 
-          transparent 100%);
-        opacity: 0;
-        transition: opacity $transition-fast;
-      }
-
-      &:hover {
-        background: $background-hover;
-        
-        &::after {
-          opacity: 0.3;
-        }
-      }
-      
-      &:last-child { 
-        border-bottom: none;
-        
-        &::after {
-          display: none;
-        }
-      }
-    }
-
-    td {
-      padding: $spacing-md;
-      vertical-align: middle;
-      color: $text-primary;
-
-      &:first-child { padding-left: $spacing-xl; }
-      &:last-child  { padding-right: $spacing-xl; }
-    }
-  }
-
-  .cell-strong { font-weight: $font-weight-semibold; }
-
-  /* Columnas específicas */
-  .col-lot {
-    min-width: 120px;
-    max-width: 160px;
-    font-family: $font-family-monospace;
-    color: $text-primary;
-    font-weight: $font-weight-bold;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    span {
-      display: inline-block;
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      vertical-align: bottom;
-      padding: 2px 8px;
-      background: linear-gradient(135deg, 
-        rgba($primary-color, 0.08) 0%, 
-        rgba($primary-color, 0.04) 100%);
-      border-radius: $border-radius-sm;
-      border: 1px solid rgba($primary-color, 0.2);
-    }
-  }
-
-  .col-bloque,
-  .col-atado {
-    min-width: 120px;
-    text-align: center;
-    font-family: $font-family-monospace;
-    font-weight: $font-weight-bold;
-    color: $text-primary;
-  }
-
-  .col-location {
-    min-width: 180px;
-    font-weight: $font-weight-semibold;
-    color: $text-primary;
-
-    .location-icon { 
-      color: $primary-color;
-      margin-right: $spacing-xs;
-      filter: drop-shadow(0 1px 2px rgba($marble-copper-rgba, 0.3));
-    }
-  }
-
-  .col-dimensions {
-    min-width: 200px;
-    font-weight: $font-weight-semibold;
-    color: $text-primary;
-    
-    .dimensions-cell {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .dimensions-measures { 
-      font-size: $font-size-small;
-      color: $text-secondary;
-    }
-
-    .dimensions-total {
-      font-weight: $font-weight-bold;
-      color: $primary-color;
-      font-family: $font-family-monospace;
-
-      .m2-value { 
-        font-size: $font-size-base;
-      }
-    }
-  }
-
-  /* Columnas de iconos */
-  .col-icon {
-    width: 50px;
-    min-width: 50px;
-    max-width: 50px;
-    text-align: center;
-    padding: $spacing-sm !important;
-  }
-
-  .icon-btn {
-    width: 32px;
-    height: 32px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    border-radius: $border-radius-md;
-    cursor: pointer;
-    transition: $transition-all;
-    background: transparent;
-    font-size: 16px;
-    position: relative;
-    overflow: hidden;
-
-    &::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: currentColor;
-      opacity: 0;
-      transition: opacity $transition-fast;
-    }
-
-    &.no-content {
-      color: $icon-default;
-      background: transparent;
-      cursor: default;
-      opacity: 0.4;
-      
-      &:hover { 
-        background: transparent;
-        transform: none;
-      }
-    }
-
-    &.has-content {
-      // Color destacado permanente (como el hover anterior)
-      background: linear-gradient(135deg, 
-        $primary-color 0%, 
-        $primary-dark 100%);
-      color: #fff;
-      border: 1px solid $primary-dark;
-      box-shadow: $shadow-xs;
-      
-      &:hover {
-        transform: scale(1.15);
-        box-shadow: $shadow-md;
-        filter: brightness(1.1);
-      }
-    }
-
-    &.has-alert {
-      // Color de alerta permanente (como el hover anterior)
-      background: linear-gradient(135deg, 
-        $icon-alert 0%, 
-        darken($icon-alert, 10%) 100%);
-      color: #fff;
-      border: 1px solid darken($icon-alert, 10%);
-      box-shadow: $shadow-xs;
-      
-      &:hover {
-        transform: scale(1.15);
-        box-shadow: $shadow-md;
-        filter: brightness(1.1);
-      }
-    }
-  }
-
-  /* Estado específico */
-  .col-state {
-    .state-cell {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: $spacing-xs;
-    }
-
-    .state-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
-      border-radius: $border-radius-md;
-      font-weight: $font-weight-bold;
-      font-size: 14px;
-      border: 1px solid transparent;
-      transition: $transition-all;
-
-      &.hold-icon {
-        // Color destacado permanente para hold con información
-        background: linear-gradient(135deg, 
-          $committed-color 0%, 
-          darken($committed-color, 10%) 100%);
-        color: #fff;
-        border: 1px solid darken($committed-color, 10%);
-        box-shadow: $shadow-xs;
-        cursor: pointer;
-        
-        i { 
-          font-size: 18px;
-          filter: drop-shadow(0 1px 2px rgba($marble-terracotta-rgba, 0.3));
-        }
-        
-        &:hover { 
-          transform: scale(1.15);
-          box-shadow: $shadow-md;
-          filter: brightness(1.1);
-        }
-
-        // Cuando NO tiene hold (has-content), mantener estilo más sutil pero clickeable
-        &.has-content {
-          background: linear-gradient(135deg, 
-            rgba($committed-color, 0.12) 0%, 
-            rgba($committed-color, 0.08) 100%);
-          color: $committed-color;
-          border-color: rgba($committed-color, 0.2);
-          box-shadow: none;
-          
-          &:hover {
-            background: linear-gradient(135deg, 
-              $committed-color 0%, 
-              darken($committed-color, 10%) 100%);
-            color: #fff;
-            border-color: darken($committed-color, 10%);
-            transform: scale(1.15);
-            box-shadow: $shadow-md;
-          }
-        }
-      }
-
-      &.so-icon {
-        color: $marble-copper;
-        background: linear-gradient(135deg, 
-          rgba($marble-copper, 0.12) 0%, 
-          rgba($marble-copper, 0.08) 100%);
-        border-color: rgba($marble-copper, 0.2);
-        font-size: 10px;
-        font-weight: $font-weight-bold;
-        letter-spacing: 0.5px;
-      }
-    }
-  }
-}
-
-/* Loading dentro de tabla */
-.table-loading {
-  padding: $spacing-xl;
-  text-align: center;
-
-  .spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid $primary-light;
-    border-top-color: $primary-color;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto $spacing-md;
-    filter: drop-shadow(0 2px 4px rgba($marble-copper-rgba, 0.3));
-  }
-
-  .loading-text { 
-    color: $text-secondary;
-    font-size: $font-size-base;
-    font-weight: $font-weight-medium;
-  }
-}
-
-@keyframes spin { 
-  to { transform: rotate(360deg); }
-}
-
-/* ========================================
-   LOADING Y MENSAJES
-   ======================================== */
 
 .o_inventory_loading {
   display: flex;
@@ -1031,216 +266,699 @@ $breakpoint-lg: 1200px !default;
   gap: $spacing-md;
 
   .spinner {
-    width: 50px;
-    height: 50px;
-    border: 4px solid $primary-light;
+    width: 40px;
+    height: 40px;
+    border: 3px solid $primary-light;
     border-top-color: $primary-color;
     border-radius: 50%;
     animation: spin 1s linear infinite;
-    filter: drop-shadow(0 2px 8px rgba($marble-copper-rgba, 0.4));
   }
 
-  .loading-text { 
+  .loading-text {
     color: $text-secondary;
     font-size: $font-size-base;
-    font-weight: $font-weight-medium;
   }
 }
 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 .o_inventory_error {
-  background: linear-gradient(135deg, 
-    rgba($marble-terracotta, 0.08) 0%, 
-    rgba($marble-terracotta, 0.04) 100%);
-  border: 1px solid rgba($marble-terracotta, 0.3);
+  background: rgba($danger-color, 0.1);
+  border: 1px solid rgba($danger-color, 0.3);
   border-radius: $border-radius-lg;
   padding: $spacing-lg;
   margin: $spacing-lg;
   text-align: center;
-  box-shadow: $shadow-sm;
 
-  .error-icon { 
-    font-size: 48px;
-    color: $marble-terracotta;
+  .error-icon {
+    font-size: 40px;
+    color: $danger-color;
     margin-bottom: $spacing-md;
-    filter: drop-shadow(0 2px 4px rgba($marble-terracotta, 0.3));
   }
-  
-  .error-message { 
-    color: darken($marble-terracotta, 10%);
+
+  .error-message {
+    color: darken($danger-color, 10%);
     font-weight: $font-weight-medium;
   }
 }
 
 .o_inventory_no_results {
   text-align: center;
-  padding: $spacing-xxl;
+  padding: $spacing-xl;
 
-  .no-results-icon { 
-    font-size: 64px;
-    color: $marble-sand;
+  .no-results-icon {
+    font-size: 56px;
+    color: $neutral-color;
     margin-bottom: $spacing-md;
-    filter: drop-shadow(0 4px 8px rgba($marble-sand-rgba, 0.3));
   }
-  
-  .no-results-title { 
-    font-size: $font-size-large;
+
+  .no-results-title {
+    font-size: 18px;
     font-weight: $font-weight-semibold;
     color: $text-secondary;
     margin-bottom: $spacing-sm;
   }
-  
-  .no-results-message { 
+
+  .no-results-message {
     color: $text-muted;
   }
 }
 
-/* ========================================
-   RESPONSIVE
-   ======================================== */
+.o_inventory_visual_content {
+  max-width: $container-max-width;
+  margin: 0 auto;
+  padding: $spacing-lg $spacing-xl;
+  width: 100%;
+  background: $background-primary;
+}
+
+.o_inventory_data_grid {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.o_inventory_grid_table {
+  width: 100%;
+  border-collapse: collapse;
+  background: $background-primary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  overflow: hidden;
+  font-size: $font-size-base;
+
+  thead {
+    background: $background-tertiary;
+    border-bottom: 1px solid $border-color;
+
+    th {
+      padding: $spacing-md;
+      text-align: left;
+      font-weight: $font-weight-bold;
+      color: $text-primary;
+      font-size: $font-size-small;
+      border-right: 1px solid $border-color;
+      white-space: nowrap;
+      line-height: 1.4;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+
+      &:last-child {
+        border-right: none;
+      }
+
+      &.col-product-name {
+        width: 22%;
+        min-width: 200px;
+      }
+
+      &.col-inventory {
+        width: 28%;
+        min-width: 280px;
+      }
+
+      &.col-type,
+      &.col-category,
+      &.col-format {
+        width: 12%;
+        min-width: 100px;
+      }
+
+      &.col-actions {
+        width: 6%;
+        min-width: 60px;
+        text-align: center;
+      }
+    }
+  }
+
+  tbody {
+    tr.o_inventory_product_row {
+      border-bottom: 1px solid $border-color;
+      background: $background-primary;
+      transition: background-color $transition-fast;
+
+      &:hover {
+        background: $background-secondary;
+      }
+
+      &.expanded {
+        background: rgba($primary-color, 0.02);
+      }
+
+      td {
+        padding: $spacing-md;
+        vertical-align: top;
+        color: $text-primary;
+        border-right: 1px solid $border-color;
+        line-height: 1.4;
+
+        &:last-child {
+          border-right: none;
+        }
+      }
+    }
+
+    tr.o_inventory_details_row {
+      background: $background-secondary;
+      border-bottom: 1px solid $border-color;
+
+      td.details-cell {
+        padding: 0;
+        border-right: none;
+      }
+    }
+  }
+
+  .col-product-name {
+    .product-name-cell {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-xs;
+    }
+
+    .product-title {
+      font-weight: $font-weight-bold;
+      color: $text-primary;
+      font-size: $font-size-base;
+      line-height: 1.3;
+    }
+
+    .product-sku {
+      font-size: $font-size-small;
+      color: $text-secondary;
+      font-family: $font-family-monospace;
+      line-height: 1.3;
+    }
+  }
+
+  .col-inventory {
+    .inventory-subgrid {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .inventory-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: $spacing-lg;
+      align-items: center;
+      line-height: 1.3;
+    }
+
+    .inventory-label {
+      font-size: $font-size-small;
+      color: $text-primary;
+      font-weight: $font-weight-normal;
+      text-align: left;
+    }
+
+    .inventory-units {
+      font-size: $font-size-small;
+      color: $text-primary;
+      font-weight: $font-weight-medium;
+      font-family: $font-family-base;
+      text-align: right;
+      min-width: 40px;
+    }
+
+    .inventory-measure {
+      font-size: $font-size-small;
+      color: $text-primary;
+      font-weight: $font-weight-medium;
+      font-family: $font-family-base;
+      text-align: right;
+      min-width: 90px;
+    }
+  }
+
+  .col-type,
+  .col-category,
+  .col-format {
+    font-size: $font-size-base;
+    color: $text-primary;
+    font-weight: $font-weight-normal;
+
+    .text-muted {
+      color: $text-muted;
+    }
+  }
+
+  .col-actions {
+    text-align: center;
+
+    .btn-expand-details {
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid $border-color;
+      border-radius: $border-radius-sm;
+      background: $background-primary;
+      color: $text-secondary;
+      cursor: pointer;
+      transition: all $transition-fast;
+      font-size: 12px;
+
+      &:hover {
+        background: $background-tertiary;
+        border-color: $border-color-medium;
+        color: $text-primary;
+      }
+
+      i {
+        transition: transform $transition-fast;
+      }
+    }
+  }
+}
+
+.details-wrapper {
+  padding: $spacing-lg;
+  background: $background-secondary;
+  overflow-x: auto;
+}
+
+.o_inventory_details_table {
+  width: 100%;
+  border-collapse: collapse;
+  background: $background-primary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  font-size: $font-size-small;
+
+  thead {
+    background: $background-tertiary;
+    border-bottom: 2px solid $border-color-medium;
+
+    th {
+      padding: $spacing-sm $spacing-md;
+      text-align: left;
+      font-weight: $font-weight-bold;
+      color: $text-primary;
+      font-size: $font-size-xsmall;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-right: 1px solid $border-color;
+      white-space: nowrap;
+
+      &:last-child {
+        border-right: none;
+      }
+
+      &.col-icon {
+        width: 40px;
+        text-align: center;
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid $border-color;
+      transition: background-color $transition-fast;
+
+      &:hover {
+        background: $background-secondary;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    td {
+      padding: $spacing-sm $spacing-md;
+      vertical-align: middle;
+      color: $text-primary;
+      border-right: 1px solid $border-color;
+
+      &:last-child {
+        border-right: none;
+      }
+
+      &.col-icon {
+        text-align: center;
+        padding: $spacing-xs;
+      }
+
+      .text-muted {
+        color: $text-muted;
+      }
+    }
+  }
+
+  .col-lot,
+  .col-bloque,
+  .col-atado {
+    font-family: $font-family-monospace;
+    font-weight: $font-weight-semibold;
+    white-space: nowrap;
+  }
+
+  .col-location {
+    font-weight: $font-weight-medium;
+
+    .fa-map-marker {
+      color: $primary-color;
+      margin-right: $spacing-xs;
+    }
+  }
+
+  .col-dimensions {
+    .dimensions-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .dimensions-measures {
+      font-size: $font-size-xsmall;
+      color: $text-secondary;
+    }
+
+    .dimensions-total {
+      font-weight: $font-weight-bold;
+      color: $primary-color;
+      font-family: sans-serif;
+      font-size: 19px;
+    }
+  }
+
+.icon-btn {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-sm;
+  cursor: pointer;
+  transition: all $transition-fast;
+  font-size: 12px;
+
+  // Estado deshabilitado/sin contenido - Gris
+  &.no-content {
+    background: #c2c2c2;
+    color: #FFFFFF;
+    border-color: #c2c2c2;
+    cursor: default;
+    opacity: 0.6;
+
+    &:hover {
+      background: #c2c2c2;
+      border-color: #c2c2c2;
+      transform: none;
+    }
+  }
+
+  // Fotos (P) - Dorado cuando tiene contenido
+  &.has-photos {
+    background: $odoo-gold;
+    color: #FFFFFF;
+    border-color: $odoo-gold;
+
+    &:hover {
+      background: darken($odoo-gold, 10%);
+      border-color: darken($odoo-gold, 10%);
+      transform: scale(1.1);
+    }
+  }
+
+  // Notas (N) - Rosa/Learning cuando tiene contenido
+  &.has-notes {
+    background: $odoo-learning;
+    color: #FFFFFF;
+    border-color: $odoo-learning;
+
+    &:hover {
+      background: darken($odoo-learning, 8%);
+      border-color: darken($odoo-learning, 8%);
+      transform: scale(1.1);
+    }
+  }
+
+  // Detalles (D) - Morado siempre activo
+  &.has-details {
+    background: $odoo-primary;
+    color: #FFFFFF;
+    border-color: $odoo-primary;
+    cursor: pointer;
+
+    &:hover {
+      background: darken($odoo-primary, 8%);
+      transform: scale(1.1);
+    }
+  }
+
+  // Sales Person (SP) - Silver/Azul cuando tiene contenido
+  &.has-sales-person {
+    background: $odoo-silver;
+    color: #FFFFFF;
+    border-color: $odoo-silver;
+
+    &:hover {
+      background: darken($odoo-silver, 8%);
+      border-color: darken($odoo-silver, 8%);
+      transform: scale(1.1);
+    }
+  }
+
+  // Hold (E) - Verde cuando activo
+  &.has-hold-active {
+    background: $odoo-ready;
+    color: #FFFFFF;
+    border-color: $odoo-ready;
+
+    &:hover {
+      background: darken($odoo-ready, 10%);
+      border-color: darken($odoo-ready, 10%);
+      transform: scale(1.1);
+    }
+  }
+
+  // Hold disponible - Dorado
+  &.has-hold-available {
+    background: $odoo-gold;
+    color: #FFFFFF;
+    border-color: $odoo-gold;
+
+    &:hover {
+      background: darken($odoo-gold, 10%);
+      border-color: darken($odoo-gold, 10%);
+      transform: scale(1.1);
+    }
+  }
+}
+
+// Badge SO - Verde cuando está en orden de venta
+.so-badge-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 8px;
+  background: $odoo-ready;
+  color: #FFFFFF;
+  border: 2px solid $odoo-ready;
+  border-radius: $border-radius-sm;
+  font-size: 10px;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all $transition-fast;
+  min-width: 32px;
+
+  &:hover {
+    background: darken($odoo-ready, 10%);
+    border-color: darken($odoo-ready, 10%);
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba($odoo-ready, 0.3);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  // Deshabilitado
+  &.no-content {
+    background: #c2c2c2;
+    border-color: #c2c2c2;
+    cursor: default;
+    opacity: 0.6;
+
+    &:hover {
+      background: #c2c2c2;
+      border-color: #c2c2c2;
+      transform: none;
+      box-shadow: none;
+    }
+  }
+}
+
+  .state-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: $spacing-xs;
+
+    .so-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 6px;
+      background: $background-tertiary;
+      color: $text-primary;
+      border: 1px solid $border-color;
+      border-radius: $border-radius-sm;
+      font-size: 10px;
+      font-weight: $font-weight-bold;
+      letter-spacing: 0.5px;
+    }
+  }
+}
+
+.table-loading {
+  padding: $spacing-xl;
+  text-align: center;
+
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid $primary-light;
+    border-top-color: $primary-color;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto $spacing-md;
+  }
+
+  .loading-text {
+    color: $text-secondary;
+    font-size: $font-size-small;
+  }
+}
 
 @media (max-width: $breakpoint-lg) {
   .o_inventory_visual_searchbar {
     padding: $spacing-md;
-    
-    .searchbar-inner { 
+
+    .searchbar-inner {
       flex-wrap: wrap;
     }
-    
-    .searchbar-label { 
-      min-width: auto;
-    }
-    
-    .searchbar-input-wrapper { 
+
+    .searchbar-input-wrapper {
       max-width: 100%;
       flex: 1 1 100%;
     }
   }
 
-  .o_inventory_product_card .product-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: $spacing-md;
-
-    .product-info { 
-      width: 100%;
-    }
-    
-    .product-metrics-grid { 
-      grid-template-columns: 1fr;
-      gap: $spacing-md;
-    }
-
-    .metrics-column {
-      border-right: none !important;
-      border-bottom: 1px solid $divider-color;
-      padding-right: 0;
-      padding-bottom: $spacing-md;
-
-      &:last-child { 
-        border-bottom: none;
-      }
-    }
-
-    .product-actions {
-      width: 100%;
-      justify-content: space-between;
-    }
+  .o_inventory_grid_table {
+    display: block;
+    overflow-x: auto;
   }
 }
 
 @media (max-width: $breakpoint-md) {
-  .o_inventory_visual_content { 
+  .o_inventory_visual_content {
     padding: $spacing-md;
   }
 
-  .o_inventory_details_table {
-    display: block;
-    overflow-x: auto;
+  .o_inventory_grid_table {
+    font-size: $font-size-small;
 
-    thead, tbody, tr, th, td { 
-      display: block;
-    }
-    
-    thead { 
-      display: none;
-    }
-
-    tbody tr {
-      margin-bottom: $spacing-md;
-      border: 1px solid $border-color;
-      border-radius: $border-radius-md;
-      padding: $spacing-md;
-      box-shadow: $shadow-xs;
+    thead th {
+      padding: $spacing-sm;
     }
 
     tbody td {
-      padding: $spacing-xs 0;
-      
-      &::before {
-        content: attr(data-label);
-        font-weight: $font-weight-semibold;
-        color: $text-secondary;
-        display: inline-block;
-        width: 150px;
-        margin-right: $spacing-sm;
-      }
+      padding: $spacing-sm;
     }
+  }
+
+  .col-inventory .inventory-row {
+    grid-template-columns: 1fr auto auto;
   }
 }
 
-/* ========================================
-   SCROLLBAR PERSONALIZADO
-   ======================================== */
-
 .o_inventory_visual_content,
-.o_inventory_product_details,
-.table-wrapper {
+.o_inventory_data_grid,
+.details-wrapper {
   scrollbar-width: thin;
-  scrollbar-color: $marble-sand $background-secondary;
+  scrollbar-color: $neutral-color $background-secondary;
 
-  &::-webkit-scrollbar { 
+  &::-webkit-scrollbar {
     width: 10px;
     height: 10px;
   }
-  
-  &::-webkit-scrollbar-track { 
+
+  &::-webkit-scrollbar-track {
     background: $background-secondary;
     border-radius: $border-radius-pill;
   }
-  
+
   &::-webkit-scrollbar-thumb {
-    background: linear-gradient(to bottom, 
-      $marble-sand 0%, 
-      $marble-copper 100%);
+    background: linear-gradient(to bottom, $neutral-color 0%, $primary-color 100%);
     border-radius: $border-radius-pill;
     border: 2px solid $background-secondary;
-    
-    &:hover { 
-      background: linear-gradient(to bottom, 
-        $marble-copper 0%, 
-        $marble-terracotta 100%);
+
+    &:hover {
+      background: linear-gradient(to bottom, $primary-color 0%, $secondary-color 100%);
     }
   }
 }
 
-/* ========================================
-   DETALLES FINALES Y POLISH
-   ======================================== */
-
-// Selección de texto
 ::selection {
-  background: rgba($marble-copper-rgba, 0.3);
+  background: rgba($primary-color, 0.3);
   color: $text-primary;
 }
 
 ::-moz-selection {
-  background: rgba($marble-copper-rgba, 0.3);
+  background: rgba($primary-color, 0.3);
   color: $text-primary;
 }
 
-// Focus visible para accesibilidad
 *:focus-visible {
   outline: 2px solid $primary-color;
   outline-offset: 2px;
   border-radius: $border-radius-sm;
+}
+
+// Badge SO (Sale Order) - diseño mejorado
+// Badge SO (Sale Order) - diseño mejorado en verde
+.so-badge-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 8px;
+  background: $success-color;
+  color: #FFFFFF;
+  border: 2px solid $success-color;
+  border-radius: $border-radius-sm;
+  font-size: 10px;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all $transition-fast;
+  min-width: 32px;
+
+  &:hover {
+    background: darken($success-color, 10%);
+    border-color: darken($success-color, 10%);
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba($success-color, 0.3);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// Ajuste del contenedor de estado para acomodar Hold + SO
+.state-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: $spacing-xs;
 }

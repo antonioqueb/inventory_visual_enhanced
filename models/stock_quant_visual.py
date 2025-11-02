@@ -30,9 +30,9 @@ class StockQuantVisual(models.Model):
         
         if search_term:
             domain += ['|', '|', 
-                      ('product_id.name', 'ilike', search_term),
-                      ('product_id.default_code', 'ilike', search_term),
-                      ('product_id.categ_id.name', 'ilike', search_term)]
+                    ('product_id.name', 'ilike', search_term),
+                    ('product_id.default_code', 'ilike', search_term),
+                    ('product_id.categ_id.name', 'ilike', search_term)]
         
         quants = self.search(domain)
         _logger.info(f"Found {len(quants)} quants matching domain")
@@ -41,6 +41,8 @@ class StockQuantVisual(models.Model):
         products_data = defaultdict(lambda: {
             'stock_qty': 0.0,
             'stock_plates': 0,
+            'hold_qty': 0.0,
+            'hold_plates': 0,
             'committed_qty': 0.0,
             'committed_plates': 0,
             'available_qty': 0.0,
@@ -73,21 +75,30 @@ class StockQuantVisual(models.Model):
             
             # Calcular métricas
             total_m2 = quant.quantity
-            committed_m2 = total_m2 if hold_activo else 0.0
+            hold_m2 = total_m2 if hold_activo else 0.0
+            
+            # 🔑 COMMITTED: Cantidad reservada por el sistema (reserved_quantity)
+            committed_m2 = quant.reserved_quantity
+            
+            # Stock = Total
             stock_m2 = total_m2
-            available_m2 = total_m2 - committed_m2
+            
+            # Available = Total - Hold - Committed
+            available_m2 = total_m2 - hold_m2 - committed_m2
             
             # Calcular placas
             total_plates = 0
+            hold_plates = 0
             committed_plates = 0
             stock_plates = 0
             available_plates = 0
             
             if plate_area > 0:
                 total_plates = int(round(total_m2 / plate_area))
-                committed_plates = 1 if hold_activo else 0
+                hold_plates = 1 if hold_activo else 0
+                committed_plates = int(round(committed_m2 / plate_area))
                 stock_plates = total_plates
-                available_plates = stock_plates - committed_plates
+                available_plates = stock_plates - hold_plates - committed_plates
             
             # Obtener categoría hija
             category_name = ''
@@ -112,6 +123,8 @@ class StockQuantVisual(models.Model):
             # Acumular cantidades
             products_data[key]['stock_qty'] += stock_m2
             products_data[key]['stock_plates'] += stock_plates
+            products_data[key]['hold_qty'] += hold_m2
+            products_data[key]['hold_plates'] += hold_plates
             products_data[key]['committed_qty'] += committed_m2
             products_data[key]['committed_plates'] += committed_plates
             products_data[key]['available_qty'] += available_m2
@@ -132,7 +145,7 @@ class StockQuantVisual(models.Model):
         
         _logger.info(f"Returning {len(result)} products")
         return result
-
+    
     @api.model
     def get_lot_photos(self, quant_id=None):
         """
@@ -455,7 +468,24 @@ class StockQuantVisual(models.Model):
                 ], limit=1)
                 en_orden_entrega = bool(delivery_moves)
             
+            # Verificar si tiene orden de venta
             en_orden_venta = False
+            sale_order_ids = []
+            if quant.lot_id:
+                sale_moves = self.env['stock.move.line'].search([
+                    ('lot_id', '=', quant.lot_id.id),
+                    ('state', 'in', ['assigned', 'partially_available', 'done']),
+                    ('move_id.sale_line_id', '!=', False)
+                ])
+                
+                if sale_moves:
+                    en_orden_venta = True
+                    for move in sale_moves:
+                        if move.move_id.sale_line_id and move.move_id.sale_line_id.order_id:
+                            so = move.move_id.sale_line_id.order_id
+                            if so.id not in sale_order_ids:
+                                sale_order_ids.append(so.id)
+                    _logger.info(f"Quant {quant.id} has {len(sale_order_ids)} sale orders")
             
             # Verificar si tiene hold activo
             tiene_hold = False
@@ -530,6 +560,7 @@ class StockQuantVisual(models.Model):
                 'esta_reservado': esta_reservado,
                 'en_orden_entrega': en_orden_entrega,
                 'en_orden_venta': en_orden_venta,
+                'sale_order_ids': sale_order_ids,
                 'tiene_detalles': tiene_detalles,
                 'tiene_hold': tiene_hold,
                 'hold_info': hold_info,
@@ -546,6 +577,60 @@ class StockQuantVisual(models.Model):
         
         _logger.info(f"Returning {len(details)} detail records")
         return details
+
+    @api.model
+    def get_sale_order_info(self, sale_order_ids=None):
+        """
+        Obtiene información detallada de órdenes de venta.
+        
+        Args:
+            sale_order_ids: Lista de IDs de órdenes de venta
+            
+        Returns:
+            dict: Información de las órdenes de venta
+        """
+        _logger.info(f"=== get_sale_order_info called ===")
+        _logger.info(f"sale_order_ids: {sale_order_ids}")
+        
+        if not sale_order_ids:
+            _logger.warning("sale_order_ids is empty")
+            return {'error': 'IDs de órdenes de venta inválidos'}
+        
+        try:
+            sale_orders = self.env['sale.order'].browse(sale_order_ids)
+            _logger.info(f"Found {len(sale_orders)} sale orders")
+            
+            orders_data = []
+            
+            for so in sale_orders:
+                if not so.exists():
+                    continue
+                
+                orders_data.append({
+                    'id': so.id,
+                    'name': so.name,
+                    'partner_name': so.partner_id.name,
+                    'partner_id': so.partner_id.id,
+                    'date_order': so.date_order.strftime('%d/%m/%Y') if so.date_order else '',
+                    'amount_total': so.amount_total,
+                    'currency_symbol': so.currency_id.symbol,
+                    'state': so.state,
+                    'state_display': dict(so._fields['state'].selection).get(so.state),
+                    'user_name': so.user_id.name if so.user_id else '',
+                    'commitment_date': so.commitment_date.strftime('%d/%m/%Y') if so.commitment_date else '',
+                })
+            
+            result = {
+                'orders': orders_data,
+                'count': len(orders_data),
+            }
+            
+            _logger.info(f"Returning {len(orders_data)} sale orders")
+            return result
+            
+        except Exception as e:
+            _logger.error(f"ERROR in get_sale_order_info: {str(e)}", exc_info=True)
+            return {'error': f'Error interno: {str(e)}'}
 
     @api.model
     def get_lot_history(self, quant_id=None):
