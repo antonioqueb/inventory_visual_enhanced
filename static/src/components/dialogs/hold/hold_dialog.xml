@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    
+    <t t-name="inventory_visual_enhanced.CreateHoldDialog" owl="1">
+        <Dialog size="'lg'">
+            <div class="o_create_hold_dialog">
+                <!-- Header con información del producto -->
+                <div class="alert alert-light border-start border-4 border-secondary mb-4">
+                    <div class="d-flex align-items-center">
+                        <i class="fa fa-cube fa-2x text-secondary me-3"></i>
+                        <div>
+                            <h5 class="mb-1 fw-bold">
+                                <t t-esc="detailData.product_name"/>
+                            </h5>
+                            <small class="text-muted">
+                                <i class="fa fa-barcode me-1"></i>
+                                Lote: <strong t-esc="detailData.lot_name"></strong>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Información adicional del lote -->
+                <div class="card bg-light mb-4 border">
+                    <div class="card-body">
+                        <h6 class="card-title mb-3">
+                            <i class="fa fa-info-circle text-muted me-2"></i>
+                            Información del Lote
+                        </h6>
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <small class="text-muted d-block">Ubicación:</small>
+                                <strong t-esc="detailData.location_name"></strong>
+                            </div>
+                            <div class="col-md-4" t-if="detailData.bloque">
+                                <small class="text-muted d-block">Bloque:</small>
+                                <strong t-esc="detailData.bloque"></strong>
+                            </div>
+                            <div class="col-md-4" t-if="detailData.formato">
+                                <small class="text-muted d-block">Formato:</small>
+                                <strong t-esc="detailData.formato"></strong>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted d-block">Cantidad Disponible:</small>
+                                <strong><t t-esc="formatNumber(detailData.available_quantity)"/> m²</strong>
+                            </div>
+                            <div class="col-md-8" t-if="detailData.grosor or detailData.alto or detailData.ancho">
+                                <small class="text-muted d-block">Dimensiones:</small>
+                                <strong>
+                                    <t t-if="detailData.grosor"><t t-esc="detailData.grosor"/>cm × </t>
+                                    <t t-if="detailData.alto"><t t-esc="detailData.alto"/>m × </t>
+                                    <t t-if="detailData.ancho"><t t-esc="detailData.ancho"/>m</t>
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Formulario de apartado -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">
+                        <i class="fa fa-user text-secondary me-2"></i>
+                        Cliente <span class="text-danger">*</span>
+                    </label>
+                    
+                    <!-- Selector de cliente con búsqueda -->
+                    <div class="input-group mb-2">
+                        <span class="input-group-text">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input 
+                            type="text"
+                            class="form-control"
+                            placeholder="Buscar cliente por nombre o referencia..."
+                            t-model="state.searchTerm"
+                            t-on-input="onSearchPartner"
+                        />
+                    </div>
+                    
+                    <!-- Lista de clientes encontrados -->
+                    <div class="list-group mb-3" style="max-height: 200px; overflow-y: auto;" t-if="state.partners.length > 0">
+                        <t t-foreach="state.partners" t-as="partner" t-key="partner.id">
+                            <button 
+                                type="button"
+                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                                t-att-class="{ active: state.selectedPartnerId === partner.id }"
+                                t-on-click="() => this.selectPartner(partner)"
+                            >
+                                <div>
+                                    <strong t-esc="partner.name"></strong>
+                                    <small class="text-muted ms-2" t-if="partner.ref">
+                                        (<t t-esc="partner.ref"/>)
+                                    </small>
+                                </div>
+                                <i class="fa fa-check text-secondary" t-if="state.selectedPartnerId === partner.id"></i>
+                            </button>
+                        </t>
+                    </div>
+                    
+                    <!-- Cliente seleccionado -->
+                    <div class="alert alert-light border d-flex align-items-center" t-if="state.selectedPartnerName">
+                        <i class="fa fa-check-circle fa-2x text-secondary me-3"></i>
+                        <div>
+                            <strong>Cliente seleccionado:</strong><br/>
+                            <t t-esc="state.selectedPartnerName"/>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Notas opcionales -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">
+                        <i class="fa fa-commenting text-secondary me-2"></i>
+                        Notas (opcional)
+                    </label>
+                    <textarea 
+                        class="form-control"
+                        rows="3"
+                        placeholder="Ej: Para proyecto X, Cotización #123, etc."
+                        t-model="state.notas"
+                        t-on-input="onNotasChange"
+                    ></textarea>
+                </div>
+                
+                <!-- Información de expiración -->
+                <div class="alert alert-light border">
+                    <div class="d-flex align-items-start">
+                        <i class="fa fa-clock-o fa-2x text-muted me-3"></i>
+                        <div>
+                            <strong class="d-block mb-1">Duración del Apartado</strong>
+                            <p class="mb-0">
+                                El apartado tendrá una duración de <strong>10 días</strong> a partir de hoy.
+                                Podrás renovarlo desde la gestión de apartados si es necesario.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <t t-set-slot="footer">
+                <button class="btn btn-light border btn-lg" t-on-click="props.close">
+                    <i class="fa fa-times me-2"></i>
+                    Cancelar
+                </button>
+                <button 
+                    class="btn btn-secondary btn-lg"
+                    t-on-click="createHold"
+                    t-att-disabled="!state.selectedPartnerId or state.isCreating"
+                >
+                    <t t-if="!state.isCreating">
+                        <i class="fa fa-hand-paper-o me-2"></i>
+                        Crear Apartado
+                    </t>
+                    <t t-else="">
+                        <i class="fa fa-spinner fa-spin me-2"></i>
+                        Creando...
+                    </t>
+                </button>
+            </t>
+        </Dialog>
+    </t>
+    
+</templates>

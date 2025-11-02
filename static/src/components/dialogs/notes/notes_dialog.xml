@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    
+    <t t-name="inventory_visual_enhanced.NotesDialog" owl="1">
+        <Dialog size="'lg'">
+            <div class="o_notes_dialog">
+                <!-- Header con información del producto -->
+                <div class="alert alert-light border-start border-4 border-secondary mb-4">
+                    <div class="d-flex align-items-center">
+                        <i class="fa fa-cube fa-2x text-secondary me-3"></i>
+                        <div>
+                            <h5 class="mb-1 fw-bold">
+                                <t t-esc="notesData.product_name"/>
+                            </h5>
+                            <small class="text-muted">
+                                <i class="fa fa-barcode me-1"></i>
+                                Lote: <strong t-esc="notesData.lot_name"></strong>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- MODO VISUALIZACIÓN -->
+                <t t-if="hasNotes and !state.isEditing">
+                    <div class="card border mb-4">
+                        <div class="card-header bg-light border-bottom">
+                            <h5 class="mb-0">
+                                <i class="fa fa-exclamation-triangle text-muted me-2"></i>
+                                <strong>Notas y Detalles Especiales</strong>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div 
+                                class="p-4 bg-light rounded border"
+                                style="
+                                    white-space: pre-wrap; 
+                                    font-size: 20px; 
+                                    line-height: 1.8; 
+                                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                                    min-height: 200px;
+                                    max-height: 400px;
+                                    overflow-y: auto;
+                                "
+                            >
+                                <t t-esc="state.notes"/>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button 
+                            class="btn btn-secondary btn-lg px-5"
+                            t-on-click="toggleEdit"
+                        >
+                            <i class="fa fa-edit me-2"></i>
+                            Editar Notas
+                        </button>
+                    </div>
+                </t>
+                
+                <!-- MODO EDICIÓN -->
+                <t t-if="!hasNotes or state.isEditing">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold fs-5 mb-3">
+                            <i class="fa fa-edit text-secondary me-2"></i> 
+                            <t t-if="hasNotes">Editar Notas y Detalles Especiales:</t>
+                            <t t-else="">Agregar Notas y Detalles Especiales:</t>
+                        </label>
+                        
+                        <textarea 
+                            class="form-control form-control-lg border-2"
+                            rows="12"
+                            placeholder="Ej: 
+                            - Placa con barreno
+                            - Release en esquina superior
+                            - Placa rota en un extremo
+                            - Veta pronunciada diagonal
+                            - Manchas de óxido
+                            - Color irregular..."
+                            t-model="state.notes"
+                            t-on-input="onNotesChange"
+                            style="
+                                font-size: 16px; 
+                                line-height: 1.8;
+                                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                            "
+                        ></textarea>
+                        
+                        <div class="alert alert-light border mt-3 mb-0">
+                            <div class="d-flex align-items-start">
+                                <i class="fa fa-info-circle text-muted me-2 mt-1"></i>
+                                <div>
+                                    <strong class="d-block mb-2">¿Qué puedes incluir?</strong>
+                                    <ul class="mb-0 ps-3">
+                                        <li>Defectos físicos (roturas, barrenos, grietas)</li>
+                                        <li>Características visuales (vetas, manchas, colores irregulares)</li>
+                                        <li>Estado general de la placa</li>
+                                        <li>Observaciones del proceso de corte</li>
+                                        <li>Cualquier detalle relevante para producción o venta</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </div>
+
+            <t t-set-slot="footer">
+                <!-- Modo visualización -->
+                <t t-if="hasNotes and !state.isEditing">
+                    <button class="btn btn-secondary btn-lg" t-on-click="props.close">
+                        <i class="fa fa-times me-2"></i>
+                        Cerrar
+                    </button>
+                </t>
+                
+                <!-- Modo edición -->
+                <t t-if="!hasNotes or state.isEditing">
+                    <button 
+                        class="btn btn-light border btn-lg" 
+                        t-on-click="hasNotes ? toggleEdit : props.close"
+                    >
+                        <i class="fa fa-times me-2"></i>
+                        Cancelar
+                    </button>
+                    <button 
+                        class="btn btn-secondary btn-lg"
+                        t-on-click="saveNotes"
+                        t-att-disabled="state.isSaving"
+                    >
+                        <t t-if="!state.isSaving">
+                            <i class="fa fa-save me-2"></i> 
+                            Guardar Notas
+                        </t>
+                        <t t-else="">
+                            <i class="fa fa-spinner fa-spin me-2"></i> 
+                            Guardando...
+                        </t>
+                    </button>
+                </t>
+            </t>
+        </Dialog>
+    </t>
+    
+</templates>

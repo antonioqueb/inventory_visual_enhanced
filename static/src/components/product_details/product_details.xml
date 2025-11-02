@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    
+    <t t-name="inventory_visual_enhanced.ProductDetails" owl="1">
+        <t t-if="!props.details || props.details.length === 0">
+            <div class="table-loading">
+                <div class="spinner"></div>
+                <div class="loading-text">Cargando placas...</div>
+            </div>
+        </t>
+        <t t-else="">
+            <div class="details-wrapper">
+                <table class="o_inventory_details_table">
+                    <thead>
+                        <tr>
+                            <th class="col-lot">Lote</th>
+                            <th class="col-bloque">Bloque</th>
+                            <th class="col-atado">Atado</th>
+                            <th class="col-location">Ubicación</th>
+                            <th class="col-dimensions">Dimensiones</th>
+                            <th class="col-icon">P</th>
+                            <th class="col-icon">N</th>
+                            <th class="col-icon">D</th>
+                            <th class="col-icon">SP</th>
+                            <th class="col-icon">E</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="props.details" t-as="detail" t-key="detail.id">
+                            <tr>
+                                <td class="col-lot" data-label="Lote">
+                                    <t t-if="detail.lot_name" t-esc="detail.lot_name"/>
+                                    <span t-else="" class="text-muted">-</span>
+                                </td>
+                                
+                                <td class="col-bloque" data-label="Bloque">
+                                    <t t-if="detail.bloque" t-esc="detail.bloque"/>
+                                    <span t-else="" class="text-muted">-</span>
+                                </td>
+                                
+                                <td class="col-atado" data-label="Atado">
+                                    <t t-if="detail.atado" t-esc="detail.atado"/>
+                                    <span t-else="" class="text-muted">-</span>
+                                </td>
+                                
+                                <td class="col-location" data-label="Ubicación">
+                                    <i class="fa fa-map-marker"></i>
+                                    <t t-esc="detail.location_name"/>
+                                </td>
+                                
+                                <td class="col-dimensions" data-label="Dimensiones">
+                                    <div class="dimensions-cell">
+                                        <div class="dimensions-measures">
+                                            <t t-if="detail.grosor or detail.alto or detail.ancho">
+                                                <t t-if="detail.grosor"><t t-esc="detail.grosor"/>cm × </t>
+                                                <t t-if="detail.alto"><t t-esc="detail.alto"/>m × </t>
+                                                <t t-if="detail.ancho"><t t-esc="detail.ancho"/>m</t>
+                                            </t>
+                                            <span t-else="" class="text-muted">-</span>
+                                        </div>
+                                        <div class="dimensions-total" t-if="detail.quantity">
+                                            <t t-esc="props.formatNumber(detail.quantity)"/> m²
+                                        </div>
+                                    </div>
+                                </td>
+                                
+                                <td class="col-icon" data-label="Foto">
+                                    <button 
+                                        class="icon-btn"
+                                        t-att-class="detail.cantidad_fotos ? 'has-photos' : 'no-content'"
+                                        t-on-click="() => props.onPhotoClick(detail.id)"
+                                        type="button"
+                                    >
+                                        <i class="fa fa-camera"></i>
+                                    </button>
+                                </td>
+                                
+                                <td class="col-icon" data-label="Notas">
+                                    <button 
+                                        class="icon-btn"
+                                        t-att-class="detail.detalles_placa ? 'has-notes' : 'no-content'"
+                                        t-on-click="() => props.onNotesClick(detail.id)"
+                                        type="button"
+                                    >
+                                        <i class="fa fa-info-circle"></i>
+                                    </button>
+                                </td>
+                                
+                                <td class="col-icon" data-label="Detalles">
+                                    <button 
+                                        class="icon-btn has-details"
+                                        t-on-click="() => props.onDetailsClick(detail.id)"
+                                        type="button"
+                                    >
+                                        <i class="fa fa-list-alt"></i>
+                                    </button>
+                                </td>
+                                
+                                <td class="col-icon" data-label="Cliente/Vendedor">
+                                    <button 
+                                        class="icon-btn"
+                                        t-att-class="detail.sales_person ? 'has-sales-person' : 'no-content'"
+                                        t-on-click="() => props.onSalesPersonClick(detail.id)"
+                                        type="button"
+                                    >
+                                        <i class="fa fa-user"></i>
+                                    </button>
+                                </td>
+                                
+                                <td class="col-icon" data-label="Estado">
+                                    <div class="state-cell">
+                                        <button 
+                                            class="icon-btn"
+                                            t-if="!detail.en_orden_venta"
+                                            t-att-class="detail.tiene_hold ? 'has-hold-active' : 'has-hold-available'"
+                                            t-on-click="() => props.onHoldClick(detail.id, detail.hold_info)"
+                                            type="button"
+                                        >
+                                            <i class="fa fa-hand-paper-o"></i>
+                                        </button>
+                                        
+                                        <button 
+                                            class="so-badge-btn"
+                                            t-if="detail.en_orden_venta"
+                                            t-on-click="() => props.onSaleOrderClick(detail.id, detail.sale_order_ids)"
+                                            type="button"
+                                        >
+                                            <strong>SO</strong>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </t>
+    
+</templates>

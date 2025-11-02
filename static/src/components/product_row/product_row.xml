@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    
+    <t t-name="inventory_visual_enhanced.ProductRow" owl="1">
+        <tr class="o_inventory_product_row" t-att-class="{ expanded: props.isExpanded }">
+            
+            <!-- Product Name -->
+            <td class="col-product-name">
+                <div class="product-name-cell">
+                    <div class="product-title" t-esc="props.product.product_name"></div>
+                    <div class="product-sku" t-if="props.product.product_code" t-esc="props.product.product_code"></div>
+                </div>
+            </td>
+            
+            <!-- Inventory -->
+            <td class="col-inventory">
+                <div class="inventory-subgrid">
+                    <div class="inventory-row">
+                        <span class="inventory-label">In Stock</span>
+                        <span class="inventory-value inventory-units" t-esc="props.product.stock_plates || 0"></span>
+                        <span class="inventory-value inventory-measure">
+                            <t t-esc="props.formatNumber(props.product.stock_qty)"/> M²
+                        </span>
+                    </div>
+                    <div class="inventory-row">
+                        <span class="inventory-label">On Hold</span>
+                        <span class="inventory-value inventory-units" t-esc="props.product.hold_plates || 0"></span>
+                        <span class="inventory-value inventory-measure">
+                            <t t-esc="props.formatNumber(props.product.hold_qty)"/> M²
+                        </span>
+                    </div>
+                    <div class="inventory-row">
+                        <span class="inventory-label">Committed</span>
+                        <span class="inventory-value inventory-units" t-esc="props.product.committed_plates || 0"></span>
+                        <span class="inventory-value inventory-measure">
+                            <t t-esc="props.formatNumber(props.product.committed_qty)"/> M²
+                        </span>
+                    </div>
+                    <div class="inventory-row">
+                        <span class="inventory-label">Available</span>
+                        <span class="inventory-value inventory-units" t-esc="props.product.available_plates || 0"></span>
+                        <span class="inventory-value inventory-measure">
+                            <t t-esc="props.formatNumber(props.product.available_qty)"/> M²
+                        </span>
+                    </div>
+                </div>
+            </td>
+            
+            <!-- Type -->
+            <td class="col-type">
+                <span t-if="props.product.formato">
+                    <t t-if="props.product.formato.includes('Placa')">Placa</t>
+                    <t t-else="" t-esc="props.product.formato"/>
+                </span>
+                <span t-else="" class="text-muted">-</span>
+            </td>
+            
+            <!-- Category -->
+            <td class="col-category">
+                <span t-if="props.product.categ_name" t-esc="props.product.categ_name"/>
+                <span t-else="" class="text-muted">-</span>
+            </td>
+            
+            <!-- Format -->
+            <td class="col-format">
+                <span t-if="props.product.formato" t-esc="props.product.formato"/>
+                <span t-else="" class="text-muted">-</span>
+            </td>
+            
+            <!-- Actions -->
+            <td class="col-actions">
+                <button 
+                    type="button" 
+                    class="btn-expand-details"
+                    t-on-click="() => props.onToggle(props.product.quant_ids)"
+                >
+                    <i class="fa fa-chevron-down" t-att-class="{ 'fa-chevron-up': props.isExpanded }"></i>
+                </button>
+            </td>
+        </tr>
+        
+        <!-- Fila de detalles -->
+        <tr class="o_inventory_details_row" t-if="props.isExpanded">
+            <td colspan="6" class="details-cell">
+                <ProductDetails 
+                    details="props.details"
+                    onPhotoClick="props.onPhotoClick"
+                    onNotesClick="props.onNotesClick"
+                    onDetailsClick="props.onDetailsClick"
+                    onSalesPersonClick="props.onSalesPersonClick"
+                    onHoldClick="props.onHoldClick"
+                    onSaleOrderClick="props.onSaleOrderClick"
+                    formatNumber="props.formatNumber"
+                />
+            </td>
+        </tr>
+    </t>
+    
+</templates>

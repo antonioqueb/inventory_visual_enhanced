@@ -15,6 +15,8 @@
         - Información consolidada: disponible, apartado, total m²
         - Interfaz intuitiva y altamente legible
         - Colores personalizables mediante variables SCSS
+        - Arquitectura modular con componentes separados
+        - Diálogos especializados para fotos, notas, historial y apartados
         - No modifica la lógica de negocio existente
         
         Este módulo NO altera la funcionalidad de Odoo, solo mejora la visualización.
@@ -34,10 +36,32 @@
     ],
     'assets': {
         'web.assets_backend': [
+            # SCSS primero
             'inventory_visual_enhanced/static/src/scss/inventory_visual.scss',
-            'inventory_visual_enhanced/static/src/js/inventory_visual_controller.js',
-            'inventory_visual_enhanced/static/src/xml/inventory_visual_template.xml',
-            'inventory_visual_enhanced/static/src/xml/inventory_visual_dialogs.xml',
+            
+            # JS - orden correcto de dependencias
+            'inventory_visual_enhanced/static/src/components/product_details/product_details.js',
+            'inventory_visual_enhanced/static/src/components/product_row/product_row.js',
+            'inventory_visual_enhanced/static/src/components/inventory_view/inventory_controller.js',
+            
+            # Diálogos JS
+            'inventory_visual_enhanced/static/src/components/dialogs/photo_gallery/photo_gallery_dialog.js',
+            'inventory_visual_enhanced/static/src/components/dialogs/notes/notes_dialog.js',
+            'inventory_visual_enhanced/static/src/components/dialogs/history/history_dialog.js',
+            'inventory_visual_enhanced/static/src/components/dialogs/hold/hold_dialog.js',
+            'inventory_visual_enhanced/static/src/components/dialogs/sale_order/sale_order_dialog.js',
+            
+            # XML - orden correcto de dependencias
+            'inventory_visual_enhanced/static/src/components/product_details/product_details.xml',
+            'inventory_visual_enhanced/static/src/components/product_row/product_row.xml',
+            'inventory_visual_enhanced/static/src/components/inventory_view/inventory_controller.xml',
+            
+            # Diálogos XML
+            'inventory_visual_enhanced/static/src/components/dialogs/photo_gallery/photo_gallery_dialog.xml',
+            'inventory_visual_enhanced/static/src/components/dialogs/notes/notes_dialog.xml',
+            'inventory_visual_enhanced/static/src/components/dialogs/history/history_dialog.xml',
+            'inventory_visual_enhanced/static/src/components/dialogs/hold/hold_dialog.xml',
+            'inventory_visual_enhanced/static/src/components/dialogs/sale_order/sale_order_dialog.xml',
         ],
     },
     'installable': True,
