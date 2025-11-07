@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    
+    <t t-name="inventory_visual_enhanced.HoldInfoDialog" owl="1">
+        <Dialog size="'lg'">
+            <div class="o_hold_info_dialog">
+                <!-- Header con información del producto -->
+                <div class="alert alert-light border-start border-4 border-warning mb-4">
+                    <div class="d-flex align-items-center">
+                        <i class="fa fa-hand-paper-o fa-2x text-warning me-3"></i>
+                        <div>
+                            <h5 class="mb-1 fw-bold">
+                                <t t-esc="detailData.product_name"/>
+                            </h5>
+                            <small class="text-muted">
+                                <i class="fa fa-barcode me-1"></i>
+                                Lote: <strong t-esc="detailData.lot_name"></strong>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estado del apartado -->
+                <div class="card border-warning mb-4">
+                    <div class="card-header bg-warning bg-opacity-10 border-bottom border-warning">
+                        <h5 class="mb-0">
+                            <i class="fa fa-info-circle me-2"></i>
+                            Estado del Apartado
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <div class="alert alert-warning mb-0">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fa fa-exclamation-triangle fa-2x me-3"></i>
+                                        <div>
+                                            <strong class="d-block mb-1">Este lote está apartado actualmente</strong>
+                                            <p class="mb-0 small">
+                                                El material está reservado y no disponible para otros clientes hasta que se libere o expire el apartado.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información del apartado -->
+                <div class="card border mb-4">
+                    <div class="card-header bg-light border-bottom">
+                        <h6 class="mb-0">
+                            <i class="fa fa-user me-2"></i>
+                            Detalles del Apartado
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-borderless mb-0">
+                            <tbody>
+                                <tr>
+                                    <td class="fw-bold" style="width: 40%;">Cliente:</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border fs-6 px-3 py-2">
+                                            <i class="fa fa-user-circle me-2"></i>
+                                            <t t-esc="holdInfo.partner_name"/>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr t-if="holdInfo.proyecto_nombre">
+                                    <td class="fw-bold">Proyecto:</td>
+                                    <td>
+                                        <i class="fa fa-folder text-secondary me-2"></i>
+                                        <t t-esc="holdInfo.proyecto_nombre"/>
+                                    </td>
+                                </tr>
+                                <tr t-if="holdInfo.arquitecto_nombre">
+                                    <td class="fw-bold">Arquitecto:</td>
+                                    <td>
+                                        <i class="fa fa-user-circle-o text-secondary me-2"></i>
+                                        <t t-esc="holdInfo.arquitecto_nombre"/>
+                                    </td>
+                                </tr>
+                                <tr t-if="holdInfo.vendedor_nombre">
+                                    <td class="fw-bold">Vendedor:</td>
+                                    <td>
+                                        <i class="fa fa-user text-info me-2"></i>
+                                        <strong t-esc="holdInfo.vendedor_nombre"></strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Fecha de inicio:</td>
+                                    <td>
+                                        <i class="fa fa-calendar-check-o text-success me-2"></i>
+                                        <t t-esc="holdInfo.fecha_inicio"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Fecha de expiración:</td>
+                                    <td>
+                                        <i class="fa fa-calendar-times-o text-danger me-2"></i>
+                                        <t t-esc="holdInfo.fecha_expiracion"/>
+                                    </td>
+                                </tr>
+                                <tr t-if="holdInfo.notas">
+                                    <td class="fw-bold align-top">Notas:</td>
+                                    <td>
+                                        <div class="p-3 bg-light rounded border">
+                                            <t t-esc="holdInfo.notas"/>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Información del lote -->
+                <div class="card border">
+                    <div class="card-header bg-light border-bottom">
+                        <h6 class="mb-0">
+                            <i class="fa fa-cube me-2"></i>
+                            Información del Lote
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <small class="text-muted d-block mb-1">Ubicación</small>
+                                <strong>
+                                    <i class="fa fa-map-marker text-secondary me-1"></i>
+                                    <t t-esc="detailData.location_name"/>
+                                </strong>
+                            </div>
+                            <div class="col-md-6">
+                                <small class="text-muted d-block mb-1">Cantidad Total</small>
+                                <strong class="text-secondary fs-5">
+                                    <t t-esc="detailData.quantity"/> m²
+                                </strong>
+                            </div>
+                            <div class="col-md-6" t-if="detailData.grosor or detailData.alto or detailData.ancho">
+                                <small class="text-muted d-block mb-1">Dimensiones</small>
+                                <strong>
+                                    <t t-if="detailData.grosor"><t t-esc="detailData.grosor"/>cm × </t>
+                                    <t t-if="detailData.alto"><t t-esc="detailData.alto"/>m × </t>
+                                    <t t-if="detailData.ancho"><t t-esc="detailData.ancho"/>m</t>
+                                </strong>
+                            </div>
+                            <div class="col-md-6" t-if="detailData.bloque">
+                                <small class="text-muted d-block mb-1">Bloque</small>
+                                <strong><t t-esc="detailData.bloque"/></strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <t t-set-slot="footer">
+                <button class="btn btn-light border btn-lg" t-on-click="props.close">
+                    <i class="fa fa-times me-2"></i>
+                    Cerrar
+                </button>
+                <!-- 
+                <button class="btn btn-warning btn-lg" t-on-click="releaseHold">
+                    <i class="fa fa-unlock me-2"></i>
+                    Liberar Apartado
+                </button>
+                -->
+            </t>
+        </Dialog>
+    </t>
+    
+</templates>

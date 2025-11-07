@@ -4,33 +4,234 @@
     <t t-name="inventory_visual_enhanced.InventoryView" owl="1">
         <div class="o_inventory_visual_container d-flex flex-column vh-100" t-ref="root">
             
-            <!-- Barra de búsqueda superior -->
+            <!-- Barra de filtros superior -->
             <div class="o_inventory_visual_searchbar flex-shrink-0 sticky-top">
-                <div class="searchbar-inner container d-flex align-items-center justify-content-between gap-2">
+                <div class="searchbar-inner container">
                     
-                    <div class="searchbar-input-wrapper mx-auto col-12 col-md-8 col-lg-6 px-0 position-relative">
-                        <i class="fa fa-search search-icon"></i>
-                        <input 
-                            type="text"
-                            class="form-control"
-                            placeholder="Buscar por producto, código o familia (ej: Tajmahal)..."
-                            t-model="state.searchTerm"
-                            t-on-input="onSearchInput"
-                            t-att-disabled="state.isLoading"
-                        />
-                        <button 
-                            class="clear-search btn btn-link p-0"
-                            t-att-class="{ visible: state.searchTerm.length > 0 }"
-                            t-on-click="clearSearch"
-                        >
-                            <i class="fa fa-times"></i>
-                        </button>
+                    <!-- Filtros principales (siempre visibles) -->
+                    <div class="filters-row main-filters">
+                        <!-- Búsqueda por nombre -->
+                        <div class="filter-group search-product-name">
+                            <label class="filter-label">Buscar Producto</label>
+                            <input 
+                                type="text"
+                                class="form-control filter-input"
+                                placeholder="Nombre o código del producto..."
+                                t-model="state.filters.product_name"
+                                t-on-input="(ev) => this.onTextFilterChange('product_name', ev)"
+                                t-att-disabled="state.isLoading"
+                            />
+                        </div>
+
+                        <!-- Almacén -->
+                        <div class="filter-group">
+                            <label class="filter-label">Almacén</label>
+                            <select 
+                                class="form-select filter-select"
+                                t-model="state.filters.almacen_id"
+                                t-on-change="onAlmacenChange"
+                                t-att-disabled="state.isLoading"
+                            >
+                                <option value="">Todos los almacenes</option>
+                                <t t-foreach="state.almacenes" t-as="almacen" t-key="almacen.id">
+                                    <option t-att-value="almacen.id" t-esc="almacen.name"></option>
+                                </t>
+                            </select>
+                        </div>
+
+                        <!-- Ubicación -->
+                        <div class="filter-group">
+                            <label class="filter-label">Ubicación</label>
+                            <select 
+                                class="form-select filter-select"
+                                t-model="state.filters.ubicacion_id"
+                                t-on-change="(ev) => this.onFilterChange('ubicacion_id', ev)"
+                                t-att-disabled="state.isLoading or !state.filters.almacen_id or state.ubicaciones.length === 0"
+                            >
+                                <option value="">Todas las ubicaciones</option>
+                                <t t-foreach="state.ubicaciones" t-as="ubicacion" t-key="ubicacion.id">
+                                    <option t-att-value="ubicacion.id" t-esc="ubicacion.complete_name"></option>
+                                </t>
+                            </select>
+                        </div>
+
+                        <!-- Tipo -->
+                        <div class="filter-group">
+                            <label class="filter-label">Tipo</label>
+                            <select 
+                                class="form-select filter-select"
+                                t-model="state.filters.tipo"
+                                t-on-change="(ev) => this.onFilterChange('tipo', ev)"
+                                t-att-disabled="state.isLoading"
+                            >
+                                <option value="">Todos los tipos</option>
+                                <t t-foreach="state.tipos" t-as="tipo" t-key="tipo_index">
+                                    <option t-att-value="tipo[0]" t-esc="tipo[1]"></option>
+                                </t>
+                            </select>
+                        </div>
+
+                        <!-- Categoría -->
+                        <div class="filter-group">
+                            <label class="filter-label">Categoría</label>
+                            <select 
+                                class="form-select filter-select"
+                                t-model="state.filters.categoria_id"
+                                t-on-change="(ev) => this.onFilterChange('categoria_id', ev)"
+                                t-att-disabled="state.isLoading"
+                            >
+                                <option value="">Todas las categorías</option>
+                                <t t-foreach="state.categorias" t-as="categoria" t-key="categoria.id">
+                                    <option t-att-value="categoria.id" t-esc="categoria.complete_name"></option>
+                                </t>
+                            </select>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="filter-actions">
+                            <button 
+                                class="btn btn-sm btn-light border"
+                                t-on-click="toggleAdvancedFilters"
+                                title="Filtros avanzados"
+                            >
+                                <i class="fa fa-sliders me-1"></i>
+                                <t t-if="!state.showAdvancedFilters">Más filtros</t>
+                                <t t-else="">Menos filtros</t>
+                            </button>
+                            <button 
+                                class="btn btn-sm btn-light border"
+                                t-on-click="clearAllFilters"
+                                t-att-disabled="!hasActiveFilters()"
+                                title="Limpiar todos los filtros"
+                            >
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
                     </div>
-                    
-                    <div class="searchbar-info text-nowrap ms-auto" t-if="state.hasSearched">
-                        <span class="count" t-esc="state.totalProducts"></span>
-                        <span t-if="state.totalProducts === 1"> producto</span>
-                        <span t-else=""> productos</span>
+
+                    <!-- Filtros avanzados (desplegables) -->
+                    <div class="filters-row advanced-filters" t-if="state.showAdvancedFilters">
+                        <!-- Grupo -->
+                        <div class="filter-group">
+                            <label class="filter-label">Grupo</label>
+                            <select 
+                                class="form-select filter-select"
+                                t-model="state.filters.grupo"
+                                t-on-change="(ev) => this.onFilterChange('grupo', ev)"
+                                t-att-disabled="state.isLoading"
+                            >
+                                <option value="">Todos los grupos</option>
+                                <t t-foreach="state.grupos" t-as="grupo" t-key="grupo_index">
+                                    <option t-att-value="grupo[0]" t-esc="grupo[1]"></option>
+                                </t>
+                            </select>
+                        </div>
+
+                        <!-- Acabado -->
+                        <div class="filter-group">
+                            <label class="filter-label">Acabado</label>
+                            <select 
+                                class="form-select filter-select"
+                                t-model="state.filters.acabado"
+                                t-on-change="(ev) => this.onFilterChange('acabado', ev)"
+                                t-att-disabled="state.isLoading"
+                            >
+                                <option value="">Todos los acabados</option>
+                                <t t-foreach="state.acabados" t-as="acabado" t-key="acabado_index">
+                                    <option t-att-value="acabado[0]" t-esc="acabado[1]"></option>
+                                </t>
+                            </select>
+                        </div>
+
+                        <!-- Grosor -->
+                        <div class="filter-group">
+                            <label class="filter-label">Grosor</label>
+                            <select 
+                                class="form-select filter-select"
+                                t-model="state.filters.grosor"
+                                t-on-change="(ev) => this.onFilterChange('grosor', ev)"
+                                t-att-disabled="state.isLoading"
+                            >
+                                <option value="">Todos los grosores</option>
+                                <t t-foreach="state.grosores" t-as="grosor" t-key="grosor">
+                                    <option t-att-value="grosor" t-esc="grosor + ' cm'"></option>
+                                </t>
+                            </select>
+                        </div>
+
+                        <!-- Número de serie -->
+                        <div class="filter-group">
+                            <label class="filter-label">N° Serie</label>
+                            <input 
+                                type="text"
+                                class="form-control filter-input"
+                                placeholder="Buscar..."
+                                t-model="state.filters.numero_serie"
+                                t-on-input="(ev) => this.onTextFilterChange('numero_serie', ev)"
+                                t-att-disabled="state.isLoading"
+                            />
+                        </div>
+
+                        <!-- Bloque -->
+                        <div class="filter-group">
+                            <label class="filter-label">Bloque</label>
+                            <input 
+                                type="text"
+                                class="form-control filter-input"
+                                placeholder="Buscar..."
+                                t-model="state.filters.bloque"
+                                t-on-input="(ev) => this.onTextFilterChange('bloque', ev)"
+                                t-att-disabled="state.isLoading"
+                            />
+                        </div>
+
+                        <!-- Pedimento -->
+                        <div class="filter-group">
+                            <label class="filter-label">Pedimento</label>
+                            <input 
+                                type="text"
+                                class="form-control filter-input"
+                                placeholder="Buscar..."
+                                t-model="state.filters.pedimento"
+                                t-on-input="(ev) => this.onTextFilterChange('pedimento', ev)"
+                                t-att-disabled="state.isLoading"
+                            />
+                        </div>
+
+                        <!-- Contenedor -->
+                        <div class="filter-group">
+                            <label class="filter-label">Contenedor</label>
+                            <input 
+                                type="text"
+                                class="form-control filter-input"
+                                placeholder="Buscar..."
+                                t-model="state.filters.contenedor"
+                                t-on-input="(ev) => this.onTextFilterChange('contenedor', ev)"
+                                t-att-disabled="state.isLoading"
+                            />
+                        </div>
+
+                        <!-- Atado -->
+                        <div class="filter-group">
+                            <label class="filter-label">Atado</label>
+                            <input 
+                                type="text"
+                                class="form-control filter-input"
+                                placeholder="Buscar..."
+                                t-model="state.filters.atado"
+                                t-on-input="(ev) => this.onTextFilterChange('atado', ev)"
+                                t-att-disabled="state.isLoading"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Información de resultados -->
+                    <div class="filters-info" t-if="state.hasSearched">
+                        <span class="results-count">
+                            <strong t-esc="state.totalProducts"></strong>
+                            <span t-if="state.totalProducts === 1"> producto encontrado</span>
+                            <span t-else=""> productos encontrados</span>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -40,10 +241,10 @@
                 
                 <!-- Estado inicial -->
                 <div class="o_inventory_visual_empty" t-if="!state.hasSearched and !state.isLoading">
-                    <i class="fa fa-search empty-icon"></i>
-                    <h2 class="empty-title">Busca para visualizar tu inventario</h2>
+                    <i class="fa fa-filter empty-icon"></i>
+                    <h2 class="empty-title">Aplica filtros para visualizar tu inventario</h2>
                     <p class="empty-subtitle">
-                        Escribe el nombre de un producto, código o familia en el buscador superior
+                        Selecciona uno o más filtros en la barra superior
                         para ver el inventario agrupado con métricas detalladas.
                     </p>
                 </div>
@@ -65,7 +266,7 @@
                     <i class="fa fa-inbox no-results-icon"></i>
                     <h3 class="no-results-title">No se encontraron productos</h3>
                     <p class="no-results-message">
-                        Intenta con otro término de búsqueda o verifica el inventario disponible.
+                        Intenta con otros filtros o verifica el inventario disponible.
                     </p>
                 </div>
                 
@@ -78,7 +279,6 @@
                                 <th class="col-inventory">Inventory</th>
                                 <th class="col-type">Type</th>
                                 <th class="col-category">Category</th>
-                                <th class="col-format">Format</th>
                                 <th class="col-actions">Actions</th>
                             </tr>
                         </thead>
@@ -96,6 +296,11 @@
                                     onHoldClick.bind="onHoldClick"
                                     onSaleOrderClick.bind="onSaleOrderClick"
                                     formatNumber.bind="formatNumber"
+                                    isInCart.bind="isInCart"
+                                    toggleCartSelection.bind="toggleCartSelection"
+                                    areAllCurrentProductSelected.bind="() => this.areAllCurrentProductSelected()"
+                                    selectAllCurrentProduct.bind="() => this.selectAllCurrentProduct()"
+                                    deselectAllCurrentProduct.bind="() => this.deselectAllCurrentProduct()"
                                 />
                             </t>
                         </tbody>

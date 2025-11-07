@@ -1,0 +1,210 @@
+.icon-btn {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-sm;
+  cursor: pointer;
+  transition: all $transition-fast;
+  font-size: 12px;
+
+  &.no-content {
+    background: #c2c2c2;
+    color: #FFFFFF;
+    border-color: #c2c2c2;
+    cursor: default;
+    opacity: 0.6;
+
+    &:hover {
+      background: #c2c2c2;
+      border-color: #c2c2c2;
+      transform: none;
+    }
+  }
+
+  &.has-photos {
+    background: $odoo-gold;
+    color: #FFFFFF;
+    border-color: $odoo-gold;
+
+    &:hover {
+      background: darken($odoo-gold, 10%);
+      border-color: darken($odoo-gold, 10%);
+      transform: scale(1.1);
+    }
+  }
+
+  &.has-notes {
+    background: $odoo-learning;
+    color: #FFFFFF;
+    border-color: $odoo-learning;
+
+    &:hover {
+      background: darken($odoo-learning, 8%);
+      border-color: darken($odoo-learning, 8%);
+      transform: scale(1.1);
+    }
+  }
+
+  &.has-details {
+    background: $odoo-primary;
+    color: #FFFFFF;
+    border-color: $odoo-primary;
+    cursor: pointer;
+
+    &:hover {
+      background: darken($odoo-primary, 8%);
+      transform: scale(1.1);
+    }
+  }
+
+  &.has-sales-person {
+    background: $odoo-silver;
+    color: #FFFFFF;
+    border-color: $odoo-silver;
+
+    &:hover {
+      background: darken($odoo-silver, 8%);
+      border-color: darken($odoo-silver, 8%);
+      transform: scale(1.1);
+    }
+  }
+
+  &.has-hold-active {
+    background: $odoo-ready;
+    color: #FFFFFF;
+    border-color: $odoo-ready;
+
+    &:hover {
+      background: darken($odoo-ready, 10%);
+      border-color: darken($odoo-ready, 10%);
+      transform: scale(1.1);
+    }
+  }
+
+  &.has-hold-available {
+    background: $odoo-gold;
+    color: #FFFFFF;
+    border-color: $odoo-gold;
+
+    &:hover {
+      background: darken($odoo-gold, 10%);
+      border-color: darken($odoo-gold, 10%);
+      transform: scale(1.1);
+    }
+  }
+}
+
+.so-badge-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 8px;
+  background: $success-color;
+  color: #FFFFFF;
+  border: 2px solid $success-color;
+  border-radius: $border-radius-sm;
+  font-size: 10px;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all $transition-fast;
+  min-width: 32px;
+
+  &:hover {
+    background: darken($success-color, 10%);
+    border-color: darken($success-color, 10%);
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba($success-color, 0.3);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &.no-content {
+    background: #c2c2c2;
+    border-color: #c2c2c2;
+    cursor: default;
+    opacity: 0.6;
+
+    &:hover {
+      background: #c2c2c2;
+      border-color: #c2c2c2;
+      transform: none;
+      box-shadow: none;
+    }
+  }
+}
+
+.status-badge-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border: 2px solid;
+  border-radius: $border-radius-sm;
+  font-size: 10px;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all $transition-fast;
+  min-width: 40px;
+  height: 28px;
+
+  i.fa {
+    font-size: 22px;
+  }
+
+  &.status-hold-active {
+    background: #ffff;
+    color: #000000;
+    border-color: #ffff;
+
+    &:hover {
+      background: darken(#ffff, 8%);
+      border-color: darken(#ffff, 8%);
+      color: lighten(#000000, 5%);
+      transform: scale(1.1);
+      box-shadow: 0 2px 8px rgba(#000000, 0.3);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  &.status-sale-order {
+    background: #528F76;
+    color: #FFFFFF;
+    border-color: #528F76;
+
+    &:hover {
+      background: darken(#528F76, 10%);
+      border-color: darken(#528F76, 10%);
+      transform: scale(1.1);
+      box-shadow: 0 2px 8px rgba(#528F76, 0.3);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  &.status-no-state {
+    background: #FFFFFF;
+    color: #909090;
+    border-color: #FFFFFF;
+    cursor: pointer;
+    opacity: 0.85;
+
+    &:hover {
+      background: darken(#FFFFFF, 8%);
+      border-color: darken(#FFFFFF, 8%);
+      color: #b0b0b0;
+      transform: scale(1.05);
+    }
+  }
+}

@@ -1,0 +1,100 @@
+.o_inventory_grid_table tbody {
+  tr.o_inventory_product_row {
+    border-bottom: 1px solid $border-color;
+    background: $background-primary;
+    transition: background-color $transition-fast;
+
+    &:hover {
+      background: $background-secondary;
+    }
+
+    &.expanded {
+      background: rgba($primary-color, 0.02);
+    }
+
+    td {
+      padding: $spacing-md;
+      vertical-align: top;
+      color: $text-primary;
+      border-right: 1px solid $border-color;
+      line-height: 1.4;
+
+      &:last-child {
+        border-right: none;
+      }
+    }
+  }
+
+  tr.o_inventory_details_row {
+    background: $background-secondary;
+    border-bottom: 1px solid $border-color;
+
+    td.details-cell {
+      padding: 0;
+      border-right: none;
+    }
+  }
+}
+
+.col-product-name {
+  .product-name-cell {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  .product-title {
+    font-weight: $font-weight-bold;
+    color: $text-primary;
+    font-size: $font-size-base;
+    line-height: 1.3;
+  }
+
+  .product-sku {
+    font-size: $font-size-small;
+    color: $text-secondary;
+    font-family: $font-family-monospace;
+    line-height: 1.3;
+  }
+}
+
+.col-inventory {
+  .inventory-subgrid {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .inventory-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: $spacing-lg;
+    align-items: center;
+    line-height: 1.3;
+  }
+
+  .inventory-label {
+    font-size: $font-size-small;
+    color: $text-primary;
+    font-weight: $font-weight-normal;
+    text-align: left;
+  }
+
+  .inventory-units {
+    font-size: $font-size-small;
+    color: $text-primary;
+    font-weight: $font-weight-medium;
+    font-family: $font-family-base;
+    text-align: right;
+    min-width: 40px;
+  }
+
+  .inventory-measure {
+    font-size: $font-size-small;
+    color: $text-primary;
+    font-weight: $font-weight-medium;
+    font-family: $font-family-base;
+    text-align: right;
+    min-width: 90px;
+  }
+}

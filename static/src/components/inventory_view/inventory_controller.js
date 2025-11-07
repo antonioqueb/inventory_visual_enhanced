@@ -9,6 +9,7 @@ import { NotesDialog } from "../dialogs/notes/notes_dialog";
 import { HistoryDialog } from "../dialogs/history/history_dialog";
 import { CreateHoldDialog } from "../dialogs/hold/hold_dialog";
 import { SaleOrderDialog } from "../dialogs/sale_order/sale_order_dialog";
+import { HoldInfoDialog } from "../dialogs/hold_info/hold_info_dialog";
 
 class InventoryVisualController extends Component {
     setup() {
@@ -18,7 +19,33 @@ class InventoryVisualController extends Component {
         this.root = useRef("root");
 
         this.state = useState({
-            searchTerm: "",
+            // Filtros
+            filters: {
+                product_name: '',
+                almacen_id: null,
+                ubicacion_id: null,
+                tipo: '',
+                categoria_id: null,
+                grupo: '',
+                acabado: '',
+                grosor: '',
+                numero_serie: '',
+                bloque: '',
+                pedimento: '',
+                contenedor: '',
+                atado: '',
+            },
+            
+            // Opciones para dropdowns
+            almacenes: [],
+            ubicaciones: [],
+            tipos: [],
+            categorias: [],
+            grupos: [],
+            acabados: [],
+            grosores: [],
+            
+            // Estado de búsqueda
             isSearching: false,
             products: [],
             expandedProducts: new Set(),
@@ -29,21 +56,20 @@ class InventoryVisualController extends Component {
             totalProducts: 0,
             totalAvailable: 0,
             totalReserved: 0,
+            
+            // UI
+            showAdvancedFilters: false,
         });
 
         this.searchTimeout = null;
         this.searchDelay = 500;
 
-        onWillStart(async () => {});
+        onWillStart(async () => {
+            await this.loadFilterOptions();
+        });
 
         onMounted(() => {
-            if (this.root.el) {
-                const searchInput = this.root.el.querySelector('.searchbar-input-wrapper input');
-                if (searchInput) {
-                    searchInput.focus();
-                }
-                this.setupScrollListener();
-            }
+            this.setupScrollListener();
         });
     }
 
@@ -70,18 +96,110 @@ class InventoryVisualController extends Component {
         });
     }
 
-    onSearchInput(ev) {
-        const value = ev.target.value;
-        this.state.searchTerm = value;
+    async loadFilterOptions() {
+        try {
+            // Cargar almacenes
+            const almacenes = await this.orm.searchRead(
+                "stock.warehouse",
+                [],
+                ["id", "name"],
+                { order: "name" }
+            );
+            this.state.almacenes = almacenes;
 
-        if (this.searchTimeout) {
-            clearTimeout(this.searchTimeout);
+            // Cargar categorías
+            const categorias = await this.orm.searchRead(
+                "product.category",
+                [],
+                ["id", "name", "complete_name"],
+                { order: "complete_name" }
+            );
+            this.state.categorias = categorias;
+
+            // Cargar opciones de selection fields
+            const fieldInfo = await this.orm.call(
+                "stock.quant",
+                "fields_get",
+                [],
+                { attributes: ["selection"] }
+            );
+
+            if (fieldInfo.x_tipo && fieldInfo.x_tipo.selection) {
+                this.state.tipos = fieldInfo.x_tipo.selection;
+            }
+
+            if (fieldInfo.x_grupo && fieldInfo.x_grupo.selection) {
+                this.state.grupos = fieldInfo.x_grupo.selection;
+            }
+
+            if (fieldInfo.x_acabado && fieldInfo.x_acabado.selection) {
+                this.state.acabados = fieldInfo.x_acabado.selection;
+            }
+
+            // Cargar grosores únicos
+            const grosores = await this.orm.call(
+                "stock.quant",
+                "read_group",
+                [],
+                {
+                    domain: [["x_grosor", "!=", false]],
+                    fields: ["x_grosor"],
+                    groupby: ["x_grosor"],
+                }
+            );
+            this.state.grosores = grosores.map(g => g.x_grosor).filter(Boolean).sort();
+
+        } catch (error) {
+            console.error("Error cargando opciones de filtros:", error);
+        }
+    }
+
+    async onAlmacenChange(ev) {
+        const almacenId = ev.target.value ? parseInt(ev.target.value) : null;
+        this.state.filters.almacen_id = almacenId;
+        this.state.filters.ubicacion_id = null;
+        this.state.ubicaciones = [];
+
+        if (almacenId) {
+            try {
+                const almacen = await this.orm.read(
+                    "stock.warehouse",
+                    [almacenId],
+                    ["view_location_id"]
+                );
+
+                if (almacen.length > 0 && almacen[0].view_location_id) {
+                    const ubicaciones = await this.orm.searchRead(
+                        "stock.location",
+                        [["location_id", "child_of", almacen[0].view_location_id[0]]],
+                        ["id", "complete_name"],
+                        { order: "complete_name" }
+                    );
+                    this.state.ubicaciones = ubicaciones;
+                }
+            } catch (error) {
+                console.error("Error cargando ubicaciones:", error);
+            }
         }
 
-        if (!value.trim()) {
-            this.state.hasSearched = false;
-            this.state.products = [];
-            return;
+        this.triggerSearch();
+    }
+
+    onFilterChange(filterName, ev) {
+        const value = ev.target.value;
+        this.state.filters[filterName] = value || null;
+        this.triggerSearch();
+    }
+
+    onTextFilterChange(filterName, ev) {
+        const value = ev.target.value.trim();
+        this.state.filters[filterName] = value;
+        this.triggerSearch();
+    }
+
+    triggerSearch() {
+        if (this.searchTimeout) {
+            clearTimeout(this.searchTimeout);
         }
 
         this.searchTimeout = setTimeout(() => {
@@ -89,11 +207,41 @@ class InventoryVisualController extends Component {
         }, this.searchDelay);
     }
 
+    toggleAdvancedFilters() {
+        this.state.showAdvancedFilters = !this.state.showAdvancedFilters;
+    }
+
+    clearAllFilters() {
+        this.state.filters = {
+            product_name: '',
+            almacen_id: null,
+            ubicacion_id: null,
+            tipo: '',
+            categoria_id: null,
+            grupo: '',
+            acabado: '',
+            grosor: '',
+            numero_serie: '',
+            bloque: '',
+            pedimento: '',
+            contenedor: '',
+            atado: '',
+        };
+        this.state.ubicaciones = [];
+        this.state.hasSearched = false;
+        this.state.products = [];
+        this.state.expandedProducts.clear();
+        this.state.productDetails = {};
+    }
+
+    hasActiveFilters() {
+        return Object.values(this.state.filters).some(v => v !== null && v !== '');
+    }
+
     async searchProducts() {
-        if (!this.state.searchTerm.trim()) {
-            this.notification.add("Por favor ingresa un término de búsqueda", {
-                type: "warning",
-            });
+        if (!this.hasActiveFilters()) {
+            this.state.hasSearched = false;
+            this.state.products = [];
             return;
         }
 
@@ -106,7 +254,7 @@ class InventoryVisualController extends Component {
                 "get_inventory_grouped_by_product",
                 [],
                 {
-                    search_term: this.state.searchTerm.trim(),
+                    filters: this.state.filters,
                 }
             );
 
@@ -119,7 +267,7 @@ class InventoryVisualController extends Component {
 
             if (products.length === 0) {
                 this.notification.add(
-                    `No se encontraron productos con "${this.state.searchTerm}"`,
+                    "No se encontraron productos con los filtros aplicados",
                     { type: "info" }
                 );
             }
@@ -149,21 +297,6 @@ class InventoryVisualController extends Component {
         this.state.totalAvailable = totalAvailable;
         this.state.totalHold = totalHold;
         this.state.totalCommitted = totalCommitted;
-    }
-
-    clearSearch() {
-        this.state.searchTerm = "";
-        this.state.hasSearched = false;
-        this.state.products = [];
-        this.state.expandedProducts.clear();
-        this.state.productDetails = {};
-        
-        if (this.root.el) {
-            const searchInput = this.root.el.querySelector('.searchbar-input-wrapper input');
-            if (searchInput) {
-                searchInput.focus();
-            }
-        }
     }
 
     async toggleProduct(productId, quantIds) {
@@ -343,24 +476,35 @@ class InventoryVisualController extends Component {
     }
 
     async onHoldClick(detailId, holdInfo) {
-        console.log('Hold click:', detailId, holdInfo);
-        
         if (!holdInfo || !holdInfo.id) {
             await this.openCreateHoldDialog(detailId);
             return;
         }
 
-        let message = `Reservado para: ${holdInfo.partner_name}\n`;
-        message += `Fecha de inicio: ${holdInfo.fecha_inicio}\n`;
-        message += `Fecha de expiración: ${holdInfo.fecha_expiracion}`;
-        if (holdInfo.notas) {
-            message += `\nNotas: ${holdInfo.notas}`;
+        // Obtener detailData completo
+        let detailData = null;
+        for (const [productId, details] of Object.entries(this.state.productDetails)) {
+            const detail = details.find(d => d.id === detailId);
+            if (detail) {
+                detailData = detail;
+                break;
+            }
+        }
+        
+        if (!detailData) {
+            this.notification.add("No se encontró información del lote", { type: "danger" });
+            return;
         }
 
-        this.notification.add(message, {
-            type: "info",
-            title: "Información de Reserva (Hold)",
-            sticky: false,
+        this.openHoldInfoDialog(holdInfo, detailData);
+    }
+
+    openHoldInfoDialog(holdInfo, detailData) {
+        this.dialog.add(HoldInfoDialog, {
+            holdInfo,
+            detailData,
+            title: `Apartado Activo - ${detailData.lot_name}`,
+            size: 'lg',
         });
     }
 
@@ -369,10 +513,21 @@ class InventoryVisualController extends Component {
         
         try {
             let detailData = null;
+            
             for (const [productId, details] of Object.entries(this.state.productDetails)) {
                 const detail = details.find(d => d.id === detailId);
                 if (detail) {
                     detailData = detail;
+                    
+                    // 🆕 AGREGAR: Añadir product_id al detailData
+                    detailData.product_id = parseInt(productId);
+                    
+                    // 🆕 AGREGAR: Buscar el product_name
+                    const product = this.state.products.find(p => p.product_id === parseInt(productId));
+                    if (product) {
+                        detailData.product_name = product.product_name;
+                    }
+                    
                     break;
                 }
             }

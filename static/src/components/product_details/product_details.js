@@ -23,4 +23,10 @@ ProductDetails.props = {
     onHoldClick: Function,
     onSaleOrderClick: Function,
     formatNumber: Function,
+    isInCart: { type: Function, optional: true },
+    toggleCartSelection: { type: Function, optional: true },
+    areAllCurrentProductSelected: { type: Function, optional: true },
+    selectAllCurrentProduct: { type: Function, optional: true },
+    deselectAllCurrentProduct: { type: Function, optional: true },
+    cart: { type: Object, optional: true },
 };

@@ -1,0 +1,124 @@
+.o_inventory_data_grid {
+  width: 100%;
+  overflow-x: auto;
+  
+  // Scrollbar inline (sin @include)
+  scrollbar-width: thin;
+  scrollbar-color: #8F8F8F #FAFAFA;
+
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #FAFAFA;
+    border-radius: 50px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #8F8F8F 0%, #714B67 100%);
+    border-radius: 50px;
+    border: 2px solid #FAFAFA;
+
+    &:hover {
+      background: linear-gradient(to bottom, #714B67 0%, #017E84 100%);
+    }
+  }
+}
+
+.o_inventory_grid_table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #FFFFFF;
+  border: 1px solid #E0E0E0;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 13px;
+
+  thead {
+    background: #F5F5F5;
+    border-bottom: 1px solid #E0E0E0;
+
+    th {
+      padding: 12px;
+      text-align: left;
+      font-weight: 700;
+      color: #2C2C2C;
+      font-size: 12px;
+      border-right: 1px solid #E0E0E0;
+      white-space: nowrap;
+      line-height: 1.4;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+
+      &:last-child {
+        border-right: none;
+      }
+
+      &.col-product-name {
+        width: 22%;
+        min-width: 200px;
+      }
+
+      &.col-inventory {
+        width: 28%;
+        min-width: 280px;
+      }
+
+      &.col-type,
+      &.col-category,
+      &.col-format {
+        width: 12%;
+        min-width: 100px;
+      }
+
+      &.col-actions {
+        width: 6%;
+        min-width: 60px;
+        text-align: center;
+      }
+    }
+  }
+
+  .col-type,
+  .col-category,
+  .col-format {
+    font-size: 13px;
+    color: #2C2C2C;
+    font-weight: 400;
+
+    .text-muted {
+      color: #808080;
+    }
+  }
+
+  .col-actions {
+    text-align: center;
+
+    .btn-expand-details {
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #E0E0E0;
+      border-radius: 4px;
+      background: #FFFFFF;
+      color: #7a7a7a;
+      cursor: pointer;
+      transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 12px;
+
+      &:hover {
+        background: #F5F5F5;
+        border-color: #CCCCCC;
+        color: #2C2C2C;
+      }
+
+      i {
+        transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      }
+    }
+  }
+}

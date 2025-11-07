@@ -1,0 +1,107 @@
+// Colores Odoo
+$odoo-primary: #714B67;
+$odoo-gray: #8F8F8F;
+$odoo-secondary: #017E84;
+$odoo-learning: #E46E78;
+$odoo-ready: #21B799;
+$odoo-silver: #5B899E;
+$odoo-gold: #E4A900;
+
+// Colores principales
+$primary-color: $odoo-primary;
+$primary-hover: darken($odoo-primary, 10%);
+$primary-light: mix(#fff, $odoo-primary, 90%);
+$primary-dark: darken($odoo-primary, 15%);
+
+$secondary-color: $odoo-secondary;
+$accent-color: $odoo-gold;
+$neutral-color: $odoo-gray;
+
+$success-color: $odoo-ready;
+$warning-color: $odoo-gold;
+$danger-color: $odoo-learning;
+$info-color: $odoo-silver;
+
+$stock-color: $odoo-gray;
+$committed-color: $odoo-learning;
+$available-color: $odoo-ready;
+
+// Fondos
+$background-primary: #FFFFFF;
+$background-secondary: #FAFAFA;
+$background-tertiary: #F5F5F5;
+$background-hover: mix(#fff, $odoo-gray, 95%);
+$background-elevated: #FFFFFF;
+
+// Bordes
+$border-color: #E0E0E0;
+$border-color-medium: #CCCCCC;
+$border-color-dark: $odoo-gray;
+$divider-color: #F0F0F0;
+
+// Textos
+$text-primary: #2C2C2C;
+$text-secondary: #7a7a7a;
+$text-tertiary: $odoo-gray;
+$text-muted: #808080;
+
+// Iconos
+$icon-default: $odoo-gray;
+$icon-active: $odoo-primary;
+$icon-alert: $odoo-learning;
+
+// Tipografía
+$font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-family-monospace: "SF Mono", Monaco, Consolas, "Courier New", monospace;
+
+$font-size-base: 13px;
+$font-size-small: 12px;
+$font-size-xsmall: 11px;
+$font-size-large: 16px;
+$font-size-xlarge: 18px;
+$font-size-xxlarge: 24px;
+
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+$line-height-base: 1.5;
+$line-height-tight: 1.3;
+$line-height-compact: 1;
+
+// Espaciado
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 12px;
+$spacing-lg: 16px;
+$spacing-xl: 24px;
+$spacing-xxl: 48px;
+
+// Sombras
+$shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.06);
+$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+$shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.08);
+$shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);
+$shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.14), 0 6px 12px rgba(0, 0, 0, 0.1);
+$shadow-hover: 0 6px 16px rgba($odoo-primary, 0.2), 0 3px 8px rgba($odoo-primary, 0.12);
+$shadow-focus: 0 0 0 3px rgba($odoo-primary, 0.15);
+
+// Border radius
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+$border-radius-lg: 12px;
+$border-radius-xl: 16px;
+$border-radius-pill: 50px;
+
+// Transiciones
+$transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-all: all $transition-base;
+
+// Layout
+$container-max-width: 1600px;
+$z-index-searchbar: 100;
+$breakpoint-md: 992px;
+$breakpoint-lg: 1200px;

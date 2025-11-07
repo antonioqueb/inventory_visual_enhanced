@@ -1,0 +1,152 @@
+.o_inventory_visual_searchbar {
+  position: sticky;
+  top: 0;
+  z-index: $z-index-searchbar;
+  background: rgba($background-elevated, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid $border-color;
+  padding: $spacing-md $spacing-lg;
+  box-shadow: $shadow-sm;
+  transition: $transition-all;
+
+  &.scrolled {
+    box-shadow: $shadow-md;
+    background: rgba($background-elevated, 0.98);
+  }
+
+  .searchbar-inner {
+    max-width: $container-max-width;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  .filters-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: $spacing-md;
+    align-items: end;
+
+    &.main-filters {
+      grid-template-columns: 1.5fr repeat(4, 1fr) auto;
+      
+      .search-product-name {
+        grid-column: span 1;
+      }
+    }
+
+    &.advanced-filters {
+      padding-top: $spacing-md;
+      border-top: 1px solid $border-color;
+      animation: slideDown 0.3s ease-out;
+    }
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .filter-label {
+    font-size: $font-size-small;
+    font-weight: $font-weight-semibold;
+    color: $text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin: 0;
+  }
+
+  .filter-select,
+  .filter-input {
+    height: 40px;
+    padding: 0 $spacing-md;
+    border: 1px solid $border-color;
+    border-radius: $border-radius-sm;
+    font-size: $font-size-base;
+    font-family: $font-family-base;
+    background: $background-primary;
+    color: $text-primary;
+    transition: $transition-all;
+    outline: none;
+
+    &:focus {
+      border-color: $primary-color;
+      box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+    }
+
+    &:disabled {
+      background: $background-tertiary;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+
+  .filter-actions {
+    display: flex;
+    gap: $spacing-sm;
+    align-items: center;
+
+    .btn {
+      height: 40px;
+      padding: 0 $spacing-md;
+      white-space: nowrap;
+      font-size: $font-size-small;
+      font-weight: $font-weight-medium;
+      border-radius: $border-radius-sm;
+      transition: $transition-all;
+
+      &:hover:not(:disabled) {
+        background: $primary-color;
+        color: white;
+        border-color: $primary-color;
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .filters-info {
+    padding: $spacing-sm $spacing-md;
+    background: $background-secondary;
+    border-radius: $border-radius-sm;
+    border: 1px solid $border-color;
+
+    .results-count {
+      font-size: $font-size-small;
+      color: $text-secondary;
+
+      strong {
+        color: $primary-color;
+        font-weight: $font-weight-bold;
+      }
+    }
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .o_inventory_visual_searchbar {
+    .filters-row {
+      grid-template-columns: 1fr 1fr;
+
+      &.main-filters {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+}

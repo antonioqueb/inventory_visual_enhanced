@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Inventario Visual Avanzado',
-    'version': '18.0.1.0.0',
+    'version': '19.0.1.0.0',
     'category': 'Inventory/Inventory',
     'summary': 'Vista visual mejorada y agrupada del inventario por producto',
     'description': """
@@ -28,39 +28,46 @@
         'web',
         'purchase',
         'sale',
+        'stock_lot_dimensions',
     ],
     'data': [
-        'security/ir.model.access.csv',
         'views/inventory_visual_views.xml',
         'views/menu_items.xml',
     ],
     'assets': {
         'web.assets_backend': [
-            # SCSS primero
-            'inventory_visual_enhanced/static/src/scss/inventory_visual.scss',
+            # Variables PRIMERO (pero dentro de assets_backend)
+            'inventory_visual_enhanced/static/src/scss/_variables.scss',
             
-            # JS - orden correcto de dependencias
+            # SCSS de componentes
+            'inventory_visual_enhanced/static/src/scss/components/_hold-wizard.scss',
+            'inventory_visual_enhanced/static/src/scss/components/_searchbar.scss',
+            'inventory_visual_enhanced/static/src/scss/components/_states.scss',
+            'inventory_visual_enhanced/static/src/scss/components/_data-grid.scss',
+            'inventory_visual_enhanced/static/src/scss/components/_product-row.scss',
+            'inventory_visual_enhanced/static/src/scss/components/_product-details.scss',
+            'inventory_visual_enhanced/static/src/scss/components/_badges.scss',
+            
+            # JS
             'inventory_visual_enhanced/static/src/components/product_details/product_details.js',
             'inventory_visual_enhanced/static/src/components/product_row/product_row.js',
             'inventory_visual_enhanced/static/src/components/inventory_view/inventory_controller.js',
-            
-            # Diálogos JS
             'inventory_visual_enhanced/static/src/components/dialogs/photo_gallery/photo_gallery_dialog.js',
             'inventory_visual_enhanced/static/src/components/dialogs/notes/notes_dialog.js',
             'inventory_visual_enhanced/static/src/components/dialogs/history/history_dialog.js',
             'inventory_visual_enhanced/static/src/components/dialogs/hold/hold_dialog.js',
+            'inventory_visual_enhanced/static/src/components/dialogs/hold_info/hold_info_dialog.js',
             'inventory_visual_enhanced/static/src/components/dialogs/sale_order/sale_order_dialog.js',
             
-            # XML - orden correcto de dependencias
+            # XML
             'inventory_visual_enhanced/static/src/components/product_details/product_details.xml',
             'inventory_visual_enhanced/static/src/components/product_row/product_row.xml',
             'inventory_visual_enhanced/static/src/components/inventory_view/inventory_controller.xml',
-            
-            # Diálogos XML
             'inventory_visual_enhanced/static/src/components/dialogs/photo_gallery/photo_gallery_dialog.xml',
             'inventory_visual_enhanced/static/src/components/dialogs/notes/notes_dialog.xml',
             'inventory_visual_enhanced/static/src/components/dialogs/history/history_dialog.xml',
             'inventory_visual_enhanced/static/src/components/dialogs/hold/hold_dialog.xml',
+            'inventory_visual_enhanced/static/src/components/dialogs/hold_info/hold_info_dialog.xml',
             'inventory_visual_enhanced/static/src/components/dialogs/sale_order/sale_order_dialog.xml',
         ],
     },

@@ -48,22 +48,13 @@
             
             <!-- Type -->
             <td class="col-type">
-                <span t-if="props.product.formato">
-                    <t t-if="props.product.formato.includes('Placa')">Placa</t>
-                    <t t-else="" t-esc="props.product.formato"/>
-                </span>
+                <span t-if="props.product.tipo" t-esc="props.product.tipo"/>
                 <span t-else="" class="text-muted">-</span>
             </td>
             
             <!-- Category -->
             <td class="col-category">
                 <span t-if="props.product.categ_name" t-esc="props.product.categ_name"/>
-                <span t-else="" class="text-muted">-</span>
-            </td>
-            
-            <!-- Format -->
-            <td class="col-format">
-                <span t-if="props.product.formato" t-esc="props.product.formato"/>
                 <span t-else="" class="text-muted">-</span>
             </td>
             
@@ -91,6 +82,11 @@
                     onHoldClick="props.onHoldClick"
                     onSaleOrderClick="props.onSaleOrderClick"
                     formatNumber="props.formatNumber"
+                    isInCart="props.isInCart"
+                    toggleCartSelection="props.toggleCartSelection"
+                    areAllCurrentProductSelected="props.areAllCurrentProductSelected"
+                    selectAllCurrentProduct="props.selectAllCurrentProduct"
+                    deselectAllCurrentProduct="props.deselectAllCurrentProduct"
                 />
             </td>
         </tr>
