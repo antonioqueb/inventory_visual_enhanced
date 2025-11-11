@@ -18,7 +18,6 @@
                         <th class="col-icon">P</th>
                         <th class="col-icon">N</th>
                         <th class="col-icon">D</th>
-                        <!-- <th class="col-icon">SP</th> -->
                         <th class="col-icon">E</th>
                     </tr>
                 </thead>
@@ -48,17 +47,21 @@
                             
                             <!-- Dimensiones -->
                             <td class="col-dimensions">
-                                <div class="dimensions-cell">
-                                    <div class="dimensions-measures">
-                                        <t t-if="detail.grosor"><t t-esc="detail.grosor"/>cm × </t>
-                                        <t t-if="detail.alto"><t t-esc="detail.alto"/>m × </t>
-                                        <t t-if="detail.ancho"><t t-esc="detail.ancho"/>m</t>
-                                        <t t-if="!detail.grosor and !detail.alto and !detail.ancho">-</t>
-                                    </div>
-                                    <div class="dimensions-total">
+                                <span class="dimensions-inline">
+                                    <t t-if="detail.alto and detail.ancho">
+                                        <t t-esc="detail.alto"/>m × <t t-esc="detail.ancho"/>m
+                                    </t>
+                                    <t t-elif="!detail.alto and !detail.ancho">-</t>
+                                    <t t-elif="detail.alto">
+                                        <t t-esc="detail.alto"/>m
+                                    </t>
+                                    <t t-else="">
+                                        <t t-esc="detail.ancho"/>m
+                                    </t>
+                                    <strong class="dimensions-total-inline">
                                         <t t-esc="props.formatNumber(detail.quantity)"/> m²
-                                    </div>
-                                </div>
+                                    </strong>
+                                </span>
                             </td>
                             
                             <!-- Tipo -->
@@ -134,19 +137,6 @@
                                     <strong>D</strong>
                                 </button>
                             </td>
-                            
-                            <!-- Sales Person (SP)
-                            <td class="col-icon">
-                                <button 
-                                    type="button"
-                                    class="icon-btn"
-                                    t-att-class="{ 'has-sales-person': detail.sales_person, 'no-content': !detail.sales_person }"
-                                    t-on-click="() => props.onSalesPersonClick(detail.id)"
-                                    t-att-title="detail.sales_person ? 'Vendedor: ' + detail.sales_person : 'Sin vendedor asignado'"
-                                >
-                                    <strong>SP</strong>
-                                </button>
-                            </td> -->
                             
                             <!-- Estado (Combinado: Hold o SO) -->
                             <td class="col-icon">

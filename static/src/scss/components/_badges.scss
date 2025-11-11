@@ -159,16 +159,15 @@
   }
 
   &.status-hold-active {
-    background: #ffff;
-    color: #000000;
-    border-color: #ffff;
+    background: #FFD700;
+    color: #2C2C2C;
+    border-color: #FFD700;
 
     &:hover {
-      background: darken(#ffff, 8%);
-      border-color: darken(#ffff, 8%);
-      color: lighten(#000000, 5%);
+      background: darken(#FFD700, 8%);
+      border-color: darken(#FFD700, 8%);
       transform: scale(1.1);
-      box-shadow: 0 2px 8px rgba(#000000, 0.3);
+      box-shadow: 0 2px 8px rgba(#FFD700, 0.3);
     }
 
     &:active {
