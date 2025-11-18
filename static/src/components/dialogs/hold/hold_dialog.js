@@ -141,22 +141,10 @@ export class CreateHoldDialog extends Component {
     
     onPriceChange(value) {
         const numValue = parseFloat(value);
-        const options = this.state.productPriceOptions || [];
         
-        if (options.length === 0) {
-            this.state.productPrice = numValue;
-            return;
-        }
-        
-        const minPrice = Math.min(...options.map(opt => opt.value));
-        
-        if (numValue < minPrice) {
-            this.notification.add(
-                `El precio no puede ser menor a ${this.formatNumber(minPrice)}`,
-                { type: "warning" }
-            );
-            this.state.productPrice = minPrice;
-        } else {
+        // ✅ PERMITIR CUALQUIER PRECIO (incluso menor al mínimo)
+        // El backend se encargará de crear la autorización si es necesario
+        if (!isNaN(numValue) && numValue >= 0) {
             this.state.productPrice = numValue;
         }
     }
@@ -475,6 +463,21 @@ export class CreateHoldDialog extends Component {
                 }
             );
             
+            // ✅ MANEJAR CASO DE AUTORIZACIÓN REQUERIDA
+            if (result.needs_authorization) {
+                this.notification.add(
+                    `${result.message}\n\nPuede ver el estado en "Autorizaciones de Precio"`, 
+                    { type: "warning", sticky: true }
+                );
+                this.props.close();
+                
+                if (this.props.onReload) {
+                    await this.props.onReload();
+                }
+                return;
+            }
+            
+            // ✅ CASO NORMAL: APARTADO CREADO
             if (result.error) {
                 this.notification.add(result.error, { type: "danger" });
             } else if (result.success) {
