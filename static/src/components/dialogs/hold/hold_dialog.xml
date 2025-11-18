@@ -436,11 +436,13 @@
                                 <t t-if="state.productPriceOptions and state.productPriceOptions.length > 0">
                                     <select 
                                         class="form-select mb-2"
-                                        t-model.number="state.productPrice"
                                         t-on-change="(ev) => this.onPriceChange(ev.target.value)"
                                     >
                                         <t t-foreach="state.productPriceOptions" t-as="option" t-key="option_index">
-                                            <option t-att-value="option.value">
+                                            <option 
+                                                t-att-value="option.value"
+                                                t-att-selected="state.productPrice === option.value"
+                                            >
                                                 <t t-esc="option.label"/> - <t t-esc="formatNumber(option.value)"/>
                                             </option>
                                         </t>
@@ -450,9 +452,10 @@
                                     type="number"
                                     class="form-control"
                                     placeholder="Precio personalizado"
-                                    t-model.number="state.productPrice"
-                                    t-on-change="(ev) => this.onPriceChange(ev.target.value)"
+                                    t-att-value="state.productPrice"
+                                    t-on-input="(ev) => this.onPriceChange(ev.target.value)"
                                     step="0.01"
+                                    min="0"
                                 />
                             </div>
                             
