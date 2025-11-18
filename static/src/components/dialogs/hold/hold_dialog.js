@@ -142,8 +142,8 @@ export class CreateHoldDialog extends Component {
     onPriceChange(value) {
         const numValue = parseFloat(value);
         
-        // ✅ PERMITIR CUALQUIER PRECIO (incluso menor al mínimo)
-        // El backend se encargará de crear la autorización si es necesario
+        // ✅ PERMITIR CUALQUIER PRECIO sin restricciones
+        // El backend maneja la autorización automáticamente
         if (!isNaN(numValue) && numValue >= 0) {
             this.state.productPrice = numValue;
         }
