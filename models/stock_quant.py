@@ -145,6 +145,11 @@ class StockQuant(models.Model):
         quants = self.browse(quant_ids)
         result = []
         
+        # Verificar permisos de ventas una sola vez
+        is_sales_user = self.env.user.has_group('sales_team.group_sale_salesman') or \
+                        self.env.user.has_group('sales_team.group_sale_salesman_all_leads') or \
+                        self.env.user.has_group('sales_team.group_sale_manager')
+        
         for quant in quants:
             # Obtener el valor display del campo tipo
             tipo_display = ''
@@ -203,26 +208,26 @@ class StockQuant(models.Model):
                     'notas': hold.notas if hasattr(hold, 'notas') else '',
                 }
             
-            # Sale orders - buscar en el campo correcto
-            if quant.lot_id:
-                # Buscar sale order lines que contengan este quant en sus lotes seleccionados
-                sale_lines = self.env['sale.order.line'].search([
-                    ('product_id', '=', quant.product_id.id),
-                    ('order_id.state', 'in', ['sale', 'done'])
+            # Sale orders - solo si el usuario tiene permisos de ventas
+            if quant.lot_id and is_sales_user:
+                # Buscar move lines que usen este lote específico
+                move_lines_with_lot = self.env['stock.move.line'].sudo().search([
+                    ('lot_id', '=', quant.lot_id.id),
+                    ('state', 'in', ['assigned', 'done']),
+                    ('picking_id.picking_type_code', '=', 'outgoing'),
                 ])
-                # Filtrar las que realmente contienen este lote
-                relevant_orders = []
-                for line in sale_lines:
-                    # Verificar si el lote está en los movimientos de esta línea
-                    move_lines = line.move_ids.mapped('move_line_ids').filtered(
-                        lambda ml: ml.lot_id.id == quant.lot_id.id
-                    )
-                    if move_lines:
-                        relevant_orders.append(line.order_id.id)
                 
-                if relevant_orders:
+                # Obtener las órdenes de venta relacionadas
+                sale_order_ids = set()
+                for move_line in move_lines_with_lot:
+                    if move_line.move_id and move_line.move_id.sale_line_id:
+                        sale_order = move_line.move_id.sale_line_id.order_id
+                        if sale_order.state in ['sale', 'done']:
+                            sale_order_ids.add(sale_order.id)
+                
+                if sale_order_ids:
                     detail['en_orden_venta'] = True
-                    detail['sale_order_ids'] = list(set(relevant_orders))
+                    detail['sale_order_ids'] = list(sale_order_ids)
             
             result.append(detail)
         
