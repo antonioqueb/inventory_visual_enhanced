@@ -679,6 +679,49 @@ class StockQuant(models.Model):
         if hasattr(quant, 'x_tiene_hold') and quant.x_tiene_hold:
             return {'error': 'Este lote ya tiene un apartado activo'}
         
+        # ✅ VERIFICAR SI REQUIERE AUTORIZACIÓN (igual que el carrito)
+        if product_prices and isinstance(product_prices, dict):
+            auth_check = self.env['product.template'].check_price_authorization_needed(
+                product_prices, 
+                currency_code
+            )
+            
+            if auth_check['needs_authorization']:
+                # Agrupar lotes por producto (en este caso solo 1 lote)
+                product_groups = {}
+                pid = quant.product_id.id
+                product_groups[str(pid)] = {
+                    'name': quant.product_id.display_name,
+                    'lots': [{
+                        'id': quant_id,
+                        'lot_name': quant.lot_id.name,
+                        'quantity': quant.quantity
+                    }],
+                    'total_quantity': quant.quantity
+                }
+                
+                # Crear autorización en lugar de hold
+                result = self.create_price_authorization(
+                    operation_type='hold',
+                    partner_id=partner_id,
+                    project_id=project_id,
+                    selected_lots=[quant_id],
+                    currency_code=currency_code,
+                    product_prices=product_prices,
+                    product_groups=product_groups,
+                    notes=notas,
+                    architect_id=architect_id
+                )
+                
+                if result['success']:
+                    return {
+                        'needs_authorization': True,
+                        'authorization_id': result['authorization_id'],
+                        'authorization_name': result['authorization_name'],
+                        'message': f'Solicitud de autorización {result["authorization_name"]} creada. Espere aprobación del autorizador.'
+                    }
+        
+        # ✅ SI NO REQUIERE AUTORIZACIÓN, CREAR HOLD NORMALMENTE
         try:
             # Construir notas con información de precios
             full_notes = notas or ''
@@ -727,7 +770,6 @@ class StockQuant(models.Model):
             if 'arquitecto_id' in hold_model._fields and architect_id:
                 hold_vals['arquitecto_id'] = architect_id
             
-        
             hold = hold_model.create(hold_vals)
             
             return {
@@ -742,6 +784,66 @@ class StockQuant(models.Model):
             error_msg = traceback.format_exc()
             _logger.error(f"Error al crear apartado: {error_msg}")
             return {'error': f'Error al crear apartado: {str(e)}'}
+    
+    @api.model
+    def create_price_authorization(self, operation_type, partner_id, project_id, 
+                                   selected_lots, currency_code, product_prices, 
+                                   product_groups, notes=None, architect_id=None):
+        """Crea solicitud de autorización de precio"""
+        
+        # ✅ NORMALIZAR: Convertir todas las claves de product_prices a string
+        if isinstance(product_prices, dict):
+            product_prices = {str(k): v for k, v in product_prices.items()}
+        
+        # ✅ CREAR LA AUTORIZACIÓN
+        auth = self.env['price.authorization'].create({
+            'seller_id': self.env.user.id,
+            'operation_type': operation_type,
+            'partner_id': partner_id,
+            'project_id': project_id,
+            'currency_code': currency_code,
+            'notes': notes or '',
+            'temp_data': {
+                'selected_lots': selected_lots,
+                'product_prices': product_prices,
+                'product_groups': product_groups,
+                'architect_id': architect_id
+            }
+        })
+        
+        # ✅ CREAR LÍNEAS CON EL PRECIO SOLICITADO CORRECTO
+        for product_id_str, group in product_groups.items():
+            product_id = int(product_id_str)
+            product = self.env['product.product'].browse(product_id)
+            
+            # Obtener precios según divisa
+            if currency_code == 'USD':
+                medium_price = product.product_tmpl_id.x_price_usd_2
+                minimum_price = product.product_tmpl_id.x_price_usd_3
+            else:  # MXN
+                medium_price = product.product_tmpl_id.x_price_mxn_2
+                minimum_price = product.product_tmpl_id.x_price_mxn_3
+            
+            # ✅ OBTENER EL PRECIO SOLICITADO CORRECTAMENTE
+            requested_price = float(product_prices.get(str(product_id), 0))
+            
+            # ✅ CREAR LÍNEA CON requested_price Y authorized_price
+            self.env['price.authorization.line'].create({
+                'authorization_id': auth.id,
+                'product_id': product_id,
+                'quantity': group['total_quantity'],
+                'lot_count': len(group['lots']),
+                'requested_price': requested_price,
+                'authorized_price': requested_price,
+                'medium_price': medium_price,
+                'minimum_price': minimum_price
+            })
+        
+        return {
+            'success': True,
+            'authorization_id': auth.id,
+            'authorization_name': auth.name
+        }
     
     @api.model
     def get_sale_order_info(self, sale_order_ids):
