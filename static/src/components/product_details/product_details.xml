@@ -126,7 +126,7 @@
                                 </button>
                             </td>
                             
-                            <!-- DETALLES/HISTORIAL (D) - SOLO VENTAS -->
+                            <!-- DETALLES/HISTORIAL (D) - Icono de historial -->
                             <td class="col-icon">
                                 <button 
                                     t-if="props.hasSalesPermissions"
@@ -135,7 +135,7 @@
                                     t-on-click="() => props.onDetailsClick(detail.id)"
                                     title="Ver historial completo de compras, ventas y movimientos"
                                 >
-                                    <i class="fa fa-info-circle"></i>
+                                    <i class="fa fa-history"></i>
                                 </button>
                                 <span 
                                     t-else=""
@@ -143,13 +143,13 @@
                                     title="Historial completo - Requiere permisos de ventas"
                                     style="cursor: not-allowed; pointer-events: none;"
                                 >
-                                    <i class="fa fa-info-circle"></i>
+                                    <i class="fa fa-history"></i>
                                 </span>
                             </td>
                             
                             <!-- ESTADO (E: Hold o SO) -->
                             <td class="col-icon">
-                                <!-- Hold Activo - DÉJALO COMO ESTÁ -->
+                                <!-- Hold Activo -->
                                 <button 
                                     t-if="detail.tiene_hold and props.hasSalesPermissions"
                                     type="button"
