@@ -54,7 +54,7 @@
                             <span class="badge bg-secondary ms-2">1</span>
                         </button>
                     </li>
-                    <li class="nav-item" role="presentation">
+                    <li class="nav-item" role="presentation" t-if="history.has_purchase_permissions">
                         <button 
                             class="nav-link"
                             t-att-class="{ active: isActiveTab('purchase') }"
@@ -241,8 +241,8 @@
                         </div>
                     </div>
 
-                    <!-- PESTAÑA: COMPRAS -->
-                    <div t-if="isActiveTab('purchase')" class="tab-pane fade show active">
+                    <!-- PESTAÑA: COMPRAS - SOLO SI TIENE PERMISOS -->
+                    <div t-if="isActiveTab('purchase') and history.has_purchase_permissions" class="tab-pane fade show active">
                         <t t-if="history.purchase_info.length === 0">
                             <div class="text-center py-5">
                                 <i class="fa fa-shopping-cart" style="font-size: 64px; color: #ccc;"></i>

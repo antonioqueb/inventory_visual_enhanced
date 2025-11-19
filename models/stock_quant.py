@@ -204,7 +204,7 @@ class StockQuant(models.Model):
                 'referencia_proveedor': quant.x_referencia_proveedor if hasattr(quant, 'x_referencia_proveedor') else '',
                 'cantidad_fotos': 0,
                 'detalles_placa': quant.x_detalles_placa if hasattr(quant, 'x_detalles_placa') else '',
-                'tiene_hold': quant.x_tiene_hold if hasattr(quant, 'x_tiene_hold') else False,
+                'tiene_hold': False,  # Por defecto False
                 'hold_info': None,
                 'en_orden_venta': False,
                 'sale_order_ids': [],
@@ -214,19 +214,22 @@ class StockQuant(models.Model):
             if quant.lot_id and hasattr(quant.lot_id, 'x_fotografia_ids'):
                 detail['cantidad_fotos'] = len(quant.lot_id.x_fotografia_ids)
             
-            # Hold info
-            if detail['tiene_hold'] and hasattr(quant, 'x_hold_activo_id') and quant.x_hold_activo_id:
-                hold = quant.x_hold_activo_id
-                detail['hold_info'] = {
-                    'id': hold.id,
-                    'partner_name': hold.partner_id.name if hold.partner_id else '',
-                    'proyecto_nombre': hold.project_id.name if hasattr(hold, 'project_id') and hold.project_id else '',
-                    'arquitecto_nombre': hold.arquitecto_id.name if hasattr(hold, 'arquitecto_id') and hold.arquitecto_id else '',
-                    'vendedor_nombre': hold.user_id.name if hold.user_id else '',
-                    'fecha_inicio': hold.fecha_inicio.strftime('%Y-%m-%d') if hasattr(hold, 'fecha_inicio') and hold.fecha_inicio else '',
-                    'fecha_expiracion': hold.fecha_expiracion.strftime('%Y-%m-%d') if hasattr(hold, 'fecha_expiracion') and hold.fecha_expiracion else '',
-                    'notas': hold.notas if hasattr(hold, 'notas') else '',
-                }
+            # Hold info - SOLO SI ES USUARIO DE VENTAS
+            if is_sales_user:
+                detail['tiene_hold'] = quant.x_tiene_hold if hasattr(quant, 'x_tiene_hold') else False
+                
+                if detail['tiene_hold'] and hasattr(quant, 'x_hold_activo_id') and quant.x_hold_activo_id:
+                    hold = quant.x_hold_activo_id
+                    detail['hold_info'] = {
+                        'id': hold.id,
+                        'partner_name': hold.partner_id.name if hold.partner_id else '',
+                        'proyecto_nombre': hold.project_id.name if hasattr(hold, 'project_id') and hold.project_id else '',
+                        'arquitecto_nombre': hold.arquitecto_id.name if hasattr(hold, 'arquitecto_id') and hold.arquitecto_id else '',
+                        'vendedor_nombre': hold.user_id.name if hold.user_id else '',
+                        'fecha_inicio': hold.fecha_inicio.strftime('%Y-%m-%d') if hasattr(hold, 'fecha_inicio') and hold.fecha_inicio else '',
+                        'fecha_expiracion': hold.fecha_expiracion.strftime('%Y-%m-%d') if hasattr(hold, 'fecha_expiracion') and hold.fecha_expiracion else '',
+                        'notas': hold.notas if hasattr(hold, 'notas') else '',
+                    }
             
             # Sale orders - solo si el usuario tiene permisos de ventas
             if quant.lot_id and is_sales_user:
@@ -269,6 +272,10 @@ class StockQuant(models.Model):
         
         lot = quant.lot_id
         
+        # Verificar si tiene permisos de compras
+        has_purchase_permissions = self.env.user.has_group('purchase.group_purchase_user') or \
+                                   self.env.user.has_group('purchase.group_purchase_manager')
+        
         # Información general
         general_info = {
             'product_name': lot.product_id.display_name,
@@ -302,23 +309,24 @@ class StockQuant(models.Model):
             'dias_en_inventario': dias_inventario,
         }
         
-        # Información de compra
+        # Información de compra - SOLO SI TIENE PERMISOS
         purchase_info = []
-        purchase_lines = self.env['purchase.order.line'].search([
-            ('product_id', '=', lot.product_id.id)
-        ], limit=5, order='create_date desc')
-        
-        for pol in purchase_lines:
-            purchase_info.append({
-                'orden_compra': pol.order_id.name,
-                'proveedor': pol.order_id.partner_id.name,
-                'fecha_orden': pol.order_id.date_order.strftime('%Y-%m-%d') if pol.order_id.date_order else '',
-                'cantidad': pol.product_qty,
-                'precio_unitario': pol.price_unit,
-                'total': pol.price_subtotal,
-                'moneda': pol.order_id.currency_id.symbol,
-                'estado': dict(pol.order_id._fields['state'].selection).get(pol.order_id.state, ''),
-            })
+        if has_purchase_permissions:
+            purchase_lines = self.env['purchase.order.line'].search([
+                ('product_id', '=', lot.product_id.id)
+            ], limit=5, order='create_date desc')
+            
+            for pol in purchase_lines:
+                purchase_info.append({
+                    'orden_compra': pol.order_id.name,
+                    'proveedor': pol.order_id.partner_id.name,
+                    'fecha_orden': pol.order_id.date_order.strftime('%Y-%m-%d') if pol.order_id.date_order else '',
+                    'cantidad': pol.product_qty,
+                    'precio_unitario': pol.price_unit,
+                    'total': pol.price_subtotal,
+                    'moneda': pol.order_id.currency_id.symbol,
+                    'estado': dict(pol.order_id._fields['state'].selection).get(pol.order_id.state, ''),
+                })
         
         # Movimientos
         movements = []
@@ -410,6 +418,7 @@ class StockQuant(models.Model):
             'general_info': general_info,
             'statistics': statistics,
             'purchase_info': purchase_info,
+            'has_purchase_permissions': has_purchase_permissions,
             'movements': movements,
             'sales_orders': sales_orders,
             'reservations': reservations,

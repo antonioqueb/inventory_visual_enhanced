@@ -147,11 +147,11 @@
                                 </span>
                             </td>
                             
-                            <!-- ========== ESTADO (E: Hold o SO) - MODIFICADO SEGÚN PERMISOS ========== -->
+                            <!-- ========== ESTADO (E: Hold o SO) - SOLO VENTAS VEN HOLDS ========== -->
                             <td class="col-icon">
-                                <!-- Prioridad 1: Hold Activo - TODOS PUEDEN VER INFO -->
+                                <!-- Prioridad 1: Hold Activo - SOLO PARA USUARIOS DE VENTAS -->
                                 <button 
-                                    t-if="detail.tiene_hold"
+                                    t-if="detail.tiene_hold and props.hasSalesPermissions"
                                     type="button"
                                     class="status-badge-btn status-hold-active"
                                     t-on-click="() => props.onHoldClick(detail.id, detail.hold_info)"
@@ -160,7 +160,7 @@
                                     <i class="fa fa-hand-paper-o"></i>
                                 </button>
                                 
-                                <!-- Prioridad 2: Sale Order - TODOS PUEDEN VER INFO -->
+                                <!-- Prioridad 2: Sale Order - TODOS PUEDEN VER -->
                                 <button 
                                     t-elif="detail.en_orden_venta"
                                     type="button"
@@ -182,14 +182,13 @@
                                     <i class="fa fa-hand-paper-o"></i>
                                 </button>
                                 
-                                <!-- Sin permisos para apartar -->
+                                <!-- Sin permisos de ventas - Muestra vacío/disponible sin acción -->
                                 <span 
                                     t-else=""
-                                    class="status-badge-btn status-no-state"
-                                    style="opacity: 0.4; cursor: not-allowed; pointer-events: none;"
-                                    title="Disponible - Requiere permisos de ventas para apartar"
+                                    class="status-badge-btn status-available-no-perms"
+                                    title="Disponible"
                                 >
-                                    <i class="fa fa-hand-paper-o"></i>
+                                    <i class="fa fa-check-circle"></i>
                                 </span>
                             </td>
                         </tr>
