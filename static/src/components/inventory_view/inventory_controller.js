@@ -59,6 +59,10 @@ class InventoryVisualController extends Component {
             
             // UI
             showAdvancedFilters: false,
+            
+            // Permisos
+            hasSalesPermissions: false,
+            hasInventoryPermissions: false,
         });
 
         this.searchTimeout = null;
@@ -66,11 +70,26 @@ class InventoryVisualController extends Component {
 
         onWillStart(async () => {
             await this.loadFilterOptions();
+            await this.loadPermissions();
         });
 
         onMounted(() => {
             this.setupScrollListener();
         });
+    }
+
+    async loadPermissions() {
+        try {
+            const salesPerms = await this.orm.call('stock.quant', 'check_sales_permissions', []);
+            const inventoryPerms = await this.orm.call('stock.quant', 'check_inventory_permissions', []);
+            
+            this.state.hasSalesPermissions = salesPerms;
+            this.state.hasInventoryPermissions = inventoryPerms;
+        } catch (error) {
+            console.error('[PERMISOS] Error verificando permisos:', error);
+            this.state.hasSalesPermissions = false;
+            this.state.hasInventoryPermissions = false;
+        }
     }
 
     setupScrollListener() {
@@ -436,6 +455,14 @@ class InventoryVisualController extends Component {
     }
 
     async onDetailsClick(detailId) {
+        if (!this.state.hasSalesPermissions) {
+            this.notification.add(
+                "No tiene permisos para ver el historial detallado. Contacte al administrador.", 
+                { type: "warning" }
+            );
+            return;
+        }
+        
         try {
             const history = await this.orm.call(
                 "stock.quant",
@@ -477,11 +504,17 @@ class InventoryVisualController extends Component {
 
     async onHoldClick(detailId, holdInfo) {
         if (!holdInfo || !holdInfo.id) {
+            if (!this.state.hasSalesPermissions) {
+                this.notification.add(
+                    "No tiene permisos para crear apartados. Contacte al administrador.", 
+                    { type: "warning" }
+                );
+                return;
+            }
             await this.openCreateHoldDialog(detailId);
             return;
         }
 
-        // Obtener detailData completo
         let detailData = null;
         for (const [productId, details] of Object.entries(this.state.productDetails)) {
             const detail = details.find(d => d.id === detailId);
@@ -518,11 +551,8 @@ class InventoryVisualController extends Component {
                 const detail = details.find(d => d.id === detailId);
                 if (detail) {
                     detailData = detail;
-                    
-                    // 🆕 AGREGAR: Añadir product_id al detailData
                     detailData.product_id = parseInt(productId);
                     
-                    // 🆕 AGREGAR: Buscar el product_name
                     const product = this.state.products.find(p => p.product_id === parseInt(productId));
                     if (product) {
                         detailData.product_name = product.product_name;

@@ -24,13 +24,13 @@
                 <tbody>
                     <t t-foreach="props.details" t-as="detail" t-key="detail.id">
                         <tr>
-                            <!-- Checkbox -->
+                            <!-- Checkbox - TODOS -->
                             <td class="col-checkbox text-center">
                                 <input 
                                     type="checkbox"
                                     class="form-check-input cart-checkbox"
-                                    t-att-checked="props.isInCart(detail.id)"
-                                    t-on-change="() => props.toggleCartSelection(detail)"
+                                    t-att-checked="props.isInCart ? props.isInCart(detail.id) : false"
+                                    t-on-change="() => props.toggleCartSelection ? props.toggleCartSelection(detail) : null"
                                 />
                             </td>
                             
@@ -100,78 +100,97 @@
                                 <span t-else="" class="text-muted">-</span>
                             </td>
                             
-                            <!-- Fotos (P) -->
+                            <!-- ========== FOTOS (P) - TODOS PUEDEN VER Y AGREGAR ========== -->
                             <td class="col-icon">
                                 <button 
                                     type="button"
                                     class="icon-btn"
                                     t-att-class="{ 'has-photos': detail.cantidad_fotos > 0, 'no-content': detail.cantidad_fotos === 0 }"
                                     t-on-click="() => props.onPhotoClick(detail.id)"
-                                    t-att-title="detail.cantidad_fotos > 0 ? detail.cantidad_fotos + ' fotos' : 'Sin fotos'"
+                                    t-att-title="detail.cantidad_fotos > 0 ? detail.cantidad_fotos + ' fotos' : 'Sin fotos - Click para agregar'"
                                 >
                                     <strong>P</strong>
                                 </button>
                             </td>
                             
-                            <!-- Notas (N) -->
+                            <!-- ========== NOTAS (N) - TODOS PUEDEN VER Y AGREGAR ========== -->
                             <td class="col-icon">
                                 <button 
                                     type="button"
                                     class="icon-btn"
                                     t-att-class="{ 'has-notes': detail.detalles_placa, 'no-content': !detail.detalles_placa }"
                                     t-on-click="() => props.onNotesClick(detail.id)"
-                                    title="Notas y detalles"
+                                    t-att-title="detail.detalles_placa ? 'Ver notas y detalles' : 'Sin notas - Click para agregar'"
                                 >
                                     <strong>N</strong>
                                 </button>
                             </td>
                             
-                            <!-- Detalles/Historial (D) -->
+                            <!-- ========== DETALLES/HISTORIAL (D) - SOLO VENTAS ========== -->
                             <td class="col-icon">
                                 <button 
+                                    t-if="props.hasSalesPermissions"
                                     type="button"
                                     class="icon-btn has-details"
                                     t-on-click="() => props.onDetailsClick(detail.id)"
-                                    title="Ver historial completo"
+                                    title="Ver historial completo de compras, ventas y movimientos"
                                 >
                                     <strong>D</strong>
                                 </button>
+                                <span 
+                                    t-else=""
+                                    class="icon-btn no-content"
+                                    title="Historial completo - Requiere permisos de ventas"
+                                    style="cursor: not-allowed; pointer-events: none;"
+                                >
+                                    <strong>D</strong>
+                                </span>
                             </td>
                             
-                            <!-- Estado (Combinado: Hold o SO) -->
+                            <!-- ========== ESTADO (E: Hold o SO) - MODIFICADO SEGÚN PERMISOS ========== -->
                             <td class="col-icon">
-                                <!-- Prioridad 1: Hold Activo -->
+                                <!-- Prioridad 1: Hold Activo - TODOS PUEDEN VER INFO -->
                                 <button 
                                     t-if="detail.tiene_hold"
                                     type="button"
                                     class="status-badge-btn status-hold-active"
                                     t-on-click="() => props.onHoldClick(detail.id, detail.hold_info)"
-                                    title="Apartado activo"
+                                    title="Apartado activo - Click para ver detalles del apartado"
                                 >
                                     <i class="fa fa-hand-paper-o"></i>
                                 </button>
                                 
-                                <!-- Prioridad 2: Sale Order -->
+                                <!-- Prioridad 2: Sale Order - TODOS PUEDEN VER INFO -->
                                 <button 
                                     t-elif="detail.en_orden_venta"
                                     type="button"
                                     class="status-badge-btn status-sale-order"
                                     t-on-click="() => props.onSaleOrderClick(detail.id, detail.sale_order_ids)"
-                                    t-att-title="detail.sale_order_ids.length + ' orden(es) de venta'"
+                                    t-att-title="'En orden de venta - ' + detail.sale_order_ids.length + ' orden(es)'"
                                 >
                                     <strong>SO</strong>
                                 </button>
                                 
-                                <!-- Prioridad 3: Disponible (sin estado especial) -->
+                                <!-- Prioridad 3: Disponible - SOLO VENTAS PUEDEN APARTAR -->
                                 <button 
-                                    t-else=""
+                                    t-elif="props.hasSalesPermissions"
                                     type="button"
                                     class="status-badge-btn status-no-state"
-                                    t-on-click="() => props.onHoldClick(detail.id, detail.hold_info)"
+                                    t-on-click="() => props.onHoldClick(detail.id, null)"
                                     title="Disponible - Click para crear apartado"
                                 >
                                     <i class="fa fa-hand-paper-o"></i>
                                 </button>
+                                
+                                <!-- Sin permisos para apartar -->
+                                <span 
+                                    t-else=""
+                                    class="status-badge-btn status-no-state"
+                                    style="opacity: 0.4; cursor: not-allowed; pointer-events: none;"
+                                    title="Disponible - Requiere permisos de ventas para apartar"
+                                >
+                                    <i class="fa fa-hand-paper-o"></i>
+                                </span>
                             </td>
                         </tr>
                     </t>

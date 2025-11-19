@@ -142,8 +142,6 @@ export class CreateHoldDialog extends Component {
     onPriceChange(value) {
         const numValue = parseFloat(value);
         
-        // ✅ PERMITIR CUALQUIER PRECIO sin restricciones
-        // El backend maneja la autorización automáticamente
         if (!isNaN(numValue) && numValue >= 0) {
             this.state.productPrice = numValue;
         }
@@ -463,7 +461,6 @@ export class CreateHoldDialog extends Component {
                 }
             );
             
-            // ✅ MANEJAR CASO DE AUTORIZACIÓN REQUERIDA
             if (result.needs_authorization) {
                 this.notification.add(
                     `${result.message}\n\nPuede ver el estado en "Autorizaciones de Precio"`, 
@@ -477,7 +474,6 @@ export class CreateHoldDialog extends Component {
                 return;
             }
             
-            // ✅ CASO NORMAL: APARTADO CREADO
             if (result.error) {
                 this.notification.add(result.error, { type: "danger" });
             } else if (result.success) {

@@ -9,6 +9,26 @@ class StockQuant(models.Model):
     _inherit = 'stock.quant'
     
     @api.model
+    def get_current_user_info(self):
+        """Obtener información del usuario actual"""
+        return {
+            'id': self.env.user.id,
+            'name': self.env.user.name
+        }
+    
+    @api.model
+    def check_sales_permissions(self):
+        """Verifica si el usuario tiene permisos de ventas"""
+        return self.env.user.has_group('sales_team.group_sale_salesman') or \
+               self.env.user.has_group('sales_team.group_sale_salesman_all_leads') or \
+               self.env.user.has_group('sales_team.group_sale_manager')
+    
+    @api.model
+    def check_inventory_permissions(self):
+        """Verifica si el usuario tiene permisos de inventario"""
+        return self.env.user.has_group('stock.group_stock_user')
+    
+    @api.model
     def get_inventory_grouped_by_product(self, filters=None):
         """
         Agrupa el inventario por producto aplicando filtros
@@ -237,7 +257,12 @@ class StockQuant(models.Model):
     def get_lot_history(self, quant_id):
         """
         Obtiene el historial completo de un lote
+        RESTRINGIDO: Solo usuarios con permisos de ventas
         """
+        # Validar permisos
+        if not self.check_sales_permissions():
+            raise UserError("No tiene permisos para ver el historial detallado. Contacte al administrador.")
+        
         quant = self.browse(quant_id)
         if not quant.exists() or not quant.lot_id:
             return {'error': 'Lote no encontrado'}
@@ -395,6 +420,7 @@ class StockQuant(models.Model):
     def get_lot_photos(self, quant_id):
         """
         Obtiene las fotografías de un lote
+        PERMITIDO: Todos los usuarios (inventario y ventas)
         """
         quant = self.browse(quant_id)
         if not quant.exists() or not quant.lot_id:
@@ -423,6 +449,7 @@ class StockQuant(models.Model):
     def get_lot_notes(self, quant_id):
         """
         Obtiene las notas de un lote
+        PERMITIDO: Todos los usuarios (inventario y ventas)
         """
         quant = self.browse(quant_id)
         if not quant.exists() or not quant.lot_id:
@@ -440,6 +467,7 @@ class StockQuant(models.Model):
     def save_lot_photo(self, quant_id, photo_name, photo_data, sequence=10, notas=''):
         """
         Guarda una fotografía para un lote
+        PERMITIDO: Todos los usuarios (inventario y ventas)
         """
         quant = self.browse(quant_id)
         if not quant.exists() or not quant.lot_id:
@@ -468,6 +496,7 @@ class StockQuant(models.Model):
     def save_lot_notes(self, quant_id, notes):
         """
         Guarda las notas de un lote
+        PERMITIDO: Todos los usuarios (inventario y ventas)
         """
         quant = self.browse(quant_id)
         if not quant.exists() or not quant.lot_id:
@@ -492,7 +521,11 @@ class StockQuant(models.Model):
     def search_partners(self, name=''):
         """
         Busca clientes/contactos
+        RESTRINGIDO: Solo usuarios con permisos de ventas
         """
+        if not self.check_sales_permissions():
+            raise UserError("No tiene permisos para buscar clientes. Contacte al administrador.")
+        
         domain = [('customer_rank', '>', 0)]
         
         if name:
@@ -522,7 +555,11 @@ class StockQuant(models.Model):
     def create_partner(self, name, vat='', ref=''):
         """
         Crea un nuevo cliente
+        RESTRINGIDO: Solo usuarios con permisos de ventas
         """
+        if not self.check_sales_permissions():
+            raise UserError("No tiene permisos para crear clientes. Contacte al administrador.")
+        
         if not name or not name.strip():
             return {'error': 'El nombre es requerido'}
         
@@ -552,7 +589,11 @@ class StockQuant(models.Model):
     def get_projects(self, search_term=''):
         """
         Obtiene proyectos de mármol
+        RESTRINGIDO: Solo usuarios con permisos de ventas
         """
+        if not self.check_sales_permissions():
+            raise UserError("No tiene permisos para consultar proyectos. Contacte al administrador.")
+        
         domain = []
         
         if hasattr(self.env['project.project'], 'x_es_proyecto_marmol'):
@@ -576,7 +617,11 @@ class StockQuant(models.Model):
     def create_project(self, name):
         """
         Crea un nuevo proyecto
+        RESTRINGIDO: Solo usuarios con permisos de ventas
         """
+        if not self.check_sales_permissions():
+            raise UserError("No tiene permisos para crear proyectos. Contacte al administrador.")
+        
         if not name or not name.strip():
             return {'error': 'El nombre del proyecto es requerido'}
         
@@ -604,7 +649,11 @@ class StockQuant(models.Model):
     def get_architects(self, search_term=''):
         """
         Obtiene arquitectos
+        RESTRINGIDO: Solo usuarios con permisos de ventas
         """
+        if not self.check_sales_permissions():
+            raise UserError("No tiene permisos para consultar arquitectos. Contacte al administrador.")
+        
         domain = []
         
         if hasattr(self.env['res.partner'], 'x_es_arquitecto'):
@@ -635,7 +684,11 @@ class StockQuant(models.Model):
     def create_architect(self, name, vat='', ref=''):
         """
         Crea un nuevo arquitecto
+        RESTRINGIDO: Solo usuarios con permisos de ventas
         """
+        if not self.check_sales_permissions():
+            raise UserError("No tiene permisos para crear arquitectos. Contacte al administrador.")
+        
         if not name or not name.strip():
             return {'error': 'El nombre del arquitecto es requerido'}
         
@@ -670,7 +723,11 @@ class StockQuant(models.Model):
                                   notas='', currency_code='USD', product_prices=None):
         """
         Crea un apartado (hold) para un lote con información completa
+        RESTRINGIDO: Solo usuarios con permisos de ventas
         """
+        if not self.check_sales_permissions():
+            raise UserError("No tiene permisos para crear apartados. Contacte al administrador.")
+        
         quant = self.browse(quant_id)
         if not quant.exists() or not quant.lot_id:
             return {'error': 'Lote no encontrado'}
@@ -679,7 +736,7 @@ class StockQuant(models.Model):
         if hasattr(quant, 'x_tiene_hold') and quant.x_tiene_hold:
             return {'error': 'Este lote ya tiene un apartado activo'}
         
-        # ✅ VERIFICAR SI REQUIERE AUTORIZACIÓN (igual que el carrito)
+        # Verificar si requiere autorización
         if product_prices and isinstance(product_prices, dict):
             auth_check = self.env['product.template'].check_price_authorization_needed(
                 product_prices, 
@@ -687,7 +744,7 @@ class StockQuant(models.Model):
             )
             
             if auth_check['needs_authorization']:
-                # Agrupar lotes por producto (en este caso solo 1 lote)
+                # Agrupar lotes por producto
                 product_groups = {}
                 pid = quant.product_id.id
                 product_groups[str(pid)] = {
@@ -700,7 +757,7 @@ class StockQuant(models.Model):
                     'total_quantity': quant.quantity
                 }
                 
-                # Crear autorización en lugar de hold
+                # Crear autorización
                 result = self.create_price_authorization(
                     operation_type='hold',
                     partner_id=partner_id,
@@ -721,9 +778,8 @@ class StockQuant(models.Model):
                         'message': f'Solicitud de autorización {result["authorization_name"]} creada. Espere aprobación del autorizador.'
                     }
         
-        # ✅ SI NO REQUIERE AUTORIZACIÓN, CREAR HOLD NORMALMENTE
+        # Crear hold normal
         try:
-            # Construir notas con información de precios
             full_notes = notas or ''
             
             if product_prices and isinstance(product_prices, dict):
@@ -744,14 +800,12 @@ class StockQuant(models.Model):
             
             while dias_agregados < 5:
                 fecha_expiracion += timedelta(days=1)
-                if fecha_expiracion.weekday() < 5:  # Lunes a Viernes
+                if fecha_expiracion.weekday() < 5:
                     dias_agregados += 1
             
-            # Verificar que el modelo stock.lot.hold existe
             if 'stock.lot.hold' not in self.env:
-                return {'error': 'El modelo stock.lot.hold no está disponible. Verifica que el módulo correspondiente esté instalado.'}
+                return {'error': 'El modelo stock.lot.hold no está disponible.'}
             
-            # Preparar valores para crear el hold
             hold_vals = {
                 'lot_id': quant.lot_id.id,
                 'partner_id': partner_id,
@@ -761,7 +815,6 @@ class StockQuant(models.Model):
                 'notas': full_notes,
             }
             
-            # Agregar campos opcionales solo si existen en el modelo
             hold_model = self.env['stock.lot.hold']
             if 'quant_id' in hold_model._fields:
                 hold_vals['quant_id'] = quant.id
@@ -789,13 +842,18 @@ class StockQuant(models.Model):
     def create_price_authorization(self, operation_type, partner_id, project_id, 
                                    selected_lots, currency_code, product_prices, 
                                    product_groups, notes=None, architect_id=None):
-        """Crea solicitud de autorización de precio"""
+        """
+        Crea solicitud de autorización de precio
+        RESTRINGIDO: Solo usuarios con permisos de ventas
+        """
+        if not self.check_sales_permissions():
+            raise UserError("No tiene permisos para crear autorizaciones. Contacte al administrador.")
         
-        # ✅ NORMALIZAR: Convertir todas las claves de product_prices a string
+        # Normalizar product_prices
         if isinstance(product_prices, dict):
             product_prices = {str(k): v for k, v in product_prices.items()}
         
-        # ✅ CREAR LA AUTORIZACIÓN
+        # Crear autorización
         auth = self.env['price.authorization'].create({
             'seller_id': self.env.user.id,
             'operation_type': operation_type,
@@ -811,23 +869,20 @@ class StockQuant(models.Model):
             }
         })
         
-        # ✅ CREAR LÍNEAS CON EL PRECIO SOLICITADO CORRECTO
+        # Crear líneas
         for product_id_str, group in product_groups.items():
             product_id = int(product_id_str)
             product = self.env['product.product'].browse(product_id)
             
-            # Obtener precios según divisa
             if currency_code == 'USD':
                 medium_price = product.product_tmpl_id.x_price_usd_2
                 minimum_price = product.product_tmpl_id.x_price_usd_3
-            else:  # MXN
+            else:
                 medium_price = product.product_tmpl_id.x_price_mxn_2
                 minimum_price = product.product_tmpl_id.x_price_mxn_3
             
-            # ✅ OBTENER EL PRECIO SOLICITADO CORRECTAMENTE
             requested_price = float(product_prices.get(str(product_id), 0))
             
-            # ✅ CREAR LÍNEA CON requested_price Y authorized_price
             self.env['price.authorization.line'].create({
                 'authorization_id': auth.id,
                 'product_id': product_id,
@@ -849,6 +904,7 @@ class StockQuant(models.Model):
     def get_sale_order_info(self, sale_order_ids):
         """
         Obtiene información de órdenes de venta
+        PERMITIDO: Todos los usuarios (visible pero sin info sensible sin permisos)
         """
         if not sale_order_ids:
             return {'count': 0, 'orders': []}

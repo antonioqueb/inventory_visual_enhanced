@@ -87,6 +87,8 @@
                     areAllCurrentProductSelected="props.areAllCurrentProductSelected"
                     selectAllCurrentProduct="props.selectAllCurrentProduct"
                     deselectAllCurrentProduct="props.deselectAllCurrentProduct"
+                    hasSalesPermissions="props.hasSalesPermissions"
+                    hasInventoryPermissions="props.hasInventoryPermissions"
                 />
             </td>
         </tr>

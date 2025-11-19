@@ -296,6 +296,8 @@
                                     onHoldClick.bind="onHoldClick"
                                     onSaleOrderClick.bind="onSaleOrderClick"
                                     formatNumber.bind="formatNumber"
+                                    hasSalesPermissions="state.hasSalesPermissions"
+                                    hasInventoryPermissions="state.hasInventoryPermissions"
                                     isInCart.bind="isInCart"
                                     toggleCartSelection.bind="toggleCartSelection"
                                     areAllCurrentProductSelected.bind="() => this.areAllCurrentProductSelected()"

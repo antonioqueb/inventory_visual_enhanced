@@ -28,6 +28,8 @@ ProductRow.props = {
     onHoldClick: Function,
     onSaleOrderClick: Function,
     formatNumber: Function,
+    hasSalesPermissions: { type: Boolean, optional: true },
+    hasInventoryPermissions: { type: Boolean, optional: true },
     isInCart: { type: Function, optional: true },
     toggleCartSelection: { type: Function, optional: true },
     areAllCurrentProductSelected: { type: Function, optional: true },
