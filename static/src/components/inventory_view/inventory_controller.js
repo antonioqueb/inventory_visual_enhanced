@@ -155,16 +155,13 @@ class InventoryVisualController extends Component {
                 this.state.acabados = fieldInfo.x_acabado.selection;
             }
 
+            // === CORRECCIÓN: Usar readGroup nativo para evitar DeprecationWarning ===
             // Cargar grosores únicos
-            const grosores = await this.orm.call(
-                "stock.quant",
-                "read_group",
-                [],
-                {
-                    domain: [["x_grosor", "!=", false]],
-                    fields: ["x_grosor"],
-                    groupby: ["x_grosor"],
-                }
+            const grosores = await this.orm.readGroup(
+                "stock.quant",               // Modelo
+                [["x_grosor", "!=", false]], // Dominio
+                ["x_grosor"],                // Campos
+                ["x_grosor"]                 // GroupBy
             );
             this.state.grosores = grosores.map(g => g.x_grosor).filter(Boolean).sort();
 
