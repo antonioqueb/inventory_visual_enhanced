@@ -6,7 +6,7 @@ import { useService } from "@web/core/utils/hooks";
 export class SearchBar extends Component {
     setup() {
         this.orm = useService("orm");
-        this.root = useRef("root"); // Referencia para el scroll listener
+        this.root = useRef("root");
 
         this.state = useState({
             // Filtros
@@ -37,6 +37,7 @@ export class SearchBar extends Component {
             
             // UI
             showAdvancedFilters: false,
+            mobileFiltersOpen: false, // <--- NUEVO: Controla la visibilidad en móvil
         });
 
         this.searchTimeout = null;
@@ -52,8 +53,6 @@ export class SearchBar extends Component {
     }
 
     setupScrollListener() {
-        // La lógica de scroll ahora vive dentro del componente SearchBar
-        // ya que es el elemento que cambia visualmente
         const searchBar = this.root.el; 
         if (!searchBar) return;
 
@@ -177,7 +176,6 @@ export class SearchBar extends Component {
         }
 
         this.searchTimeout = setTimeout(() => {
-            // Llamar a la prop onSearch pasando los filtros actuales
             if (this.props.onSearch) {
                 this.props.onSearch({ ...this.state.filters });
             }
@@ -186,6 +184,11 @@ export class SearchBar extends Component {
 
     toggleAdvancedFilters() {
         this.state.showAdvancedFilters = !this.state.showAdvancedFilters;
+    }
+    
+    // --- NUEVO: Toggle para móvil ---
+    toggleMobileFilters() {
+        this.state.mobileFiltersOpen = !this.state.mobileFiltersOpen;
     }
 
     hasActiveFilters() {
@@ -210,9 +213,8 @@ export class SearchBar extends Component {
         };
         this.state.ubicaciones = [];
         
-        // Notificar al padre que los filtros se han limpiado (búsqueda vacía)
         if (this.props.onSearch) {
-            this.props.onSearch(null); // o objeto vacío, según maneje el padre
+            this.props.onSearch(null);
         }
     }
 }

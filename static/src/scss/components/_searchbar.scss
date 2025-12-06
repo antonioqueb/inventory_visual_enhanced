@@ -70,7 +70,7 @@
     color: $text-primary;
     transition: $transition-all;
     outline: none;
-    width: 100%; // Asegurar ancho completo en móvil
+    width: 100%;
 
     &:focus {
       border-color: $primary-color;
@@ -116,7 +116,7 @@
     background: $background-secondary;
     border-radius: $border-radius-sm;
     border: 1px solid $border-color;
-    text-align: center; // Centrar en móvil
+    text-align: center;
 
     .results-count {
       font-size: $font-size-small;
@@ -144,32 +144,79 @@
 // RESPONSIVE PARA MÓVILES
 @media (max-width: $breakpoint-md) {
   .o_inventory_visual_searchbar {
-    padding: $spacing-sm $spacing-md;
+    padding: 8px 12px;
+
+    .searchbar-inner {
+      gap: 4px; // Menos espacio entre elementos
+    }
+
+    .mobile-header {
+      .input-group-text {
+        background-color: white;
+        border-color: $border-color;
+      }
+      
+      .mobile-toggle-btn {
+        height: 40px;
+        min-width: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        // Estilo activo cuando está expandido
+        &.active {
+          background-color: $primary-color;
+          color: white;
+          border-color: $primary-color;
+        }
+        
+        // Estilo cuando hay filtros aplicados (borde de color)
+        &.has-filters:not(.active) {
+           border-color: $primary-color;
+           color: $primary-color;
+           background-color: rgba($primary-color, 0.05);
+        }
+
+        .transition-icon {
+            transition: transform 0.3s ease;
+            font-size: 10px;
+        }
+        .rotate-180 {
+            transform: rotate(180deg);
+        }
+      }
+    }
 
     .filters-row {
-      display: flex;
-      flex-direction: column;
-      gap: $spacing-sm;
+      // Cuando se expande, usar grid de 2 columnas para ahorrar espacio vertical
+      &.main-filters, &.advanced-filters {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 8px;
+      }
 
-      &.main-filters {
-        display: flex;
-        flex-direction: column;
+      .filter-group {
+        margin-bottom: 0;
+      }
+
+      // Los botones de acción ocupan todo el ancho (span 2)
+      .filter-actions {
+        grid-column: 1 / -1;
+        width: 100%;
+        margin-top: 4px;
         
-        .search-product-name {
-          width: 100%;
+        .btn {
+            justify-content: center;
         }
       }
     }
     
-    .filter-actions {
-        width: 100%;
-        justify-content: space-between;
-        margin-top: $spacing-sm;
-        
-        .btn {
-            flex: 1;
-            justify-content: center;
-        }
+    // Inputs un poco más compactos en móvil
+    .filter-select, .filter-input {
+        height: 36px;
+        font-size: 13px;
+        padding: 0 8px;
     }
   }
 }

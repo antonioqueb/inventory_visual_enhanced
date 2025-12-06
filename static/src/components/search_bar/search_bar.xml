@@ -5,10 +5,42 @@
         <div class="o_inventory_visual_searchbar flex-shrink-0 sticky-top" t-ref="root">
             <div class="searchbar-inner container">
                 
-                <!-- Filtros principales (siempre visibles) -->
-                <div class="filters-row main-filters">
-                    <!-- Búsqueda por nombre -->
-                    <div class="filter-group search-product-name">
+                <!-- === VISTA MÓVIL: Cabecera Compacta === -->
+                <div class="d-md-none d-flex gap-2 align-items-center mb-2 mobile-header">
+                    <!-- Input de búsqueda principal para móvil -->
+                    <div class="filter-group flex-grow-1 mb-0">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 text-muted">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input 
+                                type="text"
+                                class="form-control filter-input border-start-0 ps-0"
+                                placeholder="Buscar producto..."
+                                t-model="state.filters.product_name"
+                                t-on-input="(ev) => this.onTextFilterChange('product_name', ev)"
+                                t-att-disabled="props.isLoading"
+                            />
+                        </div>
+                    </div>
+                    <!-- Botón Toggle Filtros -->
+                    <button 
+                        class="btn btn-light border mobile-toggle-btn" 
+                        t-on-click="toggleMobileFilters"
+                        t-att-class="{ 'active': state.mobileFiltersOpen, 'has-filters': hasActiveFilters() }"
+                        type="button"
+                    >
+                        <i class="fa fa-filter"></i>
+                        <i class="fa fa-chevron-down ms-1 transition-icon" t-att-class="{ 'rotate-180': state.mobileFiltersOpen }"></i>
+                    </button>
+                </div>
+
+                <!-- === CONTENEDOR DE FILTROS (Grid) === -->
+                <!-- En móvil, se oculta si mobileFiltersOpen es false. En desktop siempre se ve (d-md-grid) -->
+                <div class="filters-row main-filters" t-att-class="{ 'd-none': !state.mobileFiltersOpen, 'd-grid': state.mobileFiltersOpen, 'd-md-grid': true }">
+                    
+                    <!-- Búsqueda por nombre (SOLO DESKTOP - Para no duplicar input) -->
+                    <div class="filter-group search-product-name d-none d-md-flex">
                         <label class="filter-label">Buscar Producto</label>
                         <input 
                             type="text"
@@ -22,7 +54,7 @@
 
                     <!-- Almacén -->
                     <div class="filter-group">
-                        <label class="filter-label">Almacén</label>
+                        <label class="filter-label d-none d-md-block">Almacén</label>
                         <select 
                             class="form-select filter-select"
                             t-model="state.filters.almacen_id"
@@ -38,7 +70,7 @@
 
                     <!-- Ubicación -->
                     <div class="filter-group">
-                        <label class="filter-label">Ubicación</label>
+                        <label class="filter-label d-none d-md-block">Ubicación</label>
                         <select 
                             class="form-select filter-select"
                             t-model="state.filters.ubicacion_id"
@@ -54,7 +86,7 @@
 
                     <!-- Tipo -->
                     <div class="filter-group">
-                        <label class="filter-label">Tipo</label>
+                        <label class="filter-label d-none d-md-block">Tipo</label>
                         <select 
                             class="form-select filter-select"
                             t-model="state.filters.tipo"
@@ -70,7 +102,7 @@
 
                     <!-- Categoría -->
                     <div class="filter-group">
-                        <label class="filter-label">Categoría</label>
+                        <label class="filter-label d-none d-md-block">Categoría</label>
                         <select 
                             class="form-select filter-select"
                             t-model="state.filters.categoria_id"
@@ -85,15 +117,15 @@
                     </div>
 
                     <!-- Botones de acción -->
-                    <div class="filter-actions">
+                    <div class="filter-actions d-flex justify-content-between gap-2">
                         <button 
-                            class="btn btn-sm btn-light border"
+                            class="btn btn-sm btn-light border flex-grow-1"
                             t-on-click="toggleAdvancedFilters"
                             title="Filtros avanzados"
                         >
                             <i class="fa fa-sliders me-1"></i>
-                            <t t-if="!state.showAdvancedFilters">Más filtros</t>
-                            <t t-else="">Menos filtros</t>
+                            <t t-if="!state.showAdvancedFilters">Más</t>
+                            <t t-else="">Menos</t>
                         </button>
                         <button 
                             class="btn btn-sm btn-light border"
@@ -101,130 +133,70 @@
                             t-att-disabled="!hasActiveFilters()"
                             title="Limpiar todos los filtros"
                         >
-                            <i class="fa fa-times"></i>
+                            <i class="fa fa-times"></i> <span class="d-md-none">Limpiar</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Filtros avanzados (desplegables) -->
-                <div class="filters-row advanced-filters" t-if="state.showAdvancedFilters">
+                <!-- Filtros avanzados (También obedece al toggle móvil) -->
+                <div class="filters-row advanced-filters mt-3" t-if="state.showAdvancedFilters" t-att-class="{ 'd-none': !state.mobileFiltersOpen, 'd-grid': state.mobileFiltersOpen, 'd-md-grid': true }">
                     <!-- Grupo -->
                     <div class="filter-group">
-                        <label class="filter-label">Grupo</label>
-                        <select 
-                            class="form-select filter-select"
-                            t-model="state.filters.grupo"
-                            t-on-change="(ev) => this.onFilterChange('grupo', ev)"
-                            t-att-disabled="props.isLoading"
-                        >
+                        <label class="filter-label d-none d-md-block">Grupo</label>
+                        <select class="form-select filter-select" t-model="state.filters.grupo" t-on-change="(ev) => this.onFilterChange('grupo', ev)" t-att-disabled="props.isLoading">
                             <option value="">Todos los grupos</option>
-                            <t t-foreach="state.grupos" t-as="grupo" t-key="grupo_index">
-                                <option t-att-value="grupo[0]" t-esc="grupo[1]"></option>
-                            </t>
+                            <t t-foreach="state.grupos" t-as="grupo" t-key="grupo_index"><option t-att-value="grupo[0]" t-esc="grupo[1]"></option></t>
                         </select>
                     </div>
 
                     <!-- Acabado -->
                     <div class="filter-group">
-                        <label class="filter-label">Acabado</label>
-                        <select 
-                            class="form-select filter-select"
-                            t-model="state.filters.acabado"
-                            t-on-change="(ev) => this.onFilterChange('acabado', ev)"
-                            t-att-disabled="props.isLoading"
-                        >
+                        <label class="filter-label d-none d-md-block">Acabado</label>
+                        <select class="form-select filter-select" t-model="state.filters.acabado" t-on-change="(ev) => this.onFilterChange('acabado', ev)" t-att-disabled="props.isLoading">
                             <option value="">Todos los acabados</option>
-                            <t t-foreach="state.acabados" t-as="acabado" t-key="acabado_index">
-                                <option t-att-value="acabado[0]" t-esc="acabado[1]"></option>
-                            </t>
+                            <t t-foreach="state.acabados" t-as="acabado" t-key="acabado_index"><option t-att-value="acabado[0]" t-esc="acabado[1]"></option></t>
                         </select>
                     </div>
 
                     <!-- Grosor -->
                     <div class="filter-group">
-                        <label class="filter-label">Grosor</label>
-                        <select 
-                            class="form-select filter-select"
-                            t-model="state.filters.grosor"
-                            t-on-change="(ev) => this.onFilterChange('grosor', ev)"
-                            t-att-disabled="props.isLoading"
-                        >
+                        <label class="filter-label d-none d-md-block">Grosor</label>
+                        <select class="form-select filter-select" t-model="state.filters.grosor" t-on-change="(ev) => this.onFilterChange('grosor', ev)" t-att-disabled="props.isLoading">
                             <option value="">Todos los grosores</option>
-                            <t t-foreach="state.grosores" t-as="grosor" t-key="grosor">
-                                <option t-att-value="grosor" t-esc="grosor + ' cm'"></option>
-                            </t>
+                            <t t-foreach="state.grosores" t-as="grosor" t-key="grosor"><option t-att-value="grosor" t-esc="grosor + ' cm'"></option></t>
                         </select>
                     </div>
 
-                    <!-- Número de serie -->
+                    <!-- Inputs de texto -->
                     <div class="filter-group">
-                        <label class="filter-label">N° Serie</label>
-                        <input 
-                            type="text"
-                            class="form-control filter-input"
-                            placeholder="Buscar..."
-                            t-model="state.filters.numero_serie"
-                            t-on-input="(ev) => this.onTextFilterChange('numero_serie', ev)"
-                            t-att-disabled="props.isLoading"
-                        />
+                        <label class="filter-label d-none d-md-block">N° Serie</label>
+                        <input type="text" class="form-control filter-input" placeholder="N° Serie..." t-model="state.filters.numero_serie" t-on-input="(ev) => this.onTextFilterChange('numero_serie', ev)" t-att-disabled="props.isLoading"/>
                     </div>
 
-                    <!-- Bloque -->
                     <div class="filter-group">
-                        <label class="filter-label">Bloque</label>
-                        <input 
-                            type="text"
-                            class="form-control filter-input"
-                            placeholder="Buscar..."
-                            t-model="state.filters.bloque"
-                            t-on-input="(ev) => this.onTextFilterChange('bloque', ev)"
-                            t-att-disabled="props.isLoading"
-                        />
+                        <label class="filter-label d-none d-md-block">Bloque</label>
+                        <input type="text" class="form-control filter-input" placeholder="Bloque..." t-model="state.filters.bloque" t-on-input="(ev) => this.onTextFilterChange('bloque', ev)" t-att-disabled="props.isLoading"/>
                     </div>
 
-                    <!-- Pedimento -->
                     <div class="filter-group">
-                        <label class="filter-label">Pedimento</label>
-                        <input 
-                            type="text"
-                            class="form-control filter-input"
-                            placeholder="Buscar..."
-                            t-model="state.filters.pedimento"
-                            t-on-input="(ev) => this.onTextFilterChange('pedimento', ev)"
-                            t-att-disabled="props.isLoading"
-                        />
+                        <label class="filter-label d-none d-md-block">Pedimento</label>
+                        <input type="text" class="form-control filter-input" placeholder="Pedimento..." t-model="state.filters.pedimento" t-on-input="(ev) => this.onTextFilterChange('pedimento', ev)" t-att-disabled="props.isLoading"/>
                     </div>
 
-                    <!-- Contenedor -->
                     <div class="filter-group">
-                        <label class="filter-label">Contenedor</label>
-                        <input 
-                            type="text"
-                            class="form-control filter-input"
-                            placeholder="Buscar..."
-                            t-model="state.filters.contenedor"
-                            t-on-input="(ev) => this.onTextFilterChange('contenedor', ev)"
-                            t-att-disabled="props.isLoading"
-                        />
+                        <label class="filter-label d-none d-md-block">Contenedor</label>
+                        <input type="text" class="form-control filter-input" placeholder="Contenedor..." t-model="state.filters.contenedor" t-on-input="(ev) => this.onTextFilterChange('contenedor', ev)" t-att-disabled="props.isLoading"/>
                     </div>
 
-                    <!-- Atado -->
                     <div class="filter-group">
-                        <label class="filter-label">Atado</label>
-                        <input 
-                            type="text"
-                            class="form-control filter-input"
-                            placeholder="Buscar..."
-                            t-model="state.filters.atado"
-                            t-on-input="(ev) => this.onTextFilterChange('atado', ev)"
-                            t-att-disabled="props.isLoading"
-                        />
+                        <label class="filter-label d-none d-md-block">Atado</label>
+                        <input type="text" class="form-control filter-input" placeholder="Atado..." t-model="state.filters.atado" t-on-input="(ev) => this.onTextFilterChange('atado', ev)" t-att-disabled="props.isLoading"/>
                     </div>
                 </div>
 
                 <!-- Información de resultados -->
-                <div class="filters-info" t-if="props.hasSearched">
-                    <span class="results-count">
+                <div class="filters-info mt-2 py-1" t-if="props.hasSearched">
+                    <span class="results-count small">
                         <strong t-esc="props.totalProducts"></strong>
                         <span t-if="props.totalProducts === 1"> producto encontrado</span>
                         <span t-else=""> productos encontrados</span>
