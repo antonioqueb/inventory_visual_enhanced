@@ -49,6 +49,7 @@
             'inventory_visual_enhanced/static/src/scss/components/_badges.scss',
             
             # JS
+            'inventory_visual_enhanced/static/src/components/search_bar/search_bar.js', # <--- NUEVO
             'inventory_visual_enhanced/static/src/components/product_details/product_details.js',
             'inventory_visual_enhanced/static/src/components/product_row/product_row.js',
             'inventory_visual_enhanced/static/src/components/inventory_view/inventory_controller.js',
@@ -60,6 +61,7 @@
             'inventory_visual_enhanced/static/src/components/dialogs/sale_order/sale_order_dialog.js',
             
             # XML
+            'inventory_visual_enhanced/static/src/components/search_bar/search_bar.xml', # <--- NUEVO
             'inventory_visual_enhanced/static/src/components/product_details/product_details.xml',
             'inventory_visual_enhanced/static/src/components/product_row/product_row.xml',
             'inventory_visual_enhanced/static/src/components/inventory_view/inventory_controller.xml',

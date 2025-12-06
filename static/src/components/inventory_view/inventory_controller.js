@@ -1,8 +1,9 @@
 /** @odoo-module **/
 
-import { Component, useState, onWillStart, onMounted, useRef } from "@odoo/owl";
+import { Component, useState, onWillStart } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
+import { SearchBar } from "../search_bar/search_bar"; // <--- Importamos SearchBar
 import { ProductRow } from "../product_row/product_row";
 import { PhotoGalleryDialog } from "../dialogs/photo_gallery/photo_gallery_dialog";
 import { NotesDialog } from "../dialogs/notes/notes_dialog";
@@ -16,35 +17,8 @@ class InventoryVisualController extends Component {
         this.orm = useService("orm");
         this.notification = useService("notification");
         this.dialog = useService("dialog");
-        this.root = useRef("root");
 
         this.state = useState({
-            // Filtros
-            filters: {
-                product_name: '',
-                almacen_id: null,
-                ubicacion_id: null,
-                tipo: '',
-                categoria_id: null,
-                grupo: '',
-                acabado: '',
-                grosor: '',
-                numero_serie: '',
-                bloque: '',
-                pedimento: '',
-                contenedor: '',
-                atado: '',
-            },
-            
-            // Opciones para dropdowns
-            almacenes: [],
-            ubicaciones: [],
-            tipos: [],
-            categorias: [],
-            grupos: [],
-            acabados: [],
-            grosores: [],
-            
             // Estado de búsqueda
             isSearching: false,
             products: [],
@@ -54,28 +28,14 @@ class InventoryVisualController extends Component {
             hasSearched: false,
             error: null,
             totalProducts: 0,
-            totalAvailable: 0,
-            totalReserved: 0,
-            
-            // UI
-            showAdvancedFilters: false,
-            mobileFiltersOpen: false, // Controla el acordeón en móvil
             
             // Permisos
             hasSalesPermissions: false,
             hasInventoryPermissions: false,
         });
 
-        this.searchTimeout = null;
-        this.searchDelay = 500;
-
         onWillStart(async () => {
-            await this.loadFilterOptions();
             await this.loadPermissions();
-        });
-
-        onMounted(() => {
-            this.setupScrollListener();
         });
     }
 
@@ -93,177 +53,14 @@ class InventoryVisualController extends Component {
         }
     }
 
-    setupScrollListener() {
-        if (!this.root.el) return;
-        
-        const searchBar = this.root.el.querySelector('.o_inventory_visual_searchbar');
-        if (!searchBar) return;
-
-        let ticking = false;
-        
-        window.addEventListener('scroll', () => {
-            if (!ticking) {
-                window.requestAnimationFrame(() => {
-                    if (window.scrollY > 10) {
-                        searchBar.classList.add('scrolled');
-                    } else {
-                        searchBar.classList.remove('scrolled');
-                    }
-                    ticking = false;
-                });
-                ticking = true;
-            }
-        });
-    }
-
-    async loadFilterOptions() {
-        try {
-            // Cargar almacenes
-            const almacenes = await this.orm.searchRead(
-                "stock.warehouse",
-                [],
-                ["id", "name"],
-                { order: "name" }
-            );
-            this.state.almacenes = almacenes;
-
-            // Cargar categorías
-            const categorias = await this.orm.searchRead(
-                "product.category",
-                [],
-                ["id", "name", "complete_name"],
-                { order: "complete_name" }
-            );
-            this.state.categorias = categorias;
-
-            // Cargar opciones de selection fields
-            const fieldInfo = await this.orm.call(
-                "stock.quant",
-                "fields_get",
-                [],
-                { attributes: ["selection"] }
-            );
-
-            if (fieldInfo.x_tipo && fieldInfo.x_tipo.selection) {
-                this.state.tipos = fieldInfo.x_tipo.selection;
-            }
-
-            if (fieldInfo.x_grupo && fieldInfo.x_grupo.selection) {
-                this.state.grupos = fieldInfo.x_grupo.selection;
-            }
-
-            if (fieldInfo.x_acabado && fieldInfo.x_acabado.selection) {
-                this.state.acabados = fieldInfo.x_acabado.selection;
-            }
-
-            // === CORRECCIÓN: Usar readGroup nativo para evitar DeprecationWarning ===
-            // Cargar grosores únicos
-            const grosores = await this.orm.readGroup(
-                "stock.quant",               // Modelo
-                [["x_grosor", "!=", false]], // Dominio
-                ["x_grosor"],                // Campos
-                ["x_grosor"]                 // GroupBy
-            );
-            this.state.grosores = grosores.map(g => g.x_grosor).filter(Boolean).sort();
-
-        } catch (error) {
-            console.error("Error cargando opciones de filtros:", error);
-        }
-    }
-
-    async onAlmacenChange(ev) {
-        const almacenId = ev.target.value ? parseInt(ev.target.value) : null;
-        this.state.filters.almacen_id = almacenId;
-        this.state.filters.ubicacion_id = null;
-        this.state.ubicaciones = [];
-
-        if (almacenId) {
-            try {
-                const almacen = await this.orm.read(
-                    "stock.warehouse",
-                    [almacenId],
-                    ["view_location_id"]
-                );
-
-                if (almacen.length > 0 && almacen[0].view_location_id) {
-                    const ubicaciones = await this.orm.searchRead(
-                        "stock.location",
-                        [["location_id", "child_of", almacen[0].view_location_id[0]]],
-                        ["id", "complete_name"],
-                        { order: "complete_name" }
-                    );
-                    this.state.ubicaciones = ubicaciones;
-                }
-            } catch (error) {
-                console.error("Error cargando ubicaciones:", error);
-            }
-        }
-
-        this.triggerSearch();
-    }
-
-    onFilterChange(filterName, ev) {
-        const value = ev.target.value;
-        this.state.filters[filterName] = value || null;
-        this.triggerSearch();
-    }
-
-    onTextFilterChange(filterName, ev) {
-        const value = ev.target.value.trim();
-        this.state.filters[filterName] = value;
-        this.triggerSearch();
-    }
-
-    triggerSearch() {
-        if (this.searchTimeout) {
-            clearTimeout(this.searchTimeout);
-        }
-
-        this.searchTimeout = setTimeout(() => {
-            this.searchProducts();
-        }, this.searchDelay);
-    }
-
-    toggleAdvancedFilters() {
-        this.state.showAdvancedFilters = !this.state.showAdvancedFilters;
-    }
-
-    // Toggle para mostrar/ocultar filtros en móvil
-    toggleMobileFilters() {
-        this.state.mobileFiltersOpen = !this.state.mobileFiltersOpen;
-    }
-
-    clearAllFilters() {
-        this.state.filters = {
-            product_name: '',
-            almacen_id: null,
-            ubicacion_id: null,
-            tipo: '',
-            categoria_id: null,
-            grupo: '',
-            acabado: '',
-            grosor: '',
-            numero_serie: '',
-            bloque: '',
-            pedimento: '',
-            contenedor: '',
-            atado: '',
-        };
-        this.state.ubicaciones = [];
-        this.state.hasSearched = false;
-        this.state.products = [];
-        this.state.expandedProducts.clear();
-        this.state.productDetails = {};
-    }
-
-    hasActiveFilters() {
-        return Object.values(this.state.filters).some(v => v !== null && v !== '');
-    }
-
-    async searchProducts() {
-        if (!this.hasActiveFilters()) {
+    // Esta función recibe los filtros del componente hijo SearchBar
+    async onSearch(filters) {
+        // Si filters es null o no tiene valores activos, limpiamos la vista
+        if (!filters || !Object.values(filters).some(v => v !== null && v !== '')) {
             this.state.hasSearched = false;
             this.state.products = [];
+            this.state.expandedProducts.clear();
+            this.state.productDetails = {};
             return;
         }
 
@@ -275,15 +72,12 @@ class InventoryVisualController extends Component {
                 "stock.quant",
                 "get_inventory_grouped_by_product",
                 [],
-                {
-                    filters: this.state.filters,
-                }
+                { filters: filters }
             );
 
             this.state.products = products;
             this.state.hasSearched = true;
             this.state.totalProducts = products.length;
-            this.calculateTotals();
             this.state.expandedProducts.clear();
             this.state.productDetails = {};
 
@@ -302,27 +96,7 @@ class InventoryVisualController extends Component {
             });
         } finally {
             this.state.isLoading = false;
-            // En móvil, cerrar filtros al buscar
-            if (window.innerWidth < 992) {
-                this.state.mobileFiltersOpen = false;
-            }
         }
-    }
-
-    calculateTotals() {
-        let totalAvailable = 0;
-        let totalHold = 0;
-        let totalCommitted = 0;
-
-        this.state.products.forEach(product => {
-            totalAvailable += product.available_qty || 0;
-            totalHold += product.hold_qty || 0;
-            totalCommitted += product.committed_qty || 0;
-        });
-
-        this.state.totalAvailable = totalAvailable;
-        this.state.totalHold = totalHold;
-        this.state.totalCommitted = totalCommitted;
     }
 
     async toggleProduct(productId, quantIds) {
@@ -384,9 +158,7 @@ class InventoryVisualController extends Component {
                 "stock.quant",
                 "get_lot_photos",
                 [],
-                {
-                    quant_id: detailId
-                }
+                { quant_id: detailId }
             );
             
             if (photos.error) {
@@ -419,9 +191,7 @@ class InventoryVisualController extends Component {
                 "stock.quant",
                 "get_lot_notes",
                 [],
-                {
-                    quant_id: detailId
-                }
+                { quant_id: detailId }
             );
             
             if (notes.error) {
@@ -475,9 +245,7 @@ class InventoryVisualController extends Component {
                 "stock.quant",
                 "get_lot_history",
                 [],
-                {
-                    quant_id: detailId
-                }
+                { quant_id: detailId }
             );
             
             if (history.error) {
@@ -502,7 +270,6 @@ class InventoryVisualController extends Component {
     }
 
     onSalesPersonClick(detailId) {
-        console.log('Ver cliente y vendedor:', detailId);
         this.notification.add(
             "Funcionalidad de cliente/vendedor en desarrollo",
             { type: "info" }
@@ -589,8 +356,6 @@ class InventoryVisualController extends Component {
     }
 
     async onSaleOrderClick(detailId, saleOrderIds) {
-        console.log('Sale order click:', detailId, saleOrderIds);
-        
         if (!saleOrderIds || saleOrderIds.length === 0) {
             this.notification.add("No hay órdenes de venta asociadas", { type: "info" });
             return;
@@ -601,9 +366,7 @@ class InventoryVisualController extends Component {
                 "stock.quant",
                 "get_sale_order_info",
                 [],
-                {
-                    sale_order_ids: saleOrderIds
-                }
+                { sale_order_ids: saleOrderIds }
             );
             
             if (soInfo.error) {
@@ -629,7 +392,7 @@ class InventoryVisualController extends Component {
 }
 
 InventoryVisualController.template = "inventory_visual_enhanced.InventoryView";
-InventoryVisualController.components = { ProductRow };
+InventoryVisualController.components = { ProductRow, SearchBar }; // <--- Añadimos SearchBar a componentes
 
 InventoryVisualController.props = {
     action: { type: Object, optional: true },

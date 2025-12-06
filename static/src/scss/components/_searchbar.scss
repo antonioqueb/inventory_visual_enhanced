@@ -2,15 +2,16 @@
   position: sticky;
   top: 0;
   z-index: $z-index-searchbar;
-  background: rgba($background-elevated, 0.98); // Fondo más sólido
+  background: rgba($background-elevated, 0.95);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid $border-color;
-  padding: $spacing-sm $spacing-md; // Padding reducido
+  padding: $spacing-md $spacing-lg;
   box-shadow: $shadow-sm;
   transition: $transition-all;
 
   &.scrolled {
     box-shadow: $shadow-md;
+    background: rgba($background-elevated, 0.98);
   }
 
   .searchbar-inner {
@@ -18,35 +19,64 @@
     margin: 0 auto;
     display: flex;
     flex-direction: column;
+    gap: $spacing-md;
   }
 
-  // Fila superior: Input búsqueda + Botón toggle
-  .search-header-row {
+  .filters-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: $spacing-md;
+    align-items: end;
+
+    &.main-filters {
+      grid-template-columns: 1.5fr repeat(4, 1fr) auto;
+      
+      .search-product-name {
+        grid-column: span 1;
+      }
+    }
+
+    &.advanced-filters {
+      padding-top: $spacing-md;
+      border-top: 1px solid $border-color;
+      animation: slideDown 0.3s ease-out;
+    }
+  }
+
+  .filter-group {
     display: flex;
-    align-items: center;
-    width: 100%;
-    gap: $spacing-sm;
+    flex-direction: column;
+    gap: 4px;
   }
 
-  // Estilos de Inputs
+  .filter-label {
+    font-size: $font-size-small;
+    font-weight: $font-weight-semibold;
+    color: $text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin: 0;
+  }
+
   .filter-select,
   .filter-input {
-    height: 38px; // Un poco más compacto
-    font-size: $font-size-base;
-    border-radius: $border-radius-sm;
-    box-shadow: none !important; // Quitar sombras pesadas de Odoo
+    height: 40px;
     padding: 0 $spacing-md;
     border: 1px solid $border-color;
+    border-radius: $border-radius-sm;
+    font-size: $font-size-base;
+    font-family: $font-family-base;
     background: $background-primary;
     color: $text-primary;
     transition: $transition-all;
     outline: none;
-    width: 100%;
-    
+    width: 100%; // Asegurar ancho completo en móvil
+
     &:focus {
       border-color: $primary-color;
+      box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
     }
-    
+
     &:disabled {
       background: $background-tertiary;
       cursor: not-allowed;
@@ -54,100 +84,39 @@
     }
   }
 
-  .input-group-text {
-    background-color: #fff;
-    border-color: $border-color;
-  }
-
-  // Contenedor de filtros secundarios (Desktop)
-  .secondary-filters-container {
-    width: 100%;
-    margin-top: $spacing-sm;
-    
-    .filters-row.main-filters {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr) auto; // 4 columnas + acciones
-      gap: $spacing-sm;
-      align-items: end;
-    }
-
-    .filters-row.advanced-filters {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: $spacing-sm;
-      padding-top: $spacing-sm;
-      border-top: 1px dashed $border-color;
-    }
-  }
-
-  .filter-group {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .filter-label {
-    font-size: 11px;
-    font-weight: $font-weight-semibold;
-    color: $text-secondary;
-    text-transform: uppercase;
-    margin-bottom: 2px;
-  }
-
   .filter-actions {
     display: flex;
-    gap: 4px;
-    min-width: 80px;
-    
-    .btn {
-        height: 38px;
-        white-space: nowrap;
-        font-size: $font-size-small;
-        font-weight: $font-weight-medium;
-        
-        &:hover:not(:disabled) {
-            background: $primary-color;
-            color: white;
-            border-color: $primary-color;
-        }
-    }
-  }
-
-  // Botón Toggle para Móvil
-  .btn-mobile-toggle {
-    position: relative;
-    height: 38px;
-    width: 42px;
-    display: flex;
+    gap: $spacing-sm;
     align-items: center;
-    justify-content: center;
-    color: $text-secondary;
-    transition: all 0.2s;
 
-    &.active {
-      background-color: $primary-color;
-      color: white;
-      border-color: $primary-color;
-    }
+    .btn {
+      height: 40px;
+      padding: 0 $spacing-md;
+      white-space: nowrap;
+      font-size: $font-size-small;
+      font-weight: $font-weight-medium;
+      border-radius: $border-radius-sm;
+      transition: $transition-all;
 
-    .notification-dot {
-      position: absolute;
-      top: 4px;
-      right: 4px;
-      width: 8px;
-      height: 8px;
-      background-color: $danger-color;
-      border-radius: 50%;
-      border: 1px solid white;
+      &:hover:not(:disabled) {
+        background: $primary-color;
+        color: white;
+        border-color: $primary-color;
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
     }
   }
-  
+
   .filters-info {
     padding: $spacing-sm $spacing-md;
     background: $background-secondary;
     border-radius: $border-radius-sm;
     border: 1px solid $border-color;
-    text-align: center;
+    text-align: center; // Centrar en móvil
 
     .results-count {
       font-size: $font-size-small;
@@ -161,54 +130,46 @@
   }
 }
 
-// === RESPONSIVE PARA MÓVILES (LA MAGIA) ===
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// RESPONSIVE PARA MÓVILES
 @media (max-width: $breakpoint-md) {
   .o_inventory_visual_searchbar {
-    padding: 8px 12px; // Muy compacto
-    
-    // Contenedor colapsable
-    .secondary-filters-container {
-      margin-top: 0; // Pegado al input cuando está cerrado
-      max-height: 0; // Oculto por defecto
-      overflow: hidden;
-      opacity: 0;
-      transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-                  opacity 0.2s ease-in,
-                  margin-top 0.2s;
-    }
+    padding: $spacing-sm $spacing-md;
 
-    // Estado ABIERTO
-    &.mobile-open {
-      .secondary-filters-container {
-        max-height: 500px; // Suficiente para mostrar todo
-        opacity: 1;
-        margin-top: 12px;
-        padding-bottom: 8px;
-      }
-    }
+    .filters-row {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-sm;
 
-    // Reorganizar filtros en móvil (una sola columna o grid de 2)
-    .secondary-filters-container {
-      .filters-row.main-filters,
-      .filters-row.advanced-filters {
-        display: grid;
-        grid-template-columns: 1fr 1fr; // 2 columnas
-        gap: 8px;
-      }
-
-      .filter-actions {
-        grid-column: span 2; // Acciones ocupan todo el ancho
-        margin-top: 8px;
+      &.main-filters {
+        display: flex;
+        flex-direction: column;
         
-        button {
-            height: 38px;
+        .search-product-name {
+          width: 100%;
         }
       }
-      
-      // Ajustar inputs en móvil
-      .filter-select {
-        font-size: 13px; // Evitar zoom en iOS
-      }
+    }
+    
+    .filter-actions {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: $spacing-sm;
+        
+        .btn {
+            flex: 1;
+            justify-content: center;
+        }
     }
   }
 }
