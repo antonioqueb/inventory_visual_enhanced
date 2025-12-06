@@ -90,13 +90,13 @@
 
 .col-tipo {
   font-family: $font-family-monospace; font-weight: 600; white-space: nowrap;
-  .text-muted { color: $text-muted; }
+  .text-muted { color: #808080; }
 }
 
-// === RESPONSIVE DETAILS CARDS ===
-@media (max-width: $breakpoint-md) {
+// === RESPONSIVE DETAILS CARDS (CORREGIDO) ===
+@media (max-width: 992px) {
     .details-wrapper {
-        padding: $spacing-sm;
+        padding: 8px;
         background: transparent;
     }
 
@@ -109,94 +109,157 @@
         tbody {
             display: flex;
             flex-direction: column;
-            gap: $spacing-md;
+            gap: 12px; // Espacio entre tarjetas
 
+            // Transformar la fila en un GRID para control total
             tr {
-                display: flex;
-                flex-wrap: wrap;
+                display: grid;
+                // Definimos 4 columnas iguales para alinear los botones al final
+                grid-template-columns: repeat(4, 1fr);
+                // Definimos áreas específicas para cada dato
+                grid-template-areas:
+                    "header header header header"
+                    "info info info info"
+                    "tech1 tech1 tech2 tech2"
+                    "tech3 tech3 tech4 tech4"
+                    "tech5 tech5 tech6 tech6"
+                    "action1 action2 action3 action4";
+                
                 background: #FFFFFF;
-                border: 1px solid $border-color;
-                border-radius: $border-radius-md;
-                padding: $spacing-md;
-                box-shadow: $shadow-sm;
-                position: relative;
+                border: 1px solid #E0E0E0;
+                border-radius: 8px;
+                padding: 0; // Padding interno manejado por celdas
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                overflow: hidden; // Para bordes redondeados
             }
 
             td {
                 border: none !important;
-                padding: 4px !important;
+                padding: 8px 12px !important;
                 display: flex;
                 align-items: center;
+                border-bottom: 1px dashed #f0f0f0 !important;
                 
-                // Distribución de elementos en la "tarjeta" de detalle
-                
-                // Lote como título
+                // === ÁREA 1: HEADER (Lote + Checkbox) ===
                 &.col-lot {
-                    width: calc(100% - 40px); // Dejar espacio para checkbox
-                    order: 1;
+                    grid-area: header;
                     font-size: 14px;
-                    color: $primary-color;
-                    margin-bottom: 8px;
-                    border-bottom: 1px solid #f0f0f0 !important;
-                    padding-bottom: 8px !important;
+                    color: #714B67; // Primary Color
+                    background-color: #f8f9fa;
+                    border-bottom: 1px solid #e0e0e0 !important;
+                    justify-content: space-between; // Separar texto del checkbox
+                    padding: 10px 12px !important;
                     
-                    &:before { content: "Lote: "; color: $text-secondary; font-weight: normal; margin-right: 5px; font-family: sans-serif; }
+                    // Mover el checkbox dentro de esta celda visualmente
+                    // Nota: En el XML, el checkbox está en otra celda (col-checkbox).
+                    // Lo solucionamos haciendo que col-checkbox sea absolute overlay.
                 }
 
-                // Checkbox arriba a la derecha
+                // El checkbox original lo hacemos flotar sobre el header a la derecha
                 &.col-checkbox {
-                    width: 30px;
-                    order: 0;
                     position: absolute;
-                    top: 12px;
-                    right: 12px;
-                }
-
-                // Datos principales
-                &.col-location { width: 100%; order: 2; margin-bottom: 4px; }
-                &.col-dimensions { width: 100%; order: 3; margin-bottom: 8px; background: #f9f9f9; padding: 6px !important; border-radius: 4px; }
-                
-                // Datos secundarios (ocultar si están vacíos o hacerlos pequeños)
-                &.col-tipo, &.col-bloque, &.col-atado, &.col-pedimento, &.col-contenedor {
-                    width: 50%;
-                    order: 4;
-                    font-size: 11px;
-                    color: $text-secondary;
-                    
-                    span { color: $text-primary; }
-                    
-                    &:before {
-                        content: attr(class);
-                        text-transform: capitalize;
-                        margin-right: 4px;
-                        font-weight: 600;
-                    }
-                    // Limpieza de nombres de clases para el label
-                    &.col-tipo:before { content: "Tipo:"; }
-                    &.col-bloque:before { content: "Bloq:"; }
-                    &.col-atado:before { content: "Atado:"; }
-                    &.col-pedimento:before { content: "Ped:"; }
-                    &.col-contenedor:before { content: "Cont:"; }
-                }
-
-                // Iconos de acción al final
-                &.col-icon {
-                    width: 25%; // 4 iconos = 100%
-                    order: 10;
+                    right: 8px;
+                    top: 8px;
+                    width: 40px;
+                    height: 40px;
+                    display: flex;
+                    align-items: center;
                     justify-content: center;
-                    margin-top: 12px;
-                    border-top: 1px solid #f0f0f0 !important;
-                    padding-top: 8px !important;
-                    
-                    .icon-btn, .status-badge-btn {
-                        width: 40px;
-                        height: 40px;
-                        font-size: 16px;
-                    }
+                    z-index: 5;
+                    border: none !important;
+                    padding: 0 !important;
+                }
+
+                // === ÁREA 2: INFO PRINCIPAL (Ubicación + Dimensiones) ===
+                &.col-location {
+                    grid-area: info;
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 4px;
+                    padding-bottom: 4px !important;
+                    border-bottom: none !important;
                 }
                 
-                // Ocultar Ref Prov si está vacío para ahorrar espacio
-                &.col-ref-proveedor { display: none; }
+                // Movemos Dimensions junto a location visualmente si es posible,
+                // o lo dejamos abajo. Aquí lo ponemos en la misma área "info" via CSS hack 
+                // o mejor, le damos su propia fila si es mucho texto.
+                // Mejor estrategia: Location y Dims ocupan el ancho completo.
+                
+                &.col-dimensions {
+                    grid-area: info; // Ocupa el mismo espacio, pero...
+                    margin-top: 24px; // ...lo empujamos abajo del location
+                    background: transparent;
+                    padding-top: 0 !important;
+                }
+
+                // === ÁREA 3: DATOS TÉCNICOS (Grid 2 columnas) ===
+                // Usamos nth-of-type o clases específicas para asignarlos al grid
+                
+                &.col-tipo { grid-area: tech1; }
+                &.col-bloque { grid-area: tech2; }
+                &.col-atado { grid-area: tech3; }
+                &.col-pedimento { grid-area: tech4; }
+                &.col-contenedor { grid-area: tech5; }
+                &.col-ref-proveedor { grid-area: tech6; }
+
+                // Estilo unificado para datos técnicos
+                &.col-tipo, &.col-bloque, &.col-atado, 
+                &.col-pedimento, &.col-contenedor, &.col-ref-proveedor {
+                    font-size: 11px;
+                    color: #4a4a4a;
+                    flex-direction: column; // Label arriba, valor abajo
+                    align-items: flex-start;
+                    background: #fff;
+                    
+                    // Ocultar si está vacío para ahorrar espacio visual
+                    &:empty { display: none; }
+
+                    &:before {
+                        content: attr(class); // Fallback
+                        font-size: 10px;
+                        text-transform: uppercase;
+                        color: #999;
+                        font-weight: 600;
+                        margin-bottom: 2px;
+                    }
+                    
+                    // Labels bonitos
+                    &.col-tipo:before { content: "Tipo"; }
+                    &.col-bloque:before { content: "Bloque"; }
+                    &.col-atado:before { content: "Atado"; }
+                    &.col-pedimento:before { content: "Pedimento"; }
+                    &.col-contenedor:before { content: "Contenedor"; }
+                    &.col-ref-proveedor:before { content: "Ref. Prov"; }
+                    
+                    span { font-weight: 500; font-size: 12px; }
+                }
+
+                // === ÁREA 4: BOTONES DE ACCIÓN (Footer) ===
+                // Asignamos cada botón a una columna del footer
+                &.action-btn-cell:nth-of-type(11) { grid-area: action1; } // P (Fotos)
+                &.action-btn-cell:nth-of-type(12) { grid-area: action2; } // N (Notas)
+                &.action-btn-cell:nth-of-type(13) { grid-area: action3; } // D (Detalles)
+                &.action-btn-cell:nth-of-type(14) { grid-area: action4; } // E (Estado)
+
+                &.action-btn-cell {
+                    justify-content: center;
+                    padding: 12px 0 !important;
+                    background-color: #f8f9fa; // Fondo gris suave para el footer
+                    border-top: 1px solid #e0e0e0;
+                    border-bottom: none !important;
+                    border-right: 1px solid #f0f0f0; // Separador entre botones
+                    
+                    &:last-child { border-right: none; }
+
+                    .icon-btn, .status-badge-btn {
+                        width: 36px;
+                        height: 36px;
+                        font-size: 16px;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                        border-radius: 50%; // Botones redondos en móvil
+                        border: 1px solid rgba(0,0,0,0.05);
+                    }
+                }
             }
         }
     }

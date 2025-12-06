@@ -26,12 +26,14 @@
                         <tr>
                             <!-- Checkbox -->
                             <td class="col-checkbox text-center">
-                                <input 
-                                    type="checkbox"
-                                    class="form-check-input cart-checkbox"
-                                    t-att-checked="props.isInCart ? props.isInCart(detail.id) : false"
-                                    t-on-change="() => props.toggleCartSelection ? props.toggleCartSelection(detail) : null"
-                                />
+                                <div class="checkbox-wrapper">
+                                    <input 
+                                        type="checkbox"
+                                        class="form-check-input cart-checkbox"
+                                        t-att-checked="props.isInCart ? props.isInCart(detail.id) : false"
+                                        t-on-change="() => props.toggleCartSelection ? props.toggleCartSelection(detail) : null"
+                                    />
+                                </div>
                             </td>
                             
                             <!-- Lote -->
@@ -64,132 +66,98 @@
                                 </span>
                             </td>
                             
-                            <!-- Tipo -->
+                            <!-- Datos Técnicos -->
                             <td class="col-tipo">
                                 <span t-if="detail.tipo" t-esc="detail.tipo"></span>
                                 <span t-else="" class="text-muted">-</span>
                             </td>
                             
-                            <!-- Bloque -->
                             <td class="col-bloque">
                                 <span t-if="detail.bloque" t-esc="detail.bloque"></span>
                                 <span t-else="" class="text-muted">-</span>
                             </td>
                             
-                            <!-- Atado -->
                             <td class="col-atado">
                                 <span t-if="detail.atado" t-esc="detail.atado"></span>
                                 <span t-else="" class="text-muted">-</span>
                             </td>
                             
-                            <!-- Pedimento -->
                             <td class="col-pedimento">
                                 <span t-if="detail.pedimento" t-esc="detail.pedimento"></span>
                                 <span t-else="" class="text-muted">-</span>
                             </td>
                             
-                            <!-- Contenedor -->
                             <td class="col-contenedor">
                                 <span t-if="detail.contenedor" t-esc="detail.contenedor"></span>
                                 <span t-else="" class="text-muted">-</span>
                             </td>
                             
-                            <!-- Referencia Proveedor -->
                             <td class="col-ref-proveedor">
                                 <span t-if="detail.referencia_proveedor" t-esc="detail.referencia_proveedor"></span>
                                 <span t-else="" class="text-muted">-</span>
                             </td>
                             
-                            <!-- FOTOS (P) - Icono de cámara -->
-                            <td class="col-icon">
+                            <!-- ACCIONES (Botones) -->
+                            <td class="col-icon action-btn-cell">
                                 <button 
                                     type="button"
                                     class="icon-btn"
                                     t-att-class="{ 'has-photos': detail.cantidad_fotos > 0, 'no-content': detail.cantidad_fotos === 0 }"
                                     t-on-click="() => props.onPhotoClick(detail.id)"
-                                    t-att-title="detail.cantidad_fotos > 0 ? detail.cantidad_fotos + ' fotos' : 'Sin fotos - Click para agregar'"
                                 >
                                     <i class="fa fa-camera"></i>
                                 </button>
                             </td>
                             
-                            <!-- NOTAS (N) - Icono de info -->
-                            <td class="col-icon">
+                            <td class="col-icon action-btn-cell">
                                 <button 
                                     type="button"
                                     class="icon-btn"
                                     t-att-class="{ 'has-notes': detail.detalles_placa, 'no-content': !detail.detalles_placa }"
                                     t-on-click="() => props.onNotesClick(detail.id)"
-                                    t-att-title="detail.detalles_placa ? 'Ver notas y detalles' : 'Sin notas - Click para agregar'"
                                 >
                                     <i class="fa fa-info-circle"></i>
                                 </button>
                             </td>
                             
-                            <!-- DETALLES/HISTORIAL (D) - Icono de historial -->
-                            <td class="col-icon">
+                            <td class="col-icon action-btn-cell">
                                 <button 
                                     t-if="props.hasSalesPermissions"
                                     type="button"
                                     class="icon-btn has-details"
                                     t-on-click="() => props.onDetailsClick(detail.id)"
-                                    title="Ver historial completo de compras, ventas y movimientos"
                                 >
                                     <i class="fa fa-history"></i>
                                 </button>
-                                <span 
-                                    t-else=""
-                                    class="icon-btn no-content"
-                                    title="Historial completo - Requiere permisos de ventas"
-                                    style="cursor: not-allowed; pointer-events: none;"
-                                >
-                                    <i class="fa fa-history"></i>
-                                </span>
+                                <span t-else="" class="icon-btn no-content"><i class="fa fa-history"></i></span>
                             </td>
                             
-                            <!-- ESTADO (E: Hold o SO) -->
-                            <td class="col-icon">
-                                <!-- Hold Activo -->
+                            <td class="col-icon action-btn-cell">
                                 <button 
                                     t-if="detail.tiene_hold and props.hasSalesPermissions"
                                     type="button"
                                     class="status-badge-btn status-hold-active"
                                     t-on-click="() => props.onHoldClick(detail.id, detail.hold_info)"
-                                    title="Apartado activo - Click para ver detalles del apartado"
                                 >
                                     <i class="fa fa-hand-paper-o"></i>
                                 </button>
-                                
-                                <!-- Sale Order - Icono de dólar -->
                                 <button 
                                     t-elif="detail.en_orden_venta"
                                     type="button"
                                     class="status-badge-btn status-sale-order"
                                     t-on-click="() => props.onSaleOrderClick(detail.id, detail.sale_order_ids)"
-                                    t-att-title="'En orden de venta - ' + detail.sale_order_ids.length + ' orden(es)'"
                                 >
                                     <i class="fa fa-usd"></i>
                                 </button>
-                                
-                                <!-- Disponible para apartar -->
                                 <button 
                                     t-elif="props.hasSalesPermissions"
                                     type="button"
                                     class="status-badge-btn status-no-state"
                                     t-on-click="() => props.onHoldClick(detail.id, null)"
-                                    title="Disponible - Click para crear apartado"
                                 >
                                     <i class="fa fa-hand-paper-o"></i>
                                 </button>
-                                
-                                <!-- Sin permisos -->
-                                <span 
-                                    t-else=""
-                                    class="status-badge-btn status-available-no-perms"
-                                    title="Disponible"
-                                >
-                                    <i class="fa fa-check-circle"></i>
-                                </span>
+                                <span t-else="" class="status-badge-btn status-available-no-perms"><i class="fa fa-check-circle"></i></span>
                             </td>
                         </tr>
                     </t>
