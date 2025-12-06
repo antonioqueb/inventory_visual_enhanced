@@ -24,9 +24,9 @@
                 <tbody>
                     <t t-foreach="props.details" t-as="detail" t-key="detail.id">
                         <tr>
-                            <!-- Checkbox (Ahora tiene su propia área en el grid móvil) -->
+                            <!-- Checkbox: Con wrapper y stop-propagation para asegurar click en móvil -->
                             <td class="col-checkbox text-center">
-                                <div class="checkbox-wrapper">
+                                <div class="checkbox-wrapper" t-on-click.stop="">
                                     <input 
                                         type="checkbox"
                                         class="form-check-input cart-checkbox"
@@ -47,19 +47,24 @@
                                 <span t-esc="detail.location_name"></span>
                             </td>
                             
-                            <!-- Dimensiones -->
+                            <!-- Dimensiones: Estructura mejorada para separación visual -->
                             <td class="col-dimensions">
                                 <span class="dimensions-inline">
-                                    <t t-if="detail.alto and detail.ancho">
-                                        <t t-esc="detail.alto"/>m × <t t-esc="detail.ancho"/>m
-                                    </t>
-                                    <t t-elif="!detail.alto and !detail.ancho">-</t>
-                                    <t t-elif="detail.alto">
-                                        <t t-esc="detail.alto"/>m
-                                    </t>
-                                    <t t-else="">
-                                        <t t-esc="detail.ancho"/>m
-                                    </t>
+                                    <!-- Parte 1: Las medidas (Alto x Ancho) -->
+                                    <span class="dims-text">
+                                        <t t-if="detail.alto and detail.ancho">
+                                            <t t-esc="detail.alto"/>m × <t t-esc="detail.ancho"/>m
+                                        </t>
+                                        <t t-elif="!detail.alto and !detail.ancho">-</t>
+                                        <t t-elif="detail.alto">
+                                            <t t-esc="detail.alto"/>m
+                                        </t>
+                                        <t t-else="">
+                                            <t t-esc="detail.ancho"/>m
+                                        </t>
+                                    </span>
+                                    
+                                    <!-- Parte 2: El total en m² (Resaltado) -->
                                     <strong class="dimensions-total-inline">
                                         <t t-esc="props.formatNumber(detail.quantity)"/> m²
                                     </strong>
@@ -97,7 +102,7 @@
                                 <span t-else="" class="text-muted">-</span>
                             </td>
                             
-                            <!-- ACCIONES (Botones) -->
+                            <!-- ACCIONES (Botones) - Clases action-btn-cell cruciales para el CSS Grid -->
                             <td class="col-icon action-btn-cell">
                                 <button 
                                     type="button"

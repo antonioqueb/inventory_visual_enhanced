@@ -93,7 +93,9 @@
   .text-muted { color: #808080; }
 }
 
-// === RESPONSIVE DETAILS CARDS (CORREGIDO Y REPARADO) ===
+// ... (código anterior del archivo desktop) ...
+
+// === RESPONSIVE DETAILS CARDS (CORREGIDO) ===
 @media (max-width: 992px) {
     .details-wrapper {
         padding: 8px;
@@ -109,19 +111,19 @@
         tbody {
             display: flex;
             flex-direction: column;
-            gap: 12px; // Espacio entre tarjetas
+            gap: 16px; // Más espacio entre tarjetas de productos diferentes
 
             // Transformar la fila en un GRID ROBUSTO
             tr {
                 display: grid;
-                // Columna 1 pequeña para checkbox, resto iguales
-                grid-template-columns: 40px 1fr 1fr 1fr; 
+                // Col 1: Checkbox (50px), Cols 2-4: Espacio restante dividido
+                grid-template-columns: 50px 1fr 1fr 1fr; 
                 
-                // DEFINICIÓN DE ÁREAS (La solución al problema visual)
+                // DEFINICIÓN DE ÁREAS (La ubicación y dimensiones están en filas separadas)
                 grid-template-areas:
                     "check  header header header" /* Fila 1: Checkbox y Lote */
                     "loc    loc    loc    loc"    /* Fila 2: Ubicación (ancho completo) */
-                    "dims   dims   dims   dims"   /* Fila 3: Dimensiones (ancho completo) -> Ya no se solapa */
+                    "dims   dims   dims   dims"   /* Fila 3: Dimensiones (ancho completo) */
                     "tech1  tech1  tech2  tech2"  /* Fila 4: Datos técnicos */
                     "tech3  tech3  tech4  tech4"  /* Fila 5: Datos técnicos */
                     "tech5  tech5  tech6  tech6"  /* Fila 6: Datos técnicos */
@@ -129,25 +131,28 @@
                 
                 background: #FFFFFF;
                 border: 1px solid #E0E0E0;
-                border-radius: 8px;
+                border-radius: 12px;
                 padding: 0;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                box-shadow: 0 4px 6px rgba(0,0,0,0.05);
                 overflow: hidden;
             }
 
             td {
                 border: none !important;
-                padding: 8px 12px !important;
+                padding: 10px 12px !important; // Más padding general
                 display: flex;
                 align-items: center;
                 
-                // === ÁREA: CHECKBOX ===
+                // === ÁREA: CHECKBOX (Visibilidad corregida) ===
                 &.col-checkbox {
                     grid-area: check;
-                    background-color: #f8f9fa; // Mismo color que el header
+                    background-color: #f8f9fa;
                     border-bottom: 1px solid #e0e0e0 !important;
+                    border-right: 1px solid #e0e0e0 !important;
                     justify-content: center;
+                    align-items: center;
                     padding: 0 !important;
+                    min-height: 48px; // Altura mínima para asegurar visibilidad
                     
                     .checkbox-wrapper {
                         display: flex;
@@ -158,59 +163,72 @@
                     }
                     
                     input.cart-checkbox {
-                        width: 20px;
-                        height: 20px;
+                        width: 24px; // Checkbox más grande en móvil
+                        height: 24px;
                         margin: 0;
                         cursor: pointer;
+                        opacity: 1 !important; // Forzar opacidad
+                        position: relative;
+                        z-index: 10;
                     }
                 }
 
                 // === ÁREA: HEADER (LOTE) ===
                 &.col-lot {
                     grid-area: header;
-                    font-size: 14px;
-                    font-weight: 700;
+                    font-size: 15px;
+                    font-weight: 800;
                     color: #714B67; 
                     background-color: #f8f9fa;
                     border-bottom: 1px solid #e0e0e0 !important;
-                    padding: 10px 12px !important;
+                    padding: 12px 16px !important;
                 }
 
                 // === ÁREA: UBICACIÓN ===
                 &.col-location {
                     grid-area: loc;
-                    font-size: 13px;
-                    border-bottom: 1px dashed #f0f0f0 !important;
-                    padding-top: 12px !important; // Un poco de aire arriba
+                    font-size: 14px;
+                    background-color: #ffffff;
+                    // Borde inferior para separar de dimensiones
+                    border-bottom: 1px dashed #e0e0e0 !important; 
+                    padding-top: 14px !important;
+                    padding-bottom: 8px !important;
                     
-                    i { color: #714B67; margin-right: 6px; }
+                    i { 
+                        color: #714B67; 
+                        margin-right: 8px; 
+                        font-size: 16px;
+                    }
                 }
                 
-                // === ÁREA: DIMENSIONES (Corregido: Fila propia) ===
+                // === ÁREA: DIMENSIONES (Bajada a su propia línea) ===
                 &.col-dimensions {
                     grid-area: dims;
                     background-color: #ffffff;
-                    border-bottom: 1px solid #f0f0f0 !important;
-                    padding-top: 4px !important;
-                    padding-bottom: 12px !important;
+                    border-bottom: 4px solid #f8f9fa !important; // Separador visual grueso
+                    padding-top: 8px !important;
+                    padding-bottom: 14px !important;
                     
                     .dimensions-inline {
-                        font-size: 13px;
+                        font-size: 14px;
                         display: flex;
                         align-items: center;
                         width: 100%;
-                        justify-content: space-between; // Separar dims del total m2
+                        justify-content: space-between;
+                        color: #555;
                     }
                     
                     .dimensions-total-inline {
                         background: #f0f0f0;
-                        padding: 2px 6px;
-                        border-radius: 4px;
-                        font-size: 12px;
+                        color: #333;
+                        padding: 4px 10px;
+                        border-radius: 20px;
+                        font-size: 13px;
+                        font-weight: 700;
                     }
                 }
 
-                // === ÁREA: DATOS TÉCNICOS (Grid 2 columnas) ===
+                // === ÁREAS TÉCNICAS ===
                 &.col-tipo { grid-area: tech1; }
                 &.col-bloque { grid-area: tech2; }
                 &.col-atado { grid-area: tech3; }
@@ -220,25 +238,26 @@
 
                 &.col-tipo, &.col-bloque, &.col-atado, 
                 &.col-pedimento, &.col-contenedor, &.col-ref-proveedor {
-                    font-size: 12px;
+                    font-size: 13px;
                     color: #4a4a4a;
                     flex-direction: column; 
                     align-items: flex-start;
-                    border-bottom: 1px dashed #f5f5f5 !important;
-                    min-height: 45px; // Altura mínima para alineación
+                    border-bottom: 1px solid #f0f0f0 !important;
+                    min-height: 50px;
+                    background: #fff;
                     
-                    &:empty { display: none; } // Ocultar si vacío
+                    &:empty { display: none; }
 
                     &:before {
-                        content: attr(class); // Fallback
+                        content: attr(class);
                         font-size: 10px;
                         text-transform: uppercase;
                         color: #999;
                         font-weight: 700;
-                        margin-bottom: 2px;
+                        margin-bottom: 4px;
                     }
                     
-                    // Labels
+                    // Mapeo de nombres para los ::before
                     &.col-tipo:before { content: "Tipo"; }
                     &.col-bloque:before { content: "Bloque"; }
                     &.col-atado:before { content: "Atado"; }
@@ -246,38 +265,25 @@
                     &.col-contenedor:before { content: "Contenedor"; }
                     &.col-ref-proveedor:before { content: "Ref. Prov"; }
                     
-                    span { font-weight: 500; }
+                    span { font-weight: 600; }
                 }
 
-                // === ÁREA: BOTONES DE ACCIÓN (Footer) ===
-                &.action-btn-cell:nth-of-type(11) { grid-area: act1; } // P
-                &.action-btn-cell:nth-of-type(12) { grid-area: act2; } // N
-                &.action-btn-cell:nth-of-type(13) { grid-area: act3; } // D
-                &.action-btn-cell:nth-of-type(14) { grid-area: act4; } // E
-
+                // === ÁREA: BOTONES DE ACCIÓN ===
                 &.action-btn-cell {
                     justify-content: center;
-                    padding: 12px 0 !important;
+                    padding: 14px 0 !important;
                     background-color: #f8f9fa;
                     border-top: 1px solid #e0e0e0;
-                    border-right: 1px solid #f0f0f0;
                     
-                    &:last-child { border-right: none; }
+                    &:nth-of-type(11) { grid-area: act1; border-right: 1px solid #e0e0e0; }
+                    &:nth-of-type(12) { grid-area: act2; border-right: 1px solid #e0e0e0; }
+                    &:nth-of-type(13) { grid-area: act3; border-right: 1px solid #e0e0e0; }
+                    &:nth-of-type(14) { grid-area: act4; }
 
                     .icon-btn, .status-badge-btn {
-                        width: 38px;
-                        height: 38px;
-                        font-size: 16px;
-                        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-                        border-radius: 50%;
-                        background-color: white;
-                        border: 1px solid #e0e0e0;
-                        
-                        // Mantener colores de estado si tienen clases específicas
-                        &.has-photos, &.has-notes, &.has-details, &.status-hold-active, &.status-sale-order {
-                            border: none;
-                            color: white; // Asegurar texto blanco en fondos de color
-                        }
+                        width: 42px;
+                        height: 42px;
+                        font-size: 18px;
                     }
                 }
             }
