@@ -24,7 +24,7 @@
                 <tbody>
                     <t t-foreach="props.details" t-as="detail" t-key="detail.id">
                         <tr>
-                            <!-- Checkbox -->
+                            <!-- Checkbox (Ahora tiene su propia área en el grid móvil) -->
                             <td class="col-checkbox text-center">
                                 <div class="checkbox-wrapper">
                                     <input 
