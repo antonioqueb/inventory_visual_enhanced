@@ -22,6 +22,7 @@
     gap: $spacing-md;
   }
 
+  // === DESKTOP GRID ===
   .filters-row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -131,94 +132,119 @@
 }
 
 @keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-// RESPONSIVE PARA MÓVILES
+// === RESPONSIVE PARA MÓVILES (Optimizado) ===
 @media (max-width: $breakpoint-md) {
   .o_inventory_visual_searchbar {
-    padding: 8px 12px; // Menos padding en móvil
+    padding: 8px 12px;
 
     .searchbar-inner {
-      gap: 4px; // Menos espacio entre bloques
+      gap: 0; // Control total via márgenes específicos
     }
 
-    // Cabecera móvil (Input + Toggle)
-    .mobile-header {
-      .input-group-text {
-        background-color: white;
-        border-color: $border-color;
-      }
+    // Cabecera Móvil Personalizada
+    .mobile-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      width: 100%;
+      margin-bottom: 8px;
+    }
+
+    // Grupo de búsqueda (Input + Icono)
+    .mobile-search-group {
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      background: white;
+      border: 1px solid $border-color;
+      border-radius: $border-radius-md;
+      height: 44px; // Altura fija táctil
+      overflow: hidden;
       
-      .mobile-toggle-btn {
-        height: 40px;
-        min-width: 44px;
+      &:focus-within {
+        border-color: $primary-color;
+        box-shadow: 0 0 0 2px rgba($primary-color, 0.1);
+      }
+
+      .mobile-icon-box {
+        width: 40px;
         display: flex;
         align-items: center;
         justify-content: center;
-        
-        // Estilo activo cuando está expandido
-        &.active {
-          background-color: $primary-color;
-          color: white;
-          border-color: $primary-color;
-        }
-        
-        // Estilo cuando hay filtros aplicados (borde de color)
-        &.has-filters:not(.active) {
-           border-color: $primary-color;
-           color: $primary-color;
-           background-color: rgba($primary-color, 0.05);
-        }
+        color: $text-muted;
+        background: white;
+      }
 
-        .transition-icon {
-            transition: transform 0.3s ease;
-            font-size: 10px;
-        }
-        .rotate-180 {
-            transform: rotate(180deg);
-        }
+      .mobile-input {
+        flex-grow: 1;
+        border: none;
+        height: 100%;
+        padding: 0 10px 0 0;
+        font-size: 14px;
+        outline: none;
+        background: transparent;
       }
     }
 
-    // Estilo de la rejilla de filtros en móvil
+    // Botón de Filtro
+    .mobile-filter-btn {
+      width: 44px;
+      height: 44px; // Misma altura que el input
+      border-radius: $border-radius-md;
+      border: 1px solid $border-color;
+      background: white;
+      color: $text-secondary;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+
+      i { font-size: 16px; }
+
+      &.active {
+        background-color: $primary-color;
+        color: white;
+        border-color: $primary-color;
+      }
+
+      &.has-filters:not(.active) {
+        border-color: $primary-color;
+        color: $primary-color;
+        background-color: rgba($primary-color, 0.05);
+      }
+    }
+
+    // Grilla de filtros expandidos
     .filters-row {
-      // Cuando se expande, usar grid de 2 columnas para ahorrar espacio vertical
       &.main-filters, &.advanced-filters {
         display: grid;
         grid-template-columns: 1fr 1fr; // 2 columnas
-        gap: 8px;
+        gap: 10px;
         margin-top: 8px;
+        animation: slideDown 0.2s ease-out;
       }
 
-      .filter-group {
-        margin-bottom: 0;
+      // Los selectores en móvil
+      .filter-select, .filter-input {
+        height: 40px;
+        font-size: 13px;
+        padding: 0 8px;
       }
 
-      // Los botones de acción ocupan todo el ancho (span 2)
+      // Botones de acción ocupan todo el ancho
       .filter-actions {
         grid-column: 1 / -1;
         width: 100%;
         margin-top: 4px;
         
-        .btn {
-            justify-content: center;
-        }
+        .btn { justify-content: center; }
       }
-    }
-    
-    // Inputs un poco más compactos en móvil
-    .filter-select, .filter-input {
-        height: 36px;
-        font-size: 13px;
-        padding: 0 8px;
     }
   }
 }
