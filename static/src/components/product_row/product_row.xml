@@ -4,86 +4,74 @@
     <t t-name="inventory_visual_enhanced.ProductRow" owl="1">
         <tr class="o_inventory_product_row" t-att-class="{ expanded: props.isExpanded }">
             
-            <!-- CHECKBOX: SELECCIONAR TODO (Nueva columna) -->
+            <!-- CHECKBOX: SELECCIONAR TODO (Nuevo) -->
             <td class="col-checkbox-all">
                 <div class="checkbox-wrapper" t-on-click.stop="">
                     <input 
                         type="checkbox"
                         class="form-check-input select-all-checkbox"
-                        title="Seleccionar todos los lotes de este producto"
+                        title="Seleccionar todos los lotes"
                         t-att-checked="props.areAllCurrentProductSelected()"
                         t-on-change="(ev) => ev.target.checked ? props.selectAllCurrentProduct() : props.deselectAllCurrentProduct()"
                     />
                 </div>
             </td>
 
-            <!-- Product Name -->
-            <td class="col-product-name">
+            <!-- Product Name (Nativo) -->
+            <td class="col-product-name" t-on-click="() => props.onToggle(props.product.quant_ids)">
                 <div class="product-name-cell">
                     <div class="product-title" t-esc="props.product.product_name"></div>
                     <div class="product-sku" t-if="props.product.product_code" t-esc="props.product.product_code"></div>
                 </div>
             </td>
             
-            <!-- Inventory (Estructura flexible para Desktop Lista / Mobile Grid) -->
-            <td class="col-inventory">
+            <!-- Inventory (Estructura Nativa Original) -->
+            <td class="col-inventory" t-on-click="() => props.onToggle(props.product.quant_ids)">
                 <div class="inventory-subgrid">
-                    <!-- Stock Real -->
                     <div class="inventory-row item-stock">
                         <span class="inventory-label">In Stock</span>
-                        <div class="inventory-values">
-                            <span class="inventory-value inventory-units" t-esc="props.product.stock_plates || 0"></span>
-                            <span class="inventory-value inventory-measure">
-                                <t t-esc="props.formatNumber(props.product.stock_qty)"/> m²
-                            </span>
-                        </div>
+                        <span class="inventory-value inventory-units" t-esc="props.product.stock_plates || 0"></span>
+                        <span class="inventory-value inventory-measure">
+                            <t t-esc="props.formatNumber(props.product.stock_qty)"/> M²
+                        </span>
                     </div>
-                    <!-- Apartado -->
                     <div class="inventory-row item-hold">
                         <span class="inventory-label">On Hold</span>
-                        <div class="inventory-values">
-                            <span class="inventory-value inventory-units" t-esc="props.product.hold_plates || 0"></span>
-                            <span class="inventory-value inventory-measure">
-                                <t t-esc="props.formatNumber(props.product.hold_qty)"/> m²
-                            </span>
-                        </div>
+                        <span class="inventory-value inventory-units" t-esc="props.product.hold_plates || 0"></span>
+                        <span class="inventory-value inventory-measure">
+                            <t t-esc="props.formatNumber(props.product.hold_qty)"/> M²
+                        </span>
                     </div>
-                    <!-- Comprometido -->
                     <div class="inventory-row item-committed">
                         <span class="inventory-label">Committed</span>
-                        <div class="inventory-values">
-                            <span class="inventory-value inventory-units" t-esc="props.product.committed_plates || 0"></span>
-                            <span class="inventory-value inventory-measure">
-                                <t t-esc="props.formatNumber(props.product.committed_qty)"/> m²
-                            </span>
-                        </div>
+                        <span class="inventory-value inventory-units" t-esc="props.product.committed_plates || 0"></span>
+                        <span class="inventory-value inventory-measure">
+                            <t t-esc="props.formatNumber(props.product.committed_qty)"/> M²
+                        </span>
                     </div>
-                    <!-- Disponible -->
                     <div class="inventory-row item-available">
                         <span class="inventory-label">Available</span>
-                        <div class="inventory-values">
-                            <span class="inventory-value inventory-units" t-esc="props.product.available_plates || 0"></span>
-                            <span class="inventory-value inventory-measure">
-                                <t t-esc="props.formatNumber(props.product.available_qty)"/> m²
-                            </span>
-                        </div>
+                        <span class="inventory-value inventory-units" t-esc="props.product.available_plates || 0"></span>
+                        <span class="inventory-value inventory-measure">
+                            <t t-esc="props.formatNumber(props.product.available_qty)"/> M²
+                        </span>
                     </div>
                 </div>
             </td>
             
-            <!-- Type -->
+            <!-- Type (Nativo) -->
             <td class="col-type">
                 <span t-if="props.product.tipo" t-esc="props.product.tipo"/>
                 <span t-else="" class="text-muted">-</span>
             </td>
             
-            <!-- Category -->
+            <!-- Category (Nativo) -->
             <td class="col-category">
                 <span t-if="props.product.categ_name" t-esc="props.product.categ_name"/>
                 <span t-else="" class="text-muted">-</span>
             </td>
             
-            <!-- Actions -->
+            <!-- Actions (Nativo) -->
             <td class="col-actions">
                 <button 
                     type="button" 
@@ -97,7 +85,7 @@
         
         <!-- Fila de detalles -->
         <tr class="o_inventory_details_row" t-if="props.isExpanded">
-            <!-- colspan 7 para abarcar la nueva columna checkbox -->
+            <!-- colspan ajustado a 7 por la nueva columna -->
             <td colspan="7" class="details-cell">
                 <ProductDetails 
                     details="props.details"
