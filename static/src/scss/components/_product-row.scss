@@ -1,7 +1,3 @@
-// ==========================================
-// === ESTILOS ESCRITORIO (ORIGINALES + CHECKBOX) ===
-// ==========================================
-
 .o_inventory_grid_table tbody {
   tr.o_inventory_product_row {
     border-bottom: 1px solid $border-color;
@@ -14,12 +10,11 @@
 
     &.expanded {
       background: rgba($primary-color, 0.02);
-      border-bottom-color: transparent; // Unir visualmente con los detalles
     }
 
     td {
       padding: $spacing-md;
-      vertical-align: top; // Alineación superior original
+      vertical-align: top;
       color: $text-primary;
       border-right: 1px solid $border-color;
       line-height: 1.4;
@@ -39,26 +34,6 @@
       border-right: none;
     }
   }
-}
-
-// Nueva columna Checkbox
-.col-checkbox-all {
-    width: 40px;
-    text-align: center;
-    vertical-align: middle !important; // Centrado verticalmente
-    
-    .checkbox-wrapper {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-    }
-    
-    input {
-        cursor: pointer;
-        width: 16px; 
-        height: 16px;
-    }
 }
 
 .col-product-name {
@@ -83,11 +58,10 @@
   }
 }
 
-// Estilo original vertical para escritorio
 .col-inventory {
   .inventory-subgrid {
     display: flex;
-    flex-direction: column; // Original vertical
+    flex-direction: column;
     gap: 2px;
   }
 
@@ -97,10 +71,6 @@
     gap: $spacing-lg;
     align-items: center;
     line-height: 1.3;
-    
-    .inventory-values {
-        display: contents; // Para que los hijos respeten el grid padre en desktop
-    }
   }
 
   .inventory-label {
@@ -128,6 +98,7 @@
     min-width: 90px;
   }
 }
+
 
 // ==========================================
 // === ESTILOS MÓVIL (TARJETA OPTIMIZADA) ===
