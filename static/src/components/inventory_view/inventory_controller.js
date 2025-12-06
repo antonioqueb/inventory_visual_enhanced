@@ -59,6 +59,7 @@ class InventoryVisualController extends Component {
             
             // UI
             showAdvancedFilters: false,
+            mobileFiltersOpen: false, // Controla el acordeón en móvil
             
             // Permisos
             hasSalesPermissions: false,
@@ -227,6 +228,11 @@ class InventoryVisualController extends Component {
         this.state.showAdvancedFilters = !this.state.showAdvancedFilters;
     }
 
+    // Toggle para mostrar/ocultar filtros en móvil
+    toggleMobileFilters() {
+        this.state.mobileFiltersOpen = !this.state.mobileFiltersOpen;
+    }
+
     clearAllFilters() {
         this.state.filters = {
             product_name: '',
@@ -296,6 +302,10 @@ class InventoryVisualController extends Component {
             });
         } finally {
             this.state.isLoading = false;
+            // En móvil, cerrar filtros al buscar
+            if (window.innerWidth < 992) {
+                this.state.mobileFiltersOpen = false;
+            }
         }
     }
 
