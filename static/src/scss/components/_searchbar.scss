@@ -144,12 +144,13 @@
 // RESPONSIVE PARA MÓVILES
 @media (max-width: $breakpoint-md) {
   .o_inventory_visual_searchbar {
-    padding: 8px 12px;
+    padding: 8px 12px; // Menos padding en móvil
 
     .searchbar-inner {
-      gap: 4px; // Menos espacio entre elementos
+      gap: 4px; // Menos espacio entre bloques
     }
 
+    // Cabecera móvil (Input + Toggle)
     .mobile-header {
       .input-group-text {
         background-color: white;
@@ -187,11 +188,12 @@
       }
     }
 
+    // Estilo de la rejilla de filtros en móvil
     .filters-row {
       // Cuando se expande, usar grid de 2 columnas para ahorrar espacio vertical
       &.main-filters, &.advanced-filters {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1fr; // 2 columnas
         gap: 8px;
         margin-top: 8px;
       }

@@ -37,7 +37,7 @@ export class SearchBar extends Component {
             
             // UI
             showAdvancedFilters: false,
-            mobileFiltersOpen: false, // <--- NUEVO: Controla la visibilidad en móvil
+            mobileFiltersOpen: false, // <--- NUEVO: Controla si el menú móvil está abierto
         });
 
         this.searchTimeout = null;
@@ -186,7 +186,7 @@ export class SearchBar extends Component {
         this.state.showAdvancedFilters = !this.state.showAdvancedFilters;
     }
     
-    // --- NUEVO: Toggle para móvil ---
+    // --- NUEVA FUNCIÓN: Toggle Móvil ---
     toggleMobileFilters() {
         this.state.mobileFiltersOpen = !this.state.mobileFiltersOpen;
     }
