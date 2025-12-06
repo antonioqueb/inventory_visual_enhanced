@@ -1,48 +1,37 @@
-// === ESTILOS BASE (DESKTOP) ===
+// ==========================================
+// === ESTILOS ESCRITORIO (ORIGINALES + CHECKBOX) ===
+// ==========================================
+
 .o_inventory_grid_table tbody {
   tr.o_inventory_product_row {
     border-bottom: 1px solid $border-color;
-    background: #FFFFFF;
-    transition: all $transition-fast;
-    cursor: pointer;
+    background: $background-primary;
+    transition: background-color $transition-fast;
 
     &:hover {
-      background: #FAFAFA;
-      .btn-expand-details {
-        background: $primary-color;
-        color: white;
-        border-color: $primary-color;
-      }
+      background: $background-secondary;
     }
 
     &.expanded {
-      background: mix($primary-color, #fff, 3%);
-      border-bottom-color: transparent;
-      
-      .btn-expand-details {
-        transform: rotate(180deg);
-        background: $primary-color;
-        color: white;
-        border-color: $primary-color;
-      }
-      
-      .product-title {
-          color: $primary-color;
-      }
+      background: rgba($primary-color, 0.02);
+      border-bottom-color: transparent; // Unir visualmente con los detalles
     }
 
     td {
-      padding: 12px 16px;
-      vertical-align: middle;
+      padding: $spacing-md;
+      vertical-align: top; // Alineación superior original
       color: $text-primary;
-      border-right: 1px solid #f0f0f0;
+      border-right: 1px solid $border-color;
+      line-height: 1.4;
 
-      &:last-child { border-right: none; }
+      &:last-child {
+        border-right: none;
+      }
     }
   }
 
   tr.o_inventory_details_row {
-    background: #FAFAFA;
+    background: $background-secondary;
     border-bottom: 1px solid $border-color;
 
     td.details-cell {
@@ -52,163 +41,121 @@
   }
 }
 
-// === COLUMNA: CHECKBOX "SELECCIONAR TODO" ===
+// Nueva columna Checkbox
 .col-checkbox-all {
-    width: 50px;
+    width: 40px;
     text-align: center;
+    vertical-align: middle !important; // Centrado verticalmente
     
     .checkbox-wrapper {
         display: flex;
         justify-content: center;
         align-items: center;
-        width: 100%;
         height: 100%;
     }
-
-    .select-all-checkbox {
-        width: 18px;
-        height: 18px;
+    
+    input {
         cursor: pointer;
-        border: 2px solid #ccc;
-        
-        &:checked {
-            background-color: $primary-color;
-            border-color: $primary-color;
-        }
+        width: 16px; 
+        height: 16px;
     }
 }
 
-// === COLUMNA: NOMBRE PRODUCTO ===
 .col-product-name {
   .product-name-cell {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: $spacing-xs;
   }
 
   .product-title {
-    font-weight: 700;
-    color: #2c3e50;
-    font-size: 14px;
+    font-weight: $font-weight-bold;
+    color: $text-primary;
+    font-size: $font-size-base;
     line-height: 1.3;
   }
 
   .product-sku {
-    font-size: 11px;
-    color: #888;
+    font-size: $font-size-small;
+    color: $text-secondary;
     font-family: $font-family-monospace;
-    display: flex;
-    align-items: center;
+    line-height: 1.3;
   }
 }
 
-// === COLUMNA: INVENTARIO (DESKTOP) ===
+// Estilo original vertical para escritorio
 .col-inventory {
   .inventory-subgrid {
     display: flex;
-    gap: 24px;
-    align-items: center;
+    flex-direction: column; // Original vertical
+    gap: 2px;
   }
 
-  .inventory-item {
-    display: flex;
-    flex-direction: column;
-    min-width: 80px;
-
-    .inv-label {
-      font-size: 10px;
-      text-transform: uppercase;
-      color: #999;
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-
-    .inv-data {
-        display: flex;
-        align-items: baseline;
-        gap: 4px;
-    }
-
-    .inv-qty {
-      font-size: 13px;
-      font-weight: 700;
-      color: #333;
-    }
+  .inventory-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: $spacing-lg;
+    align-items: center;
+    line-height: 1.3;
     
-    .inv-plates {
-        font-size: 11px;
-        color: #999;
+    .inventory-values {
+        display: contents; // Para que los hijos respeten el grid padre en desktop
     }
+  }
 
-    // Colores por estado
-    &.item-available .inv-qty { color: $success-color; }
-    &.item-hold.has-value .inv-qty { color: $warning-color; }
-    &.item-committed.has-value .inv-qty { color: $danger-color; }
+  .inventory-label {
+    font-size: $font-size-small;
+    color: $text-primary;
+    font-weight: $font-weight-normal;
+    text-align: left;
+  }
+
+  .inventory-units {
+    font-size: $font-size-small;
+    color: $text-primary;
+    font-weight: $font-weight-medium;
+    font-family: $font-family-base;
+    text-align: right;
+    min-width: 40px;
+  }
+
+  .inventory-measure {
+    font-size: $font-size-small;
+    color: $text-primary;
+    font-weight: $font-weight-medium;
+    font-family: $font-family-base;
+    text-align: right;
+    min-width: 90px;
   }
 }
 
-// === COLUMNA: TIPO Y CATEGORIA ===
-.badge-type {
-    background: #f0f0f0;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 11px;
-    color: #666;
-    font-weight: 600;
-}
-
-// === COLUMNA: ACCIONES ===
-.col-actions {
-  width: 60px;
-  text-align: center;
-  
-  .btn-expand-details {
-    width: 32px;
-    height: 32px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #e0e0e0;
-    border-radius: 50%; // Redondo
-    background: #fff;
-    color: #888;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 12px;
-
-    &:hover {
-      background: #f5f5f5;
-      color: #333;
-    }
-  }
-}
-
-// =========================================================
-// === DISEÑO MÓVIL (RESPONSIVE CARD) - CORREGIDO Y ACTUALIZADO ===
-// =========================================================
-@media (max-width: 992px) {
+// ==========================================
+// === ESTILOS MÓVIL (TARJETA OPTIMIZADA) ===
+// ==========================================
+@media (max-width: $breakpoint-md) {
     .o_inventory_grid_table {
         background: transparent !important;
         border: none !important;
     }
 
     .o_inventory_grid_table tbody tr.o_inventory_product_row {
+        // Layout Grid Principal: Checkbox | Título | Acción
         display: grid;
-        // Grid Móvil: Checkbox (izq), Contenido (centro), Acción (der)
         grid-template-columns: 50px 1fr 50px;
+        grid-template-rows: auto auto; // Fila Header, Fila Stats
         grid-template-areas: 
             "check title action"
-            "stats stats stats";
+            "stats stats stats"; // Stats ocupan todo el ancho abajo
             
         background: #FFFFFF;
-        border: 1px solid #E0E0E0;
+        border: 1px solid $border-color;
         border-radius: 12px;
         margin-bottom: 12px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.03);
-        padding: 0 !important;
+        box-shadow: $shadow-sm;
+        padding: 0 !important; // Reset padding de tabla
         height: auto !important;
 
-        // ÁREA 1: Checkbox "Seleccionar Todo"
+        // ÁREA 1: CHECKBOX
         .col-checkbox-all {
             grid-area: check;
             border-right: 1px solid #f0f0f0 !important;
@@ -217,19 +164,21 @@
             align-items: center;
             justify-content: center;
             padding: 0 !important;
+            width: auto !important; // Override desktop width
             
-            .select-all-checkbox {
-                width: 22px;
-                height: 22px;
+            input {
+                width: 20px;
+                height: 20px;
             }
         }
 
-        // ÁREA 2: Título del Producto
+        // ÁREA 2: TÍTULO
         .col-product-name {
             grid-area: title;
             border-bottom: 1px solid #f0f0f0 !important;
             border-right: none !important;
             padding: 12px 10px !important;
+            background: #fff;
             
             .product-name-cell {
                 gap: 2px;
@@ -240,7 +189,7 @@
             }
         }
 
-        // ÁREA 3: Botón Expandir
+        // ÁREA 3: ACCIÓN (Expandir)
         .col-actions {
             grid-area: action;
             border-bottom: 1px solid #f0f0f0 !important;
@@ -248,6 +197,8 @@
             align-items: center;
             justify-content: center;
             padding: 0 !important;
+            position: static !important; // Reset absolute positioning if any
+            width: auto !important;
             
             .btn-expand-details {
                 border: none;
@@ -257,16 +208,16 @@
                 border-radius: 0;
                 background: transparent !important;
                 color: #999;
-                
-                i { font-size: 16px; }
+                font-size: 16px;
             }
         }
 
-        // ÁREA 4: Inventario (GRID 2x2 para Móvil)
+        // ÁREA 4: INVENTARIO (GRID 2x2)
         .col-inventory {
             grid-area: stats;
             border: none !important;
             padding: 12px !important;
+            display: block !important; // Override table-cell
             
             .inventory-subgrid {
                 display: grid;
@@ -275,49 +226,82 @@
                 width: 100%;
             }
 
-            .inventory-item {
+            .inventory-row {
+                display: flex;
+                flex-direction: column;
                 background: #f8f9fa;
                 border-radius: 8px;
                 padding: 8px 12px;
                 border: 1px solid #eee;
+                gap: 4px; // Reset gap
+                align-items: flex-start; // Reset align
                 
-                .inv-label {
+                .inventory-label {
                     font-size: 10px;
-                    margin-bottom: 4px;
+                    text-transform: uppercase;
+                    color: #999;
+                    font-weight: 700;
+                    margin-bottom: 2px;
                 }
                 
-                .inv-data {
-                    flex-direction: column; // Número arriba, placas abajo
+                .inventory-values {
+                    display: flex;
+                    flex-direction: column-reverse; // Número m2 arriba, placas abajo
+                    align-items: flex-start;
                     gap: 0;
                 }
                 
-                .inv-qty {
+                .inventory-measure {
+                    text-align: left;
                     font-size: 14px;
+                    font-weight: 700;
+                    color: #333;
+                }
+                
+                .inventory-units {
+                    text-align: left;
+                    font-size: 11px;
+                    color: #999;
+                    
+                    &:before { content: "("; }
+                    &:after { content: " pzas)"; }
                 }
 
-                // Estilos específicos para destacar en móvil
+                // Bordes de color para identificar estado rápido
                 &.item-stock { border-left: 3px solid #999; }
-                &.item-hold { border-left: 3px solid $warning-color; background: rgba($warning-color, 0.05); }
-                &.item-committed { border-left: 3px solid $danger-color; background: rgba($danger-color, 0.05); }
-                &.item-available { border-left: 3px solid $success-color; background: rgba($success-color, 0.05); }
+                &.item-hold { 
+                    border-left: 3px solid $warning-color; 
+                    background: rgba($warning-color, 0.05); 
+                }
+                &.item-committed { 
+                    border-left: 3px solid $danger-color; 
+                    background: rgba($danger-color, 0.05); 
+                }
+                &.item-available { 
+                    border-left: 3px solid $success-color; 
+                    background: rgba($success-color, 0.05); 
+                }
             }
         }
-
-        // Ocultar columnas desktop en móvil
+        
+        // OCULTAR COLUMNAS INNECESARIAS EN MÓVIL
         .col-type, .col-category {
             display: none !important;
         }
     }
     
-    // Ajuste para la fila de detalles en móvil
+    // Ajuste margen fila detalles
     .o_inventory_grid_table tbody tr.o_inventory_details_row {
         background: transparent;
         border: none;
-        margin-top: -8px; // Pegarlo un poco a la tarjeta de arriba
+        margin-top: -8px;
         margin-bottom: 16px;
+        display: block; // Comportamiento bloque
         
         td.details-cell {
             padding: 0 !important;
+            display: block;
+            width: 100%;
         }
     }
 }
