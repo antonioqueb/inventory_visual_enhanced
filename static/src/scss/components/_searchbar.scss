@@ -70,6 +70,7 @@
     color: $text-primary;
     transition: $transition-all;
     outline: none;
+    width: 100%; // Asegurar ancho completo en móvil
 
     &:focus {
       border-color: $primary-color;
@@ -115,6 +116,7 @@
     background: $background-secondary;
     border-radius: $border-radius-sm;
     border: 1px solid $border-color;
+    text-align: center; // Centrar en móvil
 
     .results-count {
       font-size: $font-size-small;
@@ -139,14 +141,35 @@
   }
 }
 
+// RESPONSIVE PARA MÓVILES
 @media (max-width: $breakpoint-md) {
   .o_inventory_visual_searchbar {
+    padding: $spacing-sm $spacing-md;
+
     .filters-row {
-      grid-template-columns: 1fr 1fr;
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-sm;
 
       &.main-filters {
-        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column;
+        
+        .search-product-name {
+          width: 100%;
+        }
       }
+    }
+    
+    .filter-actions {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: $spacing-sm;
+        
+        .btn {
+            flex: 1;
+            justify-content: center;
+        }
     }
   }
 }

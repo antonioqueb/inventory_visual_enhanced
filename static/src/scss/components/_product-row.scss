@@ -10,6 +10,7 @@
 
     &.expanded {
       background: rgba($primary-color, 0.02);
+      border-bottom-color: transparent; // Unir visualmente con los detalles
     }
 
     td {
@@ -97,4 +98,74 @@
     text-align: right;
     min-width: 90px;
   }
+}
+
+// === RESPONSIVE PRODUCT CARD ===
+@media (max-width: $breakpoint-md) {
+    .o_inventory_grid_table tbody tr.o_inventory_product_row {
+        padding-bottom: $spacing-md;
+        
+        .col-product-name {
+            padding-right: 50px !important; // Espacio para el botón de acción
+            border-bottom: 1px solid $border-color-medium;
+            background: #f8f9fa;
+        }
+
+        .col-inventory {
+            padding-top: $spacing-md !important;
+            
+            .inventory-row {
+                // Hacer que las filas de inventario usen todo el ancho y se separen bien
+                display: flex;
+                justify-content: space-between;
+                padding: 2px 0;
+                border-bottom: 1px dashed $border-color;
+                
+                &:last-child {
+                    border-bottom: none;
+                }
+            }
+        }
+        
+        .col-type, .col-category {
+            // Mostrar tipo y categoría como etiquetas inline
+            display: inline-block !important;
+            width: auto !important;
+            padding: 4px $spacing-md !important;
+            font-size: 11px;
+            color: $text-secondary;
+            
+            &:before {
+                content: attr(class); // Fallback simple
+                font-weight: bold;
+                margin-right: 5px;
+                text-transform: capitalize;
+            }
+            
+            &.col-type:before { content: "Tipo:"; }
+            &.col-category:before { content: "Cat:"; }
+        }
+
+        .col-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: auto !important;
+            min-width: auto !important;
+            padding: 0 !important;
+            border: none !important;
+            background: transparent;
+            
+            .btn-expand-details {
+                width: 36px;
+                height: 36px;
+                background: white;
+                box-shadow: $shadow-sm;
+                border-color: $primary-color;
+                color: $primary-color;
+                
+                i { font-size: 16px; }
+            }
+        }
+    }
 }
