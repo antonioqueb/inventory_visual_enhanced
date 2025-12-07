@@ -1,3 +1,7 @@
+// ==========================================
+// ESTILOS BASE (DESKTOP)
+// ==========================================
+
 .details-wrapper {
   padding: 16px;
   background: #FAFAFA;
@@ -76,6 +80,13 @@
       font-family: sans-serif; font-size: 13px; margin-left: 4px;
     }
   }
+
+  .col-tipo {
+    font-family: "SF Mono", Monaco, Consolas, "Courier New", monospace; 
+    font-weight: 600; 
+    white-space: nowrap;
+    .text-muted { color: #808080; }
+  }
 }
 
 .table-loading {
@@ -88,18 +99,68 @@
   .loading-text { color: #7a7a7a; font-size: 12px; }
 }
 
-.col-tipo {
-  font-family: $font-family-monospace; font-weight: 600; white-space: nowrap;
-  .text-muted { color: #808080; }
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
-// ... (código anterior del archivo desktop) ...
+// ==========================================
+// BARRA DE SELECCIÓN MÓVIL (NUEVO)
+// ==========================================
 
-// === RESPONSIVE DETAILS CARDS (CORREGIDO) ===
+.details-wrapper {
+  .mobile-select-bar {
+    display: none; // Oculto por defecto en escritorio
+    padding: 12px 16px;
+    background-color: #ffffff;
+    border: 1px solid #E0E0E0;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    cursor: pointer;
+
+    .mobile-select-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      
+      .checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        
+        input {
+          width: 22px;
+          height: 22px;
+          margin: 0;
+          cursor: pointer;
+          accent-color: #714B67;
+        }
+      }
+
+      .mobile-select-text {
+        font-weight: 700;
+        font-size: 14px;
+        color: #714B67;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+}
+
+// ==========================================
+// RESPONSIVE DETAILS CARDS (CORREGIDO)
+// ==========================================
+
 @media (max-width: 992px) {
     .details-wrapper {
         padding: 8px;
         background: transparent;
+
+        // Mostrar la barra de selección en móvil
+        .mobile-select-bar {
+            display: block;
+        }
     }
 
     .o_inventory_details_table {
@@ -111,22 +172,22 @@
         tbody {
             display: flex;
             flex-direction: column;
-            gap: 16px; // Más espacio entre tarjetas de productos diferentes
+            gap: 16px; // Espacio entre tarjetas
 
             // Transformar la fila en un GRID ROBUSTO
             tr {
                 display: grid;
-                // Col 1: Checkbox (50px), Cols 2-4: Espacio restante dividido
+                // Col 1: Checkbox (50px), Cols 2-4: Espacio restante dividido equitativamente
                 grid-template-columns: 50px 1fr 1fr 1fr; 
                 
-                // DEFINICIÓN DE ÁREAS (La ubicación y dimensiones están en filas separadas)
+                // DEFINICIÓN DE ÁREAS
                 grid-template-areas:
                     "check  header header header" /* Fila 1: Checkbox y Lote */
-                    "loc    loc    loc    loc"    /* Fila 2: Ubicación (ancho completo) */
-                    "dims   dims   dims   dims"   /* Fila 3: Dimensiones (ancho completo) */
-                    "tech1  tech1  tech2  tech2"  /* Fila 4: Datos técnicos */
-                    "tech3  tech3  tech4  tech4"  /* Fila 5: Datos técnicos */
-                    "tech5  tech5  tech6  tech6"  /* Fila 6: Datos técnicos */
+                    "loc    loc    loc    loc"    /* Fila 2: Ubicación */
+                    "dims   dims   dims   dims"   /* Fila 3: Dimensiones */
+                    "tech1  tech1  tech2  tech2"  /* Fila 4: Tipo y Bloque */
+                    "tech3  tech3  tech4  tech4"  /* Fila 5: Atado y Pedimento */
+                    "tech5  tech5  tech6  tech6"  /* Fila 6: Contenedor y Ref */
                     "act1   act2   act3   act4";  /* Fila 7: Botones de acción */
                 
                 background: #FFFFFF;
@@ -139,11 +200,11 @@
 
             td {
                 border: none !important;
-                padding: 10px 12px !important; // Más padding general
+                padding: 10px 12px !important;
                 display: flex;
                 align-items: center;
                 
-                // === ÁREA: CHECKBOX (Visibilidad corregida) ===
+                // === ÁREA: CHECKBOX ===
                 &.col-checkbox {
                     grid-area: check;
                     background-color: #f8f9fa;
@@ -152,7 +213,7 @@
                     justify-content: center;
                     align-items: center;
                     padding: 0 !important;
-                    min-height: 48px; // Altura mínima para asegurar visibilidad
+                    min-height: 48px;
                     
                     .checkbox-wrapper {
                         display: flex;
@@ -163,11 +224,11 @@
                     }
                     
                     input.cart-checkbox {
-                        width: 24px; // Checkbox más grande en móvil
+                        width: 24px;
                         height: 24px;
                         margin: 0;
                         cursor: pointer;
-                        opacity: 1 !important; // Forzar opacidad
+                        opacity: 1 !important;
                         position: relative;
                         z-index: 10;
                     }
@@ -189,7 +250,6 @@
                     grid-area: loc;
                     font-size: 14px;
                     background-color: #ffffff;
-                    // Borde inferior para separar de dimensiones
                     border-bottom: 1px dashed #e0e0e0 !important; 
                     padding-top: 14px !important;
                     padding-bottom: 8px !important;
@@ -201,11 +261,11 @@
                     }
                 }
                 
-                // === ÁREA: DIMENSIONES (Bajada a su propia línea) ===
+                // === ÁREA: DIMENSIONES ===
                 &.col-dimensions {
                     grid-area: dims;
                     background-color: #ffffff;
-                    border-bottom: 4px solid #f8f9fa !important; // Separador visual grueso
+                    border-bottom: 4px solid #f8f9fa !important;
                     padding-top: 8px !important;
                     padding-bottom: 14px !important;
                     
@@ -228,7 +288,7 @@
                     }
                 }
 
-                // === ÁREAS TÉCNICAS ===
+                // === ÁREAS TÉCNICAS (Tipo, Bloque, etc) ===
                 &.col-tipo { grid-area: tech1; }
                 &.col-bloque { grid-area: tech2; }
                 &.col-atado { grid-area: tech3; }
@@ -246,8 +306,10 @@
                     min-height: 50px;
                     background: #fff;
                     
+                    // Ocultar si está vacío para limpiar la interfaz
                     &:empty { display: none; }
 
+                    // Labels automáticos
                     &:before {
                         content: attr(class);
                         font-size: 10px;
@@ -275,15 +337,28 @@
                     background-color: #f8f9fa;
                     border-top: 1px solid #e0e0e0;
                     
-                    &:nth-of-type(11) { grid-area: act1; border-right: 1px solid #e0e0e0; }
-                    &:nth-of-type(12) { grid-area: act2; border-right: 1px solid #e0e0e0; }
-                    &:nth-of-type(13) { grid-area: act3; border-right: 1px solid #e0e0e0; }
-                    &:nth-of-type(14) { grid-area: act4; }
+                    // Asignación basada en el orden de las columnas en el XML
+                    &:nth-of-type(11) { grid-area: act1; border-right: 1px solid #e0e0e0; } // Foto
+                    &:nth-of-type(12) { grid-area: act2; border-right: 1px solid #e0e0e0; } // Notas
+                    &:nth-of-type(13) { grid-area: act3; border-right: 1px solid #e0e0e0; } // Detalles
+                    &:nth-of-type(14) { grid-area: act4; } // Estado
 
                     .icon-btn, .status-badge-btn {
                         width: 42px;
                         height: 42px;
                         font-size: 18px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border-radius: 50%;
+                        border: none;
+                        background: transparent;
+                        
+                        // Estilos específicos para estados
+                        &.status-hold-active { background-color: #ffeeba; color: #856404; }
+                        &.status-sale-order { background-color: #d4edda; color: #155724; }
+                        &.has-photos { color: #007bff; background-color: rgba(0,123,255,0.1); }
+                        &.has-notes { color: #17a2b8; background-color: rgba(23,162,184,0.1); }
                     }
                 }
             }

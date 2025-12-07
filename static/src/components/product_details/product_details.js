@@ -10,6 +10,24 @@ export class ProductDetails extends Component {
             maximumFractionDigits: 2,
         }).format(num);
     }
+
+    /**
+     * Manejador para el botón de "Seleccionar todo" en versión móvil.
+     * Verifica el estado actual y alterna entre seleccionar o deseleccionar todo.
+     */
+    onMobileSelectAll() {
+        const areAllSelected = this.props.areAllCurrentProductSelected && this.props.areAllCurrentProductSelected();
+        
+        if (areAllSelected) {
+            if (this.props.deselectAllCurrentProduct) {
+                this.props.deselectAllCurrentProduct();
+            }
+        } else {
+            if (this.props.selectAllCurrentProduct) {
+                this.props.selectAllCurrentProduct();
+            }
+        }
+    }
 }
 
 ProductDetails.template = "inventory_visual_enhanced.ProductDetails";

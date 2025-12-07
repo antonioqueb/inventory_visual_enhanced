@@ -2,6 +2,26 @@
 <templates xml:space="preserve">
     <t t-name="inventory_visual_enhanced.ProductDetails" owl="1">
         <div class="details-wrapper">
+            
+            <!-- BARRA DE SELECCIÓN MÓVIL (NUEVO) -->
+            <!-- Solo visible en móvil vía CSS, permite seleccionar todo cuando no hay cabecera -->
+            <div class="mobile-select-bar" t-on-click="onMobileSelectAll">
+                <div class="mobile-select-content">
+                    <div class="checkbox-wrapper">
+                        <input 
+                            type="checkbox"
+                            class="form-check-input"
+                            t-att-checked="props.areAllCurrentProductSelected ? props.areAllCurrentProductSelected() : false"
+                            t-on-change="onMobileSelectAll"
+                        />
+                    </div>
+                    <span class="mobile-select-text">
+                        <t t-if="props.areAllCurrentProductSelected and props.areAllCurrentProductSelected()">Deseleccionar todo</t>
+                        <t t-else="">Seleccionar todo</t>
+                    </span>
+                </div>
+            </div>
+
             <table class="o_inventory_details_table">
                 <thead>
                     <tr>
