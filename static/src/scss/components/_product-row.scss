@@ -9,6 +9,9 @@
     transition: background-color $transition-fast;
     // Fuente formal y pequeña global
     font-family: "Roboto", "Arial", sans-serif;
+    
+    // IMPORTANTE: Cursor pointer para indicar que toda la fila es clicable
+    cursor: pointer; 
 
     &:hover {
       background: $background-secondary;
@@ -16,12 +19,14 @@
 
     &.expanded {
       background: rgba($primary-color, 0.02);
+      // Borde lateral izquierdo para indicar activo (opcional, visualmente ayuda)
+      border-left: 3px solid $primary-color;
     }
 
     td {
       // PADDING REDUCIDO: Para que la fila sea delgada
       padding: 4px 6px; 
-      vertical-align: top; // Top para alinear si hay diferencias de altura
+      vertical-align: top;
       color: $text-primary;
       border-right: 1px solid $border-color;
       line-height: 1.2;
@@ -29,12 +34,6 @@
 
       &:last-child {
         border-right: none;
-      }
-      
-      // Centrar verticalmente el contenido de acciones (flecha)
-      &.col-actions {
-          vertical-align: middle;
-          text-align: center;
       }
     }
   }
@@ -137,11 +136,12 @@
         
         // Reorganizar grid interno del card móvil para compactar
         display: grid !important;
-        grid-template-columns: 1fr auto !important; // Nombre | Flecha
+        // Solo una columna principal (sin la flecha)
+        grid-template-columns: 1fr !important;
         grid-template-areas: 
-            "name    actions"
-            "inv     inv"
-            "info    info";
+            "name"
+            "inv"
+            "info";
         gap: 4px !important;
 
         td {
@@ -158,21 +158,7 @@
             .product-sku { font-size: 10px; }
         }
 
-        // 2. Acciones (Flecha)
-        td.col-actions {
-            grid-area: actions;
-            display: flex;
-            justify-content: flex-end;
-            align-items: flex-start;
-            
-            .btn-expand-details {
-                width: 24px;
-                height: 24px;
-                font-size: 10px;
-            }
-        }
-
-        // 3. Inventario (Grid compacto horizontal en móvil)
+        // 2. Inventario (Grid compacto horizontal en móvil)
         td.col-inventory {
             grid-area: inv;
             background: #f8f9fa;
@@ -197,7 +183,7 @@
             }
         }
 
-        // 4. Info extra (Tipo/Categoría) en una línea
+        // 3. Info extra (Tipo/Categoría) en una línea
         td.col-type, td.col-category {
             grid-area: info;
             display: inline-block;

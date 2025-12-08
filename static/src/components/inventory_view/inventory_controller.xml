@@ -4,7 +4,7 @@
     <t t-name="inventory_visual_enhanced.InventoryView" owl="1">
         <div class="o_inventory_visual_container d-flex flex-column vh-100">
             
-            <!-- Barra de filtros superior (Ahora Modularizada) -->
+            <!-- Barra de filtros superior -->
             <SearchBar 
                 isLoading="state.isLoading"
                 onSearch.bind="onSearch"
@@ -55,7 +55,7 @@
                                 <th class="col-inventory">Inventory</th>
                                 <th class="col-type">Type</th>
                                 <th class="col-category">Category</th>
-                                <th class="col-actions">Actions</th>
+                                <!-- Columna Actions eliminada -->
                             </tr>
                         </thead>
                         <tbody>

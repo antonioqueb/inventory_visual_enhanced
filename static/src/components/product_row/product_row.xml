@@ -2,7 +2,12 @@
 <templates xml:space="preserve">
     
     <t t-name="inventory_visual_enhanced.ProductRow" owl="1">
-        <tr class="o_inventory_product_row" t-att-class="{ expanded: props.isExpanded }">
+        <!-- El evento click ahora está en toda la fila -->
+        <tr class="o_inventory_product_row" 
+            t-att-class="{ expanded: props.isExpanded }"
+            t-on-click="() => props.onToggle(props.product.quant_ids)"
+            title="Click para ver detalles"
+        >
             
             <!-- Product Name -->
             <td class="col-product-name">
@@ -59,21 +64,13 @@
                 <span t-else="" class="text-muted">-</span>
             </td>
             
-            <!-- Actions -->
-            <td class="col-actions">
-                <button 
-                    type="button" 
-                    class="btn-expand-details"
-                    t-on-click="() => props.onToggle(props.product.quant_ids)"
-                >
-                    <i class="fa fa-chevron-down" t-att-class="{ 'fa-chevron-up': props.isExpanded }"></i>
-                </button>
-            </td>
+            <!-- Actions Eliminado -->
         </tr>
         
         <!-- Fila de detalles -->
         <tr class="o_inventory_details_row" t-if="props.isExpanded">
-            <td colspan="6" class="details-cell">
+            <!-- Colspan reducido a 4 porque quitamos una columna -->
+            <td colspan="4" class="details-cell">
                 <ProductDetails 
                     details="props.details"
                     onPhotoClick="props.onPhotoClick"
