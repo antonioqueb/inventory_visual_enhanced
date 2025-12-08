@@ -42,149 +42,182 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <t t-foreach="props.details" t-as="detail" t-key="detail.id">
-                        <tr>
-                            <!-- Checkbox: Con wrapper y stop-propagation para asegurar click en móvil -->
-                            <td class="col-checkbox text-center">
-                                <div class="checkbox-wrapper" t-on-click.stop="">
-                                    <input 
-                                        type="checkbox"
-                                        class="form-check-input cart-checkbox"
-                                        t-att-checked="props.isInCart ? props.isInCart(detail.id) : false"
-                                        t-on-change="() => props.toggleCartSelection ? props.toggleCartSelection(detail) : null"
-                                    />
-                                </div>
-                            </td>
-                            
-                            <!-- Lote -->
-                            <td class="col-lot">
-                                <span t-esc="detail.lot_name"></span>
-                            </td>
-                            
-                            <!-- Ubicación -->
-                            <td class="col-location">
-                                <i class="fa fa-map-marker"></i>
-                                <span t-esc="detail.location_name"></span>
-                            </td>
-                            
-                            <!-- Dimensiones: Estructura mejorada para separación visual -->
-                            <td class="col-dimensions">
-                                <span class="dimensions-inline">
-                                    <!-- Parte 1: Las medidas (Alto x Ancho) -->
-                                    <span class="dims-text">
-                                        <t t-if="detail.alto and detail.ancho">
-                                            <t t-esc="detail.alto"/>m × <t t-esc="detail.ancho"/>m
-                                        </t>
-                                        <t t-elif="!detail.alto and !detail.ancho">-</t>
-                                        <t t-elif="detail.alto">
-                                            <t t-esc="detail.alto"/>m
-                                        </t>
-                                        <t t-else="">
-                                            <t t-esc="detail.ancho"/>m
-                                        </t>
+                    <!-- NUEVO BUCLE EXTERNO: Itera sobre los GRUPOS (Bloques) ya ordenados -->
+                    <t t-foreach="groupedAndSortedDetails" t-as="group" t-key="group.blockName">
+                        
+                        <!-- BUCLE INTERNO: Itera sobre los detalles originales dentro de ese bloque -->
+                        <!-- Aquí comienza la lógica original fila por fila -->
+                        <t t-foreach="group.items" t-as="detail" t-key="detail.id">
+                            <tr>
+                                <!-- Checkbox: Con wrapper y stop-propagation para asegurar click en móvil -->
+                                <td class="col-checkbox text-center">
+                                    <div class="checkbox-wrapper" t-on-click.stop="">
+                                        <input 
+                                            type="checkbox"
+                                            class="form-check-input cart-checkbox"
+                                            t-att-checked="props.isInCart ? props.isInCart(detail.id) : false"
+                                            t-on-change="() => props.toggleCartSelection ? props.toggleCartSelection(detail) : null"
+                                        />
+                                    </div>
+                                </td>
+                                
+                                <!-- Lote -->
+                                <td class="col-lot">
+                                    <span t-esc="detail.lot_name"></span>
+                                </td>
+                                
+                                <!-- Ubicación -->
+                                <td class="col-location">
+                                    <i class="fa fa-map-marker"></i>
+                                    <span t-esc="detail.location_name"></span>
+                                </td>
+                                
+                                <!-- Dimensiones: Estructura mejorada para separación visual -->
+                                <td class="col-dimensions">
+                                    <span class="dimensions-inline">
+                                        <!-- Parte 1: Las medidas (Alto x Ancho) -->
+                                        <span class="dims-text">
+                                            <t t-if="detail.alto and detail.ancho">
+                                                <t t-esc="detail.alto"/>m × <t t-esc="detail.ancho"/>m
+                                            </t>
+                                            <t t-elif="!detail.alto and !detail.ancho">-</t>
+                                            <t t-elif="detail.alto">
+                                                <t t-esc="detail.alto"/>m
+                                            </t>
+                                            <t t-else="">
+                                                <t t-esc="detail.ancho"/>m
+                                            </t>
+                                        </span>
+                                        
+                                        <!-- Parte 2: El total en m² (Resaltado) -->
+                                        <strong class="dimensions-total-inline">
+                                            <t t-esc="props.formatNumber(detail.quantity)"/> m²
+                                        </strong>
                                     </span>
-                                    
-                                    <!-- Parte 2: El total en m² (Resaltado) -->
-                                    <strong class="dimensions-total-inline">
-                                        <t t-esc="props.formatNumber(detail.quantity)"/> m²
-                                    </strong>
-                                </span>
+                                </td>
+                                
+                                <!-- Datos Técnicos -->
+                                <td class="col-tipo">
+                                    <span t-if="detail.tipo" t-esc="detail.tipo"></span>
+                                    <span t-else="" class="text-muted">-</span>
+                                </td>
+                                
+                                <td class="col-bloque">
+                                    <span t-if="detail.bloque" t-esc="detail.bloque"></span>
+                                    <span t-else="" class="text-muted">-</span>
+                                </td>
+                                
+                                <td class="col-atado">
+                                    <span t-if="detail.atado" t-esc="detail.atado"></span>
+                                    <span t-else="" class="text-muted">-</span>
+                                </td>
+                                
+                                <td class="col-pedimento">
+                                    <span t-if="detail.pedimento" t-esc="detail.pedimento"></span>
+                                    <span t-else="" class="text-muted">-</span>
+                                </td>
+                                
+                                <td class="col-contenedor">
+                                    <span t-if="detail.contenedor" t-esc="detail.contenedor"></span>
+                                    <span t-else="" class="text-muted">-</span>
+                                </td>
+                                
+                                <td class="col-ref-proveedor">
+                                    <span t-if="detail.referencia_proveedor" t-esc="detail.referencia_proveedor"></span>
+                                    <span t-else="" class="text-muted">-</span>
+                                </td>
+                                
+                                <!-- ACCIONES (Botones) - Clases action-btn-cell cruciales para el CSS Grid -->
+                                <td class="col-icon action-btn-cell">
+                                    <button 
+                                        type="button"
+                                        class="icon-btn"
+                                        t-att-class="{ 'has-photos': detail.cantidad_fotos > 0, 'no-content': detail.cantidad_fotos === 0 }"
+                                        t-on-click="() => props.onPhotoClick(detail.id)"
+                                    >
+                                        <i class="fa fa-camera"></i>
+                                    </button>
+                                </td>
+                                
+                                <td class="col-icon action-btn-cell">
+                                    <button 
+                                        type="button"
+                                        class="icon-btn"
+                                        t-att-class="{ 'has-notes': detail.detalles_placa, 'no-content': !detail.detalles_placa }"
+                                        t-on-click="() => props.onNotesClick(detail.id)"
+                                    >
+                                        <i class="fa fa-info-circle"></i>
+                                    </button>
+                                </td>
+                                
+                                <td class="col-icon action-btn-cell">
+                                    <button 
+                                        t-if="props.hasSalesPermissions"
+                                        type="button"
+                                        class="icon-btn has-details"
+                                        t-on-click="() => props.onDetailsClick(detail.id)"
+                                    >
+                                        <i class="fa fa-history"></i>
+                                    </button>
+                                    <span t-else="" class="icon-btn no-content"><i class="fa fa-history"></i></span>
+                                </td>
+                                
+                                <td class="col-icon action-btn-cell">
+                                    <button 
+                                        t-if="detail.tiene_hold and props.hasSalesPermissions"
+                                        type="button"
+                                        class="status-badge-btn status-hold-active"
+                                        t-on-click="() => props.onHoldClick(detail.id, detail.hold_info)"
+                                    >
+                                        <i class="fa fa-hand-paper-o"></i>
+                                    </button>
+                                    <button 
+                                        t-elif="detail.en_orden_venta"
+                                        type="button"
+                                        class="status-badge-btn status-sale-order"
+                                        t-on-click="() => props.onSaleOrderClick(detail.id, detail.sale_order_ids)"
+                                    >
+                                        <i class="fa fa-usd"></i>
+                                    </button>
+                                    <button 
+                                        t-elif="props.hasSalesPermissions"
+                                        type="button"
+                                        class="status-badge-btn status-no-state"
+                                        t-on-click="() => props.onHoldClick(detail.id, null)"
+                                    >
+                                        <i class="fa fa-hand-paper-o"></i>
+                                    </button>
+                                    <span t-else="" class="status-badge-btn status-available-no-perms"><i class="fa fa-check-circle"></i></span>
+                                </td>
+                            </tr>
+                        </t>
+
+                        <!-- FILA DE RESUMEN (NUEVA): Se inserta al final de cada bloque -->
+                        <!-- Usa estilos inline para garantizar visibilidad sin romper CSS externo, background gris claro -->
+                        <tr class="group-summary-row" style="background-color: #f8f9fa; border-top: 2px solid #e9ecef;">
+                            <!-- Espacio Checkbox -->
+                            <td></td>
+                            
+                            <!-- Columna Lote: Total Placas -->
+                            <td class="col-lot" style="font-weight: bold; color: #495057;">
+                                <span>Total Placas: <t t-esc="group.count"/></span>
                             </td>
                             
-                            <!-- Datos Técnicos -->
-                            <td class="col-tipo">
-                                <span t-if="detail.tipo" t-esc="detail.tipo"></span>
-                                <span t-else="" class="text-muted">-</span>
+                            <!-- Espacio Ubicación -->
+                            <td></td>
+                            
+                            <!-- Columna Dimensiones: Total Metros Cuadrados -->
+                            <td class="col-dimensions" style="font-weight: bold; color: #212529;">
+                                <span>Total: <t t-esc="props.formatNumber(group.totalArea)"/> m²</span>
                             </td>
                             
-                            <td class="col-bloque">
-                                <span t-if="detail.bloque" t-esc="detail.bloque"></span>
-                                <span t-else="" class="text-muted">-</span>
-                            </td>
-                            
-                            <td class="col-atado">
-                                <span t-if="detail.atado" t-esc="detail.atado"></span>
-                                <span t-else="" class="text-muted">-</span>
-                            </td>
-                            
-                            <td class="col-pedimento">
-                                <span t-if="detail.pedimento" t-esc="detail.pedimento"></span>
-                                <span t-else="" class="text-muted">-</span>
-                            </td>
-                            
-                            <td class="col-contenedor">
-                                <span t-if="detail.contenedor" t-esc="detail.contenedor"></span>
-                                <span t-else="" class="text-muted">-</span>
-                            </td>
-                            
-                            <td class="col-ref-proveedor">
-                                <span t-if="detail.referencia_proveedor" t-esc="detail.referencia_proveedor"></span>
-                                <span t-else="" class="text-muted">-</span>
-                            </td>
-                            
-                            <!-- ACCIONES (Botones) - Clases action-btn-cell cruciales para el CSS Grid -->
-                            <td class="col-icon action-btn-cell">
-                                <button 
-                                    type="button"
-                                    class="icon-btn"
-                                    t-att-class="{ 'has-photos': detail.cantidad_fotos > 0, 'no-content': detail.cantidad_fotos === 0 }"
-                                    t-on-click="() => props.onPhotoClick(detail.id)"
-                                >
-                                    <i class="fa fa-camera"></i>
-                                </button>
-                            </td>
-                            
-                            <td class="col-icon action-btn-cell">
-                                <button 
-                                    type="button"
-                                    class="icon-btn"
-                                    t-att-class="{ 'has-notes': detail.detalles_placa, 'no-content': !detail.detalles_placa }"
-                                    t-on-click="() => props.onNotesClick(detail.id)"
-                                >
-                                    <i class="fa fa-info-circle"></i>
-                                </button>
-                            </td>
-                            
-                            <td class="col-icon action-btn-cell">
-                                <button 
-                                    t-if="props.hasSalesPermissions"
-                                    type="button"
-                                    class="icon-btn has-details"
-                                    t-on-click="() => props.onDetailsClick(detail.id)"
-                                >
-                                    <i class="fa fa-history"></i>
-                                </button>
-                                <span t-else="" class="icon-btn no-content"><i class="fa fa-history"></i></span>
-                            </td>
-                            
-                            <td class="col-icon action-btn-cell">
-                                <button 
-                                    t-if="detail.tiene_hold and props.hasSalesPermissions"
-                                    type="button"
-                                    class="status-badge-btn status-hold-active"
-                                    t-on-click="() => props.onHoldClick(detail.id, detail.hold_info)"
-                                >
-                                    <i class="fa fa-hand-paper-o"></i>
-                                </button>
-                                <button 
-                                    t-elif="detail.en_orden_venta"
-                                    type="button"
-                                    class="status-badge-btn status-sale-order"
-                                    t-on-click="() => props.onSaleOrderClick(detail.id, detail.sale_order_ids)"
-                                >
-                                    <i class="fa fa-usd"></i>
-                                </button>
-                                <button 
-                                    t-elif="props.hasSalesPermissions"
-                                    type="button"
-                                    class="status-badge-btn status-no-state"
-                                    t-on-click="() => props.onHoldClick(detail.id, null)"
-                                >
-                                    <i class="fa fa-hand-paper-o"></i>
-                                </button>
-                                <span t-else="" class="status-badge-btn status-available-no-perms"><i class="fa fa-check-circle"></i></span>
+                            <!-- Relleno del resto de columnas para que no se vea vacío -->
+                            <!-- Combina las 10 columnas restantes y alinea el nombre del bloque a la derecha -->
+                            <td colspan="10" style="text-align: right; vertical-align: middle; padding-right: 15px; color: #6c757d; font-style: italic;">
+                                <small>Fin del Bloque: <span t-esc="group.blockName" style="font-weight: 600;"/></small>
                             </td>
                         </tr>
+                        
                     </t>
                 </tbody>
             </table>
