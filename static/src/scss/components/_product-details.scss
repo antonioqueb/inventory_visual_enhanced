@@ -414,14 +414,20 @@
                         border: none;
                         background: transparent;
                         
-                        // ===== CORRECCIÓN DE COLOR PARA ICONO DESACTIVADO EN MÓVIL =====
+                        // ===== CORRECCIÓN DE ICONOS =====
                         &.no-content {
-                            color: #666666 !important; /* Gris oscuro en lugar de blanco */
+                            color: #666666 !important;
                             background-color: rgba(0, 0, 0, 0.05) !important;
                             border: 1px solid #e0e0e0 !important;
                             opacity: 1 !important;
                         }
-                        // ===============================================================
+                        
+                        // CORRECCIÓN ESPECÍFICA PARA HISTORIAL (has-details)
+                        &.has-details {
+                            color: #714B67 !important; /* Color primario visible */
+                            background-color: rgba(113, 75, 103, 0.1) !important;
+                        }
+                        // ==================================
                         
                         i.fa {
                             font-size: 18px;
