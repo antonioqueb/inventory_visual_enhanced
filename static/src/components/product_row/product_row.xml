@@ -54,7 +54,8 @@
             
             <!-- Category -->
             <td class="col-category">
-                <span t-if="props.product.categ_name" t-esc="props.product.categ_name"/>
+                <!-- Usamos shortCategoryName (el getter que creamos en JS) -->
+                <span t-if="props.product.categ_name" t-esc="shortCategoryName"/>
                 <span t-else="" class="text-muted">-</span>
             </td>
             

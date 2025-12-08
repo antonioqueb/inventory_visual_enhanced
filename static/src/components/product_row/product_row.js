@@ -11,7 +11,18 @@ export class ProductRow extends Component {
             maximumFractionDigits: 2,
         }).format(num);
     }
+
+    get shortCategoryName() {
+        const fullName = this.props.product.categ_name;
+        if (!fullName) return "";
+        // Odoo usa " / " (espacio barra espacio) para separar categorías
+        const parts = fullName.split(' / ');
+        // Retorna el último elemento del array (la categoría hija)
+        return parts[parts.length - 1];
+    }    
 }
+
+
 
 ProductRow.template = "inventory_visual_enhanced.ProductRow";
 ProductRow.components = { ProductDetails };
