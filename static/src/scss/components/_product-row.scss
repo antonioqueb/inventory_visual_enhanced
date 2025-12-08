@@ -1,8 +1,14 @@
+// ==========================================
+// ESTILOS DE FILA (PRODUCT ROW) - COMPACTO
+// ==========================================
+
 .o_inventory_grid_table tbody {
   tr.o_inventory_product_row {
     border-bottom: 1px solid $border-color;
     background: $background-primary;
     transition: background-color $transition-fast;
+    // Fuente formal y pequeña global
+    font-family: "Roboto", "Arial", sans-serif;
 
     &:hover {
       background: $background-secondary;
@@ -13,14 +19,22 @@
     }
 
     td {
-      padding: $spacing-md;
-      vertical-align: top;
+      // PADDING REDUCIDO: Para que la fila sea delgada
+      padding: 4px 6px; 
+      vertical-align: top; // Top para alinear si hay diferencias de altura
       color: $text-primary;
       border-right: 1px solid $border-color;
-      line-height: 1.4;
+      line-height: 1.2;
+      font-size: 10px; // Texto base pequeño
 
       &:last-child {
         border-right: none;
+      }
+      
+      // Centrar verticalmente el contenido de acciones (flecha)
+      &.col-actions {
+          vertical-align: middle;
+          text-align: center;
       }
     }
   }
@@ -36,65 +50,162 @@
   }
 }
 
+// === NOMBRE DEL PRODUCTO ===
 .col-product-name {
   .product-name-cell {
     display: flex;
     flex-direction: column;
-    gap: $spacing-xs;
+    gap: 2px; // Gap mínimo
   }
 
   .product-title {
-    font-weight: $font-weight-bold;
+    font-weight: 700;
     color: $text-primary;
-    font-size: $font-size-base;
-    line-height: 1.3;
+    font-size: 11px; // Título ligeramente más grande pero compacto
+    line-height: 1.2;
   }
 
   .product-sku {
-    font-size: $font-size-small;
+    font-size: 9px; // SKU muy pequeño
     color: $text-secondary;
-    font-family: $font-family-monospace;
-    line-height: 1.3;
+    font-family: "SF Mono", "Roboto Mono", monospace;
+    line-height: 1.1;
   }
 }
 
+// === COLUMNA DE INVENTARIO (La más alta) ===
 .col-inventory {
   .inventory-subgrid {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 0px; // Sin espacio extra entre filas de inventario
   }
 
   .inventory-row {
     display: grid;
-    grid-template-columns: 1fr auto auto;
-    gap: $spacing-lg;
+    // Layout comprimido: Label | Unidades | M2
+    grid-template-columns: 60px 1fr 1fr; 
+    gap: 4px;
     align-items: center;
-    line-height: 1.3;
+    line-height: 1.1; // Altura de línea mínima
+    height: 14px; // Forzar altura fija pequeña por renglón
   }
 
   .inventory-label {
-    font-size: $font-size-small;
-    color: $text-primary;
-    font-weight: $font-weight-normal;
+    font-size: 9px;
+    color: #666666; // Gris oscuro para legibilidad
+    font-weight: 400;
     text-align: left;
+    white-space: nowrap;
   }
 
   .inventory-units {
-    font-size: $font-size-small;
+    font-size: 9px;
     color: $text-primary;
-    font-weight: $font-weight-medium;
-    font-family: $font-family-base;
+    font-weight: 600;
+    font-family: "Roboto", sans-serif;
     text-align: right;
-    min-width: 40px;
   }
 
   .inventory-measure {
-    font-size: $font-size-small;
+    font-size: 9px;
     color: $text-primary;
-    font-weight: $font-weight-medium;
-    font-family: $font-family-base;
+    font-weight: 700; // Negrita para destacar el m2
+    font-family: "Roboto", sans-serif;
     text-align: right;
-    min-width: 90px;
   }
+}
+
+// === COLUMNAS SIMPLES (Tipo, Categoría) ===
+.col-type, .col-category {
+    font-size: 10px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+}
+
+// ==========================================
+// ESTILOS MÓVIL (COMPACTO)
+// ==========================================
+@media (max-width: 992px) {
+    .o_inventory_grid_table tbody tr.o_inventory_product_row {
+        // Reducir tamaño de la tarjeta en móvil
+        padding: 6px 8px !important;
+        margin-bottom: 6px !important; // Menos espacio entre tarjetas
+        border-radius: 6px; // Bordes menos redondeados para ahorrar espacio visual
+        
+        // Reorganizar grid interno del card móvil para compactar
+        display: grid !important;
+        grid-template-columns: 1fr auto !important; // Nombre | Flecha
+        grid-template-areas: 
+            "name    actions"
+            "inv     inv"
+            "info    info";
+        gap: 4px !important;
+
+        td {
+            border: none !important;
+            padding: 0 !important;
+        }
+
+        // 1. Nombre y SKU
+        td.col-product-name {
+            grid-area: name;
+            margin-bottom: 2px;
+            
+            .product-title { font-size: 12px; color: #714B67; }
+            .product-sku { font-size: 10px; }
+        }
+
+        // 2. Acciones (Flecha)
+        td.col-actions {
+            grid-area: actions;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-start;
+            
+            .btn-expand-details {
+                width: 24px;
+                height: 24px;
+                font-size: 10px;
+            }
+        }
+
+        // 3. Inventario (Grid compacto horizontal en móvil)
+        td.col-inventory {
+            grid-area: inv;
+            background: #f8f9fa;
+            border-radius: 4px;
+            padding: 4px !important;
+            
+            .inventory-subgrid {
+                // En móvil, intentamos poner pares en una línea si cabe, o lista compacta
+                display: grid;
+                grid-template-columns: 1fr 1fr; // Dos columnas de datos
+                gap: 4px 12px;
+                
+                .inventory-row {
+                    display: flex;
+                    justify-content: space-between;
+                    border-bottom: 1px dashed #e0e0e0;
+                    padding-bottom: 2px;
+                    height: auto; // Auto altura en móvil
+                    
+                    &:last-child, &:nth-last-child(2) { border-bottom: none; }
+                }
+            }
+        }
+
+        // 4. Info extra (Tipo/Categoría) en una línea
+        td.col-type, td.col-category {
+            grid-area: info;
+            display: inline-block;
+            font-size: 9px !important;
+            color: #888;
+            margin-right: 8px;
+            
+            &:empty { display: none; }
+        }
+    }
 }
