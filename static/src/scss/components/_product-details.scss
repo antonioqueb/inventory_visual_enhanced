@@ -18,25 +18,41 @@
   background: #FFFFFF;
   border: 1px solid #E0E0E0;
   border-radius: 8px;
-  font-size: 12px;
+  
+  // SOLICITUD: Fuente formal y tamaño pequeño (9px)
+  font-family: "Roboto", "Arial", sans-serif;
+  font-size: 9px;
 
   thead {
     background: #F5F5F5;
     border-bottom: 2px solid #CCCCCC;
 
     th {
-      padding: 8px 12px;
+      // SOLICITUD: Padding reducido para filas más delgadas
+      padding: 4px 6px;
       text-align: left;
       font-weight: 700;
       color: #2C2C2C;
-      font-size: 11px;
+      font-size: 9px; // Texto pequeño
       text-transform: uppercase;
       letter-spacing: 0.5px;
       border-right: 1px solid #E0E0E0;
       white-space: nowrap;
+      height: 24px; // Forzar altura pequeña
 
       &:last-child { border-right: none; }
-      &.col-icon { width: 40px; text-align: center; }
+      
+      // SOLICITUD: Iconos más pequeños en cabecera también
+      &.col-icon { width: 25px; text-align: center; }
+      
+      // SOLICITUD: Checkbox más pequeño
+      &.col-checkbox { width: 20px; text-align: center; padding: 0; }
+
+      // SOLICITUD: Lote menos ancho (aprox -30%)
+      &.col-lot { width: 90px; max-width: 100px; }
+
+      // SOLICITUD: Pedimento más ancho
+      &.col-pedimento { min-width: 140px; }
     }
   }
 
@@ -44,45 +60,86 @@
     tr {
       border-bottom: 1px solid #E0E0E0;
       transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      // Altura de fila forzada pequeña
+      height: 22px;
+      
       &:hover { background: #FAFAFA; }
       &:last-child { border-bottom: none; }
     }
 
     td {
-      padding: 8px 12px;
+      // SOLICITUD: Padding mínimo para filas delgadas
+      padding: 2px 6px;
       vertical-align: middle;
       color: #2C2C2C;
       border-right: 1px solid #E0E0E0;
+      font-size: 9px; // Texto 9px
+      line-height: 1.2;
+
       &:last-child { border-right: none; }
-      &.col-icon { text-align: center; padding: 4px; }
+      &.col-icon { text-align: center; padding: 1px; }
+      
       .text-muted { color: #808080; }
+
+      // Checkbox pequeño en escritorio
+      .checkbox-wrapper {
+        display: flex;
+        justify-content: center;
+        input.cart-checkbox {
+            width: 11px;
+            height: 11px;
+            margin: 0;
+            margin-top: 2px;
+        }
+      }
+
+      // SOLICITUD: Iconos pequeños (historial, fotos, etc)
+      .icon-btn, .status-badge-btn {
+        width: 18px;
+        height: 18px;
+        min-width: 18px; // Sobrescribir estilos globales
+        font-size: 9px;
+        border-radius: 3px; // Menos redondeado para verse más formal
+        
+        i.fa {
+            font-size: 9px;
+            line-height: 1;
+        }
+      }
+
+      // Ajuste específico para botones de estado (Hold, Venta)
+      .status-badge-btn {
+          padding: 0;
+          height: 18px;
+      }
     }
   }
 
   .col-lot, .col-bloque, .col-atado {
-    font-family: "SF Mono", Monaco, Consolas, "Courier New", monospace;
+    // Mantener fuente monoespaciada pero forzar Roboto/Arial si se prefiere formalidad total
+    // Aquí dejamos monoespaciada para legibilidad de códigos, pero pequeña
+    font-family: "SF Mono", "Roboto Mono", monospace;
     font-weight: 600;
     white-space: nowrap;
   }
 
   .col-location {
     font-weight: 500;
-    .fa-map-marker { color: #714B67; margin-right: 4px; }
+    .fa-map-marker { color: #714B67; margin-right: 2px; font-size: 9px; }
   }
 
   .col-dimensions {
     .dimensions-inline {
-      display: inline-flex; align-items: center; gap: 8px;
-      white-space: nowrap; font-size: 11px; color: #7a7a7a;
+      display: inline-flex; align-items: center; gap: 4px;
+      white-space: nowrap; font-size: 9px; color: #7a7a7a;
     }
     .dimensions-total-inline {
       font-weight: 700; color: #714B67;
-      font-family: sans-serif; font-size: 13px; margin-left: 4px;
+      font-family: inherit; font-size: 9px; margin-left: 2px;
     }
   }
 
   .col-tipo {
-    font-family: "SF Mono", Monaco, Consolas, "Courier New", monospace; 
     font-weight: 600; 
     white-space: nowrap;
     .text-muted { color: #808080; }
@@ -92,11 +149,11 @@
 .table-loading {
   padding: 24px; text-align: center;
   .spinner {
-    width: 32px; height: 32px; border: 3px solid #f0ebef;
+    width: 24px; height: 24px; border: 2px solid #f0ebef;
     border-top-color: #714B67; border-radius: 50%;
-    animation: spin 1s linear infinite; margin: 0 auto 12px;
+    animation: spin 1s linear infinite; margin: 0 auto 8px;
   }
-  .loading-text { color: #7a7a7a; font-size: 12px; }
+  .loading-text { color: #7a7a7a; font-size: 10px; }
 }
 
 @keyframes spin {
@@ -105,7 +162,7 @@
 }
 
 // ==========================================
-// BARRA DE SELECCIÓN MÓVIL (NUEVO)
+// BARRA DE SELECCIÓN MÓVIL
 // ==========================================
 
 .details-wrapper {
@@ -149,7 +206,7 @@
 }
 
 // ==========================================
-// RESPONSIVE DETAILS CARDS (CORREGIDO)
+// RESPONSIVE DETAILS CARDS (MÓVIL - EXACTAMENTE COMO ESTABA)
 // ==========================================
 
 @media (max-width: 992px) {
@@ -166,6 +223,8 @@
     .o_inventory_details_table {
         border: none;
         background: transparent;
+        // Restaurar tamaño de fuente para móvil (más legible que 9px)
+        font-size: 13px; 
 
         thead { display: none; }
 
@@ -174,21 +233,19 @@
             flex-direction: column;
             gap: 16px; // Espacio entre tarjetas
 
-            // Transformar la fila en un GRID ROBUSTO
             tr {
                 display: grid;
-                // Col 1: Checkbox (50px), Cols 2-4: Espacio restante dividido equitativamente
                 grid-template-columns: 50px 1fr 1fr 1fr; 
                 
                 // DEFINICIÓN DE ÁREAS
                 grid-template-areas:
-                    "check  header header header" /* Fila 1: Checkbox y Lote */
-                    "loc    loc    loc    loc"    /* Fila 2: Ubicación */
-                    "dims   dims   dims   dims"   /* Fila 3: Dimensiones */
-                    "tech1  tech1  tech2  tech2"  /* Fila 4: Tipo y Bloque */
-                    "tech3  tech3  tech4  tech4"  /* Fila 5: Atado y Pedimento */
-                    "tech5  tech5  tech6  tech6"  /* Fila 6: Contenedor y Ref */
-                    "act1   act2   act3   act4";  /* Fila 7: Botones de acción */
+                    "check  header header header"
+                    "loc    loc    loc    loc"
+                    "dims   dims   dims   dims"
+                    "tech1  tech1  tech2  tech2"
+                    "tech3  tech3  tech4  tech4"
+                    "tech5  tech5  tech6  tech6"
+                    "act1   act2   act3   act4";
                 
                 background: #FFFFFF;
                 border: 1px solid #E0E0E0;
@@ -196,15 +253,18 @@
                 padding: 0;
                 box-shadow: 0 4px 6px rgba(0,0,0,0.05);
                 overflow: hidden;
+                height: auto; // Restaurar altura automática en móvil
             }
 
             td {
                 border: none !important;
-                padding: 10px 12px !important;
+                padding: 10px 12px !important; // Restaurar padding cómodo en móvil
                 display: flex;
                 align-items: center;
+                font-size: 13px; // Restaurar tamaño de fuente
+                line-height: 1.5;
                 
-                // === ÁREA: CHECKBOX ===
+                // === ÁREA: CHECKBOX (Móvil) ===
                 &.col-checkbox {
                     grid-area: check;
                     background-color: #f8f9fa;
@@ -214,6 +274,7 @@
                     align-items: center;
                     padding: 0 !important;
                     min-height: 48px;
+                    width: auto !important; // Sobrescribir el width: 20px de escritorio
                     
                     .checkbox-wrapper {
                         display: flex;
@@ -221,16 +282,16 @@
                         align-items: center;
                         width: 100%;
                         height: 100%;
-                    }
-                    
-                    input.cart-checkbox {
-                        width: 24px;
-                        height: 24px;
-                        margin: 0;
-                        cursor: pointer;
-                        opacity: 1 !important;
-                        position: relative;
-                        z-index: 10;
+                        
+                        input.cart-checkbox {
+                            width: 24px; // Restaurar tamaño checkbox móvil
+                            height: 24px;
+                            margin: 0;
+                            cursor: pointer;
+                            opacity: 1 !important;
+                            position: relative;
+                            z-index: 10;
+                        }
                     }
                 }
 
@@ -243,6 +304,8 @@
                     background-color: #f8f9fa;
                     border-bottom: 1px solid #e0e0e0 !important;
                     padding: 12px 16px !important;
+                    width: auto !important; // Reset width
+                    max-width: none !important; // Reset max-width
                 }
 
                 // === ÁREA: UBICACIÓN ===
@@ -257,7 +320,7 @@
                     i { 
                         color: #714B67; 
                         margin-right: 8px; 
-                        font-size: 16px;
+                        font-size: 16px; // Restaurar tamaño icono
                     }
                 }
                 
@@ -305,11 +368,11 @@
                     border-bottom: 1px solid #f0f0f0 !important;
                     min-height: 50px;
                     background: #fff;
+                    width: auto !important; // Reset width
+                    min-width: 0 !important; // Reset min-width
                     
-                    // Ocultar si está vacío para limpiar la interfaz
                     &:empty { display: none; }
 
-                    // Labels automáticos
                     &:before {
                         content: attr(class);
                         font-size: 10px;
@@ -319,7 +382,6 @@
                         margin-bottom: 4px;
                     }
                     
-                    // Mapeo de nombres para los ::before
                     &.col-tipo:before { content: "Tipo"; }
                     &.col-bloque:before { content: "Bloque"; }
                     &.col-atado:before { content: "Atado"; }
@@ -330,31 +392,33 @@
                     span { font-weight: 600; }
                 }
 
-                // === ÁREA: BOTONES DE ACCIÓN ===
+                // === ÁREA: BOTONES DE ACCIÓN (Móvil) ===
                 &.action-btn-cell {
                     justify-content: center;
                     padding: 14px 0 !important;
                     background-color: #f8f9fa;
                     border-top: 1px solid #e0e0e0;
+                    width: auto !important;
                     
-                    // Asignación basada en el orden de las columnas en el XML
-                    &:nth-of-type(11) { grid-area: act1; border-right: 1px solid #e0e0e0; } // Foto
-                    &:nth-of-type(12) { grid-area: act2; border-right: 1px solid #e0e0e0; } // Notas
-                    &:nth-of-type(13) { grid-area: act3; border-right: 1px solid #e0e0e0; } // Detalles
-                    &:nth-of-type(14) { grid-area: act4; } // Estado
+                    &:nth-of-type(11) { grid-area: act1; border-right: 1px solid #e0e0e0; }
+                    &:nth-of-type(12) { grid-area: act2; border-right: 1px solid #e0e0e0; }
+                    &:nth-of-type(13) { grid-area: act3; border-right: 1px solid #e0e0e0; }
+                    &:nth-of-type(14) { grid-area: act4; }
 
+                    // Restaurar tamaño de botones para táctil en móvil
                     .icon-btn, .status-badge-btn {
                         width: 42px;
                         height: 42px;
                         font-size: 18px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
+                        min-width: 42px;
                         border-radius: 50%;
                         border: none;
                         background: transparent;
                         
-                        // Estilos específicos para estados
+                        i.fa {
+                            font-size: 18px;
+                        }
+                        
                         &.status-hold-active { background-color: #ffeeba; color: #856404; }
                         &.status-sale-order { background-color: #d4edda; color: #155724; }
                         &.has-photos { color: #007bff; background-color: rgba(0,123,255,0.1); }
