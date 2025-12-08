@@ -2,7 +2,7 @@
 <templates xml:space="preserve">
     
     <t t-name="inventory_visual_enhanced.ProductRow" owl="1">
-        <!-- El evento click ahora está en toda la fila -->
+        <!-- El evento click principal expande/contrae (toggle normal) -->
         <tr class="o_inventory_product_row" 
             t-att-class="{ expanded: props.isExpanded }"
             t-on-click="() => props.onToggle(props.product.quant_ids)"
@@ -17,31 +17,50 @@
                 </div>
             </td>
             
-            <!-- Inventory -->
+            <!-- Inventory: AHORA CON FILTROS CLICKABLES -->
             <td class="col-inventory">
                 <div class="inventory-subgrid">
-                    <div class="inventory-row">
+                    <!-- IN STOCK (ALL) -->
+                    <div class="inventory-row clickable-stat" 
+                         t-att-class="{ 'active-filter': state.activeFilter === 'all' }"
+                         t-on-click.stop="() => this.handleFilterClick('all')"
+                         title="Ver todo el inventario">
                         <span class="inventory-label">In Stock</span>
                         <span class="inventory-value inventory-units" t-esc="props.product.stock_plates || 0"></span>
                         <span class="inventory-value inventory-measure">
                             <t t-esc="props.formatNumber(props.product.stock_qty)"/> M²
                         </span>
                     </div>
-                    <div class="inventory-row">
+
+                    <!-- ON HOLD -->
+                    <div class="inventory-row clickable-stat"
+                         t-att-class="{ 'active-filter': state.activeFilter === 'hold' }" 
+                         t-on-click.stop="() => this.handleFilterClick('hold')"
+                         title="Filtrar solo apartados">
                         <span class="inventory-label">On Hold</span>
                         <span class="inventory-value inventory-units" t-esc="props.product.hold_plates || 0"></span>
                         <span class="inventory-value inventory-measure">
                             <t t-esc="props.formatNumber(props.product.hold_qty)"/> M²
                         </span>
                     </div>
-                    <div class="inventory-row">
+
+                    <!-- COMMITTED -->
+                    <div class="inventory-row clickable-stat"
+                         t-att-class="{ 'active-filter': state.activeFilter === 'committed' }" 
+                         t-on-click.stop="() => this.handleFilterClick('committed')"
+                         title="Filtrar solo comprometido/vendido">
                         <span class="inventory-label">Committed</span>
                         <span class="inventory-value inventory-units" t-esc="props.product.committed_plates || 0"></span>
                         <span class="inventory-value inventory-measure">
                             <t t-esc="props.formatNumber(props.product.committed_qty)"/> M²
                         </span>
                     </div>
-                    <div class="inventory-row">
+
+                    <!-- AVAILABLE -->
+                    <div class="inventory-row clickable-stat"
+                         t-att-class="{ 'active-filter': state.activeFilter === 'available' }" 
+                         t-on-click.stop="() => this.handleFilterClick('available')"
+                         title="Filtrar solo disponible para venta">
                         <span class="inventory-label">Available</span>
                         <span class="inventory-value inventory-units" t-esc="props.product.available_plates || 0"></span>
                         <span class="inventory-value inventory-measure">
@@ -59,20 +78,17 @@
             
             <!-- Category -->
             <td class="col-category">
-                <!-- Usamos shortCategoryName (el getter que creamos en JS) -->
                 <span t-if="props.product.categ_name" t-esc="shortCategoryName"/>
                 <span t-else="" class="text-muted">-</span>
             </td>
-            
-            <!-- Actions Eliminado -->
         </tr>
         
         <!-- Fila de detalles -->
         <tr class="o_inventory_details_row" t-if="props.isExpanded">
-            <!-- Colspan reducido a 4 porque quitamos una columna -->
             <td colspan="4" class="details-cell">
+                <!-- Pasamos 'filteredDetails' en lugar de 'props.details' -->
                 <ProductDetails 
-                    details="props.details"
+                    details="filteredDetails"
                     onPhotoClick="props.onPhotoClick"
                     onNotesClick="props.onNotesClick"
                     onDetailsClick="props.onDetailsClick"

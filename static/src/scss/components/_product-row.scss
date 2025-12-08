@@ -77,7 +77,8 @@
   .inventory-subgrid {
     display: flex;
     flex-direction: column;
-    gap: 0px; // Sin espacio extra entre filas de inventario
+    // Ligeramente más espacio para que los hovers no se solapen visualmente
+    gap: 1px; 
   }
 
   .inventory-row {
@@ -87,7 +88,42 @@
     gap: 4px;
     align-items: center;
     line-height: 1.1; // Altura de línea mínima
-    height: 14px; // Forzar altura fija pequeña por renglón
+    
+    // === NUEVOS ESTILOS PARA INTERACTIVIDAD ===
+    min-height: 18px; // Un poco más alto para soportar el padding del botón
+    padding: 2px 4px; // Espacio interno para el fondo hover
+    border-radius: 4px; // Bordes redondeados
+    transition: all 0.2s ease;
+
+    // Estado Clickable (Hover y Active)
+    &.clickable-stat {
+      cursor: pointer;
+      position: relative; // Para z-index si fuera necesario
+      z-index: 2; // Asegurar que está sobre la fila
+
+      // Hover sutil
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+        .inventory-label { color: #2C2C2C; }
+      }
+
+      // Estado Activo (Filtro seleccionado)
+      &.active-filter {
+        background-color: rgba($primary-color, 0.1); // Fondo del color primario (suave)
+        
+        // Label destacado
+        .inventory-label {
+          color: $primary-color;
+          font-weight: 700;
+        }
+
+        // Valores destacados
+        .inventory-units, 
+        .inventory-measure {
+          color: $primary-color;
+        }
+      }
+    }
   }
 
   .inventory-label {
@@ -96,6 +132,7 @@
     font-weight: 400;
     text-align: left;
     white-space: nowrap;
+    transition: color 0.2s ease;
   }
 
   .inventory-units {
@@ -104,6 +141,7 @@
     font-weight: 600;
     font-family: "Roboto", sans-serif;
     text-align: right;
+    transition: color 0.2s ease;
   }
 
   .inventory-measure {
@@ -112,6 +150,7 @@
     font-weight: 700; // Negrita para destacar el m2
     font-family: "Roboto", sans-serif;
     text-align: right;
+    transition: color 0.2s ease;
   }
 }
 
@@ -174,11 +213,21 @@
                 .inventory-row {
                     display: flex;
                     justify-content: space-between;
+                    // Ajuste para el borde inferior en móvil para que no choque con el hover
                     border-bottom: 1px dashed #e0e0e0;
-                    padding-bottom: 2px;
+                    padding: 4px; // Padding suficiente para el dedo
                     height: auto; // Auto altura en móvil
                     
+                    // Mantener bordes redondeados en móvil también
+                    border-radius: 4px;
+                    
                     &:last-child, &:nth-last-child(2) { border-bottom: none; }
+
+                    // En móvil, si está activo, se nota el fondo
+                    &.active-filter {
+                        background-color: rgba($primary-color, 0.1);
+                        border-bottom: 1px solid transparent; // Quitar el dashed si está activo
+                    }
                 }
             }
         }
