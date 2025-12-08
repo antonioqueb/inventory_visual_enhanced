@@ -18,6 +18,7 @@ export class SearchBar extends Component {
                 categoria_id: null,
                 grupo: '',
                 acabado: '',
+                color: '',
                 grosor: '',
                 numero_serie: '',
                 bloque: '',
@@ -34,6 +35,7 @@ export class SearchBar extends Component {
             grupos: [],
             acabados: [],
             grosores: [],
+            colores: [],
             
             // UI
             showAdvancedFilters: false,
@@ -92,6 +94,15 @@ export class SearchBar extends Component {
                 { order: "complete_name" }
             );
             this.state.categorias = categorias;
+
+            // Cargar colores únicos
+            const colores = await this.orm.readGroup(
+                "stock.quant",
+                [["x_color", "!=", false]],
+                ["x_color"],
+                ["x_color"]
+            );
+            this.state.colores = colores.map(c => c.x_color).filter(Boolean).sort();
 
             // Cargar opciones de selection fields
             const fieldInfo = await this.orm.call(
@@ -210,6 +221,7 @@ export class SearchBar extends Component {
             pedimento: '',
             contenedor: '',
             atado: '',
+            color: '',
         };
         this.state.ubicaciones = [];
         

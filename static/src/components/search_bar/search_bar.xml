@@ -94,6 +94,8 @@
                     <div class="filter-group"><label class="filter-label d-none d-md-block">Pedimento</label><input type="text" class="form-control filter-input" placeholder="Pedimento..." t-model="state.filters.pedimento" t-on-input="(ev) => this.onTextFilterChange('pedimento', ev)"/></div>
                     <div class="filter-group"><label class="filter-label d-none d-md-block">Contenedor</label><input type="text" class="form-control filter-input" placeholder="Contenedor..." t-model="state.filters.contenedor" t-on-input="(ev) => this.onTextFilterChange('contenedor', ev)"/></div>
                     <div class="filter-group"><label class="filter-label d-none d-md-block">Atado</label><input type="text" class="form-control filter-input" placeholder="Atado..." t-model="state.filters.atado" t-on-input="(ev) => this.onTextFilterChange('atado', ev)"/></div>
+                    
+                    <div class="filter-group"><label class="filter-label d-none d-md-block">Color</label><select class="form-select filter-select" t-model="state.filters.color" t-on-change="(ev) => this.onFilterChange('color', ev)"><option value="">Color...</option><t t-foreach="state.colores" t-as="color" t-key="color"><option t-att-value="color" t-esc="color"></option></t></select></div>
                 </div>
 
                 <!-- Info Resultados -->

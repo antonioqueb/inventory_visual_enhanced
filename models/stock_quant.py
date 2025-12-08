@@ -67,6 +67,10 @@ class StockQuant(models.Model):
         # Filtro por acabado
         if filters.get('acabado'):
             domain.append(('x_acabado', '=', filters['acabado']))
+
+        # Filtro por color
+        if filters.get('color'):
+            domain.append(('x_color', '=', filters['color']))
         
         # Filtro por grosor
         if filters.get('grosor'):
@@ -130,6 +134,7 @@ class StockQuant(models.Model):
                     'committed_plates': 0,
                     'available_qty': 0.0,
                     'available_plates': 0,
+                    'color': quant.x_color if hasattr(quant, 'x_color') else '',
                 }
             
             product_groups[product_id]['quant_ids'].append(quant.id)
@@ -196,6 +201,9 @@ class StockQuant(models.Model):
                 'grosor': quant.x_grosor if hasattr(quant, 'x_grosor') else False,
                 'alto': quant.x_alto if hasattr(quant, 'x_alto') else False,
                 'ancho': quant.x_ancho if hasattr(quant, 'x_ancho') else False,
+                # === CORRECCIÓN AQUÍ: Se agregó el campo color ===
+                'color': quant.x_color if hasattr(quant, 'x_color') else '',
+                # ================================================
                 'tipo': tipo_display,
                 'bloque': quant.x_bloque if hasattr(quant, 'x_bloque') else '',
                 'atado': quant.x_atado if hasattr(quant, 'x_atado') else '',

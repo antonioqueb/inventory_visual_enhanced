@@ -29,6 +29,7 @@
                         <th class="col-lot">Lote</th>
                         <th class="col-location">Ubicación</th>
                         <th class="col-dimensions">Dimensiones</th>
+                        <th class="col-color">Color</th>
                         <th class="col-tipo">Tipo</th>
                         <th class="col-bloque">Bloque</th>
                         <th class="col-atado">Atado</th>
@@ -95,7 +96,12 @@
                                         </strong>
                                     </span>
                                 </td>
-                                
+
+                                <!-- Color -->
+                                <td class="col-color">
+                                    <span t-if="detail.color" t-esc="detail.color"></span>
+                                    <span t-else="" class="text-muted">-</span>
+                                </td>
                                 <!-- Datos Técnicos -->
                                 <td class="col-tipo">
                                     <span t-if="detail.tipo" t-esc="detail.tipo"></span>
