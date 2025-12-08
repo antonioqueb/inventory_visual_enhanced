@@ -19,7 +19,7 @@
   border: 1px solid #E0E0E0;
   border-radius: 8px;
   
-  // SOLICITUD: Fuente formal y tamaño pequeño (9px)
+  // SOLICITUD: Fuente formal y tamaño pequeño (9px) en escritorio
   font-family: "Roboto", "Arial", sans-serif;
   font-size: 9px;
 
@@ -60,7 +60,7 @@
     tr {
       border-bottom: 1px solid #E0E0E0;
       transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
-      // Altura de fila forzada pequeña
+      // Altura de fila forzada pequeña en escritorio
       height: 22px;
       
       &:hover { background: #FAFAFA; }
@@ -93,7 +93,7 @@
         }
       }
 
-      // SOLICITUD: Iconos pequeños (historial, fotos, etc)
+      // SOLICITUD: Iconos pequeños (historial, fotos, etc) en escritorio
       .icon-btn, .status-badge-btn {
         width: 18px;
         height: 18px;
@@ -116,8 +116,7 @@
   }
 
   .col-lot, .col-bloque, .col-atado {
-    // Mantener fuente monoespaciada pero forzar Roboto/Arial si se prefiere formalidad total
-    // Aquí dejamos monoespaciada para legibilidad de códigos, pero pequeña
+    // Mantener fuente monoespaciada para códigos
     font-family: "SF Mono", "Roboto Mono", monospace;
     font-weight: 600;
     white-space: nowrap;
@@ -206,7 +205,7 @@
 }
 
 // ==========================================
-// RESPONSIVE DETAILS CARDS (MÓVIL - EXACTAMENTE COMO ESTABA)
+// RESPONSIVE DETAILS CARDS (MÓVIL)
 // ==========================================
 
 @media (max-width: 992px) {
@@ -414,6 +413,15 @@
                         border-radius: 50%;
                         border: none;
                         background: transparent;
+                        
+                        // ===== CORRECCIÓN DE COLOR PARA ICONO DESACTIVADO EN MÓVIL =====
+                        &.no-content {
+                            color: #666666 !important; /* Gris oscuro en lugar de blanco */
+                            background-color: rgba(0, 0, 0, 0.05) !important;
+                            border: 1px solid #e0e0e0 !important;
+                            opacity: 1 !important;
+                        }
+                        // ===============================================================
                         
                         i.fa {
                             font-size: 18px;
