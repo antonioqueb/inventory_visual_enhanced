@@ -54,9 +54,10 @@ export class ProductDetails extends Component {
 
 ProductDetails.template = "inventory_visual_enhanced.ProductDetails";
 
-// Definición de props para validación y autocompletado, idéntico al uso en XML
+// Definición de props para validación y autocompletado
 ProductDetails.props = {
     details: Array,
+    // Props existentes
     areAllCurrentProductSelected: { type: Function, optional: true },
     isInCart: { type: Function, optional: true },
     toggleCartSelection: { type: Function, optional: true },
@@ -67,4 +68,10 @@ ProductDetails.props = {
     onSaleOrderClick: { type: Function, optional: true },
     formatNumber: { type: Function, optional: true },
     hasSalesPermissions: { type: Boolean, optional: true },
+    
+    // === AGREGADOS PARA CORREGIR EL ERROR ===
+    onSalesPersonClick: { type: Function, optional: true },
+    selectAllCurrentProduct: { type: Function, optional: true },
+    deselectAllCurrentProduct: { type: Function, optional: true },
+    hasInventoryPermissions: { type: Boolean, optional: true },
 };
