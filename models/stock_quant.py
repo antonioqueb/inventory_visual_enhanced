@@ -32,6 +32,7 @@ class StockQuant(models.Model):
     def get_inventory_grouped_by_product(self, filters=None):
         """
         Agrupa el inventario por producto aplicando filtros
+        Separa contadores para ubicaciones Internas vs Tránsito.
         """
         if not filters:
             return []
@@ -126,6 +127,8 @@ class StockQuant(models.Model):
                     'categ_name': quant.product_id.categ_id.display_name,
                     'tipo': tipo_display,
                     'quant_ids': [],
+                    
+                    # Contadores Internos (Stock normal)
                     'stock_qty': 0.0,
                     'stock_plates': 0,
                     'hold_qty': 0.0,
@@ -134,28 +137,71 @@ class StockQuant(models.Model):
                     'committed_plates': 0,
                     'available_qty': 0.0,
                     'available_plates': 0,
+                    
+                    # Contadores de Tránsito (NUEVO)
+                    'transit_qty': 0.0,
+                    'transit_plates': 0,
+                    'transit_hold_qty': 0.0,
+                    'transit_hold_plates': 0,
+                    'transit_committed_qty': 0.0,
+                    'transit_committed_plates': 0,
+                    'transit_available_qty': 0.0,
+                    'transit_available_plates': 0,
+                    
                     'color': quant.x_color if hasattr(quant, 'x_color') else '',
                 }
             
             product_groups[product_id]['quant_ids'].append(quant.id)
-            product_groups[product_id]['stock_qty'] += quant.quantity
-            product_groups[product_id]['stock_plates'] += 1
             
-            # Hold
-            if hasattr(quant, 'x_tiene_hold') and quant.x_tiene_hold:
-                product_groups[product_id]['hold_qty'] += quant.quantity
-                product_groups[product_id]['hold_plates'] += 1
+            # === LOGICA SEPARACIÓN TRÁNSITO VS INTERNO ===
+            qty = quant.quantity
+            reserved = quant.reserved_quantity
+            available = qty - reserved
+            has_hold = hasattr(quant, 'x_tiene_hold') and quant.x_tiene_hold
             
-            # Committed (reservado)
-            if quant.reserved_quantity > 0:
-                product_groups[product_id]['committed_qty'] += quant.reserved_quantity
-                product_groups[product_id]['committed_plates'] += 1
+            # Determinar si es Tránsito
+            usage = quant.location_id.usage
+            is_transit = (usage == 'transit')
             
-            # Available
-            available = quant.quantity - quant.reserved_quantity
-            if hasattr(quant, 'x_tiene_hold') and not quant.x_tiene_hold and available > 0:
-                product_groups[product_id]['available_qty'] += available
-                product_groups[product_id]['available_plates'] += 1
+            if is_transit:
+                # Métricas de Tránsito
+                product_groups[product_id]['transit_qty'] += qty
+                product_groups[product_id]['transit_plates'] += 1
+                
+                # Hold en tránsito
+                if has_hold:
+                    product_groups[product_id]['transit_hold_qty'] += qty
+                    product_groups[product_id]['transit_hold_plates'] += 1
+                
+                # Comprometido en tránsito
+                if reserved > 0:
+                    product_groups[product_id]['transit_committed_qty'] += reserved
+                    product_groups[product_id]['transit_committed_plates'] += 1
+                
+                # Disponible en tránsito
+                if not has_hold and available > 0:
+                    product_groups[product_id]['transit_available_qty'] += available
+                    product_groups[product_id]['transit_available_plates'] += 1
+                    
+            else:
+                # Métricas Normales (Stock Interno)
+                product_groups[product_id]['stock_qty'] += qty
+                product_groups[product_id]['stock_plates'] += 1
+                
+                # Hold Interno
+                if has_hold:
+                    product_groups[product_id]['hold_qty'] += qty
+                    product_groups[product_id]['hold_plates'] += 1
+                
+                # Comprometido Interno
+                if reserved > 0:
+                    product_groups[product_id]['committed_qty'] += reserved
+                    product_groups[product_id]['committed_plates'] += 1
+                
+                # Disponible Interno
+                if not has_hold and available > 0:
+                    product_groups[product_id]['available_qty'] += available
+                    product_groups[product_id]['available_plates'] += 1
         
         return list(product_groups.values())
     
@@ -196,14 +242,13 @@ class StockQuant(models.Model):
                 'lot_name': quant.lot_id.name if quant.lot_id else '',
                 'location_id': quant.location_id.id,
                 'location_name': quant.location_id.complete_name,
+                'location_usage': quant.location_id.usage, # <--- CAMPO NUEVO IMPORTANTE
                 'quantity': quant.quantity,
                 'reserved_quantity': quant.reserved_quantity,
                 'grosor': quant.x_grosor if hasattr(quant, 'x_grosor') else False,
                 'alto': quant.x_alto if hasattr(quant, 'x_alto') else False,
                 'ancho': quant.x_ancho if hasattr(quant, 'x_ancho') else False,
-                # === CORRECCIÓN AQUÍ: Se agregó el campo color ===
                 'color': quant.x_color if hasattr(quant, 'x_color') else '',
-                # ================================================
                 'tipo': tipo_display,
                 'bloque': quant.x_bloque if hasattr(quant, 'x_bloque') else '',
                 'atado': quant.x_atado if hasattr(quant, 'x_atado') else '',

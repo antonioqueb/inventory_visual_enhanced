@@ -6,7 +6,7 @@ import { ProductDetails } from "../product_details/product_details";
 export class ProductRow extends Component {
     setup() {
         this.state = useState({
-            activeFilter: 'all', // all, hold, committed, available
+            activeFilter: 'all', // Valores posibles: all, hold, committed, available, transit_available, transit_hold, transit_committed
         });
 
         // Resetear el filtro a 'all' si la fila se cierra
@@ -19,8 +19,6 @@ export class ProductRow extends Component {
 
     /**
      * Maneja el click en los textos de estadísticas.
-     * Si la fila está cerrada, la abre.
-     * Establece el filtro activo.
      */
     handleFilterClick(filterType) {
         // Si la fila no está expandida, la expandimos primero
@@ -29,7 +27,7 @@ export class ProductRow extends Component {
         }
         
         // Si ya está activo este filtro, lo quitamos (volvemos a 'all'), 
-        // a menos que sea 'all' (In Stock), que siempre se queda activo.
+        // EXCEPTO si es 'all', que siempre se queda activo.
         if (this.state.activeFilter === filterType && filterType !== 'all') {
             this.state.activeFilter = 'all';
         } else {
@@ -38,28 +36,57 @@ export class ProductRow extends Component {
     }
 
     /**
-     * Filtra los detalles basados en el estado activeFilter
+     * Filtra los detalles basados en el estado activeFilter.
+     * Ahora discrimina por location_usage ('transit' vs otros).
      */
     get filteredDetails() {
         const details = this.props.details || [];
         const filter = this.state.activeFilter;
 
-        if (filter === 'all') {
-            return details;
-        }
-
         return details.filter(d => {
+            // Cantidad disponible matemática
+            const availableQty = d.quantity - d.reserved_quantity;
+            const isTransit = d.location_usage === 'transit';
+
+            // --- FILTROS DE STOCK INTERNO (Ignoran Tránsito) ---
+            
+            if (filter === 'all') {
+                // In Stock: Todo lo que NO sea tránsito
+                return !isTransit;
+            }
+            
             if (filter === 'hold') {
-                return d.tiene_hold;
+                // On Hold: No tránsito Y tiene hold
+                return !isTransit && d.tiene_hold;
             }
+            
             if (filter === 'committed') {
-                return d.reserved_quantity > 0;
+                // Committed: No tránsito Y reservado
+                return !isTransit && d.reserved_quantity > 0;
             }
+            
             if (filter === 'available') {
-                // Disponible: Cantidad > reservada Y no tiene hold manual
-                const isAvailable = (d.quantity - d.reserved_quantity) > 0;
-                return isAvailable && !d.tiene_hold;
+                // Disponible: No tránsito, disponible > 0 Y sin hold
+                return !isTransit && availableQty > 0 && !d.tiene_hold;
             }
+
+            // --- FILTROS DE TRÁNSITO (Solo Tránsito) ---
+
+            if (filter === 'transit_available') {
+                // En Tránsito Disponible: Es tránsito, disponible > 0 Y sin hold
+                return isTransit && availableQty > 0 && !d.tiene_hold;
+            }
+
+            if (filter === 'transit_hold') {
+                // En Tránsito Hold: Es tránsito Y tiene hold
+                return isTransit && d.tiene_hold;
+            }
+
+            if (filter === 'transit_committed') {
+                // En Tránsito Comprometido: Es tránsito Y reservado
+                return isTransit && d.reserved_quantity > 0;
+            }
+
             return true;
         });
     }

@@ -17,14 +17,17 @@
                 </div>
             </td>
             
-            <!-- Inventory: AHORA CON FILTROS CLICKABLES -->
+            <!-- Inventory: AHORA CON FILTROS CLICKABLES + SECCIÓN TRÁNSITO -->
             <td class="col-inventory">
                 <div class="inventory-subgrid">
+                    
+                    <!-- === SECCIÓN STOCK (Interno) === -->
+                    
                     <!-- IN STOCK (ALL) -->
                     <div class="inventory-row clickable-stat" 
                          t-att-class="{ 'active-filter': state.activeFilter === 'all' }"
                          t-on-click.stop="() => this.handleFilterClick('all')"
-                         title="Ver todo el inventario">
+                         title="Ver todo el inventario en almacén">
                         <span class="inventory-label">In Stock</span>
                         <span class="inventory-value inventory-units" t-esc="props.product.stock_plates || 0"></span>
                         <span class="inventory-value inventory-measure">
@@ -36,7 +39,7 @@
                     <div class="inventory-row clickable-stat"
                          t-att-class="{ 'active-filter': state.activeFilter === 'hold' }" 
                          t-on-click.stop="() => this.handleFilterClick('hold')"
-                         title="Filtrar solo apartados">
+                         title="Filtrar apartados en almacén">
                         <span class="inventory-label">On Hold</span>
                         <span class="inventory-value inventory-units" t-esc="props.product.hold_plates || 0"></span>
                         <span class="inventory-value inventory-measure">
@@ -48,7 +51,7 @@
                     <div class="inventory-row clickable-stat"
                          t-att-class="{ 'active-filter': state.activeFilter === 'committed' }" 
                          t-on-click.stop="() => this.handleFilterClick('committed')"
-                         title="Filtrar solo comprometido/vendido">
+                         title="Filtrar comprometido en almacén">
                         <span class="inventory-label">Committed</span>
                         <span class="inventory-value inventory-units" t-esc="props.product.committed_plates || 0"></span>
                         <span class="inventory-value inventory-measure">
@@ -60,13 +63,57 @@
                     <div class="inventory-row clickable-stat"
                          t-att-class="{ 'active-filter': state.activeFilter === 'available' }" 
                          t-on-click.stop="() => this.handleFilterClick('available')"
-                         title="Filtrar solo disponible para venta">
-                        <span class="inventory-label">Available</span>
+                         title="Filtrar disponible para venta en almacén">
+                        <span class="inventory-label text-success">Disponible</span>
                         <span class="inventory-value inventory-units" t-esc="props.product.available_plates || 0"></span>
-                        <span class="inventory-value inventory-measure">
+                        <span class="inventory-value inventory-measure text-success">
                             <t t-esc="props.formatNumber(props.product.available_qty)"/> M²
                         </span>
                     </div>
+
+                    <!-- === SECCIÓN TRÁNSITO (Si hay algo en tránsito) === -->
+                    <t t-if="props.product.transit_qty > 0">
+                        <div class="inventory-separator">
+                            <span>En Tránsito</span>
+                        </div>
+
+                        <!-- TRANSIT AVAILABLE -->
+                        <div class="inventory-row clickable-stat transit-row"
+                             t-att-class="{ 'active-filter': state.activeFilter === 'transit_available' }" 
+                             t-on-click.stop="() => this.handleFilterClick('transit_available')"
+                             title="Disponible en Tránsito">
+                            <span class="inventory-label">T. Available</span>
+                            <span class="inventory-value inventory-units" t-esc="props.product.transit_available_plates || 0"></span>
+                            <span class="inventory-value inventory-measure">
+                                <t t-esc="props.formatNumber(props.product.transit_available_qty)"/> M²
+                            </span>
+                        </div>
+
+                        <!-- TRANSIT HOLD -->
+                        <div class="inventory-row clickable-stat transit-row"
+                             t-att-class="{ 'active-filter': state.activeFilter === 'transit_hold' }" 
+                             t-on-click.stop="() => this.handleFilterClick('transit_hold')"
+                             title="Apartado en Tránsito">
+                            <span class="inventory-label">T. On Hold</span>
+                            <span class="inventory-value inventory-units" t-esc="props.product.transit_hold_plates || 0"></span>
+                            <span class="inventory-value inventory-measure">
+                                <t t-esc="props.formatNumber(props.product.transit_hold_qty)"/> M²
+                            </span>
+                        </div>
+
+                        <!-- TRANSIT COMMITTED -->
+                        <div class="inventory-row clickable-stat transit-row"
+                             t-att-class="{ 'active-filter': state.activeFilter === 'transit_committed' }" 
+                             t-on-click.stop="() => this.handleFilterClick('transit_committed')"
+                             title="Comprometido en Tránsito">
+                            <span class="inventory-label">T. Committed</span>
+                            <span class="inventory-value inventory-units" t-esc="props.product.transit_committed_plates || 0"></span>
+                            <span class="inventory-value inventory-measure">
+                                <t t-esc="props.formatNumber(props.product.transit_committed_qty)"/> M²
+                            </span>
+                        </div>
+                    </t>
+
                 </div>
             </td>
             

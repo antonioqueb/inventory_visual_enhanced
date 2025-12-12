@@ -81,10 +81,27 @@
     gap: 1px; 
   }
 
+  // --- SEPARADOR DE TRÁNSITO ---
+  .inventory-separator {
+    text-align: center;
+    border-bottom: 1px dashed #cccccc;
+    margin: 4px 0;
+    line-height: 0.1em;
+    
+    span {
+        background: #fff;
+        padding: 0 5px;
+        color: #888;
+        font-size: 8px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+  }
+
   .inventory-row {
     display: grid;
     // Layout comprimido: Label | Unidades | M2
-    grid-template-columns: 60px 1fr 1fr; 
+    grid-template-columns: 70px 1fr 1fr; // Aumenté un poco el label para "Available"
     gap: 4px;
     align-items: center;
     line-height: 1.1; // Altura de línea mínima
@@ -124,6 +141,21 @@
         }
       }
     }
+    
+    // Estilo especial para filas de tránsito
+    &.transit-row {
+        .inventory-label {
+            color: #795548; // Un café/marrón para distinguir del stock normal
+        }
+        
+        &.active-filter {
+            background-color: rgba(121, 85, 72, 0.1); // Fondo café suave
+            
+            .inventory-label, .inventory-units, .inventory-measure {
+                color: #795548;
+            }
+        }
+    }
   }
 
   .inventory-label {
@@ -133,6 +165,8 @@
     text-align: left;
     white-space: nowrap;
     transition: color 0.2s ease;
+    
+    &.text-success { color: $success-color; font-weight: 600; }
   }
 
   .inventory-units {
@@ -151,6 +185,8 @@
     font-family: "Roboto", sans-serif;
     text-align: right;
     transition: color 0.2s ease;
+    
+    &.text-success { color: $success-color; }
   }
 }
 
@@ -210,6 +246,11 @@
                 grid-template-columns: 1fr 1fr; // Dos columnas de datos
                 gap: 4px 12px;
                 
+                .inventory-separator {
+                    grid-column: 1 / -1;
+                    margin: 8px 0 4px 0;
+                }
+                
                 .inventory-row {
                     display: flex;
                     justify-content: space-between;
@@ -221,7 +262,7 @@
                     // Mantener bordes redondeados en móvil también
                     border-radius: 4px;
                     
-                    &:last-child, &:nth-last-child(2) { border-bottom: none; }
+                    &:last-child { border-bottom: none; }
 
                     // En móvil, si está activo, se nota el fondo
                     &.active-filter {
