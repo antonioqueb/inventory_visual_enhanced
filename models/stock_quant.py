@@ -69,9 +69,9 @@ class StockQuant(models.Model):
         if filters.get('acabado'):
             domain.append(('x_acabado', '=', filters['acabado']))
 
-        # Filtro por color
+        # Filtro por color (ilike para búsqueda parcial y case-insensitive)
         if filters.get('color'):
-            domain.append(('x_color', '=', filters['color']))
+            domain.append(('x_color', 'ilike', filters['color']))
         
         # Filtro por grosor
         if filters.get('grosor'):
@@ -242,7 +242,7 @@ class StockQuant(models.Model):
                 'lot_name': quant.lot_id.name if quant.lot_id else '',
                 'location_id': quant.location_id.id,
                 'location_name': quant.location_id.complete_name,
-                'location_usage': quant.location_id.usage, # <--- CAMPO NUEVO IMPORTANTE
+                'location_usage': quant.location_id.usage,
                 'quantity': quant.quantity,
                 'reserved_quantity': quant.reserved_quantity,
                 'grosor': quant.x_grosor if hasattr(quant, 'x_grosor') else False,
@@ -257,7 +257,7 @@ class StockQuant(models.Model):
                 'referencia_proveedor': quant.x_referencia_proveedor if hasattr(quant, 'x_referencia_proveedor') else '',
                 'cantidad_fotos': 0,
                 'detalles_placa': quant.x_detalles_placa if hasattr(quant, 'x_detalles_placa') else '',
-                'tiene_hold': False,  # Por defecto False
+                'tiene_hold': False,
                 'hold_info': None,
                 'en_orden_venta': False,
                 'sale_order_ids': [],
@@ -286,14 +286,12 @@ class StockQuant(models.Model):
             
             # Sale orders - solo si el usuario tiene permisos de ventas
             if quant.lot_id and is_sales_user:
-                # Buscar move lines que usen este lote específico
                 move_lines_with_lot = self.env['stock.move.line'].sudo().search([
                     ('lot_id', '=', quant.lot_id.id),
                     ('state', 'in', ['assigned', 'done']),
                     ('picking_id.picking_type_code', '=', 'outgoing'),
                 ])
                 
-                # Obtener las órdenes de venta relacionadas
                 sale_order_ids = set()
                 for move_line in move_lines_with_lot:
                     if move_line.move_id and move_line.move_id.sale_line_id:
@@ -315,7 +313,6 @@ class StockQuant(models.Model):
         Obtiene el historial completo de un lote
         RESTRINGIDO: Solo usuarios con permisos de ventas
         """
-        # Validar permisos
         if not self.check_sales_permissions():
             raise UserError("No tiene permisos para ver el historial detallado. Contacte al administrador.")
         
@@ -325,11 +322,9 @@ class StockQuant(models.Model):
         
         lot = quant.lot_id
         
-        # Verificar si tiene permisos de compras
         has_purchase_permissions = self.env.user.has_group('purchase.group_purchase_user') or \
                                    self.env.user.has_group('purchase.group_purchase_manager')
         
-        # Información general
         general_info = {
             'product_name': lot.product_id.display_name,
             'product_code': lot.product_id.default_code or '',
@@ -342,7 +337,6 @@ class StockQuant(models.Model):
             'cantidad_disponible': quant.quantity - quant.reserved_quantity,
         }
         
-        # Estadísticas
         move_lines = self.env['stock.move.line'].search([
             ('lot_id', '=', lot.id)
         ])
@@ -362,7 +356,6 @@ class StockQuant(models.Model):
             'dias_en_inventario': dias_inventario,
         }
         
-        # Información de compra - SOLO SI TIENE PERMISOS
         purchase_info = []
         if has_purchase_permissions:
             purchase_lines = self.env['purchase.order.line'].search([
@@ -381,7 +374,6 @@ class StockQuant(models.Model):
                     'estado': dict(pol.order_id._fields['state'].selection).get(pol.order_id.state, ''),
                 })
         
-        # Movimientos
         movements = []
         for ml in move_lines.sorted('date', reverse=True):
             icon = 'fa-arrow-right'
@@ -405,7 +397,6 @@ class StockQuant(models.Model):
                 'usuario': ml.write_uid.name if ml.write_uid else '',
             })
         
-        # Órdenes de venta
         sales_orders = []
         sale_lines = self.env['sale.order.line'].search([
             ('product_id', '=', lot.product_id.id),
@@ -413,7 +404,6 @@ class StockQuant(models.Model):
         ], limit=10, order='create_date desc')
         
         for sol in sale_lines:
-            # Verificar si este lote fue usado en esta línea
             used_in_line = self.env['stock.move.line'].search([
                 ('lot_id', '=', lot.id),
                 ('move_id.sale_line_id', '=', sol.id)
@@ -433,7 +423,6 @@ class StockQuant(models.Model):
                     'estado': dict(sol.order_id._fields['state'].selection).get(sol.order_id.state, ''),
                 })
         
-        # Reservas/Apartados
         reservations = []
         if hasattr(quant, 'x_hold_ids'):
             for hold in quant.x_hold_ids:
@@ -447,7 +436,6 @@ class StockQuant(models.Model):
                     'notas': hold.notas or '',
                 })
         
-        # Entregas
         deliveries = []
         delivery_moves = self.env['stock.move.line'].search([
             ('lot_id', '=', lot.id),
@@ -480,10 +468,7 @@ class StockQuant(models.Model):
     
     @api.model
     def get_lot_photos(self, quant_id):
-        """
-        Obtiene las fotografías de un lote
-        PERMITIDO: Todos los usuarios (inventario y ventas)
-        """
+        """Obtiene las fotografías de un lote"""
         quant = self.browse(quant_id)
         if not quant.exists() or not quant.lot_id:
             return {'error': 'Lote no encontrado'}
@@ -509,10 +494,7 @@ class StockQuant(models.Model):
     
     @api.model
     def get_lot_notes(self, quant_id):
-        """
-        Obtiene las notas de un lote
-        PERMITIDO: Todos los usuarios (inventario y ventas)
-        """
+        """Obtiene las notas de un lote"""
         quant = self.browse(quant_id)
         if not quant.exists() or not quant.lot_id:
             return {'error': 'Lote no encontrado'}
@@ -527,10 +509,7 @@ class StockQuant(models.Model):
     
     @api.model
     def save_lot_photo(self, quant_id, photo_name, photo_data, sequence=10, notas=''):
-        """
-        Guarda una fotografía para un lote
-        PERMITIDO: Todos los usuarios (inventario y ventas)
-        """
+        """Guarda una fotografía para un lote"""
         quant = self.browse(quant_id)
         if not quant.exists() or not quant.lot_id:
             return {'success': False, 'error': 'Lote no encontrado'}
@@ -556,10 +535,7 @@ class StockQuant(models.Model):
     
     @api.model
     def save_lot_notes(self, quant_id, notes):
-        """
-        Guarda las notas de un lote
-        PERMITIDO: Todos los usuarios (inventario y ventas)
-        """
+        """Guarda las notas de un lote"""
         quant = self.browse(quant_id)
         if not quant.exists() or not quant.lot_id:
             return {'success': False, 'error': 'Lote no encontrado'}
@@ -581,10 +557,7 @@ class StockQuant(models.Model):
     
     @api.model
     def search_partners(self, name=''):
-        """
-        Busca clientes/contactos
-        RESTRINGIDO: Solo usuarios con permisos de ventas
-        """
+        """Busca clientes/contactos"""
         if not self.check_sales_permissions():
             raise UserError("No tiene permisos para buscar clientes. Contacte al administrador.")
         
@@ -615,10 +588,7 @@ class StockQuant(models.Model):
     
     @api.model
     def create_partner(self, name, vat='', ref=''):
-        """
-        Crea un nuevo cliente
-        RESTRINGIDO: Solo usuarios con permisos de ventas
-        """
+        """Crea un nuevo cliente"""
         if not self.check_sales_permissions():
             raise UserError("No tiene permisos para crear clientes. Contacte al administrador.")
         
@@ -649,10 +619,7 @@ class StockQuant(models.Model):
     
     @api.model
     def get_projects(self, search_term=''):
-        """
-        Obtiene proyectos de mármol
-        RESTRINGIDO: Solo usuarios con permisos de ventas
-        """
+        """Obtiene proyectos de mármol"""
         if not self.check_sales_permissions():
             raise UserError("No tiene permisos para consultar proyectos. Contacte al administrador.")
         
@@ -677,10 +644,7 @@ class StockQuant(models.Model):
     
     @api.model
     def create_project(self, name):
-        """
-        Crea un nuevo proyecto
-        RESTRINGIDO: Solo usuarios con permisos de ventas
-        """
+        """Crea un nuevo proyecto"""
         if not self.check_sales_permissions():
             raise UserError("No tiene permisos para crear proyectos. Contacte al administrador.")
         
@@ -709,10 +673,7 @@ class StockQuant(models.Model):
     
     @api.model
     def get_architects(self, search_term=''):
-        """
-        Obtiene arquitectos
-        RESTRINGIDO: Solo usuarios con permisos de ventas
-        """
+        """Obtiene arquitectos"""
         if not self.check_sales_permissions():
             raise UserError("No tiene permisos para consultar arquitectos. Contacte al administrador.")
         
@@ -744,10 +705,7 @@ class StockQuant(models.Model):
     
     @api.model
     def create_architect(self, name, vat='', ref=''):
-        """
-        Crea un nuevo arquitecto
-        RESTRINGIDO: Solo usuarios con permisos de ventas
-        """
+        """Crea un nuevo arquitecto"""
         if not self.check_sales_permissions():
             raise UserError("No tiene permisos para crear arquitectos. Contacte al administrador.")
         
@@ -783,10 +741,7 @@ class StockQuant(models.Model):
     @api.model
     def create_lot_hold_enhanced(self, quant_id, partner_id, project_id, architect_id, 
                                   notas='', currency_code='USD', product_prices=None):
-        """
-        Crea un apartado (hold) para un lote con información completa
-        RESTRINGIDO: Solo usuarios con permisos de ventas
-        """
+        """Crea un apartado (hold) para un lote con información completa"""
         if not self.check_sales_permissions():
             raise UserError("No tiene permisos para crear apartados. Contacte al administrador.")
         
@@ -794,11 +749,9 @@ class StockQuant(models.Model):
         if not quant.exists() or not quant.lot_id:
             return {'error': 'Lote no encontrado'}
         
-        # Verificar si ya tiene hold activo
         if hasattr(quant, 'x_tiene_hold') and quant.x_tiene_hold:
             return {'error': 'Este lote ya tiene un apartado activo'}
         
-        # Verificar si requiere autorización
         if product_prices and isinstance(product_prices, dict):
             auth_check = self.env['product.template'].check_price_authorization_needed(
                 product_prices, 
@@ -806,7 +759,6 @@ class StockQuant(models.Model):
             )
             
             if auth_check['needs_authorization']:
-                # Agrupar lotes por producto
                 product_groups = {}
                 pid = quant.product_id.id
                 product_groups[str(pid)] = {
@@ -819,7 +771,6 @@ class StockQuant(models.Model):
                     'total_quantity': quant.quantity
                 }
                 
-                # Crear autorización
                 result = self.create_price_authorization(
                     operation_type='hold',
                     partner_id=partner_id,
@@ -840,7 +791,6 @@ class StockQuant(models.Model):
                         'message': f'Solicitud de autorización {result["authorization_name"]} creada. Espere aprobación del autorizador.'
                     }
         
-        # Crear hold normal
         try:
             full_notes = notas or ''
             
@@ -854,7 +804,6 @@ class StockQuant(models.Model):
                     except Exception as e:
                         _logger.warning(f"Error procesando precio del producto {product_id_str}: {e}")
             
-            # Calcular fecha de expiración (5 días hábiles)
             from datetime import datetime, timedelta
             fecha_inicio = datetime.now()
             fecha_expiracion = fecha_inicio
@@ -904,18 +853,13 @@ class StockQuant(models.Model):
     def create_price_authorization(self, operation_type, partner_id, project_id, 
                                    selected_lots, currency_code, product_prices, 
                                    product_groups, notes=None, architect_id=None):
-        """
-        Crea solicitud de autorización de precio
-        RESTRINGIDO: Solo usuarios con permisos de ventas
-        """
+        """Crea solicitud de autorización de precio"""
         if not self.check_sales_permissions():
             raise UserError("No tiene permisos para crear autorizaciones. Contacte al administrador.")
         
-        # Normalizar product_prices
         if isinstance(product_prices, dict):
             product_prices = {str(k): v for k, v in product_prices.items()}
         
-        # Crear autorización
         auth = self.env['price.authorization'].create({
             'seller_id': self.env.user.id,
             'operation_type': operation_type,
@@ -931,7 +875,6 @@ class StockQuant(models.Model):
             }
         })
         
-        # Crear líneas
         for product_id_str, group in product_groups.items():
             product_id = int(product_id_str)
             product = self.env['product.product'].browse(product_id)
@@ -964,10 +907,7 @@ class StockQuant(models.Model):
     
     @api.model
     def get_sale_order_info(self, sale_order_ids):
-        """
-        Obtiene información de órdenes de venta
-        PERMITIDO: Todos los usuarios (visible pero sin info sensible sin permisos)
-        """
+        """Obtiene información de órdenes de venta"""
         if not sale_order_ids:
             return {'count': 0, 'orders': []}
         

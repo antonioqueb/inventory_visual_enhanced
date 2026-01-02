@@ -35,11 +35,11 @@ export class SearchBar extends Component {
             grupos: [],
             acabados: [],
             grosores: [],
-            colores: [],
+            colores: [], // Lista de colores para sugerencias (datalist)
             
             // UI
             showAdvancedFilters: false,
-            mobileFiltersOpen: false, // <--- NUEVO: Controla si el menú móvil está abierto
+            mobileFiltersOpen: false,
         });
 
         this.searchTimeout = null;
@@ -95,7 +95,7 @@ export class SearchBar extends Component {
             );
             this.state.categorias = categorias;
 
-            // Cargar colores únicos
+            // Cargar colores únicos para sugerencias
             const colores = await this.orm.readGroup(
                 "stock.quant",
                 [["x_color", "!=", false]],
@@ -197,7 +197,6 @@ export class SearchBar extends Component {
         this.state.showAdvancedFilters = !this.state.showAdvancedFilters;
     }
     
-    // --- NUEVA FUNCIÓN: Toggle Móvil ---
     toggleMobileFilters() {
         this.state.mobileFiltersOpen = !this.state.mobileFiltersOpen;
     }
