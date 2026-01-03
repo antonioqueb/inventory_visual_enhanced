@@ -95,14 +95,19 @@ export class SearchBar extends Component {
             );
             this.state.categorias = categorias;
 
-            // Cargar colores únicos para sugerencias
-            const colores = await this.orm.readGroup(
-                "stock.quant",
-                [["x_color", "!=", false]],
-                ["x_color"],
-                ["x_color"]
-            );
-            this.state.colores = colores.map(c => c.x_color).filter(Boolean).sort();
+            // Cargar colores únicos - usando orm.call en lugar de readGroup
+            try {
+                const colores = await this.orm.call(
+                    "stock.quant",
+                    "read_group",
+                    [[["x_color", "!=", false], ["quantity", ">", 0]]],
+                    { groupby: ["x_color"], fields: ["x_color"] }
+                );
+                this.state.colores = colores.map(c => c.x_color).filter(Boolean).sort();
+            } catch (e) {
+                console.error("Error cargando colores:", e);
+                this.state.colores = [];
+            }
 
             // Cargar opciones de selection fields
             const fieldInfo = await this.orm.call(
@@ -124,15 +129,14 @@ export class SearchBar extends Component {
                 this.state.acabados = fieldInfo.x_acabado.selection;
             }
 
-            // Cargar grosores únicos
+            // Cargar grosores únicos - usando orm.call
             try {
-                const grosores = await this.orm.readGroup(
+                const grosores = await this.orm.call(
                     "stock.quant",
-                    [["x_grosor", "!=", false], ["quantity", ">", 0]],
-                    ["x_grosor:array_agg"],
-                    ["x_grosor"]
+                    "read_group",
+                    [[["x_grosor", "!=", false], ["quantity", ">", 0]]],
+                    { groupby: ["x_grosor"], fields: ["x_grosor"] }
                 );
-                // Extraer valores únicos y ordenar
                 const grosorSet = new Set();
                 grosores.forEach(g => {
                     if (g.x_grosor !== false && g.x_grosor !== null) {
