@@ -73,9 +73,14 @@ class StockQuant(models.Model):
         if filters.get('color'):
             domain.append(('x_color', 'ilike', filters['color']))
         
-        # Filtro por grosor
+        # Filtro por grosor (con tolerancia para precisión de punto flotante)
         if filters.get('grosor'):
-            domain.append(('x_grosor', '=', float(filters['grosor'])))
+            try:
+                grosor_val = float(filters['grosor'])
+                domain.append(('x_grosor', '>=', grosor_val - 0.001))
+                domain.append(('x_grosor', '<=', grosor_val + 0.001))
+            except (ValueError, TypeError):
+                pass
         
         # Filtro por número de serie
         if filters.get('numero_serie'):

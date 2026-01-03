@@ -125,13 +125,25 @@ export class SearchBar extends Component {
             }
 
             // Cargar grosores únicos
-            const grosores = await this.orm.readGroup(
-                "stock.quant",
-                [["x_grosor", "!=", false]],
-                ["x_grosor"],
-                ["x_grosor"]
-            );
-            this.state.grosores = grosores.map(g => g.x_grosor).filter(Boolean).sort();
+            try {
+                const grosores = await this.orm.readGroup(
+                    "stock.quant",
+                    [["x_grosor", "!=", false], ["quantity", ">", 0]],
+                    ["x_grosor:array_agg"],
+                    ["x_grosor"]
+                );
+                // Extraer valores únicos y ordenar
+                const grosorSet = new Set();
+                grosores.forEach(g => {
+                    if (g.x_grosor !== false && g.x_grosor !== null) {
+                        grosorSet.add(g.x_grosor);
+                    }
+                });
+                this.state.grosores = Array.from(grosorSet).sort((a, b) => a - b);
+            } catch (e) {
+                console.error("Error cargando grosores:", e);
+                this.state.grosores = [];
+            }
 
         } catch (error) {
             console.error("Error cargando opciones de filtros:", error);
