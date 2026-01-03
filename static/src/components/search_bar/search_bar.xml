@@ -100,13 +100,13 @@
                         <label class="filter-label d-none d-md-block">Categoría</label>
                         <select 
                             class="form-select filter-select" 
-                            t-model="state.filters.categoria_id" 
-                            t-on-change="(ev) => this.onFilterChange('categoria_id', ev)" 
+                            t-model="state.filters.categoria_name" 
+                            t-on-change="(ev) => this.onFilterChange('categoria_name', ev)" 
                             t-att-disabled="props.isLoading"
                         >
                             <option value="">Todas las categorías</option>
-                            <t t-foreach="state.categorias" t-as="categoria" t-key="categoria.id">
-                                <option t-att-value="categoria.id" t-esc="categoria.complete_name"></option>
+                            <t t-foreach="state.categorias" t-as="categoria" t-key="categoria.name">
+                                <option t-att-value="categoria.name" t-esc="categoria.name"></option>
                             </t>
                         </select>
                     </div>

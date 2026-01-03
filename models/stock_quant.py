@@ -58,9 +58,17 @@ class StockQuant(models.Model):
             domain.append(('x_tipo', '=', filters['tipo']))
         
         # Filtro por categoría
-        if filters.get('categoria_id'):
-            domain.append(('product_id.categ_id', '=', int(filters['categoria_id'])))
-        
+        # Filtro por categoría (busca por nombre en todas las categorías hoja con ese nombre)
+        if filters.get('categoria_name'):
+            # Buscar todas las categorías que tengan ese nombre exacto
+            categoria_ids = self.env['product.category'].search([
+                ('name', '=', filters['categoria_name']),
+                ('child_ids', '=', False)  # Solo hojas
+            ]).ids
+            if categoria_ids:
+                domain.append(('product_id.categ_id', 'in', categoria_ids))
+
+
         # Filtro por grupo
         if filters.get('grupo'):
             domain.append(('x_grupo', '=', filters['grupo']))

@@ -15,7 +15,7 @@ export class SearchBar extends Component {
                 almacen_id: null,
                 ubicacion_id: null,
                 tipo: '',
-                categoria_id: null,
+                categoria_name: '',
                 grupo: '',
                 acabado: '',
                 color: '',
@@ -35,7 +35,7 @@ export class SearchBar extends Component {
             grupos: [],
             acabados: [],
             grosores: [],
-            colores: [], // Lista de colores para sugerencias (datalist)
+            colores: [],
             
             // UI
             showAdvancedFilters: false,
@@ -86,16 +86,37 @@ export class SearchBar extends Component {
             );
             this.state.almacenes = almacenes;
 
-            // Cargar categorías
-            const categorias = await this.orm.searchRead(
+            // Cargar categorías - solo hojas únicas por nombre corto
+            const allCategorias = await this.orm.searchRead(
                 "product.category",
                 [],
-                ["id", "name", "complete_name"],
-                { order: "complete_name" }
+                ["id", "name", "complete_name", "child_ids"],
+                { order: "name" }
             );
-            this.state.categorias = categorias;
 
-            // Cargar colores únicos - usando orm.call en lugar de readGroup
+            // Filtrar solo categorías hoja (sin hijos) y agrupar por nombre corto
+            const categoriasMap = new Map();
+            allCategorias.forEach(cat => {
+                // Solo categorías sin hijos (hojas)
+                if (!cat.child_ids || cat.child_ids.length === 0) {
+                    const shortName = cat.name;
+                    if (!categoriasMap.has(shortName)) {
+                        categoriasMap.set(shortName, {
+                            name: shortName,
+                            ids: [cat.id]
+                        });
+                    } else {
+                        categoriasMap.get(shortName).ids.push(cat.id);
+                    }
+                }
+            });
+
+            // Convertir a array para el dropdown
+            this.state.categorias = Array.from(categoriasMap.values()).sort((a, b) => 
+                a.name.localeCompare(b.name)
+            );
+
+            // Cargar colores únicos
             try {
                 const colores = await this.orm.call(
                     "stock.quant",
@@ -129,7 +150,7 @@ export class SearchBar extends Component {
                 this.state.acabados = fieldInfo.x_acabado.selection;
             }
 
-            // Cargar grosores únicos - usando orm.call
+            // Cargar grosores únicos
             try {
                 const grosores = await this.orm.call(
                     "stock.quant",
@@ -227,7 +248,7 @@ export class SearchBar extends Component {
             almacen_id: null,
             ubicacion_id: null,
             tipo: '',
-            categoria_id: null,
+            categoria_name: '',
             grupo: '',
             acabado: '',
             grosor: '',
