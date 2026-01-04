@@ -219,4 +219,17 @@
       font-size: 14px;
     }
   }
+&.status-no-hold {
+  background: #E0E0E0;
+  color: #6a6a6a;
+  border-color: #E0E0E0;
+  cursor: default;
+  pointer-events: none;
+  opacity: 0.6;
+  
+  i {
+    font-size: 14px;
+  }
+}
+
 }
