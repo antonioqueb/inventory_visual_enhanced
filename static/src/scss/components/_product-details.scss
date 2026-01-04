@@ -1,166 +1,211 @@
 // ==========================================
+// PRODUCT DETAILS - Paleta Odoo Brand
+// ==========================================
+
+$brand-primary: #714B67;
+$brand-gray: #8F8F8F;
+$brand-secondary: #017E84;
+
+// ==========================================
 // ESTILOS BASE (DESKTOP)
 // ==========================================
 
 .details-wrapper {
   padding: 16px;
-  background: #FAFAFA;
+  background: #FFFFFF;
   overflow-x: auto;
   
-  // Scrollbar inline
+  // Scrollbar con gradiente de marca
   scrollbar-width: thin;
-  scrollbar-color: #8F8F8F #FAFAFA;
+  scrollbar-color: $brand-primary #F5F5F5;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #F5F5F5;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, $brand-primary 0%, $brand-secondary 100%);
+    border-radius: 4px;
+    
+    &:hover {
+      background: linear-gradient(180deg, darken($brand-primary, 10%) 0%, darken($brand-secondary, 10%) 100%);
+    }
+  }
 }
 
 .o_inventory_details_table {
   width: 100%;
   border-collapse: collapse;
   background: #FFFFFF;
-  border: 1px solid #E0E0E0;
+  border: 1px solid rgba($brand-gray, 0.3);
   border-radius: 8px;
   
-  // SOLICITUD: Fuente formal y tamaño pequeño (9px) en escritorio
   font-family: "Roboto", "Arial", sans-serif;
   font-size: 9px;
 
   thead {
-    background: #F5F5F5;
-    border-bottom: 2px solid #CCCCCC;
+    background: linear-gradient(135deg, rgba($brand-primary, 0.05) 0%, rgba($brand-secondary, 0.05) 100%);
+    border-bottom: 2px solid rgba($brand-primary, 0.2);
 
     th {
-      // SOLICITUD: Padding reducido para filas más delgadas
       padding: 4px 6px;
       text-align: left;
       font-weight: 700;
-      color: #2C2C2C;
-      font-size: 9px; // Texto pequeño
+      color: $brand-primary;
+      font-size: 9px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      border-right: 1px solid #E0E0E0;
+      border-right: 1px solid rgba($brand-gray, 0.2);
       white-space: nowrap;
-      height: 24px; // Forzar altura pequeña
+      height: 24px;
 
       &:last-child { border-right: none; }
       
-      // SOLICITUD: Iconos más pequeños en cabecera también
       &.col-icon { width: 25px; text-align: center; }
-      
-      // SOLICITUD: Checkbox más pequeño
       &.col-checkbox { width: 20px; text-align: center; padding: 0; }
-
-      // SOLICITUD: Lote menos ancho (aprox -30%)
       &.col-lot { width: 90px; max-width: 100px; }
-
-      // SOLICITUD: Pedimento más ancho
       &.col-pedimento { min-width: 140px; }
-
-      // === NUEVO: Columna Color ===
       &.col-color { width: 80px; min-width: 80px; }
     }
   }
 
   tbody {
     tr {
-      border-bottom: 1px solid #E0E0E0;
+      border-bottom: 1px solid rgba($brand-gray, 0.15);
       transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
-      // Altura de fila forzada pequeña en escritorio
       height: 22px;
       
-      &:hover { background: #FAFAFA; }
+      &:hover { 
+        background: linear-gradient(90deg, rgba($brand-primary, 0.03) 0%, rgba($brand-secondary, 0.03) 100%);
+      }
       &:last-child { border-bottom: none; }
+
+      // Fila de resumen de grupo
+      &.group-summary-row {
+        background: linear-gradient(90deg, rgba($brand-primary, 0.08) 0%, rgba($brand-secondary, 0.05) 100%) !important;
+        border-top: 2px solid rgba($brand-primary, 0.2);
+        
+        td {
+          font-weight: 700;
+          color: $brand-primary;
+        }
+      }
     }
 
     td {
-      // SOLICITUD: Padding mínimo para filas delgadas
       padding: 2px 6px;
       vertical-align: middle;
       color: #2C2C2C;
-      border-right: 1px solid #E0E0E0;
-      font-size: 9px; // Texto 9px
+      border-right: 1px solid rgba($brand-gray, 0.15);
+      font-size: 9px;
       line-height: 1.2;
 
       &:last-child { border-right: none; }
       &.col-icon { text-align: center; padding: 1px; }
       
-      .text-muted { color: #808080; }
+      .text-muted { color: $brand-gray; }
 
-      // Checkbox pequeño en escritorio
       .checkbox-wrapper {
         display: flex;
         justify-content: center;
         input.cart-checkbox {
-            width: 11px;
-            height: 11px;
-            margin: 0;
-            margin-top: 2px;
+          width: 11px;
+          height: 11px;
+          margin: 0;
+          margin-top: 2px;
+          accent-color: $brand-primary;
         }
       }
 
-      // SOLICITUD: Iconos pequeños (historial, fotos, etc) en escritorio
       .icon-btn, .status-badge-btn {
         width: 18px;
         height: 18px;
-        min-width: 18px; // Sobrescribir estilos globales
+        min-width: 18px;
         font-size: 9px;
-        border-radius: 3px; // Menos redondeado para verse más formal
+        border-radius: 3px;
         
         i.fa {
-            font-size: 9px;
-            line-height: 1;
+          font-size: 9px;
+          line-height: 1;
         }
       }
 
-      // Ajuste específico para botones de estado (Hold, Venta)
       .status-badge-btn {
-          padding: 0;
-          height: 18px;
+        padding: 0;
+        height: 18px;
       }
     }
   }
 
   .col-lot, .col-bloque, .col-atado {
-    // Mantener fuente monoespaciada para códigos
     font-family: "SF Mono", "Roboto Mono", monospace;
     font-weight: 600;
     white-space: nowrap;
+    color: $brand-primary;
   }
 
   .col-location {
     font-weight: 500;
-    .fa-map-marker { color: #714B67; margin-right: 2px; font-size: 9px; }
+    .fa-map-marker { 
+      color: $brand-secondary; 
+      margin-right: 2px; 
+      font-size: 9px; 
+    }
   }
 
   .col-dimensions {
     .dimensions-inline {
-      display: inline-flex; align-items: center; gap: 4px;
-      white-space: nowrap; font-size: 9px; color: #7a7a7a;
+      display: inline-flex; 
+      align-items: center; 
+      gap: 4px;
+      white-space: nowrap; 
+      font-size: 9px; 
+      color: $brand-gray;
     }
     .dimensions-total-inline {
-      font-weight: 700; color: #714B67;
-      font-family: inherit; font-size: 9px; margin-left: 2px;
+      font-weight: 700; 
+      color: $brand-primary;
+      font-family: inherit; 
+      font-size: 9px; 
+      margin-left: 2px;
     }
   }
 
   .col-tipo {
     font-weight: 600; 
     white-space: nowrap;
-    .text-muted { color: #808080; }
+    .text-muted { color: $brand-gray; }
   }
 }
 
 .table-loading {
-  padding: 24px; text-align: center;
+  padding: 24px; 
+  text-align: center;
+  
   .spinner {
-    width: 24px; height: 24px; border: 2px solid #f0ebef;
-    border-top-color: #714B67; border-radius: 50%;
-    animation: spin 1s linear infinite; margin: 0 auto 8px;
+    width: 24px; 
+    height: 24px; 
+    border: 2px solid rgba($brand-primary, 0.2);
+    border-top-color: $brand-primary; 
+    border-radius: 50%;
+    animation: spin 1s linear infinite; 
+    margin: 0 auto 8px;
   }
-  .loading-text { color: #7a7a7a; font-size: 10px; }
+  .loading-text { 
+    color: $brand-gray; 
+    font-size: 10px; 
+  }
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 // ==========================================
@@ -169,14 +214,20 @@
 
 .details-wrapper {
   .mobile-select-bar {
-    display: none; // Oculto por defecto en escritorio
+    display: none;
     padding: 12px 16px;
-    background-color: #ffffff;
-    border: 1px solid #E0E0E0;
+    background: #FFFFFF;
+    border: 2px solid rgba($brand-primary, 0.2);
     margin-bottom: 12px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgba($brand-primary, 0.1);
     cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: $brand-primary;
+      box-shadow: 0 4px 12px rgba($brand-primary, 0.15);
+    }
 
     .mobile-select-content {
       display: flex;
@@ -192,14 +243,14 @@
           height: 22px;
           margin: 0;
           cursor: pointer;
-          accent-color: #714B67;
+          accent-color: $brand-primary;
         }
       }
 
       .mobile-select-text {
         font-weight: 700;
         font-size: 14px;
-        color: #714B67;
+        color: $brand-primary;
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
@@ -212,242 +263,297 @@
 // ==========================================
 
 @media (max-width: 992px) {
-    .details-wrapper {
-        padding: 8px;
-        background: transparent;
+  .details-wrapper {
+    padding: 8px;
+    background: transparent;
 
-        // Mostrar la barra de selección en móvil
-        .mobile-select-bar {
-            display: block;
-        }
+    .mobile-select-bar {
+      display: block;
     }
+  }
 
-    .o_inventory_details_table {
-        border: none;
-        background: transparent;
-        // Restaurar tamaño de fuente para móvil (más legible que 9px)
-        font-size: 13px; 
+  .o_inventory_details_table {
+    border: none;
+    background: transparent;
+    font-size: 13px; 
 
-        thead { display: none; }
+    thead { display: none; }
 
-        tbody {
+    tbody {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+
+      tr {
+        display: grid;
+        grid-template-columns: 50px 1fr 1fr 1fr; 
+        
+        grid-template-areas:
+          "check  header header header"
+          "loc    loc    loc    loc"
+          "dims   dims   dims   dims"
+          "tech0  tech0  tech1  tech1"
+          "tech2  tech2  tech3  tech3"
+          "tech4  tech4  tech5  tech5"
+          "tech6  tech6  tech6  tech6"
+          "act1   act2   act3   act4";
+        
+        background: #FFFFFF;
+        border: 1px solid rgba($brand-gray, 0.25);
+        border-radius: 12px;
+        padding: 0;
+        box-shadow: 0 4px 12px rgba($brand-primary, 0.08);
+        overflow: hidden;
+        height: auto;
+        transition: all 0.2s ease;
+
+        &:hover {
+          box-shadow: 0 6px 16px rgba($brand-primary, 0.12);
+          border-color: rgba($brand-primary, 0.3);
+        }
+
+        // Fila de resumen en móvil
+        &.group-summary-row {
+          background: linear-gradient(135deg, rgba($brand-primary, 0.1) 0%, rgba($brand-secondary, 0.08) 100%) !important;
+          border: 2px solid rgba($brand-primary, 0.25);
+          
+          td {
+            background: transparent !important;
+            color: $brand-primary;
+            font-weight: 700;
+          }
+        }
+      }
+
+      td {
+        border: none !important;
+        padding: 10px 12px !important;
+        display: flex;
+        align-items: center;
+        font-size: 13px;
+        line-height: 1.5;
+        
+        // === ÁREA: CHECKBOX (Móvil) ===
+        &.col-checkbox {
+          grid-area: check;
+          background: linear-gradient(135deg, rgba($brand-primary, 0.05) 0%, #FFFFFF 100%);
+          border-bottom: 1px solid rgba($brand-gray, 0.2) !important;
+          border-right: 1px solid rgba($brand-gray, 0.2) !important;
+          justify-content: center;
+          align-items: center;
+          padding: 0 !important;
+          min-height: 48px;
+          width: auto !important;
+          
+          .checkbox-wrapper {
             display: flex;
-            flex-direction: column;
-            gap: 16px; // Espacio entre tarjetas
-
-            tr {
-                display: grid;
-                grid-template-columns: 50px 1fr 1fr 1fr; 
-                
-                // DEFINICIÓN DE ÁREAS (ACTUALIZADA con tech0 para Color)
-                grid-template-areas:
-                    "check  header header header"
-                    "loc    loc    loc    loc"
-                    "dims   dims   dims   dims"
-                    "tech0  tech0  tech1  tech1" /* Color | Tipo */
-                    "tech2  tech2  tech3  tech3" /* Bloque | Atado */
-                    "tech4  tech4  tech5  tech5" /* Pedimento | Contenedor */
-                    "tech6  tech6  tech6  tech6" /* Ref. Prov (Ancho completo) */
-                    "act1   act2   act3   act4";
-                
-                background: #FFFFFF;
-                border: 1px solid #E0E0E0;
-                border-radius: 12px;
-                padding: 0;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-                overflow: hidden;
-                height: auto; // Restaurar altura automática en móvil
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            
+            input.cart-checkbox {
+              width: 24px;
+              height: 24px;
+              margin: 0;
+              cursor: pointer;
+              opacity: 1 !important;
+              position: relative;
+              z-index: 10;
+              accent-color: $brand-primary;
             }
-
-            td {
-                border: none !important;
-                padding: 10px 12px !important; // Restaurar padding cómodo en móvil
-                display: flex;
-                align-items: center;
-                font-size: 13px; // Restaurar tamaño de fuente
-                line-height: 1.5;
-                
-                // === ÁREA: CHECKBOX (Móvil) ===
-                &.col-checkbox {
-                    grid-area: check;
-                    background-color: #f8f9fa;
-                    border-bottom: 1px solid #e0e0e0 !important;
-                    border-right: 1px solid #e0e0e0 !important;
-                    justify-content: center;
-                    align-items: center;
-                    padding: 0 !important;
-                    min-height: 48px;
-                    width: auto !important; // Sobrescribir el width: 20px de escritorio
-                    
-                    .checkbox-wrapper {
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        width: 100%;
-                        height: 100%;
-                        
-                        input.cart-checkbox {
-                            width: 24px; // Restaurar tamaño checkbox móvil
-                            height: 24px;
-                            margin: 0;
-                            cursor: pointer;
-                            opacity: 1 !important;
-                            position: relative;
-                            z-index: 10;
-                        }
-                    }
-                }
-
-                // === ÁREA: HEADER (LOTE) ===
-                &.col-lot {
-                    grid-area: header;
-                    font-size: 15px;
-                    font-weight: 800;
-                    color: #714B67; 
-                    background-color: #f8f9fa;
-                    border-bottom: 1px solid #e0e0e0 !important;
-                    padding: 12px 16px !important;
-                    width: auto !important; // Reset width
-                    max-width: none !important; // Reset max-width
-                }
-
-                // === ÁREA: UBICACIÓN ===
-                &.col-location {
-                    grid-area: loc;
-                    font-size: 14px;
-                    background-color: #ffffff;
-                    border-bottom: 1px dashed #e0e0e0 !important; 
-                    padding-top: 14px !important;
-                    padding-bottom: 8px !important;
-                    
-                    i { 
-                        color: #714B67; 
-                        margin-right: 8px; 
-                        font-size: 16px; // Restaurar tamaño icono
-                    }
-                }
-                
-                // === ÁREA: DIMENSIONES ===
-                &.col-dimensions {
-                    grid-area: dims;
-                    background-color: #ffffff;
-                    border-bottom: 4px solid #f8f9fa !important;
-                    padding-top: 8px !important;
-                    padding-bottom: 14px !important;
-                    
-                    .dimensions-inline {
-                        font-size: 14px;
-                        display: flex;
-                        align-items: center;
-                        width: 100%;
-                        justify-content: space-between;
-                        color: #555;
-                    }
-                    
-                    .dimensions-total-inline {
-                        background: #f0f0f0;
-                        color: #333;
-                        padding: 4px 10px;
-                        border-radius: 20px;
-                        font-size: 13px;
-                        font-weight: 700;
-                    }
-                }
-
-                // === ÁREAS TÉCNICAS (Tipo, Bloque, Color, etc) ===
-                &.col-color { grid-area: tech0; }
-                &.col-tipo { grid-area: tech1; }
-                &.col-bloque { grid-area: tech2; }
-                &.col-atado { grid-area: tech3; }
-                &.col-pedimento { grid-area: tech4; }
-                &.col-contenedor { grid-area: tech5; }
-                &.col-ref-proveedor { grid-area: tech6; }
-
-                &.col-color,
-                &.col-tipo, &.col-bloque, &.col-atado, 
-                &.col-pedimento, &.col-contenedor, &.col-ref-proveedor {
-                    font-size: 13px;
-                    color: #4a4a4a;
-                    flex-direction: column; 
-                    align-items: flex-start;
-                    border-bottom: 1px solid #f0f0f0 !important;
-                    min-height: 50px;
-                    background: #fff;
-                    width: auto !important; // Reset width
-                    min-width: 0 !important; // Reset min-width
-                    
-                    &:empty { display: none; }
-
-                    &:before {
-                        content: attr(class);
-                        font-size: 10px;
-                        text-transform: uppercase;
-                        color: #999;
-                        font-weight: 700;
-                        margin-bottom: 4px;
-                    }
-                    
-                    // Definición de Etiquetas para Móvil
-                    &.col-color:before { content: "Color"; }
-                    &.col-tipo:before { content: "Tipo"; }
-                    &.col-bloque:before { content: "Bloque"; }
-                    &.col-atado:before { content: "Atado"; }
-                    &.col-pedimento:before { content: "Pedimento"; }
-                    &.col-contenedor:before { content: "Contenedor"; }
-                    &.col-ref-proveedor:before { content: "Ref. Prov"; }
-                    
-                    span { font-weight: 600; }
-                }
-
-                // === ÁREA: BOTONES DE ACCIÓN (Móvil) ===
-                &.action-btn-cell {
-                    justify-content: center;
-                    padding: 14px 0 !important;
-                    background-color: #f8f9fa;
-                    border-top: 1px solid #e0e0e0;
-                    width: auto !important;
-                    
-                    &:nth-of-type(12) { grid-area: act1; border-right: 1px solid #e0e0e0; }
-                    &:nth-of-type(13) { grid-area: act2; border-right: 1px solid #e0e0e0; }
-                    &:nth-of-type(14) { grid-area: act3; border-right: 1px solid #e0e0e0; }
-                    &:nth-of-type(15) { grid-area: act4; }
-
-                    // Restaurar tamaño de botones para táctil en móvil
-                    .icon-btn, .status-badge-btn {
-                        width: 42px;
-                        height: 42px;
-                        font-size: 18px;
-                        min-width: 42px;
-                        border-radius: 50%;
-                        border: none;
-                        background: transparent;
-                        
-                        // ===== CORRECCIÓN DE ICONOS =====
-                        &.no-content {
-                            color: #666666 !important;
-                            background-color: rgba(0, 0, 0, 0.05) !important;
-                            border: 1px solid #e0e0e0 !important;
-                            opacity: 1 !important;
-                        }
-                        
-                        // CORRECCIÓN ESPECÍFICA PARA HISTORIAL (has-details)
-                        &.has-details {
-                            color: #714B67 !important; /* Color primario visible */
-                            background-color: rgba(113, 75, 103, 0.1) !important;
-                        }
-                        // ==================================
-                        
-                        i.fa {
-                            font-size: 18px;
-                        }
-                        
-                        &.status-hold-active { background-color: #ffeeba; color: #856404; }
-                        &.status-sale-order { background-color: #d4edda; color: #155724; }
-                        &.has-photos { color: #007bff; background-color: rgba(0,123,255,0.1); }
-                        &.has-notes { color: #17a2b8; background-color: rgba(23,162,184,0.1); }
-                    }
-                }
-            }
+          }
         }
+
+        // === ÁREA: HEADER (LOTE) ===
+        &.col-lot {
+          grid-area: header;
+          font-size: 15px;
+          font-weight: 800;
+          color: $brand-primary; 
+          background: linear-gradient(90deg, rgba($brand-primary, 0.05) 0%, #FFFFFF 100%);
+          border-bottom: 1px solid rgba($brand-gray, 0.2) !important;
+          padding: 12px 16px !important;
+          width: auto !important;
+          max-width: none !important;
+        }
+
+        // === ÁREA: UBICACIÓN ===
+        &.col-location {
+          grid-area: loc;
+          font-size: 14px;
+          background: #FFFFFF;
+          border-bottom: 1px dashed rgba($brand-gray, 0.3) !important; 
+          padding-top: 14px !important;
+          padding-bottom: 8px !important;
+          
+          i { 
+            color: $brand-secondary; 
+            margin-right: 8px; 
+            font-size: 16px;
+          }
+        }
+        
+        // === ÁREA: DIMENSIONES ===
+        &.col-dimensions {
+          grid-area: dims;
+          background: #FFFFFF;
+          border-bottom: 4px solid rgba($brand-primary, 0.05) !important;
+          padding-top: 8px !important;
+          padding-bottom: 14px !important;
+          
+          .dimensions-inline {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: space-between;
+            color: #555;
+          }
+          
+          .dimensions-total-inline {
+            background: linear-gradient(135deg, rgba($brand-primary, 0.1) 0%, rgba($brand-secondary, 0.1) 100%);
+            color: $brand-primary;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+          }
+        }
+
+        // === ÁREAS TÉCNICAS ===
+        &.col-color { grid-area: tech0; }
+        &.col-tipo { grid-area: tech1; }
+        &.col-bloque { grid-area: tech2; }
+        &.col-atado { grid-area: tech3; }
+        &.col-pedimento { grid-area: tech4; }
+        &.col-contenedor { grid-area: tech5; }
+        &.col-ref-proveedor { grid-area: tech6; }
+
+        &.col-color,
+        &.col-tipo, &.col-bloque, &.col-atado, 
+        &.col-pedimento, &.col-contenedor, &.col-ref-proveedor {
+          font-size: 13px;
+          color: #4a4a4a;
+          flex-direction: column; 
+          align-items: flex-start;
+          border-bottom: 1px solid rgba($brand-gray, 0.1) !important;
+          min-height: 50px;
+          background: #FFFFFF;
+          width: auto !important;
+          min-width: 0 !important;
+          
+          &:empty { display: none; }
+
+          &:before {
+            content: attr(class);
+            font-size: 10px;
+            text-transform: uppercase;
+            color: $brand-secondary;
+            font-weight: 700;
+            margin-bottom: 4px;
+          }
+          
+          &.col-color:before { content: "Color"; }
+          &.col-tipo:before { content: "Tipo"; }
+          &.col-bloque:before { content: "Bloque"; }
+          &.col-atado:before { content: "Atado"; }
+          &.col-pedimento:before { content: "Pedimento"; }
+          &.col-contenedor:before { content: "Contenedor"; }
+          &.col-ref-proveedor:before { content: "Ref. Prov"; }
+          
+          span { 
+            font-weight: 600; 
+            color: #2C2C2C;
+          }
+        }
+
+        // === ÁREA: BOTONES DE ACCIÓN (Móvil) ===
+        &.action-btn-cell {
+          justify-content: center;
+          padding: 14px 0 !important;
+          background: linear-gradient(180deg, #FFFFFF 0%, rgba($brand-primary, 0.03) 100%);
+          border-top: 1px solid rgba($brand-gray, 0.2);
+          width: auto !important;
+          
+          &:nth-of-type(12) { grid-area: act1; border-right: 1px solid rgba($brand-gray, 0.2); }
+          &:nth-of-type(13) { grid-area: act2; border-right: 1px solid rgba($brand-gray, 0.2); }
+          &:nth-of-type(14) { grid-area: act3; border-right: 1px solid rgba($brand-gray, 0.2); }
+          &:nth-of-type(15) { grid-area: act4; }
+
+          .icon-btn, .status-badge-btn {
+            width: 42px;
+            height: 42px;
+            font-size: 18px;
+            min-width: 42px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            transition: all 0.2s ease;
+            
+            &.no-content {
+              color: $brand-gray !important;
+              background-color: rgba($brand-gray, 0.1) !important;
+              border: 1px solid rgba($brand-gray, 0.2) !important;
+              opacity: 1 !important;
+            }
+            
+            &.has-details {
+              color: $brand-primary !important;
+              background-color: rgba($brand-primary, 0.1) !important;
+              
+              &:hover {
+                background-color: rgba($brand-primary, 0.2) !important;
+              }
+            }
+            
+            &.has-photos { 
+              color: $brand-secondary !important; 
+              background-color: rgba($brand-secondary, 0.1) !important;
+              
+              &:hover {
+                background-color: rgba($brand-secondary, 0.2) !important;
+              }
+            }
+            
+            &.has-notes { 
+              color: $brand-primary !important; 
+              background-color: rgba($brand-primary, 0.1) !important;
+              
+              &:hover {
+                background-color: rgba($brand-primary, 0.2) !important;
+              }
+            }
+            
+            i.fa {
+              font-size: 18px;
+            }
+            
+            &.status-hold-active { 
+              background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); 
+              color: #2C2C2C;
+              box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+            }
+            
+            &.status-sale-order { 
+              background: linear-gradient(135deg, $brand-secondary 0%, darken($brand-secondary, 10%) 100%); 
+              color: #FFFFFF;
+              box-shadow: 0 2px 8px rgba($brand-secondary, 0.3);
+            }
+            
+            &.status-no-state {
+              color: $brand-gray;
+              background: rgba($brand-gray, 0.05);
+              border: 1px dashed rgba($brand-gray, 0.3) !important;
+              
+              &:hover {
+                border-color: $brand-primary !important;
+                color: $brand-primary;
+              }
+            }
+          }
+        }
+      }
     }
+  }
 }
