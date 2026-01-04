@@ -58,15 +58,19 @@ class StockQuant(models.Model):
             domain.append(('x_tipo', '=', filters['tipo']))
         
         # Filtro por categoría
-        # Filtro por categoría (busca por nombre en todas las categorías hoja con ese nombre)
         if filters.get('categoria_name'):
-            # Buscar todas las categorías que tengan ese nombre exacto
-            categoria_ids = self.env['product.category'].search([
-                ('name', '=', filters['categoria_name']),
-                ('child_ids', '=', False)  # Solo hojas
-            ]).ids
-            if categoria_ids:
-                domain.append(('product_id.categ_id', 'in', categoria_ids))
+            # Buscar todas las categorías con ese nombre
+            all_cats = self.env['product.category'].search([
+                ('name', '=', filters['categoria_name'])
+            ])
+            # Obtener IDs de categorías que son padres
+            parent_ids = set(
+                self.env['product.category'].search([('parent_id', '!=', False)]).mapped('parent_id').ids
+            )
+            # Filtrar solo las hojas (las que NO son padres de nadie)
+            leaf_cat_ids = [cat.id for cat in all_cats if cat.id not in parent_ids]
+            if leaf_cat_ids:
+                domain.append(('product_id.categ_id', 'in', leaf_cat_ids))
 
 
         # Filtro por grupo
