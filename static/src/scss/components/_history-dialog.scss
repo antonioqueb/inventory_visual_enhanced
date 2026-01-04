@@ -1,5 +1,5 @@
 // ==========================================
-// HISTORY DIALOG - Paleta Odoo Brand
+// HISTORY DIALOG - Paleta Odoo Brand (Fondo Blanco)
 // ==========================================
 
 $brand-primary: #714B67;
@@ -11,7 +11,7 @@ $brand-secondary: #017E84;
 
   // === HEADER PRINCIPAL ===
   .alert-light {
-    background: linear-gradient(135deg, rgba($brand-primary, 0.08) 0%, rgba($brand-secondary, 0.05) 100%) !important;
+    background: #FFFFFF !important;
     border-color: $brand-primary !important;
     border-left-width: 5px !important;
     
@@ -34,7 +34,7 @@ $brand-secondary: #017E84;
     // Badge de días en inventario
     .badge.bg-light {
       background: #FFFFFF !important;
-      border: 2px solid rgba($brand-primary, 0.2) !important;
+      border: 2px solid $brand-primary !important;
       color: $brand-primary !important;
       
       .fa-calendar {
@@ -42,17 +42,18 @@ $brand-secondary: #017E84;
       }
     }
     
-    // Badge de estado
+    // Badge de estado - FONDO OSCURO = TEXTO BLANCO
     .badge.bg-secondary {
-      background: linear-gradient(135deg, $brand-primary 0%, darken($brand-primary, 10%) 100%) !important;
+      background: $brand-primary !important;
+      color: #FFFFFF !important;
       border: none;
-      box-shadow: 0 2px 6px rgba($brand-primary, 0.3);
     }
   }
 
   // === NAVEGACIÓN POR PESTAÑAS ===
   .nav-tabs {
-    border-bottom: 3px solid rgba($brand-primary, 0.15);
+    background: #FFFFFF;
+    border-bottom: 2px solid rgba($brand-primary, 0.2);
     gap: 4px;
     
     .nav-item {
@@ -63,19 +64,19 @@ $brand-secondary: #017E84;
         padding: 10px 16px;
         font-weight: 600;
         transition: all 0.2s ease;
-        background: rgba($brand-gray, 0.05);
+        background: #FFFFFF;
         
         i {
           color: $brand-gray;
         }
         
         .badge {
-          background: rgba($brand-gray, 0.2) !important;
+          background: rgba($brand-gray, 0.15) !important;
           color: $brand-gray !important;
         }
         
         &:hover {
-          background: rgba($brand-primary, 0.08);
+          background: rgba($brand-primary, 0.05);
           color: $brand-primary;
           
           i {
@@ -83,19 +84,18 @@ $brand-secondary: #017E84;
           }
         }
         
+        // TAB ACTIVO - FONDO OSCURO = TEXTO BLANCO
         &.active {
-          background: linear-gradient(180deg, rgba($brand-primary, 0.12) 0%, rgba($brand-primary, 0.05) 100%);
-          color: $brand-primary;
-          border-bottom: 3px solid $brand-primary;
-          margin-bottom: -3px;
+          background: $brand-primary;
+          color: #FFFFFF;
           
           i {
-            color: $brand-secondary;
+            color: #FFFFFF;
           }
           
           .badge {
-            background: linear-gradient(135deg, $brand-primary 0%, $brand-secondary 100%) !important;
-            color: #FFFFFF !important;
+            background: #FFFFFF !important;
+            color: $brand-primary !important;
           }
         }
       }
@@ -104,56 +104,63 @@ $brand-secondary: #017E84;
 
   // === CONTENIDO DE PESTAÑAS ===
   .tab-content {
-    background: linear-gradient(180deg, rgba($brand-primary, 0.02) 0%, #FFFFFF 100%);
+    background: #FFFFFF;
     padding: 16px 0;
     
     // Scrollbar
     scrollbar-width: thin;
-    scrollbar-color: $brand-primary rgba($brand-primary, 0.1);
+    scrollbar-color: $brand-primary #FFFFFF;
     
     &::-webkit-scrollbar {
       width: 8px;
     }
     
     &::-webkit-scrollbar-track {
-      background: rgba($brand-primary, 0.05);
+      background: #F5F5F5;
       border-radius: 4px;
     }
     
     &::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, $brand-primary 0%, $brand-secondary 100%);
+      background: $brand-primary;
       border-radius: 4px;
+      
+      &:hover {
+        background: $brand-secondary;
+      }
     }
   }
 
   // === TARJETAS GENERALES ===
   .card {
-    border: 2px solid rgba($brand-primary, 0.12) !important;
+    background: #FFFFFF;
+    border: 1px solid rgba($brand-gray, 0.25) !important;
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba($brand-primary, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     transition: all 0.2s ease;
     
     &:hover {
-      box-shadow: 0 6px 16px rgba($brand-primary, 0.12);
-      border-color: rgba($brand-primary, 0.2) !important;
+      box-shadow: 0 4px 12px rgba($brand-primary, 0.1);
+      border-color: $brand-primary !important;
     }
     
+    // CARD HEADER - FONDO OSCURO = TEXTO BLANCO
     .card-header {
-      background: linear-gradient(135deg, rgba($brand-primary, 0.1) 0%, rgba($brand-secondary, 0.06) 100%) !important;
-      border-bottom: 2px solid rgba($brand-primary, 0.1) !important;
+      background: $brand-primary !important;
+      border-bottom: none !important;
       
       h6 {
-        color: $brand-primary !important;
+        color: #FFFFFF !important;
         font-weight: 700;
         
         i {
-          color: $brand-secondary !important;
+          color: #FFFFFF !important;
         }
       }
       
       .badge.bg-secondary {
-        background: linear-gradient(135deg, $brand-secondary 0%, darken($brand-secondary, 10%) 100%) !important;
+        background: #FFFFFF !important;
+        color: $brand-primary !important;
       }
     }
     
@@ -163,9 +170,10 @@ $brand-secondary: #017E84;
       // Tablas dentro de cards
       .table {
         margin-bottom: 0;
+        background: #FFFFFF;
         
         tr {
-          border-bottom: 1px solid rgba($brand-gray, 0.1);
+          border-bottom: 1px solid rgba($brand-gray, 0.15);
           
           &:last-child {
             border-bottom: none;
@@ -173,6 +181,7 @@ $brand-secondary: #017E84;
           
           td {
             padding: 10px 8px;
+            background: #FFFFFF;
             
             &.fw-bold {
               color: $brand-primary;
@@ -180,15 +189,16 @@ $brand-secondary: #017E84;
           }
         }
         
-        // Badges en tablas
+        // Badges en tablas - FONDO OSCURO = TEXTO BLANCO
         .badge.bg-secondary {
-          background: $brand-primary !important;
+          background: $brand-secondary !important;
+          color: #FFFFFF !important;
         }
         
         .badge.bg-light {
-          background: rgba($brand-primary, 0.08) !important;
+          background: #FFFFFF !important;
           color: $brand-primary !important;
-          border: 1px solid rgba($brand-primary, 0.2);
+          border: 1px solid $brand-primary;
         }
       }
     }
@@ -198,15 +208,25 @@ $brand-secondary: #017E84;
   .row.g-3.text-center {
     .col-md-2 {
       > div {
-        background: linear-gradient(135deg, rgba($brand-primary, 0.06) 0%, rgba($brand-secondary, 0.04) 100%) !important;
-        border: 2px solid rgba($brand-primary, 0.12) !important;
+        background: #FFFFFF !important;
+        border: 2px solid $brand-primary !important;
         border-radius: 10px;
         transition: all 0.2s ease;
         
+        // HOVER - FONDO OSCURO = TEXTO BLANCO
         &:hover {
+          background: $brand-primary !important;
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba($brand-primary, 0.15);
-          border-color: $brand-primary !important;
+          box-shadow: 0 4px 12px rgba($brand-primary, 0.25);
+          
+          h3 {
+            color: #FFFFFF !important;
+          }
+          
+          small {
+            color: #FFFFFF !important;
+            opacity: 0.9;
+          }
         }
         
         h3 {
@@ -225,17 +245,19 @@ $brand-secondary: #017E84;
   // === TABLAS (Movimientos, Entregas) ===
   .table-responsive {
     .table {
-      border: 2px solid rgba($brand-primary, 0.12);
+      background: #FFFFFF;
+      border: 1px solid rgba($brand-gray, 0.2);
       border-radius: 8px;
       overflow: hidden;
       
+      // THEAD - FONDO OSCURO = TEXTO BLANCO
       thead {
-        background: linear-gradient(135deg, rgba($brand-primary, 0.12) 0%, rgba($brand-secondary, 0.08) 100%) !important;
+        background: $brand-secondary !important;
         
         th {
-          color: $brand-primary !important;
+          color: #FFFFFF !important;
           font-weight: 700;
-          border-bottom: 2px solid rgba($brand-primary, 0.2);
+          border-bottom: none;
           padding: 12px 10px;
         }
       }
@@ -243,13 +265,14 @@ $brand-secondary: #017E84;
       tbody {
         tr {
           transition: all 0.15s ease;
+          background: #FFFFFF;
           
           &:nth-child(odd) {
-            background: rgba($brand-primary, 0.02);
+            background: #FAFAFA;
           }
           
           &:hover {
-            background: linear-gradient(90deg, rgba($brand-primary, 0.08) 0%, rgba($brand-secondary, 0.06) 100%);
+            background: rgba($brand-primary, 0.05);
           }
           
           td {
@@ -257,13 +280,15 @@ $brand-secondary: #017E84;
             vertical-align: middle;
             border-bottom: 1px solid rgba($brand-gray, 0.1);
             
-            // Badges de tipo
+            // Badges de tipo - FONDO OSCURO = TEXTO BLANCO
             .badge.bg-secondary {
-              background: linear-gradient(135deg, $brand-primary 0%, $brand-secondary 100%) !important;
+              background: $brand-primary !important;
+              color: #FFFFFF !important;
               padding: 4px 8px;
               
               i {
                 margin-right: 4px;
+                color: #FFFFFF;
               }
             }
             
@@ -283,12 +308,13 @@ $brand-secondary: #017E84;
   // === ESTADOS VACÍOS ===
   .text-center.py-5 {
     padding: 48px 24px !important;
-    background: linear-gradient(180deg, rgba($brand-primary, 0.03) 0%, #FFFFFF 100%);
+    background: #FFFFFF;
     border-radius: 12px;
-    border: 2px dashed rgba($brand-primary, 0.15);
+    border: 2px dashed rgba($brand-gray, 0.3);
     
     i {
-      color: rgba($brand-primary, 0.25) !important;
+      color: $brand-gray !important;
+      opacity: 0.5;
     }
     
     p {
@@ -300,6 +326,8 @@ $brand-secondary: #017E84;
   // === CARDS DE COMPRAS/VENTAS/RESERVAS ===
   .card.mb-3 {
     .card-body {
+      background: #FFFFFF;
+      
       .row {
         .col-md-6 {
           p {
@@ -314,17 +342,22 @@ $brand-secondary: #017E84;
                 color: $brand-primary;
               }
               
-              // Total destacado
+              // Total destacado - FONDO OSCURO = TEXTO BLANCO
               .fs-5.fw-bold {
-                color: $brand-primary !important;
-                background: linear-gradient(135deg, rgba($brand-primary, 0.1) 0%, rgba($brand-secondary, 0.08) 100%);
-                padding: 4px 12px;
+                background: $brand-primary !important;
+                color: #FFFFFF !important;
+                padding: 6px 14px;
                 border-radius: 6px;
                 display: inline-block;
               }
             }
           }
         }
+      }
+      
+      // Notas con separador
+      hr {
+        border-color: rgba($brand-gray, 0.2);
       }
     }
   }
@@ -333,22 +366,23 @@ $brand-secondary: #017E84;
 // === FOOTER DEL DIÁLOGO ===
 .o_history_dialog + .modal-footer,
 .modal-content:has(.o_history_dialog) .modal-footer {
-  background: linear-gradient(180deg, #FFFFFF 0%, rgba($brand-primary, 0.04) 100%);
-  border-top: 2px solid rgba($brand-primary, 0.1);
+  background: #FFFFFF;
+  border-top: 1px solid rgba($brand-gray, 0.2);
   padding: 16px 24px;
   
+  // BOTÓN - FONDO OSCURO = TEXTO BLANCO
   .btn-secondary {
-    background: linear-gradient(135deg, $brand-primary 0%, darken($brand-primary, 10%) 100%) !important;
+    background: $brand-primary !important;
     border: none !important;
     color: #FFFFFF !important;
     font-weight: 600;
     padding: 10px 24px;
-    box-shadow: 0 4px 12px rgba($brand-primary, 0.3);
+    box-shadow: 0 2px 8px rgba($brand-primary, 0.3);
     transition: all 0.2s ease;
     
     &:hover {
-      background: linear-gradient(135deg, $brand-secondary 0%, darken($brand-secondary, 10%) 100%) !important;
-      box-shadow: 0 6px 16px rgba($brand-secondary, 0.4);
+      background: $brand-secondary !important;
+      box-shadow: 0 4px 12px rgba($brand-secondary, 0.4);
       transform: translateY(-1px);
     }
     
@@ -365,6 +399,7 @@ $brand-secondary: #017E84;
       flex-wrap: nowrap;
       overflow-x: auto;
       padding-bottom: 8px;
+      background: #FFFFFF;
       
       .nav-link {
         padding: 8px 12px;
@@ -376,7 +411,7 @@ $brand-secondary: #017E84;
         }
         
         .badge {
-          display: none; // Ocultar badges en móvil
+          display: none;
         }
       }
     }
@@ -385,6 +420,17 @@ $brand-secondary: #017E84;
       .col-md-2 {
         flex: 0 0 50%;
         max-width: 50%;
+      }
+    }
+    
+    // Cards en móvil
+    .card {
+      .card-header {
+        padding: 10px 12px;
+        
+        h6 {
+          font-size: 14px;
+        }
       }
     }
   }
