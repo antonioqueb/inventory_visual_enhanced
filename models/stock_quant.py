@@ -75,23 +75,17 @@ class StockQuant(models.Model):
 
         # Filtro por grupo
         if filters.get('grupo'):
-            grupo_search = filters['grupo'].lower()
-            # Obtener opciones del campo selection
+            grupo_search = filters['grupo']
+            # Obtener el modelo relacionado del Many2many
             field = self._fields.get('x_grupo')
-            if field and field.selection:
-                selection = field.selection
-                if callable(selection):
-                    selection = selection(self)
-                # Buscar valores técnicos cuyas etiquetas coincidan parcialmente
-                matching_values = [
-                    val[0] for val in selection 
-                    if grupo_search in val[1].lower()
-                ]
-                if matching_values:
-                    domain.append(('x_grupo', 'in', matching_values))
+            if field and hasattr(field, 'comodel_name'):
+                # Buscar registros en el modelo relacionado que coincidan
+                related_model = self.env[field.comodel_name]
+                matching_records = related_model.search([('name', 'ilike', grupo_search)])
+                if matching_records:
+                    domain.append(('x_grupo', 'in', matching_records.ids))
                 else:
-                    # Si no hay coincidencia, forzar resultado vacío
-                    domain.append(('x_grupo', '=', '__no_match__'))
+                    domain.append(('id', '=', 0))  # Forzar resultado vacío
         
         # Filtro por acabado
         if filters.get('acabado'):
