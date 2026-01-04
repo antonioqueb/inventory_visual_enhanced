@@ -49,6 +49,7 @@
             'inventory_visual_enhanced/static/src/scss/components/_badges.scss',
             'inventory_visual_enhanced/static/src/scss/components/_notes-dialog.scss',
             'inventory_visual_enhanced/static/src/scss/components/_history-dialog.scss',
+            'inventory_visual_enhanced/static/src/scss/components/_hold-info-dialog.scss',
             
             # JS
             'inventory_visual_enhanced/static/src/components/search_bar/search_bar.js', # <--- NUEVO

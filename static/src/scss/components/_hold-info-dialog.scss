@@ -1,0 +1,297 @@
+// ==========================================
+// HOLD INFO DIALOG - Estilos Limpios
+// ==========================================
+
+$brand-primary: #714B67;
+$brand-gray: #8F8F8F;
+$brand-secondary: #017E84;
+
+.o_hold_info_dialog {
+  background: #FFFFFF;
+  padding: 8px;
+
+  // === HEADER DEL PRODUCTO ===
+  .alert-light {
+    background: #FFFFFF !important;
+    border: none !important;
+    border-left: 4px solid $brand-secondary !important;
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+    .fa-hand-paper-o {
+      color: $brand-secondary !important;
+      opacity: 0.9;
+    }
+
+    h5 {
+      color: $brand-primary;
+      font-weight: 700;
+      font-size: 16px;
+      margin: 0;
+    }
+
+    small.text-muted {
+      color: $brand-gray !important;
+      font-size: 13px;
+
+      strong {
+        color: $brand-primary;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // === CARDS GENERALES ===
+  .card {
+    background: #FFFFFF;
+    border: 1px solid rgba($brand-gray, 0.2) !important;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+    margin-bottom: 16px;
+
+    // Card de estado (warning)
+    &.border-warning {
+      border: 1px solid rgba($brand-secondary, 0.3) !important;
+
+      .card-header {
+        background: rgba($brand-secondary, 0.06) !important;
+        border-bottom: 1px solid rgba($brand-secondary, 0.15) !important;
+        padding: 14px 18px;
+
+        h5 {
+          color: $brand-primary;
+          font-weight: 700;
+          font-size: 14px;
+          margin: 0;
+
+          .fa-info-circle {
+            color: $brand-secondary;
+            margin-right: 8px;
+          }
+        }
+      }
+    }
+
+    // Card normal
+    .card-header {
+      background: #FAFAFA !important;
+      border-bottom: 1px solid rgba($brand-gray, 0.15) !important;
+      padding: 12px 18px;
+
+      h6 {
+        color: $brand-primary;
+        font-weight: 700;
+        font-size: 13px;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        i {
+          color: $brand-secondary;
+          font-size: 14px;
+        }
+      }
+    }
+
+    .card-body {
+      padding: 16px 18px;
+      background: #FFFFFF;
+    }
+  }
+
+  // === ALERTA DE ESTADO ===
+  .alert-warning {
+    background: rgba($brand-secondary, 0.04) !important;
+    border: 1px solid rgba($brand-secondary, 0.15) !important;
+    border-radius: 8px;
+    padding: 14px 16px;
+
+    .fa-exclamation-triangle {
+      color: $brand-secondary !important;
+      font-size: 20px !important;
+    }
+
+    strong {
+      color: $brand-primary;
+      font-size: 14px;
+    }
+
+    p {
+      color: $brand-gray;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+  }
+
+  // === TABLA DE DETALLES ===
+  .table-borderless {
+    margin: 0;
+
+    tbody tr {
+      border-bottom: 1px solid rgba($brand-gray, 0.08);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      td {
+        padding: 10px 4px;
+        vertical-align: middle;
+        font-size: 13px;
+
+        &.fw-bold {
+          color: $brand-gray;
+          font-weight: 600;
+          width: 35%;
+        }
+
+        // Badge de cliente
+        .badge {
+          background: #FFFFFF !important;
+          color: $brand-primary !important;
+          border: 1px solid rgba($brand-primary, 0.2) !important;
+          font-weight: 600;
+          font-size: 13px;
+          padding: 8px 14px;
+          border-radius: 6px;
+
+          .fa-user-circle {
+            color: $brand-secondary;
+            margin-right: 6px;
+          }
+        }
+
+        // Iconos en la tabla
+        i.fa {
+          width: 18px;
+          text-align: center;
+          font-size: 13px;
+
+          &.fa-folder { color: $brand-gray; }
+          &.fa-user-circle-o { color: $brand-gray; }
+          &.fa-user { color: $brand-secondary; }
+          &.fa-calendar-check-o { color: $brand-secondary; }
+          &.fa-calendar-times-o { color: $brand-primary; }
+        }
+
+        strong {
+          color: $brand-primary;
+        }
+      }
+    }
+  }
+
+  // === INFORMACIÓN DEL LOTE ===
+  .row.g-3 {
+    .col-md-6 {
+      small.text-muted {
+        color: $brand-gray !important;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      strong {
+        color: $brand-primary;
+        font-size: 14px;
+        display: block;
+        margin-top: 2px;
+
+        &.text-secondary {
+          color: $brand-secondary !important;
+          font-size: 18px;
+          font-weight: 700;
+        }
+
+        i.fa-map-marker {
+          color: $brand-secondary;
+          margin-right: 6px;
+        }
+      }
+    }
+  }
+}
+
+// === FOOTER DEL DIÁLOGO ===
+.modal-content:has(.o_hold_info_dialog) .modal-footer,
+.o_hold_info_dialog + .modal-footer {
+  background: #FAFAFA;
+  border-top: 1px solid rgba($brand-gray, 0.15);
+  padding: 14px 20px;
+
+  .btn-light {
+    background: #FFFFFF !important;
+    color: $brand-gray !important;
+    border: 1px solid rgba($brand-gray, 0.3) !important;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px 24px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $brand-primary !important;
+      color: #FFFFFF !important;
+      border-color: $brand-primary !important;
+    }
+
+    i {
+      margin-right: 6px;
+    }
+  }
+}
+
+// === RESPONSIVE ===
+@media (max-width: 768px) {
+  .o_hold_info_dialog {
+    padding: 4px;
+
+    .alert-light {
+      padding: 12px 14px;
+      
+      h5 {
+        font-size: 14px;
+      }
+    }
+
+    .card {
+      margin-bottom: 12px;
+
+      .card-header {
+        padding: 10px 14px;
+      }
+
+      .card-body {
+        padding: 12px 14px;
+      }
+    }
+
+    .table-borderless tbody tr td {
+      font-size: 12px;
+      padding: 8px 2px;
+
+      &.fw-bold {
+        width: 40%;
+      }
+
+      .badge {
+        font-size: 12px;
+        padding: 6px 10px;
+      }
+    }
+
+    .row.g-3 .col-md-6 {
+      margin-bottom: 12px;
+
+      strong.text-secondary {
+        font-size: 16px !important;
+      }
+    }
+  }
+}
