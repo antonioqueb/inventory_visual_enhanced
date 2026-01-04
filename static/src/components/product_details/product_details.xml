@@ -168,12 +168,14 @@
                                     <span t-else="" class="icon-btn no-content"><i class="fa fa-history"></i></span>
                                 </td>
                                 
+                                <!-- ESTADO: Solo informativo, no permite crear apartados -->
                                 <td class="col-icon action-btn-cell">
                                     <button 
                                         t-if="detail.tiene_hold and props.hasSalesPermissions"
                                         type="button"
                                         class="status-badge-btn status-hold-active"
                                         t-on-click="() => props.onHoldClick(detail.id, detail.hold_info)"
+                                        title="Ver información del apartado"
                                     >
                                         <i class="fa fa-hand-paper-o"></i>
                                     </button>
@@ -182,18 +184,11 @@
                                         type="button"
                                         class="status-badge-btn status-sale-order"
                                         t-on-click="() => props.onSaleOrderClick(detail.id, detail.sale_order_ids)"
+                                        title="Ver orden de venta"
                                     >
                                         <i class="fa fa-usd"></i>
                                     </button>
-                                    <button 
-                                        t-elif="props.hasSalesPermissions"
-                                        type="button"
-                                        class="status-badge-btn status-no-state"
-                                        t-on-click="() => props.onHoldClick(detail.id, null)"
-                                    >
-                                        <i class="fa fa-hand-paper-o"></i>
-                                    </button>
-                                    <span t-else="" class="status-badge-btn status-available-no-perms"><i class="fa fa-check-circle"></i></span>
+                                    <span t-else="" class="status-badge-btn status-available-no-perms" title="Disponible"><i class="fa fa-check-circle"></i></span>
                                 </td>
                             </tr>
                         </t>

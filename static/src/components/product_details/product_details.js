@@ -64,12 +64,10 @@ ProductDetails.props = {
     onPhotoClick: { type: Function, optional: true },
     onNotesClick: { type: Function, optional: true },
     onDetailsClick: { type: Function, optional: true },
-    onHoldClick: { type: Function, optional: true },
+    onHoldClick: { type: Function, optional: true },  // Solo para ver info de holds existentes
     onSaleOrderClick: { type: Function, optional: true },
     formatNumber: { type: Function, optional: true },
     hasSalesPermissions: { type: Boolean, optional: true },
-    
-    // === AGREGADOS PARA CORREGIR EL ERROR ===
     onSalesPersonClick: { type: Function, optional: true },
     selectAllCurrentProduct: { type: Function, optional: true },
     deselectAllCurrentProduct: { type: Function, optional: true },

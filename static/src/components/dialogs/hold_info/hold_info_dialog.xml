@@ -160,12 +160,7 @@
                     <i class="fa fa-times me-2"></i>
                     Cerrar
                 </button>
-                <!-- 
-                <button class="btn btn-warning btn-lg" t-on-click="releaseHold">
-                    <i class="fa fa-unlock me-2"></i>
-                    Liberar Apartado
-                </button>
-                -->
+              
             </t>
         </Dialog>
     </t>

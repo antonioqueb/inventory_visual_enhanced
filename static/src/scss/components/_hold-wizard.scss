@@ -1,6 +1,43 @@
+// ==========================================
+// HOLD WIZARD DIALOG - Paleta Odoo Brand (Fondo Blanco)
+// ==========================================
+
+$brand-primary: #714B67;
+$brand-gray: #8F8F8F;
+$brand-secondary: #017E84;
+$brand-success: #21B799;
+$brand-warning: #E4A900;
+
 .o_create_hold_dialog {
+  background: #FFFFFF;
+
+  // === HEADER DEL PRODUCTO ===
+  .alert-light {
+    background: #FFFFFF !important;
+    border-color: $brand-primary !important;
+    border-left-width: 5px !important;
+    
+    .fa-cube {
+      color: $brand-secondary !important;
+    }
+    
+    h5 {
+      color: $brand-primary !important;
+    }
+    
+    .text-muted {
+      color: $brand-gray !important;
+      
+      strong {
+        color: $brand-primary;
+      }
+    }
+  }
+
+  // === INDICADOR DE PASOS ===
   .steps-indicator {
-    padding: 16px 0;
+    padding: 20px 0;
+    background: #FFFFFF;
     
     .step-item {
       display: flex;
@@ -10,11 +47,12 @@
       flex: 1;
       
       .step-number {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
-        background: #E0E0E0;
-        color: #808080;
+        background: #FFFFFF;
+        color: $brand-gray;
+        border: 2px solid $brand-gray;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -24,58 +62,348 @@
       }
       
       .step-label {
-        font-size: 12px;
-        color: #808080;
+        font-size: 11px;
+        color: $brand-gray;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         transition: all 0.3s ease;
       }
       
+      // PASO ACTIVO - FONDO OSCURO = TEXTO BLANCO
       &.active {
         .step-number {
-          background: #714B67;
-          color: white;
+          background: $brand-primary;
+          color: #FFFFFF;
+          border-color: $brand-primary;
+          box-shadow: 0 4px 12px rgba($brand-primary, 0.3);
         }
         
         .step-label {
-          color: #714B67;
+          color: $brand-primary;
+          font-weight: 700;
         }
       }
       
+      // PASO COMPLETADO
       &.completed {
         .step-number {
-          background: #21B799;
-          color: white;
+          background: $brand-success;
+          color: #FFFFFF;
+          border-color: $brand-success;
         }
         
         .step-label {
-          color: #21B799;
+          color: $brand-success;
         }
       }
     }
     
     .step-line {
       flex: 1;
-      height: 2px;
-      background: #E0E0E0;
+      height: 3px;
+      background: rgba($brand-gray, 0.3);
       margin: 0 8px;
       align-self: center;
       transition: all 0.3s ease;
       margin-top: -24px;
+      border-radius: 2px;
       
       &.active {
-        background: #714B67;
+        background: linear-gradient(90deg, $brand-primary 0%, $brand-secondary 100%);
       }
     }
   }
-  
+
+  // === CONTENIDO DE PASOS ===
   .step-content {
     min-height: 400px;
     animation: fadeIn 0.3s ease-in;
+    background: #FFFFFF;
+    
+    // Títulos de sección
+    h5 {
+      color: $brand-primary;
+      font-weight: 700;
+      
+      i {
+        color: $brand-secondary;
+      }
+    }
+  }
+
+  // === BOTONES DE TOGGLE (Buscar/Crear) ===
+  .btn-group {
+    .btn {
+      transition: all 0.2s ease;
+      font-weight: 600;
+      
+      &.btn-secondary {
+        background: $brand-primary !important;
+        border-color: $brand-primary !important;
+        color: #FFFFFF !important;
+      }
+      
+      &.btn-outline-secondary {
+        background: #FFFFFF !important;
+        border-color: $brand-gray !important;
+        color: $brand-gray !important;
+        
+        &:hover {
+          background: rgba($brand-primary, 0.05) !important;
+          border-color: $brand-primary !important;
+          color: $brand-primary !important;
+        }
+      }
+    }
+  }
+
+  // === CAMPOS DE BÚSQUEDA ===
+  .input-group {
+    .input-group-text {
+      background: $brand-primary;
+      border-color: $brand-primary;
+      color: #FFFFFF;
+      
+      i {
+        color: #FFFFFF;
+      }
+    }
+    
+    .form-control {
+      border-color: rgba($brand-gray, 0.3);
+      
+      &:focus {
+        border-color: $brand-primary;
+        box-shadow: 0 0 0 3px rgba($brand-primary, 0.1);
+      }
+    }
+  }
+
+  // === ALERTAS DE SELECCIÓN ===
+  .alert {
+    &.alert-light {
+      background: #FFFFFF !important;
+      border: 2px solid $brand-success !important;
+      
+      .fa-check-circle {
+        color: $brand-success !important;
+      }
+      
+      strong {
+        color: $brand-primary;
+      }
+    }
+  }
+
+  // === LISTA DE RESULTADOS ===
+  .list-group {
+    border: 1px solid rgba($brand-gray, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+    
+    .list-group-item {
+      background: #FFFFFF;
+      border: none;
+      border-bottom: 1px solid rgba($brand-gray, 0.1);
+      transition: all 0.15s ease;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      &:hover {
+        background: rgba($brand-primary, 0.05);
+        
+        strong {
+          color: $brand-primary;
+        }
+        
+        .fa-chevron-right {
+          color: $brand-primary;
+        }
+      }
+      
+      strong {
+        color: $brand-secondary;
+      }
+      
+      .text-muted {
+        color: $brand-gray !important;
+        font-size: 12px;
+      }
+      
+      .fa-chevron-right {
+        color: $brand-gray;
+        transition: all 0.15s ease;
+      }
+    }
+  }
+
+  // === CARDS DE FORMULARIO ===
+  .card {
+    background: #FFFFFF;
+    border: 1px solid rgba($brand-gray, 0.25) !important;
+    border-radius: 10px;
+    overflow: hidden;
+    
+    &.bg-light {
+      background: #FAFAFA !important;
+    }
+    
+    &.border-secondary {
+      border-color: $brand-primary !important;
+      
+      .card-header {
+        background: $brand-primary !important;
+        border-bottom: none !important;
+        
+        h6 {
+          color: #FFFFFF !important;
+          
+          i {
+            color: #FFFFFF !important;
+          }
+        }
+      }
+    }
+    
+    .card-body {
+      background: #FFFFFF;
+      
+      .form-label {
+        color: $brand-primary;
+        font-weight: 600;
+        
+        .text-danger {
+          color: #E46E78 !important;
+        }
+      }
+      
+      .form-control,
+      .form-select {
+        border-color: rgba($brand-gray, 0.3);
+        
+        &:focus {
+          border-color: $brand-primary;
+          box-shadow: 0 0 0 3px rgba($brand-primary, 0.1);
+        }
+      }
+    }
+  }
+
+  // === RESUMEN FINAL ===
+  .card-title {
+    color: $brand-primary !important;
+    font-weight: 700;
+  }
+
+  // === BADGES ===
+  .badge {
+    &.bg-info {
+      background: $brand-secondary !important;
+      color: #FFFFFF !important;
+    }
+    
+    &.bg-light {
+      background: #FFFFFF !important;
+      color: $brand-primary !important;
+      border: 1px solid $brand-primary;
+    }
+  }
+
+  // === PRECIOS Y TOTALES ===
+  .text-secondary {
+    color: $brand-primary !important;
+  }
+
+  .h4, .h5 {
+    &.text-secondary {
+      color: $brand-primary !important;
+      font-weight: 700;
+    }
+  }
+
+  // === ALERTA DE INFORMACIÓN ===
+  .alert-light.border {
+    background: #FFFFFF !important;
+    border-color: rgba($brand-secondary, 0.3) !important;
+    
+    .fa-clock-o,
+    .fa-info-circle {
+      color: $brand-secondary !important;
+    }
+    
+    strong {
+      color: $brand-primary;
+    }
+  }
+
+  // === TEXTAREA DE NOTAS ===
+  textarea.form-control {
+    border: 2px solid rgba($brand-gray, 0.3);
+    
+    &:focus {
+      border-color: $brand-primary;
+      box-shadow: 0 0 0 3px rgba($brand-primary, 0.1);
+    }
   }
 }
 
+// === FOOTER DEL DIÁLOGO ===
+.o_create_hold_dialog + .modal-footer,
+.modal-content:has(.o_create_hold_dialog) .modal-footer {
+  background: #FFFFFF;
+  border-top: 1px solid rgba($brand-gray, 0.2);
+  padding: 16px 24px;
+  
+  // Botón Cancelar/Anterior
+  .btn-light {
+    background: #FFFFFF !important;
+    color: $brand-gray !important;
+    border: 2px solid $brand-gray !important;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: $brand-gray !important;
+      color: #FFFFFF !important;
+    }
+    
+    i {
+      color: inherit;
+    }
+  }
+  
+  // Botón Principal (Siguiente/Crear) - FONDO OSCURO = TEXTO BLANCO
+  .btn-secondary {
+    background: $brand-primary !important;
+    border: none !important;
+    color: #FFFFFF !important;
+    font-weight: 600;
+    padding: 10px 24px;
+    box-shadow: 0 2px 8px rgba($brand-primary, 0.3);
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: $brand-secondary !important;
+      box-shadow: 0 4px 12px rgba($brand-secondary, 0.4);
+      transform: translateY(-1px);
+    }
+    
+    &:disabled {
+      background: $brand-gray !important;
+      box-shadow: none;
+      opacity: 0.6;
+    }
+    
+    i {
+      color: #FFFFFF;
+    }
+  }
+}
+
+// === ANIMACIÓN ===
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -84,5 +412,52 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+// === RESPONSIVE ===
+@media (max-width: 768px) {
+  .o_create_hold_dialog {
+    .steps-indicator {
+      padding: 12px 0;
+      
+      .step-item {
+        .step-number {
+          width: 32px;
+          height: 32px;
+          font-size: 12px;
+        }
+        
+        .step-label {
+          font-size: 9px;
+          display: none; // Ocultar labels en móvil muy pequeño
+        }
+      }
+      
+      .step-line {
+        margin-top: -16px;
+      }
+    }
+    
+    .step-content {
+      min-height: 300px;
+    }
+    
+    .list-group {
+      max-height: 200px !important;
+    }
+  }
+}
+
+@media (min-width: 576px) and (max-width: 768px) {
+  .o_create_hold_dialog {
+    .steps-indicator {
+      .step-item {
+        .step-label {
+          display: block;
+          font-size: 10px;
+        }
+      }
+    }
   }
 }
