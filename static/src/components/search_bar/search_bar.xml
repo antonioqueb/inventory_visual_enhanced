@@ -143,32 +143,23 @@
                     <!-- Grupo -->
                     <div class="filter-group">
                         <label class="filter-label d-none d-md-block">Grupo</label>
-                        <select 
-                            class="form-select filter-select" 
+                        <input 
+                            type="text" 
+                            class="form-control filter-input" 
+                            placeholder="Escribe o selecciona grupo..." 
                             t-model="state.filters.grupo" 
-                            t-on-change="(ev) => this.onFilterChange('grupo', ev)"
-                        >
-                            <option value="">Grupo...</option>
+                            t-on-input="(ev) => this.onTextFilterChange('grupo', ev)"
+                            list="grupos-datalist"
+                            autocomplete="off"
+                        />
+                        <datalist id="grupos-datalist">
                             <t t-foreach="state.grupos" t-as="grupo" t-key="grupo_index">
-                                <option t-att-value="grupo[0]" t-esc="grupo[1]"></option>
+                                <option t-att-value="grupo[1]"/>
                             </t>
-                        </select>
+                        </datalist>
                     </div>
                     
-                    <!-- Acabado -->
-                    <div class="filter-group">
-                        <label class="filter-label d-none d-md-block">Acabado</label>
-                        <select 
-                            class="form-select filter-select" 
-                            t-model="state.filters.acabado" 
-                            t-on-change="(ev) => this.onFilterChange('acabado', ev)"
-                        >
-                            <option value="">Acabado...</option>
-                            <t t-foreach="state.acabados" t-as="acabado" t-key="acabado_index">
-                                <option t-att-value="acabado[0]" t-esc="acabado[1]"></option>
-                            </t>
-                        </select>
-                    </div>
+                    
                     
                     <!-- Grosor -->
                     <div class="filter-group">

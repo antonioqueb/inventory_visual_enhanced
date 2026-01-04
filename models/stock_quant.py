@@ -75,7 +75,23 @@ class StockQuant(models.Model):
 
         # Filtro por grupo
         if filters.get('grupo'):
-            domain.append(('x_grupo', '=', filters['grupo']))
+            grupo_search = filters['grupo'].lower()
+            # Obtener opciones del campo selection
+            field = self._fields.get('x_grupo')
+            if field and field.selection:
+                selection = field.selection
+                if callable(selection):
+                    selection = selection(self)
+                # Buscar valores técnicos cuyas etiquetas coincidan parcialmente
+                matching_values = [
+                    val[0] for val in selection 
+                    if grupo_search in val[1].lower()
+                ]
+                if matching_values:
+                    domain.append(('x_grupo', 'in', matching_values))
+                else:
+                    # Si no hay coincidencia, forzar resultado vacío
+                    domain.append(('x_grupo', '=', '__no_match__'))
         
         # Filtro por acabado
         if filters.get('acabado'):
