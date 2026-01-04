@@ -101,7 +101,7 @@
                         <input 
                             type="text" 
                             class="form-control filter-input" 
-                            placeholder="Escribe o selecciona categoría..." 
+                            placeholder="Escribe categoría..." 
                             t-model="state.filters.categoria_name" 
                             t-on-input="(ev) => this.onTextFilterChange('categoria_name', ev)"
                             list="categorias-datalist"
@@ -146,7 +146,7 @@
                         <input 
                             type="text" 
                             class="form-control filter-input" 
-                            placeholder="Escribe o selecciona grupo..." 
+                            placeholder="Escribe grupo..." 
                             t-model="state.filters.grupo" 
                             t-on-input="(ev) => this.onTextFilterChange('grupo', ev)"
                             list="grupos-datalist"
@@ -178,11 +178,11 @@
                     
                     <!-- N° Serie -->
                     <div class="filter-group">
-                        <label class="filter-label d-none d-md-block">N° Serie</label>
+                        <label class="filter-label d-none d-md-block">Lote</label>
                         <input 
                             type="text" 
                             class="form-control filter-input" 
-                            placeholder="N° Serie..." 
+                            placeholder="Lote..." 
                             t-model="state.filters.numero_serie" 
                             t-on-input="(ev) => this.onTextFilterChange('numero_serie', ev)"
                         />

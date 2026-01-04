@@ -114,7 +114,18 @@ class StockQuant(models.Model):
         
         # Filtro por pedimento
         if filters.get('pedimento'):
-            domain.append(('x_pedimento', 'ilike', filters['pedimento']))
+            pedimento_normalized = filters['pedimento'].replace(' ', '').replace('-', '')
+            # Buscar quants con pedimento no vacío
+            quants_con_pedimento = self.search([('x_pedimento', '!=', False), ('quantity', '>', 0)])
+            # Filtrar los que coincidan exactamente al normalizar (sin espacios ni guiones)
+            matching_quant_ids = [
+                q.id for q in quants_con_pedimento
+                if q.x_pedimento and q.x_pedimento.replace(' ', '').replace('-', '') == pedimento_normalized
+            ]
+            if matching_quant_ids:
+                domain.append(('id', 'in', matching_quant_ids))
+            else:
+                domain.append(('id', '=', 0))  # Forzar resultado vacío
         
         # Filtro por contenedor
         if filters.get('contenedor'):
