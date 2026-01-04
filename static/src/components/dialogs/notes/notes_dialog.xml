@@ -70,7 +70,7 @@
                         <textarea 
                             class="form-control form-control-lg border-2"
                             rows="12"
-                            placeholder="Ej: - Placa con barreno, grietas visibles en el borde derecho.&#10;- Color irregular, presenta manchas oscuras.&#10;- Requiere corte especial para evitar desperdicios..."
+                            placeholder="Ej: &#10;- Placa con barreno, grietas visibles en el borde derecho.&#10;- Color irregular, presenta manchas oscuras.&#10;- Requiere corte especial para evitar desperdicios.&#10;- Estado general: Bueno, sin daños significativos.&#10;- Observaciones: Cortar con cuidado para evitar más daños."
                             t-model="state.notes"
                             t-on-input="onNotesChange"
                             style="
