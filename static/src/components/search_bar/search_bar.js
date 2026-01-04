@@ -90,15 +90,22 @@ export class SearchBar extends Component {
             const allCategorias = await this.orm.searchRead(
                 "product.category",
                 [],
-                ["id", "name", "complete_name", "child_ids"],
+                ["id", "name", "complete_name", "parent_id"],
                 { order: "name" }
             );
 
-            // Filtrar solo categorías hoja (sin hijos) y agrupar por nombre corto
+            // Obtener IDs de categorías que son padres (tienen hijos)
+            const parentIds = new Set(
+                allCategorias
+                    .filter(cat => cat.parent_id)
+                    .map(cat => cat.parent_id[0])
+            );
+
+            // Filtrar solo categorías hoja (no son padres de nadie) y agrupar por nombre
             const categoriasMap = new Map();
             allCategorias.forEach(cat => {
-                // Solo categorías sin hijos (hojas)
-                if (!cat.child_ids || cat.child_ids.length === 0) {
+                // Es hoja si su ID NO está en la lista de padres
+                if (!parentIds.has(cat.id)) {
                     const shortName = cat.name;
                     if (!categoriasMap.has(shortName)) {
                         categoriasMap.set(shortName, {
