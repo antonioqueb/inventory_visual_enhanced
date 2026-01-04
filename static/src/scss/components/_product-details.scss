@@ -1,5 +1,5 @@
 // ==========================================
-// PRODUCT DETAILS - Paleta Odoo Brand
+// PRODUCT DETAILS - Paleta Odoo Brand (Colorido)
 // ==========================================
 
 $brand-primary: #714B67;
@@ -12,12 +12,13 @@ $brand-secondary: #017E84;
 
 .details-wrapper {
   padding: 16px;
-  background: #FFFFFF;
+  // Fondo con gradiente sutil
+  background: linear-gradient(180deg, rgba($brand-primary, 0.04) 0%, rgba($brand-secondary, 0.04) 100%);
   overflow-x: auto;
   
   // Scrollbar con gradiente de marca
   scrollbar-width: thin;
-  scrollbar-color: $brand-primary #F5F5F5;
+  scrollbar-color: $brand-primary rgba($brand-primary, 0.1);
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -25,7 +26,7 @@ $brand-secondary: #017E84;
   }
 
   &::-webkit-scrollbar-track {
-    background: #F5F5F5;
+    background: rgba($brand-primary, 0.08);
     border-radius: 4px;
   }
 
@@ -43,27 +44,30 @@ $brand-secondary: #017E84;
   width: 100%;
   border-collapse: collapse;
   background: #FFFFFF;
-  border: 1px solid rgba($brand-gray, 0.3);
+  border: 2px solid rgba($brand-primary, 0.15);
   border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba($brand-primary, 0.1);
   
   font-family: "Roboto", "Arial", sans-serif;
   font-size: 9px;
 
   thead {
-    background: linear-gradient(135deg, rgba($brand-primary, 0.05) 0%, rgba($brand-secondary, 0.05) 100%);
-    border-bottom: 2px solid rgba($brand-primary, 0.2);
+    // Header con gradiente de marca más visible
+    background: linear-gradient(135deg, rgba($brand-primary, 0.15) 0%, rgba($brand-secondary, 0.12) 100%);
+    border-bottom: 3px solid $brand-primary;
 
     th {
-      padding: 4px 6px;
+      padding: 6px 8px;
       text-align: left;
       font-weight: 700;
       color: $brand-primary;
       font-size: 9px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      border-right: 1px solid rgba($brand-gray, 0.2);
+      border-right: 1px solid rgba($brand-primary, 0.15);
       white-space: nowrap;
-      height: 24px;
+      height: 28px;
 
       &:last-child { border-right: none; }
       
@@ -78,22 +82,35 @@ $brand-secondary: #017E84;
   tbody {
     tr {
       border-bottom: 1px solid rgba($brand-gray, 0.15);
-      transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
       height: 22px;
       
-      &:hover { 
-        background: linear-gradient(90deg, rgba($brand-primary, 0.03) 0%, rgba($brand-secondary, 0.03) 100%);
+      // Zebra striping con colores de marca
+      &:nth-child(odd) {
+        background: rgba($brand-primary, 0.02);
       }
+      
+      &:nth-child(even) {
+        background: rgba($brand-secondary, 0.02);
+      }
+      
+      &:hover { 
+        background: linear-gradient(90deg, rgba($brand-primary, 0.08) 0%, rgba($brand-secondary, 0.08) 100%);
+        transform: scale(1.002);
+      }
+      
       &:last-child { border-bottom: none; }
 
-      // Fila de resumen de grupo
+      // Fila de resumen de grupo - MÁS COLORIDA
       &.group-summary-row {
-        background: linear-gradient(90deg, rgba($brand-primary, 0.08) 0%, rgba($brand-secondary, 0.05) 100%) !important;
-        border-top: 2px solid rgba($brand-primary, 0.2);
+        background: linear-gradient(90deg, rgba($brand-primary, 0.18) 0%, rgba($brand-secondary, 0.12) 100%) !important;
+        border-top: 3px solid $brand-primary;
+        border-bottom: 2px solid rgba($brand-secondary, 0.3);
         
         td {
           font-weight: 700;
           color: $brand-primary;
+          padding: 6px 8px !important;
         }
       }
     }
@@ -102,7 +119,7 @@ $brand-secondary: #017E84;
       padding: 2px 6px;
       vertical-align: middle;
       color: #2C2C2C;
-      border-right: 1px solid rgba($brand-gray, 0.15);
+      border-right: 1px solid rgba($brand-gray, 0.12);
       font-size: 9px;
       line-height: 1.2;
 
@@ -170,9 +187,11 @@ $brand-secondary: #017E84;
     }
     .dimensions-total-inline {
       font-weight: 700; 
-      color: $brand-primary;
-      font-family: inherit; 
-      font-size: 9px; 
+      color: #FFFFFF;
+      background: linear-gradient(135deg, $brand-primary 0%, $brand-secondary 100%);
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 8px; 
       margin-left: 2px;
     }
   }
@@ -180,6 +199,7 @@ $brand-secondary: #017E84;
   .col-tipo {
     font-weight: 600; 
     white-space: nowrap;
+    color: $brand-secondary;
     .text-muted { color: $brand-gray; }
   }
 }
@@ -187,19 +207,22 @@ $brand-secondary: #017E84;
 .table-loading {
   padding: 24px; 
   text-align: center;
+  background: linear-gradient(135deg, rgba($brand-primary, 0.05) 0%, rgba($brand-secondary, 0.05) 100%);
+  border-radius: 8px;
   
   .spinner {
     width: 24px; 
     height: 24px; 
-    border: 2px solid rgba($brand-primary, 0.2);
+    border: 3px solid rgba($brand-primary, 0.2);
     border-top-color: $brand-primary; 
     border-radius: 50%;
     animation: spin 1s linear infinite; 
     margin: 0 auto 8px;
   }
   .loading-text { 
-    color: $brand-gray; 
-    font-size: 10px; 
+    color: $brand-primary; 
+    font-size: 10px;
+    font-weight: 600;
   }
 }
 
@@ -216,17 +239,19 @@ $brand-secondary: #017E84;
   .mobile-select-bar {
     display: none;
     padding: 12px 16px;
-    background: #FFFFFF;
-    border: 2px solid rgba($brand-primary, 0.2);
+    // Gradiente de fondo más visible
+    background: linear-gradient(135deg, rgba($brand-primary, 0.1) 0%, rgba($brand-secondary, 0.08) 100%);
+    border: 2px solid $brand-primary;
     margin-bottom: 12px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba($brand-primary, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba($brand-primary, 0.2);
     cursor: pointer;
     transition: all 0.2s ease;
 
     &:hover {
-      border-color: $brand-primary;
-      box-shadow: 0 4px 12px rgba($brand-primary, 0.15);
+      background: linear-gradient(135deg, rgba($brand-primary, 0.15) 0%, rgba($brand-secondary, 0.12) 100%);
+      box-shadow: 0 6px 16px rgba($brand-primary, 0.25);
+      transform: translateY(-1px);
     }
 
     .mobile-select-content {
@@ -265,7 +290,7 @@ $brand-secondary: #017E84;
 @media (max-width: 992px) {
   .details-wrapper {
     padding: 8px;
-    background: transparent;
+    background: linear-gradient(180deg, rgba($brand-primary, 0.06) 0%, rgba($brand-secondary, 0.04) 100%);
 
     .mobile-select-bar {
       display: block;
@@ -299,23 +324,24 @@ $brand-secondary: #017E84;
           "act1   act2   act3   act4";
         
         background: #FFFFFF;
-        border: 1px solid rgba($brand-gray, 0.25);
-        border-radius: 12px;
+        border: 2px solid rgba($brand-primary, 0.2);
+        border-radius: 14px;
         padding: 0;
-        box-shadow: 0 4px 12px rgba($brand-primary, 0.08);
+        box-shadow: 0 6px 16px rgba($brand-primary, 0.12);
         overflow: hidden;
         height: auto;
         transition: all 0.2s ease;
 
         &:hover {
-          box-shadow: 0 6px 16px rgba($brand-primary, 0.12);
-          border-color: rgba($brand-primary, 0.3);
+          box-shadow: 0 8px 24px rgba($brand-primary, 0.18);
+          border-color: $brand-primary;
+          transform: translateY(-2px);
         }
 
-        // Fila de resumen en móvil
+        // Fila de resumen en móvil - MUY COLORIDA
         &.group-summary-row {
-          background: linear-gradient(135deg, rgba($brand-primary, 0.1) 0%, rgba($brand-secondary, 0.08) 100%) !important;
-          border: 2px solid rgba($brand-primary, 0.25);
+          background: linear-gradient(135deg, rgba($brand-primary, 0.2) 0%, rgba($brand-secondary, 0.15) 100%) !important;
+          border: 3px solid $brand-primary;
           
           td {
             background: transparent !important;
@@ -333,12 +359,12 @@ $brand-secondary: #017E84;
         font-size: 13px;
         line-height: 1.5;
         
-        // === ÁREA: CHECKBOX (Móvil) ===
+        // === ÁREA: CHECKBOX (Móvil) - CON COLOR ===
         &.col-checkbox {
           grid-area: check;
-          background: linear-gradient(135deg, rgba($brand-primary, 0.05) 0%, #FFFFFF 100%);
-          border-bottom: 1px solid rgba($brand-gray, 0.2) !important;
-          border-right: 1px solid rgba($brand-gray, 0.2) !important;
+          background: linear-gradient(180deg, rgba($brand-primary, 0.12) 0%, rgba($brand-primary, 0.06) 100%);
+          border-bottom: 2px solid rgba($brand-primary, 0.15) !important;
+          border-right: 2px solid rgba($brand-primary, 0.15) !important;
           justify-content: center;
           align-items: center;
           padding: 0 !important;
@@ -365,27 +391,31 @@ $brand-secondary: #017E84;
           }
         }
 
-        // === ÁREA: HEADER (LOTE) ===
+        // === ÁREA: HEADER (LOTE) - DESTACADO ===
         &.col-lot {
           grid-area: header;
           font-size: 15px;
           font-weight: 800;
-          color: $brand-primary; 
-          background: linear-gradient(90deg, rgba($brand-primary, 0.05) 0%, #FFFFFF 100%);
-          border-bottom: 1px solid rgba($brand-gray, 0.2) !important;
-          padding: 12px 16px !important;
+          color: #FFFFFF; 
+          // Header con gradiente fuerte
+          background: linear-gradient(135deg, $brand-primary 0%, darken($brand-primary, 8%) 100%);
+          border-bottom: none !important;
+          padding: 14px 16px !important;
           width: auto !important;
           max-width: none !important;
+          text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
 
-        // === ÁREA: UBICACIÓN ===
+        // === ÁREA: UBICACIÓN - CON ACENTO ===
         &.col-location {
           grid-area: loc;
           font-size: 14px;
-          background: #FFFFFF;
-          border-bottom: 1px dashed rgba($brand-gray, 0.3) !important; 
+          background: linear-gradient(90deg, rgba($brand-secondary, 0.08) 0%, #FFFFFF 100%);
+          border-bottom: 2px solid rgba($brand-secondary, 0.15) !important; 
+          border-left: 4px solid $brand-secondary !important;
           padding-top: 14px !important;
-          padding-bottom: 8px !important;
+          padding-bottom: 10px !important;
+          padding-left: 12px !important;
           
           i { 
             color: $brand-secondary; 
@@ -394,12 +424,12 @@ $brand-secondary: #017E84;
           }
         }
         
-        // === ÁREA: DIMENSIONES ===
+        // === ÁREA: DIMENSIONES - DESTACADA ===
         &.col-dimensions {
           grid-area: dims;
-          background: #FFFFFF;
-          border-bottom: 4px solid rgba($brand-primary, 0.05) !important;
-          padding-top: 8px !important;
+          background: linear-gradient(180deg, #FFFFFF 0%, rgba($brand-primary, 0.05) 100%);
+          border-bottom: 4px solid rgba($brand-primary, 0.1) !important;
+          padding-top: 10px !important;
           padding-bottom: 14px !important;
           
           .dimensions-inline {
@@ -412,16 +442,18 @@ $brand-secondary: #017E84;
           }
           
           .dimensions-total-inline {
-            background: linear-gradient(135deg, rgba($brand-primary, 0.1) 0%, rgba($brand-secondary, 0.1) 100%);
-            color: $brand-primary;
-            padding: 4px 10px;
+            // Badge con gradiente de marca
+            background: linear-gradient(135deg, $brand-primary 0%, $brand-secondary 100%);
+            color: #FFFFFF;
+            padding: 6px 14px;
             border-radius: 20px;
             font-size: 13px;
             font-weight: 700;
+            box-shadow: 0 2px 8px rgba($brand-primary, 0.3);
           }
         }
 
-        // === ÁREAS TÉCNICAS ===
+        // === ÁREAS TÉCNICAS - COLOREADAS ===
         &.col-color { grid-area: tech0; }
         &.col-tipo { grid-area: tech1; }
         &.col-bloque { grid-area: tech2; }
@@ -434,14 +466,14 @@ $brand-secondary: #017E84;
         &.col-tipo, &.col-bloque, &.col-atado, 
         &.col-pedimento, &.col-contenedor, &.col-ref-proveedor {
           font-size: 13px;
-          color: #4a4a4a;
+          color: #2C2C2C;
           flex-direction: column; 
           align-items: flex-start;
-          border-bottom: 1px solid rgba($brand-gray, 0.1) !important;
+          border-bottom: 1px solid rgba($brand-gray, 0.15) !important;
           min-height: 50px;
-          background: #FFFFFF;
           width: auto !important;
           min-width: 0 !important;
+          transition: all 0.2s ease;
           
           &:empty { display: none; }
 
@@ -449,18 +481,69 @@ $brand-secondary: #017E84;
             content: attr(class);
             font-size: 10px;
             text-transform: uppercase;
-            color: $brand-secondary;
             font-weight: 700;
             margin-bottom: 4px;
+            padding: 2px 6px;
+            border-radius: 3px;
           }
           
-          &.col-color:before { content: "Color"; }
-          &.col-tipo:before { content: "Tipo"; }
-          &.col-bloque:before { content: "Bloque"; }
-          &.col-atado:before { content: "Atado"; }
-          &.col-pedimento:before { content: "Pedimento"; }
-          &.col-contenedor:before { content: "Contenedor"; }
-          &.col-ref-proveedor:before { content: "Ref. Prov"; }
+          // Etiquetas con colores alternados
+          &.col-color {
+            background: rgba($brand-primary, 0.04);
+            &:before { 
+              content: "Color"; 
+              color: #FFFFFF;
+              background: $brand-primary;
+            }
+          }
+          &.col-tipo {
+            background: rgba($brand-secondary, 0.04);
+            &:before { 
+              content: "Tipo"; 
+              color: #FFFFFF;
+              background: $brand-secondary;
+            }
+          }
+          &.col-bloque {
+            background: rgba($brand-primary, 0.04);
+            &:before { 
+              content: "Bloque"; 
+              color: #FFFFFF;
+              background: $brand-primary;
+            }
+          }
+          &.col-atado {
+            background: rgba($brand-secondary, 0.04);
+            &:before { 
+              content: "Atado"; 
+              color: #FFFFFF;
+              background: $brand-secondary;
+            }
+          }
+          &.col-pedimento {
+            background: rgba($brand-primary, 0.04);
+            &:before { 
+              content: "Pedimento"; 
+              color: #FFFFFF;
+              background: $brand-primary;
+            }
+          }
+          &.col-contenedor {
+            background: rgba($brand-secondary, 0.04);
+            &:before { 
+              content: "Contenedor"; 
+              color: #FFFFFF;
+              background: $brand-secondary;
+            }
+          }
+          &.col-ref-proveedor {
+            background: rgba($brand-primary, 0.04);
+            &:before { 
+              content: "Ref. Prov"; 
+              color: #FFFFFF;
+              background: $brand-primary;
+            }
+          }
           
           span { 
             font-weight: 600; 
@@ -468,60 +551,69 @@ $brand-secondary: #017E84;
           }
         }
 
-        // === ÁREA: BOTONES DE ACCIÓN (Móvil) ===
+        // === ÁREA: BOTONES DE ACCIÓN (Móvil) - CON GRADIENTE ===
         &.action-btn-cell {
           justify-content: center;
           padding: 14px 0 !important;
-          background: linear-gradient(180deg, #FFFFFF 0%, rgba($brand-primary, 0.03) 100%);
-          border-top: 1px solid rgba($brand-gray, 0.2);
+          // Fondo con gradiente
+          background: linear-gradient(180deg, rgba($brand-primary, 0.06) 0%, rgba($brand-secondary, 0.04) 100%);
+          border-top: 2px solid rgba($brand-primary, 0.1);
           width: auto !important;
           
-          &:nth-of-type(12) { grid-area: act1; border-right: 1px solid rgba($brand-gray, 0.2); }
-          &:nth-of-type(13) { grid-area: act2; border-right: 1px solid rgba($brand-gray, 0.2); }
-          &:nth-of-type(14) { grid-area: act3; border-right: 1px solid rgba($brand-gray, 0.2); }
+          &:nth-of-type(12) { grid-area: act1; border-right: 1px solid rgba($brand-primary, 0.15); }
+          &:nth-of-type(13) { grid-area: act2; border-right: 1px solid rgba($brand-primary, 0.15); }
+          &:nth-of-type(14) { grid-area: act3; border-right: 1px solid rgba($brand-primary, 0.15); }
           &:nth-of-type(15) { grid-area: act4; }
 
           .icon-btn, .status-badge-btn {
-            width: 42px;
-            height: 42px;
+            width: 44px;
+            height: 44px;
             font-size: 18px;
-            min-width: 42px;
+            min-width: 44px;
             border-radius: 50%;
-            border: none;
-            background: transparent;
+            border: 2px solid transparent;
+            background: #FFFFFF;
             transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            
+            &:hover {
+              transform: scale(1.1);
+            }
             
             &.no-content {
               color: $brand-gray !important;
-              background-color: rgba($brand-gray, 0.1) !important;
-              border: 1px solid rgba($brand-gray, 0.2) !important;
-              opacity: 1 !important;
+              background: rgba($brand-gray, 0.1) !important;
+              border: 2px dashed rgba($brand-gray, 0.3) !important;
+              box-shadow: none;
             }
             
             &.has-details {
-              color: $brand-primary !important;
-              background-color: rgba($brand-primary, 0.1) !important;
+              color: #FFFFFF !important;
+              background: linear-gradient(135deg, $brand-primary 0%, darken($brand-primary, 10%) 100%) !important;
+              box-shadow: 0 3px 10px rgba($brand-primary, 0.3);
               
               &:hover {
-                background-color: rgba($brand-primary, 0.2) !important;
+                box-shadow: 0 5px 14px rgba($brand-primary, 0.4);
               }
             }
             
             &.has-photos { 
-              color: $brand-secondary !important; 
-              background-color: rgba($brand-secondary, 0.1) !important;
+              color: #FFFFFF !important; 
+              background: linear-gradient(135deg, $brand-secondary 0%, darken($brand-secondary, 10%) 100%) !important;
+              box-shadow: 0 3px 10px rgba($brand-secondary, 0.3);
               
               &:hover {
-                background-color: rgba($brand-secondary, 0.2) !important;
+                box-shadow: 0 5px 14px rgba($brand-secondary, 0.4);
               }
             }
             
             &.has-notes { 
-              color: $brand-primary !important; 
-              background-color: rgba($brand-primary, 0.1) !important;
+              color: #FFFFFF !important; 
+              background: linear-gradient(135deg, mix($brand-primary, $brand-secondary, 50%) 0%, $brand-primary 100%) !important;
+              box-shadow: 0 3px 10px rgba($brand-primary, 0.3);
               
               &:hover {
-                background-color: rgba($brand-primary, 0.2) !important;
+                box-shadow: 0 5px 14px rgba($brand-primary, 0.4);
               }
             }
             
@@ -530,25 +622,28 @@ $brand-secondary: #017E84;
             }
             
             &.status-hold-active { 
-              background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); 
-              color: #2C2C2C;
-              box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+              background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%) !important; 
+              color: #2C2C2C !important;
+              border: 2px solid #FFD700;
+              box-shadow: 0 3px 10px rgba(255, 215, 0, 0.4);
             }
             
             &.status-sale-order { 
-              background: linear-gradient(135deg, $brand-secondary 0%, darken($brand-secondary, 10%) 100%); 
-              color: #FFFFFF;
-              box-shadow: 0 2px 8px rgba($brand-secondary, 0.3);
+              background: linear-gradient(135deg, $brand-secondary 0%, darken($brand-secondary, 15%) 100%) !important; 
+              color: #FFFFFF !important;
+              border: 2px solid $brand-secondary;
+              box-shadow: 0 3px 10px rgba($brand-secondary, 0.4);
             }
             
             &.status-no-state {
-              color: $brand-gray;
-              background: rgba($brand-gray, 0.05);
-              border: 1px dashed rgba($brand-gray, 0.3) !important;
+              color: $brand-primary;
+              background: #FFFFFF;
+              border: 2px dashed rgba($brand-primary, 0.4) !important;
               
               &:hover {
+                border-style: solid !important;
                 border-color: $brand-primary !important;
-                color: $brand-primary;
+                background: rgba($brand-primary, 0.05);
               }
             }
           }
