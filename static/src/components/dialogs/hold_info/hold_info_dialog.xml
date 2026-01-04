@@ -102,14 +102,6 @@
                                         <t t-esc="holdInfo.fecha_expiracion"/>
                                     </td>
                                 </tr>
-                                <tr t-if="holdInfo.notas">
-                                    <td class="fw-bold align-top">Notas:</td>
-                                    <td>
-                                        <div class="p-3 bg-light rounded border">
-                                            <t t-esc="holdInfo.notas"/>
-                                        </div>
-                                    </td>
-                                </tr>
                             </tbody>
                         </table>
                     </div>
