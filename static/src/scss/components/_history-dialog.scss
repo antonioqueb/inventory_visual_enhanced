@@ -1,0 +1,391 @@
+// ==========================================
+// HISTORY DIALOG - Paleta Odoo Brand
+// ==========================================
+
+$brand-primary: #714B67;
+$brand-gray: #8F8F8F;
+$brand-secondary: #017E84;
+
+.o_history_dialog {
+  background: #FFFFFF;
+
+  // === HEADER PRINCIPAL ===
+  .alert-light {
+    background: linear-gradient(135deg, rgba($brand-primary, 0.08) 0%, rgba($brand-secondary, 0.05) 100%) !important;
+    border-color: $brand-primary !important;
+    border-left-width: 5px !important;
+    
+    h5 {
+      color: $brand-primary !important;
+      
+      .fa-cube {
+        color: $brand-secondary !important;
+      }
+    }
+    
+    .text-muted {
+      color: $brand-gray !important;
+      
+      strong {
+        color: $brand-primary;
+      }
+    }
+    
+    // Badge de días en inventario
+    .badge.bg-light {
+      background: #FFFFFF !important;
+      border: 2px solid rgba($brand-primary, 0.2) !important;
+      color: $brand-primary !important;
+      
+      .fa-calendar {
+        color: $brand-secondary;
+      }
+    }
+    
+    // Badge de estado
+    .badge.bg-secondary {
+      background: linear-gradient(135deg, $brand-primary 0%, darken($brand-primary, 10%) 100%) !important;
+      border: none;
+      box-shadow: 0 2px 6px rgba($brand-primary, 0.3);
+    }
+  }
+
+  // === NAVEGACIÓN POR PESTAÑAS ===
+  .nav-tabs {
+    border-bottom: 3px solid rgba($brand-primary, 0.15);
+    gap: 4px;
+    
+    .nav-item {
+      .nav-link {
+        color: $brand-gray;
+        border: none;
+        border-radius: 8px 8px 0 0;
+        padding: 10px 16px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        background: rgba($brand-gray, 0.05);
+        
+        i {
+          color: $brand-gray;
+        }
+        
+        .badge {
+          background: rgba($brand-gray, 0.2) !important;
+          color: $brand-gray !important;
+        }
+        
+        &:hover {
+          background: rgba($brand-primary, 0.08);
+          color: $brand-primary;
+          
+          i {
+            color: $brand-primary;
+          }
+        }
+        
+        &.active {
+          background: linear-gradient(180deg, rgba($brand-primary, 0.12) 0%, rgba($brand-primary, 0.05) 100%);
+          color: $brand-primary;
+          border-bottom: 3px solid $brand-primary;
+          margin-bottom: -3px;
+          
+          i {
+            color: $brand-secondary;
+          }
+          
+          .badge {
+            background: linear-gradient(135deg, $brand-primary 0%, $brand-secondary 100%) !important;
+            color: #FFFFFF !important;
+          }
+        }
+      }
+    }
+  }
+
+  // === CONTENIDO DE PESTAÑAS ===
+  .tab-content {
+    background: linear-gradient(180deg, rgba($brand-primary, 0.02) 0%, #FFFFFF 100%);
+    padding: 16px 0;
+    
+    // Scrollbar
+    scrollbar-width: thin;
+    scrollbar-color: $brand-primary rgba($brand-primary, 0.1);
+    
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: rgba($brand-primary, 0.05);
+      border-radius: 4px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, $brand-primary 0%, $brand-secondary 100%);
+      border-radius: 4px;
+    }
+  }
+
+  // === TARJETAS GENERALES ===
+  .card {
+    border: 2px solid rgba($brand-primary, 0.12) !important;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba($brand-primary, 0.08);
+    transition: all 0.2s ease;
+    
+    &:hover {
+      box-shadow: 0 6px 16px rgba($brand-primary, 0.12);
+      border-color: rgba($brand-primary, 0.2) !important;
+    }
+    
+    .card-header {
+      background: linear-gradient(135deg, rgba($brand-primary, 0.1) 0%, rgba($brand-secondary, 0.06) 100%) !important;
+      border-bottom: 2px solid rgba($brand-primary, 0.1) !important;
+      
+      h6 {
+        color: $brand-primary !important;
+        font-weight: 700;
+        
+        i {
+          color: $brand-secondary !important;
+        }
+      }
+      
+      .badge.bg-secondary {
+        background: linear-gradient(135deg, $brand-secondary 0%, darken($brand-secondary, 10%) 100%) !important;
+      }
+    }
+    
+    .card-body {
+      background: #FFFFFF;
+      
+      // Tablas dentro de cards
+      .table {
+        margin-bottom: 0;
+        
+        tr {
+          border-bottom: 1px solid rgba($brand-gray, 0.1);
+          
+          &:last-child {
+            border-bottom: none;
+          }
+          
+          td {
+            padding: 10px 8px;
+            
+            &.fw-bold {
+              color: $brand-primary;
+            }
+          }
+        }
+        
+        // Badges en tablas
+        .badge.bg-secondary {
+          background: $brand-primary !important;
+        }
+        
+        .badge.bg-light {
+          background: rgba($brand-primary, 0.08) !important;
+          color: $brand-primary !important;
+          border: 1px solid rgba($brand-primary, 0.2);
+        }
+      }
+    }
+  }
+
+  // === ESTADÍSTICAS (Cajas numéricas) ===
+  .row.g-3.text-center {
+    .col-md-2 {
+      > div {
+        background: linear-gradient(135deg, rgba($brand-primary, 0.06) 0%, rgba($brand-secondary, 0.04) 100%) !important;
+        border: 2px solid rgba($brand-primary, 0.12) !important;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba($brand-primary, 0.15);
+          border-color: $brand-primary !important;
+        }
+        
+        h3 {
+          color: $brand-primary !important;
+          font-weight: 800;
+        }
+        
+        small {
+          color: $brand-secondary !important;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
+  // === TABLAS (Movimientos, Entregas) ===
+  .table-responsive {
+    .table {
+      border: 2px solid rgba($brand-primary, 0.12);
+      border-radius: 8px;
+      overflow: hidden;
+      
+      thead {
+        background: linear-gradient(135deg, rgba($brand-primary, 0.12) 0%, rgba($brand-secondary, 0.08) 100%) !important;
+        
+        th {
+          color: $brand-primary !important;
+          font-weight: 700;
+          border-bottom: 2px solid rgba($brand-primary, 0.2);
+          padding: 12px 10px;
+        }
+      }
+      
+      tbody {
+        tr {
+          transition: all 0.15s ease;
+          
+          &:nth-child(odd) {
+            background: rgba($brand-primary, 0.02);
+          }
+          
+          &:hover {
+            background: linear-gradient(90deg, rgba($brand-primary, 0.08) 0%, rgba($brand-secondary, 0.06) 100%);
+          }
+          
+          td {
+            padding: 10px;
+            vertical-align: middle;
+            border-bottom: 1px solid rgba($brand-gray, 0.1);
+            
+            // Badges de tipo
+            .badge.bg-secondary {
+              background: linear-gradient(135deg, $brand-primary 0%, $brand-secondary 100%) !important;
+              padding: 4px 8px;
+              
+              i {
+                margin-right: 4px;
+              }
+            }
+            
+            strong {
+              color: $brand-primary;
+            }
+            
+            small {
+              color: $brand-gray;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // === ESTADOS VACÍOS ===
+  .text-center.py-5 {
+    padding: 48px 24px !important;
+    background: linear-gradient(180deg, rgba($brand-primary, 0.03) 0%, #FFFFFF 100%);
+    border-radius: 12px;
+    border: 2px dashed rgba($brand-primary, 0.15);
+    
+    i {
+      color: rgba($brand-primary, 0.25) !important;
+    }
+    
+    p {
+      color: $brand-gray !important;
+      font-weight: 500;
+    }
+  }
+
+  // === CARDS DE COMPRAS/VENTAS/RESERVAS ===
+  .card.mb-3 {
+    .card-body {
+      .row {
+        .col-md-6 {
+          p {
+            strong {
+              color: $brand-secondary;
+            }
+          }
+          
+          &.text-end {
+            p {
+              strong {
+                color: $brand-primary;
+              }
+              
+              // Total destacado
+              .fs-5.fw-bold {
+                color: $brand-primary !important;
+                background: linear-gradient(135deg, rgba($brand-primary, 0.1) 0%, rgba($brand-secondary, 0.08) 100%);
+                padding: 4px 12px;
+                border-radius: 6px;
+                display: inline-block;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// === FOOTER DEL DIÁLOGO ===
+.o_history_dialog + .modal-footer,
+.modal-content:has(.o_history_dialog) .modal-footer {
+  background: linear-gradient(180deg, #FFFFFF 0%, rgba($brand-primary, 0.04) 100%);
+  border-top: 2px solid rgba($brand-primary, 0.1);
+  padding: 16px 24px;
+  
+  .btn-secondary {
+    background: linear-gradient(135deg, $brand-primary 0%, darken($brand-primary, 10%) 100%) !important;
+    border: none !important;
+    color: #FFFFFF !important;
+    font-weight: 600;
+    padding: 10px 24px;
+    box-shadow: 0 4px 12px rgba($brand-primary, 0.3);
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: linear-gradient(135deg, $brand-secondary 0%, darken($brand-secondary, 10%) 100%) !important;
+      box-shadow: 0 6px 16px rgba($brand-secondary, 0.4);
+      transform: translateY(-1px);
+    }
+    
+    i {
+      color: #FFFFFF;
+    }
+  }
+}
+
+// === RESPONSIVE ===
+@media (max-width: 768px) {
+  .o_history_dialog {
+    .nav-tabs {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      
+      .nav-link {
+        padding: 8px 12px;
+        font-size: 12px;
+        white-space: nowrap;
+        
+        i {
+          margin-right: 4px !important;
+        }
+        
+        .badge {
+          display: none; // Ocultar badges en móvil
+        }
+      }
+    }
+    
+    .row.g-3.text-center {
+      .col-md-2 {
+        flex: 0 0 50%;
+        max-width: 50%;
+      }
+    }
+  }
+}

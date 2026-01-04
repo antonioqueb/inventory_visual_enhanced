@@ -1,234 +1,166 @@
 // ==========================================
-// PRODUCT DETAILS - Paleta Odoo Brand (Colorido)
-// ==========================================
-
-$brand-primary: #714B67;
-$brand-gray: #8F8F8F;
-$brand-secondary: #017E84;
-
-// ==========================================
 // ESTILOS BASE (DESKTOP)
 // ==========================================
 
 .details-wrapper {
   padding: 16px;
-  // Fondo con gradiente sutil
-  background: linear-gradient(180deg, rgba($brand-primary, 0.04) 0%, rgba($brand-secondary, 0.04) 100%);
+  background: #FAFAFA;
   overflow-x: auto;
   
-  // Scrollbar con gradiente de marca
+  // Scrollbar inline
   scrollbar-width: thin;
-  scrollbar-color: $brand-primary rgba($brand-primary, 0.1);
-
-  &::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: rgba($brand-primary, 0.08);
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, $brand-primary 0%, $brand-secondary 100%);
-    border-radius: 4px;
-    
-    &:hover {
-      background: linear-gradient(180deg, darken($brand-primary, 10%) 0%, darken($brand-secondary, 10%) 100%);
-    }
-  }
+  scrollbar-color: #8F8F8F #FAFAFA;
 }
 
 .o_inventory_details_table {
   width: 100%;
   border-collapse: collapse;
   background: #FFFFFF;
-  border: 2px solid rgba($brand-primary, 0.15);
+  border: 1px solid #E0E0E0;
   border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba($brand-primary, 0.1);
   
+  // SOLICITUD: Fuente formal y tamaño pequeño (9px) en escritorio
   font-family: "Roboto", "Arial", sans-serif;
   font-size: 9px;
 
   thead {
-    // Header con gradiente de marca más visible
-    background: linear-gradient(135deg, rgba($brand-primary, 0.15) 0%, rgba($brand-secondary, 0.12) 100%);
-    border-bottom: 3px solid $brand-primary;
+    background: #F5F5F5;
+    border-bottom: 2px solid #CCCCCC;
 
     th {
-      padding: 6px 8px;
+      // SOLICITUD: Padding reducido para filas más delgadas
+      padding: 4px 6px;
       text-align: left;
       font-weight: 700;
-      color: $brand-primary;
-      font-size: 9px;
+      color: #2C2C2C;
+      font-size: 9px; // Texto pequeño
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      border-right: 1px solid rgba($brand-primary, 0.15);
+      border-right: 1px solid #E0E0E0;
       white-space: nowrap;
-      height: 28px;
+      height: 24px; // Forzar altura pequeña
 
       &:last-child { border-right: none; }
       
+      // SOLICITUD: Iconos más pequeños en cabecera también
       &.col-icon { width: 25px; text-align: center; }
+      
+      // SOLICITUD: Checkbox más pequeño
       &.col-checkbox { width: 20px; text-align: center; padding: 0; }
+
+      // SOLICITUD: Lote menos ancho (aprox -30%)
       &.col-lot { width: 90px; max-width: 100px; }
+
+      // SOLICITUD: Pedimento más ancho
       &.col-pedimento { min-width: 140px; }
+
+      // === NUEVO: Columna Color ===
       &.col-color { width: 80px; min-width: 80px; }
     }
   }
 
   tbody {
     tr {
-      border-bottom: 1px solid rgba($brand-gray, 0.15);
-      transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      border-bottom: 1px solid #E0E0E0;
+      transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      // Altura de fila forzada pequeña en escritorio
       height: 22px;
       
-      // Zebra striping con colores de marca
-      &:nth-child(odd) {
-        background: rgba($brand-primary, 0.02);
-      }
-      
-      &:nth-child(even) {
-        background: rgba($brand-secondary, 0.02);
-      }
-      
-      &:hover { 
-        background: linear-gradient(90deg, rgba($brand-primary, 0.08) 0%, rgba($brand-secondary, 0.08) 100%);
-        transform: scale(1.002);
-      }
-      
+      &:hover { background: #FAFAFA; }
       &:last-child { border-bottom: none; }
-
-      // Fila de resumen de grupo - MÁS COLORIDA
-      &.group-summary-row {
-        background: linear-gradient(90deg, rgba($brand-primary, 0.18) 0%, rgba($brand-secondary, 0.12) 100%) !important;
-        border-top: 3px solid $brand-primary;
-        border-bottom: 2px solid rgba($brand-secondary, 0.3);
-        
-        td {
-          font-weight: 700;
-          color: $brand-primary;
-          padding: 6px 8px !important;
-        }
-      }
     }
 
     td {
+      // SOLICITUD: Padding mínimo para filas delgadas
       padding: 2px 6px;
       vertical-align: middle;
       color: #2C2C2C;
-      border-right: 1px solid rgba($brand-gray, 0.12);
-      font-size: 9px;
+      border-right: 1px solid #E0E0E0;
+      font-size: 9px; // Texto 9px
       line-height: 1.2;
 
       &:last-child { border-right: none; }
       &.col-icon { text-align: center; padding: 1px; }
       
-      .text-muted { color: $brand-gray; }
+      .text-muted { color: #808080; }
 
+      // Checkbox pequeño en escritorio
       .checkbox-wrapper {
         display: flex;
         justify-content: center;
         input.cart-checkbox {
-          width: 11px;
-          height: 11px;
-          margin: 0;
-          margin-top: 2px;
-          accent-color: $brand-primary;
+            width: 11px;
+            height: 11px;
+            margin: 0;
+            margin-top: 2px;
         }
       }
 
+      // SOLICITUD: Iconos pequeños (historial, fotos, etc) en escritorio
       .icon-btn, .status-badge-btn {
         width: 18px;
         height: 18px;
-        min-width: 18px;
+        min-width: 18px; // Sobrescribir estilos globales
         font-size: 9px;
-        border-radius: 3px;
+        border-radius: 3px; // Menos redondeado para verse más formal
         
         i.fa {
-          font-size: 9px;
-          line-height: 1;
+            font-size: 9px;
+            line-height: 1;
         }
       }
 
+      // Ajuste específico para botones de estado (Hold, Venta)
       .status-badge-btn {
-        padding: 0;
-        height: 18px;
+          padding: 0;
+          height: 18px;
       }
     }
   }
 
   .col-lot, .col-bloque, .col-atado {
+    // Mantener fuente monoespaciada para códigos
     font-family: "SF Mono", "Roboto Mono", monospace;
     font-weight: 600;
     white-space: nowrap;
-    color: $brand-primary;
   }
 
   .col-location {
     font-weight: 500;
-    .fa-map-marker { 
-      color: $brand-secondary; 
-      margin-right: 2px; 
-      font-size: 9px; 
-    }
+    .fa-map-marker { color: #714B67; margin-right: 2px; font-size: 9px; }
   }
 
   .col-dimensions {
     .dimensions-inline {
-      display: inline-flex; 
-      align-items: center; 
-      gap: 4px;
-      white-space: nowrap; 
-      font-size: 9px; 
-      color: $brand-gray;
+      display: inline-flex; align-items: center; gap: 4px;
+      white-space: nowrap; font-size: 9px; color: #7a7a7a;
     }
     .dimensions-total-inline {
-      font-weight: 700; 
-      color: #FFFFFF;
-      background: linear-gradient(135deg, $brand-primary 0%, $brand-secondary 100%);
-      padding: 1px 4px;
-      border-radius: 3px;
-      font-size: 8px; 
-      margin-left: 2px;
+      font-weight: 700; color: #714B67;
+      font-family: inherit; font-size: 9px; margin-left: 2px;
     }
   }
 
   .col-tipo {
     font-weight: 600; 
     white-space: nowrap;
-    color: $brand-secondary;
-    .text-muted { color: $brand-gray; }
+    .text-muted { color: #808080; }
   }
 }
 
 .table-loading {
-  padding: 24px; 
-  text-align: center;
-  background: linear-gradient(135deg, rgba($brand-primary, 0.05) 0%, rgba($brand-secondary, 0.05) 100%);
-  border-radius: 8px;
-  
+  padding: 24px; text-align: center;
   .spinner {
-    width: 24px; 
-    height: 24px; 
-    border: 3px solid rgba($brand-primary, 0.2);
-    border-top-color: $brand-primary; 
-    border-radius: 50%;
-    animation: spin 1s linear infinite; 
-    margin: 0 auto 8px;
+    width: 24px; height: 24px; border: 2px solid #f0ebef;
+    border-top-color: #714B67; border-radius: 50%;
+    animation: spin 1s linear infinite; margin: 0 auto 8px;
   }
-  .loading-text { 
-    color: $brand-primary; 
-    font-size: 10px;
-    font-weight: 600;
-  }
+  .loading-text { color: #7a7a7a; font-size: 10px; }
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 // ==========================================
@@ -237,22 +169,14 @@ $brand-secondary: #017E84;
 
 .details-wrapper {
   .mobile-select-bar {
-    display: none;
+    display: none; // Oculto por defecto en escritorio
     padding: 12px 16px;
-    // Gradiente de fondo más visible
-    background: linear-gradient(135deg, rgba($brand-primary, 0.1) 0%, rgba($brand-secondary, 0.08) 100%);
-    border: 2px solid $brand-primary;
+    background-color: #ffffff;
+    border: 1px solid #E0E0E0;
     margin-bottom: 12px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba($brand-primary, 0.2);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     cursor: pointer;
-    transition: all 0.2s ease;
-
-    &:hover {
-      background: linear-gradient(135deg, rgba($brand-primary, 0.15) 0%, rgba($brand-secondary, 0.12) 100%);
-      box-shadow: 0 6px 16px rgba($brand-primary, 0.25);
-      transform: translateY(-1px);
-    }
 
     .mobile-select-content {
       display: flex;
@@ -268,14 +192,14 @@ $brand-secondary: #017E84;
           height: 22px;
           margin: 0;
           cursor: pointer;
-          accent-color: $brand-primary;
+          accent-color: #714B67;
         }
       }
 
       .mobile-select-text {
         font-weight: 700;
         font-size: 14px;
-        color: $brand-primary;
+        color: #714B67;
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
@@ -288,367 +212,242 @@ $brand-secondary: #017E84;
 // ==========================================
 
 @media (max-width: 992px) {
-  .details-wrapper {
-    padding: 8px;
-    background: linear-gradient(180deg, rgba($brand-primary, 0.06) 0%, rgba($brand-secondary, 0.04) 100%);
+    .details-wrapper {
+        padding: 8px;
+        background: transparent;
 
-    .mobile-select-bar {
-      display: block;
+        // Mostrar la barra de selección en móvil
+        .mobile-select-bar {
+            display: block;
+        }
     }
-  }
 
-  .o_inventory_details_table {
-    border: none;
-    background: transparent;
-    font-size: 13px; 
+    .o_inventory_details_table {
+        border: none;
+        background: transparent;
+        // Restaurar tamaño de fuente para móvil (más legible que 9px)
+        font-size: 13px; 
 
-    thead { display: none; }
+        thead { display: none; }
 
-    tbody {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-
-      tr {
-        display: grid;
-        grid-template-columns: 50px 1fr 1fr 1fr; 
-        
-        grid-template-areas:
-          "check  header header header"
-          "loc    loc    loc    loc"
-          "dims   dims   dims   dims"
-          "tech0  tech0  tech1  tech1"
-          "tech2  tech2  tech3  tech3"
-          "tech4  tech4  tech5  tech5"
-          "tech6  tech6  tech6  tech6"
-          "act1   act2   act3   act4";
-        
-        background: #FFFFFF;
-        border: 2px solid rgba($brand-primary, 0.2);
-        border-radius: 14px;
-        padding: 0;
-        box-shadow: 0 6px 16px rgba($brand-primary, 0.12);
-        overflow: hidden;
-        height: auto;
-        transition: all 0.2s ease;
-
-        &:hover {
-          box-shadow: 0 8px 24px rgba($brand-primary, 0.18);
-          border-color: $brand-primary;
-          transform: translateY(-2px);
-        }
-
-        // Fila de resumen en móvil - MUY COLORIDA
-        &.group-summary-row {
-          background: linear-gradient(135deg, rgba($brand-primary, 0.2) 0%, rgba($brand-secondary, 0.15) 100%) !important;
-          border: 3px solid $brand-primary;
-          
-          td {
-            background: transparent !important;
-            color: $brand-primary;
-            font-weight: 700;
-          }
-        }
-      }
-
-      td {
-        border: none !important;
-        padding: 10px 12px !important;
-        display: flex;
-        align-items: center;
-        font-size: 13px;
-        line-height: 1.5;
-        
-        // === ÁREA: CHECKBOX (Móvil) - CON COLOR ===
-        &.col-checkbox {
-          grid-area: check;
-          background: linear-gradient(180deg, rgba($brand-primary, 0.12) 0%, rgba($brand-primary, 0.06) 100%);
-          border-bottom: 2px solid rgba($brand-primary, 0.15) !important;
-          border-right: 2px solid rgba($brand-primary, 0.15) !important;
-          justify-content: center;
-          align-items: center;
-          padding: 0 !important;
-          min-height: 48px;
-          width: auto !important;
-          
-          .checkbox-wrapper {
+        tbody {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-            
-            input.cart-checkbox {
-              width: 24px;
-              height: 24px;
-              margin: 0;
-              cursor: pointer;
-              opacity: 1 !important;
-              position: relative;
-              z-index: 10;
-              accent-color: $brand-primary;
+            flex-direction: column;
+            gap: 16px; // Espacio entre tarjetas
+
+            tr {
+                display: grid;
+                grid-template-columns: 50px 1fr 1fr 1fr; 
+                
+                // DEFINICIÓN DE ÁREAS (ACTUALIZADA con tech0 para Color)
+                grid-template-areas:
+                    "check  header header header"
+                    "loc    loc    loc    loc"
+                    "dims   dims   dims   dims"
+                    "tech0  tech0  tech1  tech1" /* Color | Tipo */
+                    "tech2  tech2  tech3  tech3" /* Bloque | Atado */
+                    "tech4  tech4  tech5  tech5" /* Pedimento | Contenedor */
+                    "tech6  tech6  tech6  tech6" /* Ref. Prov (Ancho completo) */
+                    "act1   act2   act3   act4";
+                
+                background: #FFFFFF;
+                border: 1px solid #E0E0E0;
+                border-radius: 12px;
+                padding: 0;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+                overflow: hidden;
+                height: auto; // Restaurar altura automática en móvil
             }
-          }
+
+            td {
+                border: none !important;
+                padding: 10px 12px !important; // Restaurar padding cómodo en móvil
+                display: flex;
+                align-items: center;
+                font-size: 13px; // Restaurar tamaño de fuente
+                line-height: 1.5;
+                
+                // === ÁREA: CHECKBOX (Móvil) ===
+                &.col-checkbox {
+                    grid-area: check;
+                    background-color: #f8f9fa;
+                    border-bottom: 1px solid #e0e0e0 !important;
+                    border-right: 1px solid #e0e0e0 !important;
+                    justify-content: center;
+                    align-items: center;
+                    padding: 0 !important;
+                    min-height: 48px;
+                    width: auto !important; // Sobrescribir el width: 20px de escritorio
+                    
+                    .checkbox-wrapper {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        width: 100%;
+                        height: 100%;
+                        
+                        input.cart-checkbox {
+                            width: 24px; // Restaurar tamaño checkbox móvil
+                            height: 24px;
+                            margin: 0;
+                            cursor: pointer;
+                            opacity: 1 !important;
+                            position: relative;
+                            z-index: 10;
+                        }
+                    }
+                }
+
+                // === ÁREA: HEADER (LOTE) ===
+                &.col-lot {
+                    grid-area: header;
+                    font-size: 15px;
+                    font-weight: 800;
+                    color: #714B67; 
+                    background-color: #f8f9fa;
+                    border-bottom: 1px solid #e0e0e0 !important;
+                    padding: 12px 16px !important;
+                    width: auto !important; // Reset width
+                    max-width: none !important; // Reset max-width
+                }
+
+                // === ÁREA: UBICACIÓN ===
+                &.col-location {
+                    grid-area: loc;
+                    font-size: 14px;
+                    background-color: #ffffff;
+                    border-bottom: 1px dashed #e0e0e0 !important; 
+                    padding-top: 14px !important;
+                    padding-bottom: 8px !important;
+                    
+                    i { 
+                        color: #714B67; 
+                        margin-right: 8px; 
+                        font-size: 16px; // Restaurar tamaño icono
+                    }
+                }
+                
+                // === ÁREA: DIMENSIONES ===
+                &.col-dimensions {
+                    grid-area: dims;
+                    background-color: #ffffff;
+                    border-bottom: 4px solid #f8f9fa !important;
+                    padding-top: 8px !important;
+                    padding-bottom: 14px !important;
+                    
+                    .dimensions-inline {
+                        font-size: 14px;
+                        display: flex;
+                        align-items: center;
+                        width: 100%;
+                        justify-content: space-between;
+                        color: #555;
+                    }
+                    
+                    .dimensions-total-inline {
+                        background: #f0f0f0;
+                        color: #333;
+                        padding: 4px 10px;
+                        border-radius: 20px;
+                        font-size: 13px;
+                        font-weight: 700;
+                    }
+                }
+
+                // === ÁREAS TÉCNICAS (Tipo, Bloque, Color, etc) ===
+                &.col-color { grid-area: tech0; }
+                &.col-tipo { grid-area: tech1; }
+                &.col-bloque { grid-area: tech2; }
+                &.col-atado { grid-area: tech3; }
+                &.col-pedimento { grid-area: tech4; }
+                &.col-contenedor { grid-area: tech5; }
+                &.col-ref-proveedor { grid-area: tech6; }
+
+                &.col-color,
+                &.col-tipo, &.col-bloque, &.col-atado, 
+                &.col-pedimento, &.col-contenedor, &.col-ref-proveedor {
+                    font-size: 13px;
+                    color: #4a4a4a;
+                    flex-direction: column; 
+                    align-items: flex-start;
+                    border-bottom: 1px solid #f0f0f0 !important;
+                    min-height: 50px;
+                    background: #fff;
+                    width: auto !important; // Reset width
+                    min-width: 0 !important; // Reset min-width
+                    
+                    &:empty { display: none; }
+
+                    &:before {
+                        content: attr(class);
+                        font-size: 10px;
+                        text-transform: uppercase;
+                        color: #999;
+                        font-weight: 700;
+                        margin-bottom: 4px;
+                    }
+                    
+                    // Definición de Etiquetas para Móvil
+                    &.col-color:before { content: "Color"; }
+                    &.col-tipo:before { content: "Tipo"; }
+                    &.col-bloque:before { content: "Bloque"; }
+                    &.col-atado:before { content: "Atado"; }
+                    &.col-pedimento:before { content: "Pedimento"; }
+                    &.col-contenedor:before { content: "Contenedor"; }
+                    &.col-ref-proveedor:before { content: "Ref. Prov"; }
+                    
+                    span { font-weight: 600; }
+                }
+
+                // === ÁREA: BOTONES DE ACCIÓN (Móvil) ===
+                &.action-btn-cell {
+                    justify-content: center;
+                    padding: 14px 0 !important;
+                    background-color: #f8f9fa;
+                    border-top: 1px solid #e0e0e0;
+                    width: auto !important;
+                    
+                    &:nth-of-type(12) { grid-area: act1; border-right: 1px solid #e0e0e0; }
+                    &:nth-of-type(13) { grid-area: act2; border-right: 1px solid #e0e0e0; }
+                    &:nth-of-type(14) { grid-area: act3; border-right: 1px solid #e0e0e0; }
+                    &:nth-of-type(15) { grid-area: act4; }
+
+                    // Restaurar tamaño de botones para táctil en móvil
+                    .icon-btn, .status-badge-btn {
+                        width: 42px;
+                        height: 42px;
+                        font-size: 18px;
+                        min-width: 42px;
+                        border-radius: 50%;
+                        border: none;
+                        background: transparent;
+                        
+                        // ===== CORRECCIÓN DE ICONOS =====
+                        &.no-content {
+                            color: #666666 !important;
+                            background-color: rgba(0, 0, 0, 0.05) !important;
+                            border: 1px solid #e0e0e0 !important;
+                            opacity: 1 !important;
+                        }
+                        
+                        // CORRECCIÓN ESPECÍFICA PARA HISTORIAL (has-details)
+                        &.has-details {
+                            color: #714B67 !important; /* Color primario visible */
+                            background-color: rgba(113, 75, 103, 0.1) !important;
+                        }
+                        // ==================================
+                        
+                        i.fa {
+                            font-size: 18px;
+                        }
+                        
+                        &.status-hold-active { background-color: #ffeeba; color: #856404; }
+                        &.status-sale-order { background-color: #d4edda; color: #155724; }
+                        &.has-photos { color: #007bff; background-color: rgba(0,123,255,0.1); }
+                        &.has-notes { color: #17a2b8; background-color: rgba(23,162,184,0.1); }
+                    }
+                }
+            }
         }
-
-        // === ÁREA: HEADER (LOTE) - DESTACADO ===
-        &.col-lot {
-          grid-area: header;
-          font-size: 15px;
-          font-weight: 800;
-          color: #FFFFFF; 
-          // Header con gradiente fuerte
-          background: linear-gradient(135deg, $brand-primary 0%, darken($brand-primary, 8%) 100%);
-          border-bottom: none !important;
-          padding: 14px 16px !important;
-          width: auto !important;
-          max-width: none !important;
-          text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-        }
-
-        // === ÁREA: UBICACIÓN - CON ACENTO ===
-        &.col-location {
-          grid-area: loc;
-          font-size: 14px;
-          background: linear-gradient(90deg, rgba($brand-secondary, 0.08) 0%, #FFFFFF 100%);
-          border-bottom: 2px solid rgba($brand-secondary, 0.15) !important; 
-          border-left: 4px solid $brand-secondary !important;
-          padding-top: 14px !important;
-          padding-bottom: 10px !important;
-          padding-left: 12px !important;
-          
-          i { 
-            color: $brand-secondary; 
-            margin-right: 8px; 
-            font-size: 16px;
-          }
-        }
-        
-        // === ÁREA: DIMENSIONES - DESTACADA ===
-        &.col-dimensions {
-          grid-area: dims;
-          background: linear-gradient(180deg, #FFFFFF 0%, rgba($brand-primary, 0.05) 100%);
-          border-bottom: 4px solid rgba($brand-primary, 0.1) !important;
-          padding-top: 10px !important;
-          padding-bottom: 14px !important;
-          
-          .dimensions-inline {
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            width: 100%;
-            justify-content: space-between;
-            color: #555;
-          }
-          
-          .dimensions-total-inline {
-            // Badge con gradiente de marca
-            background: linear-gradient(135deg, $brand-primary 0%, $brand-secondary 100%);
-            color: #FFFFFF;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 700;
-            box-shadow: 0 2px 8px rgba($brand-primary, 0.3);
-          }
-        }
-
-        // === ÁREAS TÉCNICAS - COLOREADAS ===
-        &.col-color { grid-area: tech0; }
-        &.col-tipo { grid-area: tech1; }
-        &.col-bloque { grid-area: tech2; }
-        &.col-atado { grid-area: tech3; }
-        &.col-pedimento { grid-area: tech4; }
-        &.col-contenedor { grid-area: tech5; }
-        &.col-ref-proveedor { grid-area: tech6; }
-
-        &.col-color,
-        &.col-tipo, &.col-bloque, &.col-atado, 
-        &.col-pedimento, &.col-contenedor, &.col-ref-proveedor {
-          font-size: 13px;
-          color: #2C2C2C;
-          flex-direction: column; 
-          align-items: flex-start;
-          border-bottom: 1px solid rgba($brand-gray, 0.15) !important;
-          min-height: 50px;
-          width: auto !important;
-          min-width: 0 !important;
-          transition: all 0.2s ease;
-          
-          &:empty { display: none; }
-
-          &:before {
-            content: attr(class);
-            font-size: 10px;
-            text-transform: uppercase;
-            font-weight: 700;
-            margin-bottom: 4px;
-            padding: 2px 6px;
-            border-radius: 3px;
-          }
-          
-          // Etiquetas con colores alternados
-          &.col-color {
-            background: rgba($brand-primary, 0.04);
-            &:before { 
-              content: "Color"; 
-              color: #FFFFFF;
-              background: $brand-primary;
-            }
-          }
-          &.col-tipo {
-            background: rgba($brand-secondary, 0.04);
-            &:before { 
-              content: "Tipo"; 
-              color: #FFFFFF;
-              background: $brand-secondary;
-            }
-          }
-          &.col-bloque {
-            background: rgba($brand-primary, 0.04);
-            &:before { 
-              content: "Bloque"; 
-              color: #FFFFFF;
-              background: $brand-primary;
-            }
-          }
-          &.col-atado {
-            background: rgba($brand-secondary, 0.04);
-            &:before { 
-              content: "Atado"; 
-              color: #FFFFFF;
-              background: $brand-secondary;
-            }
-          }
-          &.col-pedimento {
-            background: rgba($brand-primary, 0.04);
-            &:before { 
-              content: "Pedimento"; 
-              color: #FFFFFF;
-              background: $brand-primary;
-            }
-          }
-          &.col-contenedor {
-            background: rgba($brand-secondary, 0.04);
-            &:before { 
-              content: "Contenedor"; 
-              color: #FFFFFF;
-              background: $brand-secondary;
-            }
-          }
-          &.col-ref-proveedor {
-            background: rgba($brand-primary, 0.04);
-            &:before { 
-              content: "Ref. Prov"; 
-              color: #FFFFFF;
-              background: $brand-primary;
-            }
-          }
-          
-          span { 
-            font-weight: 600; 
-            color: #2C2C2C;
-          }
-        }
-
-        // === ÁREA: BOTONES DE ACCIÓN (Móvil) - CON GRADIENTE ===
-        &.action-btn-cell {
-          justify-content: center;
-          padding: 14px 0 !important;
-          // Fondo con gradiente
-          background: linear-gradient(180deg, rgba($brand-primary, 0.06) 0%, rgba($brand-secondary, 0.04) 100%);
-          border-top: 2px solid rgba($brand-primary, 0.1);
-          width: auto !important;
-          
-          &:nth-of-type(12) { grid-area: act1; border-right: 1px solid rgba($brand-primary, 0.15); }
-          &:nth-of-type(13) { grid-area: act2; border-right: 1px solid rgba($brand-primary, 0.15); }
-          &:nth-of-type(14) { grid-area: act3; border-right: 1px solid rgba($brand-primary, 0.15); }
-          &:nth-of-type(15) { grid-area: act4; }
-
-          .icon-btn, .status-badge-btn {
-            width: 44px;
-            height: 44px;
-            font-size: 18px;
-            min-width: 44px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            background: #FFFFFF;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            
-            &:hover {
-              transform: scale(1.1);
-            }
-            
-            &.no-content {
-              color: $brand-gray !important;
-              background: rgba($brand-gray, 0.1) !important;
-              border: 2px dashed rgba($brand-gray, 0.3) !important;
-              box-shadow: none;
-            }
-            
-            &.has-details {
-              color: #FFFFFF !important;
-              background: linear-gradient(135deg, $brand-primary 0%, darken($brand-primary, 10%) 100%) !important;
-              box-shadow: 0 3px 10px rgba($brand-primary, 0.3);
-              
-              &:hover {
-                box-shadow: 0 5px 14px rgba($brand-primary, 0.4);
-              }
-            }
-            
-            &.has-photos { 
-              color: #FFFFFF !important; 
-              background: linear-gradient(135deg, $brand-secondary 0%, darken($brand-secondary, 10%) 100%) !important;
-              box-shadow: 0 3px 10px rgba($brand-secondary, 0.3);
-              
-              &:hover {
-                box-shadow: 0 5px 14px rgba($brand-secondary, 0.4);
-              }
-            }
-            
-            &.has-notes { 
-              color: #FFFFFF !important; 
-              background: linear-gradient(135deg, mix($brand-primary, $brand-secondary, 50%) 0%, $brand-primary 100%) !important;
-              box-shadow: 0 3px 10px rgba($brand-primary, 0.3);
-              
-              &:hover {
-                box-shadow: 0 5px 14px rgba($brand-primary, 0.4);
-              }
-            }
-            
-            i.fa {
-              font-size: 18px;
-            }
-            
-            &.status-hold-active { 
-              background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%) !important; 
-              color: #2C2C2C !important;
-              border: 2px solid #FFD700;
-              box-shadow: 0 3px 10px rgba(255, 215, 0, 0.4);
-            }
-            
-            &.status-sale-order { 
-              background: linear-gradient(135deg, $brand-secondary 0%, darken($brand-secondary, 15%) 100%) !important; 
-              color: #FFFFFF !important;
-              border: 2px solid $brand-secondary;
-              box-shadow: 0 3px 10px rgba($brand-secondary, 0.4);
-            }
-            
-            &.status-no-state {
-              color: $brand-primary;
-              background: #FFFFFF;
-              border: 2px dashed rgba($brand-primary, 0.4) !important;
-              
-              &:hover {
-                border-style: solid !important;
-                border-color: $brand-primary !important;
-                background: rgba($brand-primary, 0.05);
-              }
-            }
-          }
-        }
-      }
     }
-  }
 }
