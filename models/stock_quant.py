@@ -61,7 +61,7 @@ class StockQuant(models.Model):
         if filters.get('categoria_name'):
             # Buscar todas las categorías con ese nombre
             all_cats = self.env['product.category'].search([
-                ('name', '=', filters['categoria_name'])
+                ('name', 'ilike', filters['categoria_name'])
             ])
             # Obtener IDs de categorías que son padres
             parent_ids = set(

@@ -98,17 +98,21 @@
                     <!-- Categoría -->
                     <div class="filter-group">
                         <label class="filter-label d-none d-md-block">Categoría</label>
-                        <select 
-                            class="form-select filter-select" 
+                        <input 
+                            type="text" 
+                            class="form-control filter-input" 
+                            placeholder="Escribe o selecciona categoría..." 
                             t-model="state.filters.categoria_name" 
-                            t-on-change="(ev) => this.onFilterChange('categoria_name', ev)" 
+                            t-on-input="(ev) => this.onTextFilterChange('categoria_name', ev)"
+                            list="categorias-datalist"
+                            autocomplete="off"
                             t-att-disabled="props.isLoading"
-                        >
-                            <option value="">Todas las categorías</option>
+                        />
+                        <datalist id="categorias-datalist">
                             <t t-foreach="state.categorias" t-as="categoria" t-key="categoria.name">
-                                <option t-att-value="categoria.name" t-esc="categoria.name"></option>
+                                <option t-att-value="categoria.name"/>
                             </t>
-                        </select>
+                        </datalist>
                     </div>
 
                     <!-- Botones -->
