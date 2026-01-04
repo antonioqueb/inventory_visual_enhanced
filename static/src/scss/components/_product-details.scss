@@ -208,76 +208,126 @@
 }
 
 // ==========================================
-// RESPONSIVE DETAILS CARDS (MÓVIL)
+// RESPONSIVE DETAILS CARDS (MÓVIL) - ULTRA COMPACTO
 // ==========================================
 
 @media (max-width: 992px) {
     .details-wrapper {
-        padding: 8px;
+        padding: 4px;
         background: transparent;
 
-        // Mostrar la barra de selección en móvil
         .mobile-select-bar {
             display: block;
+            padding: 6px 10px;
+            margin-bottom: 6px;
+            border-radius: 4px;
+            
+            .mobile-select-content {
+                gap: 8px;
+                
+                .checkbox-wrapper input {
+                    width: 16px;
+                    height: 16px;
+                }
+                
+                .mobile-select-text {
+                    font-size: 11px;
+                }
+            }
         }
     }
 
     .o_inventory_details_table {
         border: none;
         background: transparent;
-        // Restaurar tamaño de fuente para móvil (más legible que 9px)
-        font-size: 13px; 
+        font-size: 8px;
 
         thead { display: none; }
 
         tbody {
             display: flex;
             flex-direction: column;
-            gap: 16px; // Espacio entre tarjetas
+            gap: 3px;
 
             tr {
                 display: grid;
-                grid-template-columns: 50px 1fr 1fr 1fr; 
-                
-                // DEFINICIÓN DE ÁREAS (ACTUALIZADA con tech0 para Color)
+                grid-template-columns: 24px 1fr 1fr 1fr 1fr 20px 20px 20px 20px;
                 grid-template-areas:
-                    "check  header header header"
-                    "loc    loc    loc    loc"
-                    "dims   dims   dims   dims"
-                    "tech0  tech0  tech1  tech1" /* Color | Tipo */
-                    "tech2  tech2  tech3  tech3" /* Bloque | Atado */
-                    "tech4  tech4  tech5  tech5" /* Pedimento | Contenedor */
-                    "tech6  tech6  tech6  tech6" /* Ref. Prov (Ancho completo) */
-                    "act1   act2   act3   act4";
+                    "check  header header dims   dims   act1 act2 act3 act4"
+                    "check  loc    loc    loc    loc    act1 act2 act3 act4"
+                    "tech0  tech1  tech2  tech3  tech4  act1 act2 act3 act4"
+                    "tech5  tech5  tech6  tech6  tech6  act1 act2 act3 act4";
                 
                 background: #FFFFFF;
-                border: 1px solid #E0E0E0;
-                border-radius: 12px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
                 padding: 0;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+                box-shadow: none;
                 overflow: hidden;
-                height: auto; // Restaurar altura automática en móvil
+                height: auto;
+                min-height: 52px;
+            }
+
+            // Fila de resumen de grupo
+            tr.group-summary-row {
+                display: flex !important;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                background: #e9ecef !important;
+                padding: 3px 8px !important;
+                min-height: 20px !important;
+                border-radius: 2px;
+                
+                td {
+                    display: none !important;
+                    padding: 0 !important;
+                    min-height: auto !important;
+                    background: transparent !important;
+                    
+                    &.col-lot {
+                        display: block !important;
+                        font-size: 8px !important;
+                        font-weight: 600;
+                        color: #495057;
+                    }
+                    
+                    &.col-dimensions {
+                        display: block !important;
+                        font-size: 8px !important;
+                        font-weight: 700;
+                        color: #212529;
+                    }
+                    
+                    &:last-child {
+                        display: block !important;
+                        font-size: 7px !important;
+                        color: #6c757d;
+                        text-align: right;
+                        
+                        small { font-size: 7px; }
+                    }
+                }
             }
 
             td {
                 border: none !important;
-                padding: 10px 12px !important; // Restaurar padding cómodo en móvil
+                padding: 1px 3px !important;
                 display: flex;
                 align-items: center;
-                font-size: 13px; // Restaurar tamaño de fuente
-                line-height: 1.5;
+                font-size: 8px;
+                line-height: 1.1;
+                min-height: auto;
                 
-                // === ÁREA: CHECKBOX (Móvil) ===
+                // === CHECKBOX ===
                 &.col-checkbox {
                     grid-area: check;
-                    background-color: #f8f9fa;
-                    border-bottom: 1px solid #e0e0e0 !important;
+                    background-color: #f5f5f5;
                     border-right: 1px solid #e0e0e0 !important;
                     justify-content: center;
                     align-items: center;
                     padding: 0 !important;
-                    min-height: 48px;
-                    width: auto !important; // Sobrescribir el width: 20px de escritorio
+                    width: auto !important;
                     
                     .checkbox-wrapper {
                         display: flex;
@@ -287,74 +337,75 @@
                         height: 100%;
                         
                         input.cart-checkbox {
-                            width: 24px; // Restaurar tamaño checkbox móvil
-                            height: 24px;
+                            width: 12px;
+                            height: 12px;
                             margin: 0;
                             cursor: pointer;
-                            opacity: 1 !important;
-                            position: relative;
-                            z-index: 10;
                         }
                     }
                 }
 
-                // === ÁREA: HEADER (LOTE) ===
+                // === LOTE ===
                 &.col-lot {
                     grid-area: header;
-                    font-size: 15px;
-                    font-weight: 800;
-                    color: #714B67; 
-                    background-color: #f8f9fa;
-                    border-bottom: 1px solid #e0e0e0 !important;
-                    padding: 12px 16px !important;
-                    width: auto !important; // Reset width
-                    max-width: none !important; // Reset max-width
+                    font-size: 9px;
+                    font-weight: 700;
+                    color: #714B67;
+                    background-color: #f8f8f8;
+                    padding: 2px 4px !important;
+                    width: auto !important;
+                    max-width: none !important;
+                    border-bottom: 1px solid #eee !important;
                 }
 
-                // === ÁREA: UBICACIÓN ===
+                // === UBICACIÓN ===
                 &.col-location {
                     grid-area: loc;
-                    font-size: 14px;
-                    background-color: #ffffff;
-                    border-bottom: 1px dashed #e0e0e0 !important; 
-                    padding-top: 14px !important;
-                    padding-bottom: 8px !important;
+                    font-size: 7px;
+                    background-color: #fff;
+                    padding: 1px 4px !important;
+                    color: #777;
+                    border-bottom: 1px solid #f0f0f0 !important;
                     
                     i { 
                         color: #714B67; 
-                        margin-right: 8px; 
-                        font-size: 16px; // Restaurar tamaño icono
+                        margin-right: 2px; 
+                        font-size: 7px;
                     }
                 }
                 
-                // === ÁREA: DIMENSIONES ===
+                // === DIMENSIONES ===
                 &.col-dimensions {
                     grid-area: dims;
-                    background-color: #ffffff;
-                    border-bottom: 4px solid #f8f9fa !important;
-                    padding-top: 8px !important;
-                    padding-bottom: 14px !important;
+                    background-color: #f8f8f8;
+                    padding: 2px 4px !important;
+                    border-bottom: 1px solid #eee !important;
+                    justify-content: flex-end;
                     
                     .dimensions-inline {
-                        font-size: 14px;
+                        font-size: 7px;
                         display: flex;
                         align-items: center;
-                        width: 100%;
-                        justify-content: space-between;
-                        color: #555;
+                        gap: 3px;
+                        color: #666;
                     }
                     
                     .dimensions-total-inline {
-                        background: #f0f0f0;
-                        color: #333;
-                        padding: 4px 10px;
-                        border-radius: 20px;
-                        font-size: 13px;
+                        background: #714B67;
+                        color: #fff;
+                        padding: 1px 4px;
+                        border-radius: 6px;
+                        font-size: 8px;
                         font-weight: 700;
+                    }
+                    
+                    .dims-text {
+                        font-size: 6px;
+                        color: #999;
                     }
                 }
 
-                // === ÁREAS TÉCNICAS (Tipo, Bloque, Color, etc) ===
+                // === CAMPOS TÉCNICOS ===
                 &.col-color { grid-area: tech0; }
                 &.col-tipo { grid-area: tech1; }
                 &.col-bloque { grid-area: tech2; }
@@ -366,85 +417,107 @@
                 &.col-color,
                 &.col-tipo, &.col-bloque, &.col-atado, 
                 &.col-pedimento, &.col-contenedor, &.col-ref-proveedor {
-                    font-size: 13px;
-                    color: #4a4a4a;
-                    flex-direction: column; 
-                    align-items: flex-start;
-                    border-bottom: 1px solid #f0f0f0 !important;
-                    min-height: 50px;
+                    font-size: 7px;
+                    color: #555;
+                    flex-direction: row;
+                    align-items: center;
+                    gap: 1px;
+                    border-right: 1px solid #f0f0f0 !important;
+                    min-height: 14px;
                     background: #fff;
-                    width: auto !important; // Reset width
-                    min-width: 0 !important; // Reset min-width
+                    width: auto !important;
+                    min-width: 0 !important;
+                    padding: 1px 2px !important;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
                     
-                    &:empty { display: none; }
-
                     &:before {
-                        content: attr(class);
-                        font-size: 10px;
-                        text-transform: uppercase;
-                        color: #999;
-                        font-weight: 700;
-                        margin-bottom: 4px;
+                        content: "";
+                        font-size: 6px;
+                        color: #aaa;
+                        font-weight: 600;
+                        flex-shrink: 0;
                     }
                     
-                    // Definición de Etiquetas para Móvil
-                    &.col-color:before { content: "Color"; }
-                    &.col-tipo:before { content: "Tipo"; }
-                    &.col-bloque:before { content: "Bloque"; }
-                    &.col-atado:before { content: "Atado"; }
-                    &.col-pedimento:before { content: "Pedimento"; }
-                    &.col-contenedor:before { content: "Contenedor"; }
-                    &.col-ref-proveedor:before { content: "Ref. Prov"; }
+                    &.col-color:before { content: "C:"; }
+                    &.col-tipo:before { content: "T:"; }
+                    &.col-bloque:before { content: "B:"; }
+                    &.col-atado:before { content: "A:"; }
+                    &.col-pedimento:before { content: "P:"; }
+                    &.col-contenedor:before { content: "Ct:"; }
+                    &.col-ref-proveedor:before { content: "Rf:"; }
                     
-                    span { font-weight: 600; }
+                    span { 
+                        font-weight: 600; 
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        font-size: 7px;
+                    }
+                    
+                    .text-muted {
+                        color: #ccc;
+                        font-size: 6px;
+                    }
                 }
 
-                // === ÁREA: BOTONES DE ACCIÓN (Móvil) ===
+                // === BOTONES DE ACCIÓN ===
                 &.action-btn-cell {
                     justify-content: center;
-                    padding: 14px 0 !important;
-                    background-color: #f8f9fa;
-                    border-top: 1px solid #e0e0e0;
+                    align-items: center;
+                    padding: 0 !important;
+                    background-color: #fafafa;
                     width: auto !important;
+                    border-left: 1px solid #eee !important;
                     
-                    &:nth-of-type(12) { grid-area: act1; border-right: 1px solid #e0e0e0; }
-                    &:nth-of-type(13) { grid-area: act2; border-right: 1px solid #e0e0e0; }
-                    &:nth-of-type(14) { grid-area: act3; border-right: 1px solid #e0e0e0; }
+                    &:nth-of-type(12) { grid-area: act1; }
+                    &:nth-of-type(13) { grid-area: act2; }
+                    &:nth-of-type(14) { grid-area: act3; }
                     &:nth-of-type(15) { grid-area: act4; }
 
-                    // Restaurar tamaño de botones para táctil en móvil
                     .icon-btn, .status-badge-btn {
-                        width: 42px;
-                        height: 42px;
-                        font-size: 18px;
-                        min-width: 42px;
-                        border-radius: 50%;
+                        width: 18px;
+                        height: 18px;
+                        font-size: 9px;
+                        min-width: 18px;
+                        border-radius: 3px;
                         border: none;
                         background: transparent;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
                         
-                        // ===== CORRECCIÓN DE ICONOS =====
                         &.no-content {
-                            color: #666666 !important;
-                            background-color: rgba(0, 0, 0, 0.05) !important;
-                            border: 1px solid #e0e0e0 !important;
-                            opacity: 1 !important;
+                            color: #bbb !important;
+                            background-color: transparent !important;
+                            opacity: 0.6 !important;
                         }
                         
-                        // CORRECCIÓN ESPECÍFICA PARA HISTORIAL (has-details)
                         &.has-details {
-                            color: #714B67 !important; /* Color primario visible */
+                            color: #714B67 !important;
                             background-color: rgba(113, 75, 103, 0.1) !important;
                         }
-                        // ==================================
                         
                         i.fa {
-                            font-size: 18px;
+                            font-size: 9px;
                         }
                         
-                        &.status-hold-active { background-color: #ffeeba; color: #856404; }
-                        &.status-sale-order { background-color: #d4edda; color: #155724; }
-                        &.has-photos { color: #007bff; background-color: rgba(0,123,255,0.1); }
-                        &.has-notes { color: #17a2b8; background-color: rgba(23,162,184,0.1); }
+                        &.status-hold-active { 
+                            background-color: #ffeeba; 
+                            color: #856404; 
+                        }
+                        &.status-sale-order { 
+                            background-color: #d4edda; 
+                            color: #155724; 
+                        }
+                        &.has-photos { 
+                            color: #007bff; 
+                            background-color: rgba(0,123,255,0.1); 
+                        }
+                        &.has-notes { 
+                            color: #17a2b8; 
+                            background-color: rgba(23,162,184,0.1); 
+                        }
                     }
                 }
             }
