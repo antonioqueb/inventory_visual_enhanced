@@ -188,7 +188,7 @@
                                     >
                                         <i class="fa fa-usd"></i>
                                     </button>
-                                    <span t-else="" class="status-badge-btn status-available-no-perms" title="Disponible"><i class="fa fa-check-circle"></i></span>
+                                    <span t-else="" class="status-badge-btn status-no-hold" title="Sin apartado"><i class="fa fa-hand-paper-o"></i></span>
                                 </td>
                             </tr>
                         </t>
