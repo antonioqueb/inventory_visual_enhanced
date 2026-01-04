@@ -70,13 +70,7 @@
                         <textarea 
                             class="form-control form-control-lg border-2"
                             rows="12"
-                            placeholder="Ej: 
-                            - Placa con barreno
-                            - Release en esquina superior
-                            - Placa rota en un extremo
-                            - Veta pronunciada diagonal
-                            - Manchas de óxido
-                            - Color irregular..."
+                            placeholder="Ej: - Placa con barreno, grietas visibles en el borde derecho.&#10;- Color irregular, presenta manchas oscuras.&#10;- Requiere corte especial para evitar desperdicios..."
                             t-model="state.notes"
                             t-on-input="onNotesChange"
                             style="
