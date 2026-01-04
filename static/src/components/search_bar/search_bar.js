@@ -25,6 +25,8 @@ export class SearchBar extends Component {
                 pedimento: '',
                 contenedor: '',
                 atado: '',
+                alto_min: '',
+                ancho_min: '',
             },
             
             // Opciones para dropdowns
@@ -265,6 +267,9 @@ export class SearchBar extends Component {
             contenedor: '',
             atado: '',
             color: '',
+            alto_min: '',
+            ancho_min: '',
+            
         };
         this.state.ubicaciones = [];
         

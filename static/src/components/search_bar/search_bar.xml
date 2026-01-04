@@ -248,6 +248,37 @@
                             list="colores-datalist"
                             autocomplete="off"
                         />
+                        
+                        <!-- Alto Mínimo -->
+                        <div class="filter-group">
+                            <label class="filter-label d-none d-md-block">Alto mín. (m)</label>
+                            <input 
+                                type="number" 
+                                class="form-control filter-input" 
+                                placeholder="Ej: 1.5" 
+                                t-model="state.filters.alto_min" 
+                                t-on-input="(ev) => this.onTextFilterChange('alto_min', ev)"
+                                step="0.01"
+                                min="0"
+                            />
+                        </div>
+
+                        <!-- Ancho Mínimo -->
+                        <div class="filter-group">
+                            <label class="filter-label d-none d-md-block">Ancho mín. (m)</label>
+                            <input 
+                                type="number" 
+                                class="form-control filter-input" 
+                                placeholder="Ej: 2.0" 
+                                t-model="state.filters.ancho_min" 
+                                t-on-input="(ev) => this.onTextFilterChange('ancho_min', ev)"
+                                step="0.01"
+                                min="0"
+                            />
+                        </div>
+
+
+
                         <!-- Datalist con sugerencias de colores existentes -->
                         <datalist id="colores-datalist">
                             <t t-foreach="state.colores" t-as="color" t-key="color">

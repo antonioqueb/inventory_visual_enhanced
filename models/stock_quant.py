@@ -134,6 +134,22 @@ class StockQuant(models.Model):
         # Filtro por atado
         if filters.get('atado'):
             domain.append(('x_atado', 'ilike', filters['atado']))
+
+        # Filtro por alto mínimo
+        if filters.get('alto_min'):
+            try:
+                alto_val = float(filters['alto_min'])
+                domain.append(('x_alto', '>=', alto_val))
+            except (ValueError, TypeError):
+                pass
+
+        # Filtro por ancho mínimo
+        if filters.get('ancho_min'):
+            try:
+                ancho_val = float(filters['ancho_min'])
+                domain.append(('x_ancho', '>=', ancho_val))
+            except (ValueError, TypeError):
+                pass
         
         # Buscar quants
         quants = self.search(domain)
