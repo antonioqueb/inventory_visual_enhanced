@@ -74,7 +74,7 @@
                             t-model="state.notes"
                             t-on-input="onNotesChange"
                             style="
-                                font-size: 16px; 
+                                font-size: 14px; 
                                 line-height: 1.8;
                                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                             "

@@ -1,0 +1,195 @@
+// ==========================================
+// NOTES DIALOG - Paleta Odoo
+// ==========================================
+
+$note-primary: #714B67;
+$note-gray: #8F8F8F;
+$note-secondary: #017E84;
+
+.o_notes_dialog {
+  // Fondo blanco limpio
+  background: #FFFFFF;
+
+  // Header del producto
+  .alert-light {
+    background: #FFFFFF !important;
+    border-color: $note-primary !important;
+    
+    .fa-cube {
+      color: $note-primary !important;
+    }
+    
+    .fw-bold {
+      color: #2C2C2C;
+    }
+    
+    .text-muted {
+      color: $note-gray !important;
+    }
+  }
+
+  // Card de notas (modo visualización)
+  .card {
+    border-color: #E0E0E0 !important;
+    background: #FFFFFF;
+    
+    .card-header {
+      background: linear-gradient(135deg, rgba($note-primary, 0.05) 0%, rgba($note-secondary, 0.05) 100%) !important;
+      border-bottom-color: rgba($note-primary, 0.15) !important;
+      
+      h5, .mb-0 {
+        color: $note-primary !important;
+        
+        .fa-exclamation-triangle {
+          color: $note-secondary !important;
+        }
+      }
+    }
+    
+    .card-body {
+      background: #FFFFFF;
+      
+      // Área de texto con notas
+      .bg-light {
+        background: linear-gradient(180deg, #FAFAFA 0%, #FFFFFF 100%) !important;
+        border-color: rgba($note-primary, 0.2) !important;
+      }
+    }
+  }
+
+  // Textarea de edición
+  textarea.form-control {
+    background: #FFFFFF;
+    border: 2px solid rgba($note-primary, 0.3) !important;
+    transition: all 0.2s ease;
+    
+    &:focus {
+      border-color: $note-primary !important;
+      box-shadow: 0 0 0 3px rgba($note-primary, 0.1) !important;
+      background: #FFFFFF;
+    }
+    
+    &::placeholder {
+      color: $note-gray;
+      opacity: 0.7;
+    }
+  }
+
+  // Alert de información
+  .alert-light.border {
+    background: #FFFFFF !important;
+    border-color: rgba($note-secondary, 0.3) !important;
+    
+    .fa-info-circle {
+      color: $note-secondary !important;
+    }
+    
+    strong {
+      color: $note-primary;
+    }
+    
+    ul li {
+      color: #4a4a4a;
+    }
+  }
+
+  // Labels
+  .form-label {
+    color: $note-primary !important;
+    
+    .fa-edit {
+      color: $note-secondary !important;
+    }
+  }
+}
+
+// ==========================================
+// BOTONES DEL FOOTER (Dialog)
+// ==========================================
+
+.o_notes_dialog + .modal-footer,
+.modal-content:has(.o_notes_dialog) .modal-footer {
+  background: #FFFFFF;
+  border-top: 1px solid rgba($note-primary, 0.1);
+  
+  // Botón Cancelar / Cerrar
+  .btn-light, 
+  .btn-secondary:not(:last-child) {
+    background: #FFFFFF !important;
+    color: $note-gray !important;
+    border: 2px solid $note-gray !important;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: $note-gray !important;
+      color: #FFFFFF !important;
+      border-color: $note-gray !important;
+    }
+    
+    i.fa {
+      color: inherit;
+    }
+  }
+  
+  // Botón Principal (Guardar / Editar)
+  .btn-secondary:last-child,
+  .btn-secondary.btn-lg:last-of-type {
+    background: linear-gradient(135deg, $note-primary 0%, darken($note-primary, 10%) 100%) !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba($note-primary, 0.3);
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: linear-gradient(135deg, $note-secondary 0%, darken($note-secondary, 10%) 100%) !important;
+      box-shadow: 0 6px 16px rgba($note-secondary, 0.4);
+      transform: translateY(-1px);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+    
+    &:disabled {
+      background: $note-gray !important;
+      box-shadow: none;
+      opacity: 0.6;
+    }
+    
+    i.fa {
+      color: #FFFFFF;
+    }
+  }
+}
+
+// ==========================================
+// SCROLLBAR PERSONALIZADO
+// ==========================================
+
+.o_notes_dialog {
+  .card-body .bg-light,
+  textarea {
+    scrollbar-width: thin;
+    scrollbar-color: $note-primary #F5F5F5;
+    
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: #F5F5F5;
+      border-radius: 4px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, $note-primary 0%, $note-secondary 100%);
+      border-radius: 4px;
+      
+      &:hover {
+        background: linear-gradient(180deg, darken($note-primary, 10%) 0%, darken($note-secondary, 10%) 100%);
+      }
+    }
+  }
+}

@@ -47,6 +47,7 @@
             'inventory_visual_enhanced/static/src/scss/components/_product-row.scss',
             'inventory_visual_enhanced/static/src/scss/components/_product-details.scss',
             'inventory_visual_enhanced/static/src/scss/components/_badges.scss',
+            'inventory_visual_enhanced/static/src/scss/components/_notes-dialog.scss',
             
             # JS
             'inventory_visual_enhanced/static/src/components/search_bar/search_bar.js', # <--- NUEVO
