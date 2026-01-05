@@ -240,7 +240,7 @@
     .o_inventory_details_table {
         border: none;
         background: transparent;
-        font-size: 8px;
+        font-size: 10px;
 
         thead { display: none; }
 
@@ -288,14 +288,14 @@
                     
                     &.col-lot {
                         display: block !important;
-                        font-size: 8px !important;
+                        font-size: 10px !important;
                         font-weight: 600;
                         color: #495057;
                     }
                     
                     &.col-dimensions {
                         display: block !important;
-                        font-size: 8px !important;
+                        ffont-size: 10px; !important;
                         font-weight: 700;
                         color: #212529;
                     }
@@ -316,7 +316,7 @@
                 padding: 1px 3px !important;
                 display: flex;
                 align-items: center;
-                font-size: 8px;
+                ffont-size: 10px;;
                 line-height: 1.1;
                 min-height: auto;
                 
@@ -396,7 +396,7 @@
                         color: #fff;
                         padding: 1px 4px;
                         border-radius: 6px;
-                        font-size: 8px;
+                        ffont-size: 10px;;
                         font-weight: 700;
                     }
                     
@@ -423,7 +423,7 @@
 
                 &.col-bloque, &.col-atado, 
                 &.col-pedimento, &.col-contenedor {
-                    font-size: 8px;
+                    ffont-size: 10px;;
                     color: #333;
                     flex-direction: row;
                     align-items: center;
@@ -450,7 +450,7 @@
                     
                     span { 
                         font-weight: 600; 
-                        font-size: 8px;
+                        ffont-size: 10px;;
                     }
                     
                     .text-muted {
