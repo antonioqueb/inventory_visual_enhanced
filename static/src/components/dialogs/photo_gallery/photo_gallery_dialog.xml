@@ -5,6 +5,99 @@
         <Dialog size="'xl'" contentClass="'h-100'">
             <div class="o_photo_gallery_dialog d-flex flex-column h-100">
                 
+                <!-- ========== VISOR FULLSCREEN DE IMAGEN ========== -->
+                <div t-if="state.showFullscreenViewer" 
+                     class="fullscreen-viewer position-fixed top-0 start-0 w-100 h-100 d-flex flex-column"
+                     style="z-index: 9999; background: rgba(0,0,0,0.95);">
+                    
+                    <!-- Toolbar superior -->
+                    <div class="fullscreen-toolbar d-flex align-items-center justify-content-between p-3">
+                        <div class="text-white">
+                            <strong t-esc="currentPhoto.name"></strong>
+                            <span class="ms-3 opacity-75">
+                                <t t-esc="state.currentImageIndex + 1"/> / <t t-esc="photosData.photos.length"/>
+                            </span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button 
+                                type="button"
+                                class="btn btn-outline-light btn-sm"
+                                t-on-click="downloadCurrentImage"
+                                title="Descargar"
+                            >
+                                <i class="fa fa-download"></i>
+                            </button>
+                            <button 
+                                type="button"
+                                class="btn btn-outline-light btn-sm"
+                                t-on-click="shareCurrentImage"
+                                title="Compartir"
+                            >
+                                <i class="fa fa-share-alt"></i>
+                            </button>
+                            <button 
+                                type="button"
+                                class="btn btn-light btn-sm"
+                                t-on-click="closeFullscreenViewer"
+                                title="Cerrar"
+                            >
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Imagen centrada -->
+                    <div class="flex-grow-1 d-flex align-items-center justify-content-center position-relative p-3">
+                        <!-- Botón anterior -->
+                        <button 
+                            t-if="photosData.photos.length > 1"
+                            type="button"
+                            class="btn btn-dark btn-lg position-absolute start-0 ms-3 rounded-circle"
+                            style="width: 50px; height: 50px; opacity: 0.7;"
+                            t-on-click="fullscreenPrev"
+                            t-att-disabled="state.currentImageIndex === 0"
+                        >
+                            <i class="fa fa-chevron-left"></i>
+                        </button>
+                        
+                        <img 
+                            t-att-src="`data:image/png;base64,${currentPhoto.image}`"
+                            style="max-width: 95%; max-height: 85vh; object-fit: contain; border-radius: 8px;"
+                            t-att-alt="currentPhoto.name"
+                        />
+                        
+                        <!-- Botón siguiente -->
+                        <button 
+                            t-if="photosData.photos.length > 1"
+                            type="button"
+                            class="btn btn-dark btn-lg position-absolute end-0 me-3 rounded-circle"
+                            style="width: 50px; height: 50px; opacity: 0.7;"
+                            t-on-click="fullscreenNext"
+                            t-att-disabled="state.currentImageIndex === photosData.photos.length - 1"
+                        >
+                            <i class="fa fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Miniaturas abajo -->
+                    <div t-if="photosData.photos.length > 1" class="p-2 d-flex justify-content-center gap-2 overflow-auto" style="max-height: 80px;">
+                        <t t-foreach="photosData.photos" t-as="photo" t-key="photo.id">
+                            <div 
+                                class="border rounded flex-shrink-0"
+                                t-att-class="{ 'border-light border-3': photo_index === state.currentImageIndex, 'border-secondary': photo_index !== state.currentImageIndex }"
+                                t-on-click="() => this.state.currentImageIndex = photo_index"
+                                style="cursor: pointer; width: 60px; height: 60px; opacity: 0.8;"
+                            >
+                                <img 
+                                    t-att-src="`data:image/png;base64,${photo.image}`"
+                                    class="rounded"
+                                    style="width: 100%; height: 100%; object-fit: cover;"
+                                />
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
                 <!-- ========== EDITOR DE DIBUJO FULLSCREEN ========== -->
                 <div t-if="state.showDrawingEditor" 
                      class="drawing-editor-fullscreen position-fixed top-0 start-0 w-100 h-100 d-flex flex-column"
@@ -102,7 +195,7 @@
                     </div>
                 </div>
 
-                <!-- ========== VISOR DE FOTOS ========== -->
+                <!-- ========== VISOR DE FOTOS (Normal) ========== -->
                 <t t-if="hasPhotos and !state.showUploadForm">
                     <div class="photo-viewer-section flex-grow-1 d-flex flex-column mb-3" style="min-height: 0;">
                         <div class="position-relative flex-grow-1 d-flex flex-column" style="min-height: 0;">
@@ -110,10 +203,10 @@
                                 <img 
                                     t-att-src="`data:image/png;base64,${currentPhoto.image}`"
                                     class="img-fluid rounded shadow-lg"
-                                    style="max-height: calc(100vh - 350px); max-width: 100%; object-fit: contain; cursor: pointer;"
-                                    t-on-click="() => this.openImageInNewTab(currentPhoto.image)"
+                                    style="max-height: calc(100vh - 350px); max-width: 100%; object-fit: contain; cursor: zoom-in;"
+                                    t-on-click="openFullscreenViewer"
                                     t-att-alt="currentPhoto.name"
-                                    title="Click para ver en tamaño completo"
+                                    title="Click para ver en pantalla completa"
                                 />
                             </div>
                             

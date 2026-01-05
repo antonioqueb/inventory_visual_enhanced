@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-import { Component, useState, useRef, onMounted, onWillUnmount } from "@odoo/owl";
+import { Component, useState, useRef, onWillUnmount } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { Dialog } from "@web/core/dialog/dialog";
 
@@ -32,6 +32,9 @@ export class PhotoGalleryDialog extends Component {
             brushColor: '#FF0000',
             brushSize: 6,
             canUndo: false,
+            
+            // Visor fullscreen
+            showFullscreenViewer: false,
         });
 
         this.compressionConfig = {
@@ -121,6 +124,30 @@ export class PhotoGalleryDialog extends Component {
     }
     
     prevPhoto() {
+        if (this.state.currentImageIndex > 0) {
+            this.state.currentImageIndex--;
+        }
+    }
+
+    // === VISOR FULLSCREEN ===
+    
+    openFullscreenViewer() {
+        this.state.showFullscreenViewer = true;
+        document.body.style.overflow = 'hidden';
+    }
+    
+    closeFullscreenViewer() {
+        this.state.showFullscreenViewer = false;
+        document.body.style.overflow = '';
+    }
+    
+    fullscreenNext() {
+        if (this.state.currentImageIndex < this.photosData.photos.length - 1) {
+            this.state.currentImageIndex++;
+        }
+    }
+    
+    fullscreenPrev() {
         if (this.state.currentImageIndex > 0) {
             this.state.currentImageIndex--;
         }
@@ -224,8 +251,7 @@ export class PhotoGalleryDialog extends Component {
             
             this.notification.add("Imagen copiada al portapapeles", { type: "success" });
         } catch (err) {
-            this.notification.add("No se pudo copiar. Abriendo en nueva pestaña...", { type: "info" });
-            this.openImageInNewTab(this.currentPhoto.image);
+            this.notification.add("No se pudo copiar la imagen", { type: "warning" });
         }
     }
 
@@ -575,7 +601,8 @@ export class PhotoGalleryDialog extends Component {
     }
     
     openImageInNewTab(imageData) {
-        window.open(`data:image/png;base64,${imageData}`, '_blank');
+        // Ahora abre el visor fullscreen en lugar de nueva pestaña
+        this.openFullscreenViewer();
     }
 }
 
