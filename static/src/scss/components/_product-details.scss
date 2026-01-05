@@ -240,7 +240,7 @@
     .o_inventory_details_table {
         border: none;
         background: transparent;
-        font-size: 10px;
+        font-size: 8px;
 
         thead { display: none; }
 
@@ -316,7 +316,7 @@
                 padding: 1px 3px !important;
                 display: flex;
                 align-items: center;
-                font-size: 10px;
+                font-size: 8px;
                 line-height: 1.1;
                 min-height: auto;
                 
@@ -396,7 +396,7 @@
                         color: #fff;
                         padding: 1px 4px;
                         border-radius: 6px;
-                        font-size: 10px;
+                        font-size: 8px;
                         font-weight: 700;
                     }
                     
@@ -414,16 +414,16 @@
                 }
 
                 // === CAMPOS TÉCNICOS VISIBLES ===
-                // Fila 3: Pedimento | Bloque | Atado
-                &.col-pedimento { grid-area: tech4; }
+                // Fila 3: Contenedor | Bloque | Atado
+                &.col-contenedor { grid-area: tech4; }
                 &.col-bloque { grid-area: tech2; }
                 &.col-atado { grid-area: tech3; }
-                // Fila 4: Contenedor (ancho completo)
-                &.col-contenedor { grid-area: tech5; }
+                // Fila 4: Pedimento (ancho completo)
+                &.col-pedimento { grid-area: tech5; }
 
                 &.col-bloque, &.col-atado, 
                 &.col-pedimento, &.col-contenedor {
-                    font-size: 10px;
+                    font-size: 8px;
                     color: #333;
                     flex-direction: row;
                     align-items: center;
@@ -450,7 +450,7 @@
                     
                     span { 
                         font-weight: 600; 
-                        font-size: 10px;
+                        font-size: 8px;
                     }
                     
                     .text-muted {
@@ -461,7 +461,7 @@
                 
                 // Quitar borde derecho del último de cada fila
                 &.col-atado,
-                &.col-contenedor {
+                &.col-pedimento {
                     border-right: none !important;
                 }
 
