@@ -253,7 +253,7 @@
             tr {
                 display: grid;
                 // NUEVO GRID: Checkbox grande a la izquierda, contenido a la derecha
-                grid-template-columns: 36px 1fr 1fr 1fr;
+                grid-template-columns: 42px 1fr 1fr 1fr;
                 grid-template-rows: auto auto auto auto auto;
                 grid-template-areas:
                     "check  header header header"
@@ -319,8 +319,8 @@
                 padding: 1px 3px !important;
                 display: flex;
                 align-items: center;
-                font-size: 10px;
-                line-height: 1.1;
+                font-size: 12px;
+                line-height: 1.2;
                 min-height: auto;
                 
                 // === CHECKBOX GRANDE ===
@@ -341,8 +341,8 @@
                         height: 100%;
                         
                         input.cart-checkbox {
-                            width: 20px;
-                            height: 20px;
+                            width: 26px;
+                            height: 26px;
                             margin: 0;
                             cursor: pointer;
                             accent-color: #714B67;
@@ -353,11 +353,11 @@
                 // === LOTE ===
                 &.col-lot {
                     grid-area: header;
-                    font-size: 12px;
+                    font-size: 13px;
                     font-weight: 700;
                     color: #714B67;
                     background-color: #f8f8f8;
-                    padding: 3px 6px !important;
+                    padding: 4px 8px !important;
                     width: auto !important;
                     max-width: none !important;
                     border-bottom: 1px solid #eee !important;
@@ -366,16 +366,16 @@
                 // === UBICACIÓN ===
                 &.col-location {
                     grid-area: loc;
-                    font-size: 9px;
+                    font-size: 12px;
                     background-color: #fff;
-                    padding: 2px 6px !important;
-                    color: #555;
+                    padding: 3px 8px !important;
+                    color: #444;
                     border-bottom: 1px solid #f0f0f0 !important;
                     
                     i { 
                         color: #714B67; 
-                        margin-right: 3px; 
-                        font-size: 9px;
+                        margin-right: 4px; 
+                        font-size: 11px;
                     }
                 }
                 
@@ -383,30 +383,30 @@
                 &.col-dimensions {
                     grid-area: dims;
                     background-color: #fff;
-                    padding: 2px 6px !important;
+                    padding: 3px 8px !important;
                     border-bottom: 1px solid #f0f0f0 !important;
                     justify-content: flex-end;
                     
                     .dimensions-inline {
-                        font-size: 10px;
+                        font-size: 12px;
                         display: flex;
                         align-items: center;
-                        gap: 4px;
-                        color: #666;
+                        gap: 5px;
+                        color: #555;
                     }
                     
                     .dimensions-total-inline {
                         background: #714B67;
                         color: #fff;
-                        padding: 2px 6px;
+                        padding: 3px 8px;
                         border-radius: 6px;
-                        font-size: 11px;
+                        font-size: 13px;
                         font-weight: 700;
                     }
                     
                     .dims-text {
-                        font-size: 8px;
-                        color: #999;
+                        font-size: 10px;
+                        color: #888;
                     }
                 }
 
@@ -425,22 +425,22 @@
 
                 &.col-bloque, &.col-atado, 
                 &.col-pedimento, &.col-contenedor {
-                    font-size: 10px;
+                    font-size: 12px;
                     color: #333;
                     flex-direction: row;
                     align-items: center;
-                    gap: 3px;
+                    gap: 4px;
                     border-right: 1px solid #f0f0f0 !important;
-                    min-height: 18px;
+                    min-height: 22px;
                     background: #fff;
                     width: auto !important;
                     min-width: 0 !important;
-                    padding: 2px 6px !important;
+                    padding: 3px 8px !important;
                     
                     &:before {
                         content: "";
-                        font-size: 8px;
-                        color: #999;
+                        font-size: 10px;
+                        color: #888;
                         font-weight: 600;
                         flex-shrink: 0;
                     }
@@ -452,12 +452,12 @@
                     
                     span { 
                         font-weight: 600; 
-                        font-size: 11px;
+                        font-size: 13px;
                     }
                     
                     .text-muted {
-                        color: #bbb;
-                        font-size: 8px;
+                        color: #aaa;
+                        font-size: 10px;
                     }
                 }
                 
