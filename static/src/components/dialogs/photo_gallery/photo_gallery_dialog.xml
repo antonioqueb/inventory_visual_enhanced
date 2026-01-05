@@ -5,11 +5,107 @@
         <Dialog size="'xl'" contentClass="'h-100'">
             <div class="o_photo_gallery_dialog d-flex flex-column h-100">
                 
-                <!-- SI HAY FOTOS: Mostrar visor grande -->
+                <!-- ========== EDITOR DE DIBUJO FULLSCREEN ========== -->
+                <div t-if="state.showDrawingEditor" 
+                     class="drawing-editor-fullscreen position-fixed top-0 start-0 w-100 h-100 d-flex flex-column"
+                     style="z-index: 9999; background: #000;">
+                    
+                    <!-- Toolbar superior -->
+                    <div class="drawing-toolbar bg-dark text-white p-2 d-flex align-items-center gap-2 flex-wrap">
+                        <!-- Cerrar -->
+                        <button class="btn btn-outline-light btn-sm" t-on-click="closeDrawingEditor">
+                            <i class="fa fa-times"></i>
+                        </button>
+                        
+                        <!-- Colores -->
+                        <div class="d-flex gap-1 ms-2">
+                            <t t-foreach="availableColors" t-as="colorOption" t-key="colorOption.color">
+                                <button 
+                                    class="btn btn-sm p-0"
+                                    t-att-style="`background-color: ${colorOption.color}; width: 32px; height: 32px; border: 3px solid ${state.brushColor === colorOption.color ? '#fff' : 'transparent'}; border-radius: 50%;`"
+                                    t-on-click="() => this.setColor(colorOption.color)"
+                                ></button>
+                            </t>
+                        </div>
+                        
+                        <!-- Tamaño -->
+                        <div class="d-flex align-items-center gap-1 ms-2">
+                            <i class="fa fa-circle" style="font-size: 6px;"></i>
+                            <input 
+                                type="range" 
+                                min="2" 
+                                max="20" 
+                                t-att-value="state.brushSize"
+                                t-on-input="(e) => this.setBrushSize(e.target.value)"
+                                style="width: 80px;"
+                            />
+                            <i class="fa fa-circle" style="font-size: 14px;"></i>
+                        </div>
+                        
+                        <!-- Spacer -->
+                        <div class="flex-grow-1"></div>
+                        
+                        <!-- Deshacer -->
+                        <button 
+                            class="btn btn-outline-warning btn-sm"
+                            t-on-click="undoLastStroke"
+                            t-att-disabled="!state.canUndo"
+                        >
+                            <i class="fa fa-undo"></i>
+                        </button>
+                        
+                        <!-- Limpiar -->
+                        <button 
+                            class="btn btn-outline-danger btn-sm"
+                            t-on-click="clearDrawing"
+                            t-att-disabled="!state.canUndo"
+                        >
+                            <i class="fa fa-trash"></i>
+                        </button>
+                        
+                        <!-- Guardar -->
+                        <button class="btn btn-success btn-sm" t-on-click="saveDrawingAndClose">
+                            <i class="fa fa-check me-1"></i>
+                            <span class="d-none d-sm-inline">Listo</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Área de dibujo -->
+                    <div class="drawing-area flex-grow-1 d-flex align-items-center justify-content-center position-relative overflow-hidden"
+                         style="touch-action: none;">
+                        <!-- Imagen de fondo -->
+                        <img 
+                            t-ref="editorImage"
+                            t-att-src="state.previewUrl"
+                            class="position-absolute"
+                            style="max-width: 100%; max-height: 100%; object-fit: contain; pointer-events: none;"
+                        />
+                        <!-- Canvas de dibujo -->
+                        <canvas 
+                            t-ref="editorCanvas"
+                            class="position-absolute"
+                            style="touch-action: none; cursor: crosshair;"
+                            t-on-pointerdown="onCanvasPointerDown"
+                            t-on-pointermove="onCanvasPointerMove"
+                            t-on-pointerup="onCanvasPointerUp"
+                            t-on-pointerleave="onCanvasPointerUp"
+                            t-on-touchstart.stop.prevent="onCanvasPointerDown"
+                            t-on-touchmove.stop.prevent="onCanvasPointerMove"
+                            t-on-touchend.stop.prevent="onCanvasPointerUp"
+                        ></canvas>
+                    </div>
+                    
+                    <!-- Indicador -->
+                    <div class="bg-dark text-white text-center py-1" style="font-size: 12px;">
+                        <i class="fa fa-hand-pointer-o me-1"></i>
+                        Dibuja con el dedo o mouse sobre la imagen
+                    </div>
+                </div>
+
+                <!-- ========== VISOR DE FOTOS ========== -->
                 <t t-if="hasPhotos and !state.showUploadForm">
                     <div class="photo-viewer-section flex-grow-1 d-flex flex-column mb-3" style="min-height: 0;">
                         <div class="position-relative flex-grow-1 d-flex flex-column" style="min-height: 0;">
-                            <!-- Imagen principal grande -->
                             <div class="text-center bg-dark rounded p-2 flex-grow-1 d-flex align-items-center justify-content-center" style="min-height: 0; overflow: hidden;">
                                 <img 
                                     t-att-src="`data:image/png;base64,${currentPhoto.image}`"
@@ -21,7 +117,6 @@
                                 />
                             </div>
                             
-                            <!-- Botones de navegación -->
                             <t t-if="photosData.photos.length > 1">
                                 <button 
                                     class="btn btn-light position-absolute top-50 start-0 translate-middle-y ms-3 shadow-lg"
@@ -41,7 +136,6 @@
                                 </button>
                             </t>
                             
-                            <!-- Contador de imágenes -->
                             <div class="position-absolute top-0 end-0 m-3">
                                 <span class="badge bg-dark bg-opacity-75 px-3 py-2 fs-6">
                                     <i class="fa fa-image me-2"></i>
@@ -50,26 +144,20 @@
                             </div>
                         </div>
                         
-                        <!-- Información de la foto actual -->
                         <div class="mt-2 p-2 bg-light rounded border">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-1">
-                                        <i class="fa fa-tag text-secondary me-2"></i>
-                                        <strong t-esc="currentPhoto.name"></strong>
-                                    </h6>
-                                    <div class="d-flex gap-3">
-                                        <small class="text-muted">
-                                            <i class="fa fa-calendar me-1"></i>
-                                            <t t-esc="currentPhoto.fecha_captura"/>
-                                        </small>
-                                        <small t-if="currentPhoto.notas" class="text-muted flex-grow-1" t-esc="currentPhoto.notas"></small>
-                                    </div>
-                                </div>
+                            <h6 class="mb-1">
+                                <i class="fa fa-tag text-secondary me-2"></i>
+                                <strong t-esc="currentPhoto.name"></strong>
+                            </h6>
+                            <div class="d-flex gap-3">
+                                <small class="text-muted">
+                                    <i class="fa fa-calendar me-1"></i>
+                                    <t t-esc="currentPhoto.fecha_captura"/>
+                                </small>
+                                <small t-if="currentPhoto.notas" class="text-muted" t-esc="currentPhoto.notas"></small>
                             </div>
                         </div>
                         
-                        <!-- Miniaturas -->
                         <t t-if="photosData.photos.length > 1">
                             <div class="d-flex gap-2 mt-2 overflow-auto pb-2" style="max-height: 100px;">
                                 <t t-foreach="photosData.photos" t-as="photo" t-key="photo.id">
@@ -83,18 +171,16 @@
                                             t-att-src="`data:image/png;base64,${photo.image}`"
                                             class="img-fluid rounded"
                                             style="width: 100%; height: 100%; object-fit: cover;"
-                                            t-att-alt="photo.name"
                                         />
                                     </div>
                                 </t>
                             </div>
                         </t>
                     </div>
-                    
                     <hr class="my-2"/>
                 </t>
                 
-                <!-- SI NO HAY FOTOS Y NO ESTÁ EN MODO UPLOAD -->
+                <!-- SI NO HAY FOTOS -->
                 <t t-if="!hasPhotos and !state.showUploadForm">
                     <div class="text-center py-5 mb-3">
                         <i class="fa fa-camera" style="font-size: 64px; color: #ccc;"></i>
@@ -103,7 +189,7 @@
                     <hr class="my-2"/>
                 </t>
 
-                <!-- BOTÓN PARA MOSTRAR FORMULARIO (cuando no está en modo upload) -->
+                <!-- BOTÓN AGREGAR (cuando no hay editor abierto) -->
                 <t t-if="!state.showUploadForm">
                     <div class="text-center mb-2">
                         <button class="btn btn-secondary btn-lg" t-on-click="toggleUploadForm">
@@ -113,11 +199,10 @@
                     </div>
                 </t>
 
-                <!-- ========== FORMULARIO DE SUBIDA ========== -->
-                <t t-if="state.showUploadForm">
+                <!-- ========== EDITOR DE FOTO (después de seleccionar) ========== -->
+                <t t-if="state.showEditor">
                     <div class="upload-section flex-grow-1 d-flex flex-column">
                         
-                        <!-- Header del formulario -->
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h5 class="mb-0">
                                 <i class="fa fa-camera text-secondary me-2"></i>
@@ -128,208 +213,73 @@
                             </button>
                         </div>
 
-                        <!-- SI NO HAY IMAGEN SELECCIONADA: Mostrar opciones de captura -->
-                        <t t-if="!state.showEditor">
+                        <!-- Nombre -->
+                        <div class="mb-3">
+                            <input 
+                                type="text" 
+                                class="form-control"
+                                placeholder="Nombre de la foto"
+                                t-model="state.photoName"
+                                t-on-input="onPhotoNameChange"
+                            />
+                        </div>
+
+                        <!-- Info compresión -->
+                        <div class="alert alert-info py-2 mb-3" t-if="state.compressionInfo">
+                            <small>
+                                <i class="fa fa-info-circle me-1"></i>
+                                Original: <strong t-esc="state.compressionInfo.originalSize"></strong>
+                                <t t-if="state.compressionInfo.compressedSize">
+                                    → <strong t-esc="state.compressionInfo.compressedSize"></strong>
+                                </t>
+                            </small>
+                        </div>
+
+                        <!-- Preview de imagen -->
+                        <div class="text-center mb-3 position-relative">
+                            <img 
+                                t-ref="previewImage"
+                                t-att-src="state.previewUrl"
+                                class="img-fluid rounded shadow"
+                                style="max-height: 40vh; max-width: 100%;"
+                            />
                             
-                            <!-- VISTA MÓVIL: Botones grandes de Cámara/Galería -->
-                            <div class="mobile-capture-options d-md-none">
-                                <div class="row g-3">
-                                    <div class="col-6">
-                                        <button 
-                                            class="btn btn-primary w-100 py-4 d-flex flex-column align-items-center"
-                                            t-on-click="openCamera"
-                                            style="background: linear-gradient(135deg, #714B67 0%, #5a3d52 100%); border: none;"
-                                        >
-                                            <i class="fa fa-camera fa-3x mb-2"></i>
-                                            <span class="fw-bold">Tomar Foto</span>
-                                        </button>
-                                    </div>
-                                    <div class="col-6">
-                                        <button 
-                                            class="btn btn-secondary w-100 py-4 d-flex flex-column align-items-center"
-                                            t-on-click="openGallery"
-                                            style="background: linear-gradient(135deg, #017E84 0%, #015f63 100%); border: none;"
-                                        >
-                                            <i class="fa fa-image fa-3x mb-2"></i>
-                                            <span class="fw-bold">Galería</span>
-                                        </button>
-                                    </div>
-                                </div>
+                            <!-- Indicador de anotaciones -->
+                            <div t-if="state.canUndo" class="position-absolute top-0 end-0 m-2">
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fa fa-pencil me-1"></i>
+                                    Con anotaciones
+                                </span>
                             </div>
+                        </div>
 
-                            <!-- VISTA DESKTOP: Input tradicional -->
-                            <div class="desktop-capture-options d-none d-md-block">
-                                <div class="card bg-light border-dashed" style="border: 2px dashed #ccc;">
-                                    <div class="card-body text-center py-5">
-                                        <i class="fa fa-cloud-upload fa-4x text-muted mb-3"></i>
-                                        <p class="mb-3">Arrastra una imagen aquí o</p>
-                                        <input 
-                                            type="file" 
-                                            class="d-none"
-                                            id="fileInputDesktop"
-                                            accept="image/*"
-                                            t-on-change="onFileSelected"
-                                        />
-                                        <label for="fileInputDesktop" class="btn btn-secondary btn-lg">
-                                            <i class="fa fa-folder-open me-2"></i>
-                                            Seleccionar Archivo
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </t>
+                        <!-- Botones de acción -->
+                        <div class="d-flex gap-2 mb-3">
+                            <button class="btn btn-outline-secondary flex-grow-1" t-on-click="openFilePicker">
+                                <i class="fa fa-refresh me-1"></i>
+                                Cambiar
+                            </button>
+                            <button class="btn btn-outline-warning flex-grow-1" t-on-click="openDrawingEditor">
+                                <i class="fa fa-pencil me-1"></i>
+                                Dibujar
+                            </button>
+                        </div>
 
-                        <!-- SI HAY IMAGEN SELECCIONADA: Mostrar editor -->
-                        <t t-if="state.showEditor">
-                            <div class="editor-section flex-grow-1 d-flex flex-column">
-                                
-                                <!-- Nombre de la foto -->
-                                <div class="mb-3">
-                                    <input 
-                                        type="text" 
-                                        class="form-control form-control-lg"
-                                        placeholder="Nombre de la foto"
-                                        t-model="state.photoName"
-                                        t-on-input="onPhotoNameChange"
-                                    />
-                                </div>
-
-                                <!-- Info de compresión -->
-                                <div class="alert alert-info py-2 mb-3" t-if="state.compressionInfo">
-                                    <small>
-                                        <i class="fa fa-info-circle me-1"></i>
-                                        Original: <strong t-esc="state.compressionInfo.originalSize"></strong>
-                                        <span t-if="state.compressionInfo.compressedSize">
-                                            → Comprimido: <strong t-esc="state.compressionInfo.compressedSize"></strong>
-                                            (<t t-esc="state.compressionInfo.reduction"/> reducción)
-                                        </span>
-                                    </small>
-                                </div>
-
-                                <!-- Contenedor de imagen + canvas de dibujo -->
-                                <div class="image-editor-container position-relative flex-grow-1 mb-3" style="min-height: 200px;">
-                                    <div class="position-relative d-inline-block w-100 text-center" style="max-height: 50vh; overflow: hidden;">
-                                        <img 
-                                            t-ref="previewImage"
-                                            t-att-src="state.previewUrl"
-                                            class="img-fluid rounded shadow"
-                                            style="max-height: 50vh; max-width: 100%; object-fit: contain;"
-                                        />
-                                        <canvas 
-                                            t-ref="drawingCanvas"
-                                            class="drawing-canvas position-absolute"
-                                            style="top: 0; left: 50%; transform: translateX(-50%); touch-action: none; pointer-events: none;"
-                                            t-on-pointerdown="onCanvasPointerDown"
-                                            t-on-pointermove="onCanvasPointerMove"
-                                            t-on-pointerup="onCanvasPointerUp"
-                                            t-on-pointerleave="onCanvasPointerLeave"
-                                            t-on-touchstart="onCanvasPointerDown"
-                                            t-on-touchmove="onCanvasPointerMove"
-                                            t-on-touchend="onCanvasPointerUp"
-                                        ></canvas>
-                                    </div>
-                                </div>
-
-                                <!-- BARRA DE HERRAMIENTAS DE DIBUJO -->
-                                <div class="drawing-toolbar bg-light rounded p-2 mb-3">
-                                    <div class="d-flex flex-wrap align-items-center gap-2">
-                                        
-                                        <!-- Toggle Dibujo -->
-                                        <button 
-                                            class="btn"
-                                            t-att-class="state.drawingEnabled ? 'btn-warning' : 'btn-outline-secondary'"
-                                            t-on-click="toggleDrawing"
-                                            title="Activar/Desactivar dibujo"
-                                        >
-                                            <i class="fa fa-pencil me-1"></i>
-                                            <span class="d-none d-sm-inline">
-                                                <t t-if="state.drawingEnabled">Dibujando...</t>
-                                                <t t-else="">Dibujar</t>
-                                            </span>
-                                        </button>
-
-                                        <!-- Separador -->
-                                        <div class="vr d-none d-sm-block" t-if="state.drawingEnabled"></div>
-
-                                        <!-- Colores (solo si dibujo activo) -->
-                                        <div class="color-picker d-flex gap-1" t-if="state.drawingEnabled">
-                                            <t t-foreach="availableColors" t-as="colorOption" t-key="colorOption.color">
-                                                <button 
-                                                    class="btn btn-sm color-btn p-0"
-                                                    t-att-class="{ 'ring-2': state.brushColor === colorOption.color }"
-                                                    t-att-style="`background-color: ${colorOption.color}; width: 28px; height: 28px; border: 2px solid ${state.brushColor === colorOption.color ? '#333' : '#ccc'}; border-radius: 50%;`"
-                                                    t-on-click="() => this.setColor(colorOption.color)"
-                                                    t-att-title="colorOption.name"
-                                                ></button>
-                                            </t>
-                                        </div>
-
-                                        <!-- Tamaño de pincel -->
-                                        <div class="brush-size d-flex align-items-center gap-2" t-if="state.drawingEnabled">
-                                            <i class="fa fa-circle text-muted" style="font-size: 8px;"></i>
-                                            <input 
-                                                type="range" 
-                                                class="form-range" 
-                                                min="2" 
-                                                max="20" 
-                                                t-att-value="state.brushSize"
-                                                t-on-input="(e) => this.setBrushSize(e.target.value)"
-                                                style="width: 80px;"
-                                            />
-                                            <i class="fa fa-circle text-muted" style="font-size: 16px;"></i>
-                                        </div>
-
-                                        <!-- Spacer -->
-                                        <div class="flex-grow-1"></div>
-
-                                        <!-- Deshacer -->
-                                        <button 
-                                            class="btn btn-outline-secondary btn-sm"
-                                            t-on-click="undoLastStroke"
-                                            t-att-disabled="!state.canUndo"
-                                            title="Deshacer último trazo"
-                                        >
-                                            <i class="fa fa-undo"></i>
-                                        </button>
-
-                                        <!-- Limpiar todo -->
-                                        <button 
-                                            class="btn btn-outline-danger btn-sm"
-                                            t-on-click="clearDrawing"
-                                            t-att-disabled="!state.canUndo"
-                                            title="Limpiar dibujo"
-                                        >
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-
-                                        <!-- Cambiar imagen -->
-                                        <button 
-                                            class="btn btn-outline-secondary btn-sm"
-                                            t-on-click="resetEditor"
-                                            title="Cambiar imagen"
-                                        >
-                                            <i class="fa fa-refresh"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- BOTÓN DE SUBIR -->
-                                <button 
-                                    class="btn btn-success btn-lg w-100 py-3"
-                                    t-on-click="uploadPhoto"
-                                    t-att-disabled="state.isUploading"
-                                >
-                                    <t t-if="!state.isUploading">
-                                        <i class="fa fa-cloud-upload me-2"></i>
-                                        Guardar Fotografía
-                                    </t>
-                                    <t t-else="">
-                                        <i class="fa fa-spinner fa-spin me-2"></i>
-                                        Procesando y subiendo...
-                                    </t>
-                                </button>
-                            </div>
-                        </t>
+                        <!-- Botón subir -->
+                        <button 
+                            class="btn btn-success btn-lg w-100 py-3"
+                            t-on-click="uploadPhoto"
+                            t-att-disabled="state.isUploading"
+                        >
+                            <t t-if="!state.isUploading">
+                                <i class="fa fa-cloud-upload me-2"></i>
+                                Guardar Fotografía
+                            </t>
+                            <t t-else="">
+                                <i class="fa fa-spinner fa-spin me-2"></i>
+                                Subiendo...
+                            </t>
+                        </button>
                     </div>
                 </t>
             </div>

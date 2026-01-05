@@ -11,9 +11,10 @@ export class PhotoGalleryDialog extends Component {
         this.orm = useService("orm");
         this.notification = useService("notification");
         
-        // Referencias a elementos del DOM
         this.canvasRef = useRef("drawingCanvas");
         this.previewRef = useRef("previewImage");
+        this.editorCanvasRef = useRef("editorCanvas");
+        this.editorImageRef = useRef("editorImage");
         
         this.state = useState({
             photoName: `Foto - ${this.photosData.lot_name}`,
@@ -22,20 +23,17 @@ export class PhotoGalleryDialog extends Component {
             showUploadForm: false,
             currentImageIndex: 0,
             compressionInfo: null,
-            
-            // Preview y edición
             previewUrl: null,
             showEditor: false,
             
-            // Herramientas de dibujo
+            // Editor de dibujo fullscreen
+            showDrawingEditor: false,
             isDrawing: false,
-            drawingEnabled: false,
             brushColor: '#FF0000',
-            brushSize: 4,
+            brushSize: 6,
             canUndo: false,
         });
 
-        // Configuración de compresión
         this.compressionConfig = {
             maxWidth: 1280,
             maxHeight: 1280,
@@ -44,33 +42,19 @@ export class PhotoGalleryDialog extends Component {
             minQuality: 0.3,
         };
 
-        // Canvas y contexto
         this.canvas = null;
         this.ctx = null;
         this.drawingHistory = [];
         this.currentPath = [];
         
-        // Detectar móvil
         this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-        onMounted(() => {
-            this.setupCanvas();
-        });
 
         onWillUnmount(() => {
             if (this.state.previewUrl) {
                 URL.revokeObjectURL(this.state.previewUrl);
             }
+            document.body.style.overflow = '';
         });
-    }
-
-    setupCanvas() {
-        if (this.canvasRef.el) {
-            this.canvas = this.canvasRef.el;
-            this.ctx = this.canvas.getContext('2d');
-            this.ctx.lineCap = 'round';
-            this.ctx.lineJoin = 'round';
-        }
     }
 
     get hasPhotos() {
@@ -88,17 +72,33 @@ export class PhotoGalleryDialog extends Component {
             { color: '#00FF00', name: 'Verde' },
             { color: '#0000FF', name: 'Azul' },
             { color: '#FFFF00', name: 'Amarillo' },
-            { color: '#FF00FF', name: 'Magenta' },
             { color: '#000000', name: 'Negro' },
             { color: '#FFFFFF', name: 'Blanco' },
         ];
     }
     
     toggleUploadForm() {
-        this.state.showUploadForm = !this.state.showUploadForm;
         if (!this.state.showUploadForm) {
+            // Al abrir, disparar directamente el file picker
+            this.openFilePicker();
+        } else {
+            // Al cerrar, limpiar
+            this.state.showUploadForm = false;
             this.resetEditor();
         }
+    }
+
+    openFilePicker() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        // En móvil esto muestra el menú nativo con opciones de cámara/galería
+        input.onchange = (e) => {
+            if (e.target.files[0]) {
+                this.handleFileSelect(e.target.files[0]);
+            }
+        };
+        input.click();
     }
 
     resetEditor() {
@@ -110,13 +110,11 @@ export class PhotoGalleryDialog extends Component {
         this.state.compressionInfo = null;
         this.state.previewUrl = null;
         this.state.showEditor = false;
-        this.state.drawingEnabled = false;
+        this.state.showDrawingEditor = false;
         this.state.canUndo = false;
         this.drawingHistory = [];
         this.currentPath = [];
-        if (this.ctx) {
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        }
+        document.body.style.overflow = '';
     }
     
     nextPhoto() {
@@ -131,32 +129,6 @@ export class PhotoGalleryDialog extends Component {
         }
     }
 
-    // === CAPTURA DE IMAGEN ===
-    
-    openCamera() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.capture = 'environment'; // Cámara trasera
-        input.onchange = (e) => this.handleFileSelect(e.target.files[0]);
-        input.click();
-    }
-
-    openGallery() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.onchange = (e) => this.handleFileSelect(e.target.files[0]);
-        input.click();
-    }
-    
-    onFileSelected(ev) {
-        const file = ev.target.files[0];
-        if (file) {
-            this.handleFileSelect(file);
-        }
-    }
-
     handleFileSelect(file) {
         if (!file) return;
 
@@ -165,7 +137,6 @@ export class PhotoGalleryDialog extends Component {
             return;
         }
 
-        // Limpiar preview anterior
         if (this.state.previewUrl) {
             URL.revokeObjectURL(this.state.previewUrl);
         }
@@ -176,37 +147,9 @@ export class PhotoGalleryDialog extends Component {
             originalSize: this.formatFileSize(file.size),
             originalSizeBytes: file.size,
         };
+        this.state.showUploadForm = true;
         this.state.showEditor = true;
-        this.state.drawingEnabled = false;
         this.drawingHistory = [];
-
-        // Configurar canvas cuando la imagen cargue
-        setTimeout(() => this.initializeCanvasSize(), 100);
-    }
-
-    initializeCanvasSize() {
-        const img = this.previewRef.el;
-        if (img && this.canvas) {
-            // Esperar a que la imagen cargue
-            if (img.complete) {
-                this.setCanvasSize(img);
-            } else {
-                img.onload = () => this.setCanvasSize(img);
-            }
-        }
-    }
-
-    setCanvasSize(img) {
-        if (!this.canvas) return;
-        
-        const rect = img.getBoundingClientRect();
-        this.canvas.width = rect.width;
-        this.canvas.height = rect.height;
-        this.canvas.style.width = rect.width + 'px';
-        this.canvas.style.height = rect.height + 'px';
-        
-        // Redibujar historial si existe
-        this.redrawCanvas();
     }
     
     onPhotoNameChange(ev) {
@@ -219,12 +162,69 @@ export class PhotoGalleryDialog extends Component {
         return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
     }
 
-    // === HERRAMIENTAS DE DIBUJO ===
+    // === EDITOR DE DIBUJO FULLSCREEN ===
 
-    toggleDrawing() {
-        this.state.drawingEnabled = !this.state.drawingEnabled;
-        if (this.canvas) {
-            this.canvas.style.pointerEvents = this.state.drawingEnabled ? 'auto' : 'none';
+    openDrawingEditor() {
+        this.state.showDrawingEditor = true;
+        document.body.style.overflow = 'hidden'; // Bloquear scroll
+        
+        // Esperar a que el DOM se actualice
+        setTimeout(() => this.initDrawingCanvas(), 50);
+    }
+
+    closeDrawingEditor() {
+        this.state.showDrawingEditor = false;
+        document.body.style.overflow = '';
+    }
+
+    initDrawingCanvas() {
+        const canvas = this.editorCanvasRef.el;
+        const img = this.editorImageRef.el;
+        
+        if (!canvas || !img) {
+            console.error('Canvas o imagen no encontrados');
+            return;
+        }
+
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        
+        // Esperar a que la imagen cargue
+        const setupCanvas = () => {
+            const container = canvas.parentElement;
+            const containerRect = container.getBoundingClientRect();
+            
+            // Calcular tamaño manteniendo proporción
+            const imgRatio = img.naturalWidth / img.naturalHeight;
+            const containerRatio = containerRect.width / containerRect.height;
+            
+            let canvasWidth, canvasHeight;
+            
+            if (imgRatio > containerRatio) {
+                canvasWidth = containerRect.width;
+                canvasHeight = containerRect.width / imgRatio;
+            } else {
+                canvasHeight = containerRect.height;
+                canvasWidth = containerRect.height * imgRatio;
+            }
+            
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            canvas.style.width = canvasWidth + 'px';
+            canvas.style.height = canvasHeight + 'px';
+            
+            // Configurar contexto
+            this.ctx.lineCap = 'round';
+            this.ctx.lineJoin = 'round';
+            
+            // Redibujar historial existente
+            this.redrawCanvas();
+        };
+
+        if (img.complete && img.naturalWidth > 0) {
+            setupCanvas();
+        } else {
+            img.onload = setupCanvas;
         }
     }
 
@@ -237,6 +237,8 @@ export class PhotoGalleryDialog extends Component {
     }
 
     getPointerPosition(e) {
+        if (!this.canvas) return { x: 0, y: 0 };
+        
         const rect = this.canvas.getBoundingClientRect();
         const scaleX = this.canvas.width / rect.width;
         const scaleY = this.canvas.height / rect.height;
@@ -258,9 +260,9 @@ export class PhotoGalleryDialog extends Component {
     }
 
     onCanvasPointerDown(e) {
-        if (!this.state.drawingEnabled) return;
-        
         e.preventDefault();
+        e.stopPropagation();
+        
         this.state.isDrawing = true;
         
         const pos = this.getPointerPosition(e);
@@ -275,12 +277,18 @@ export class PhotoGalleryDialog extends Component {
         this.ctx.moveTo(pos.x, pos.y);
         this.ctx.strokeStyle = this.state.brushColor;
         this.ctx.lineWidth = this.state.brushSize;
+        
+        // Dibujar un punto si solo es un tap
+        this.ctx.lineTo(pos.x + 0.1, pos.y + 0.1);
+        this.ctx.stroke();
     }
 
     onCanvasPointerMove(e) {
-        if (!this.state.isDrawing || !this.state.drawingEnabled) return;
+        if (!this.state.isDrawing) return;
         
         e.preventDefault();
+        e.stopPropagation();
+        
         const pos = this.getPointerPosition(e);
         
         this.currentPath.push({
@@ -298,6 +306,8 @@ export class PhotoGalleryDialog extends Component {
         if (!this.state.isDrawing) return;
         
         e.preventDefault();
+        e.stopPropagation();
+        
         this.state.isDrawing = false;
         this.ctx.closePath();
         
@@ -306,10 +316,6 @@ export class PhotoGalleryDialog extends Component {
             this.state.canUndo = true;
         }
         this.currentPath = [];
-    }
-
-    onCanvasPointerLeave(e) {
-        this.onCanvasPointerUp(e);
     }
 
     undoLastStroke() {
@@ -322,12 +328,14 @@ export class PhotoGalleryDialog extends Component {
 
     clearDrawing() {
         this.drawingHistory = [];
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        if (this.ctx && this.canvas) {
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
         this.state.canUndo = false;
     }
 
     redrawCanvas() {
-        if (!this.ctx) return;
+        if (!this.ctx || !this.canvas) return;
         
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         
@@ -337,6 +345,8 @@ export class PhotoGalleryDialog extends Component {
             this.ctx.beginPath();
             this.ctx.strokeStyle = path[0].color;
             this.ctx.lineWidth = path[0].size;
+            this.ctx.lineCap = 'round';
+            this.ctx.lineJoin = 'round';
             this.ctx.moveTo(path[0].x, path[0].y);
             
             for (let i = 1; i < path.length; i++) {
@@ -345,6 +355,11 @@ export class PhotoGalleryDialog extends Component {
             this.ctx.stroke();
             this.ctx.closePath();
         }
+    }
+
+    saveDrawingAndClose() {
+        this.closeDrawingEditor();
+        this.notification.add("Anotaciones guardadas", { type: "success" });
     }
 
     // === COMPRESIÓN Y SUBIDA ===
