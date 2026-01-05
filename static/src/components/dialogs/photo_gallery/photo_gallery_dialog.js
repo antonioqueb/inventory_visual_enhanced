@@ -191,14 +191,34 @@ export class PhotoGalleryDialog extends Component {
     downloadCurrentImage() {
         if (!this.currentPhoto) return;
         
-        const link = document.createElement('a');
-        link.href = `data:image/png;base64,${this.currentPhoto.image}`;
-        link.download = this.currentPhoto.name || `foto_${this.photosData.lot_name}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        this.notification.add("Imagen descargada", { type: "success" });
+        try {
+            // Convertir base64 a Blob
+            const byteCharacters = atob(this.currentPhoto.image);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: 'image/png' });
+            
+            // Crear Object URL para descarga
+            const blobUrl = URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = this.currentPhoto.name || `foto_${this.photosData.lot_name}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Liberar memoria
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+            
+            this.notification.add("Imagen descargada", { type: "success" });
+        } catch (err) {
+            console.error("Error al descargar:", err);
+            this.notification.add("Error al descargar la imagen", { type: "danger" });
+        }
     }
 
     async shareCurrentImage() {
