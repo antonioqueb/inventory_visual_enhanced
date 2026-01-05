@@ -384,7 +384,7 @@
                     justify-content: flex-end;
                     
                     .dimensions-inline {
-                        font-size: 7px;
+                        font-size: 9px;
                         display: flex;
                         align-items: center;
                         gap: 3px;
@@ -423,7 +423,7 @@
 
                 &.col-bloque, &.col-atado, 
                 &.col-pedimento, &.col-contenedor {
-                    font-size: 10px;
+                    font-size: 9px;
                     color: #333;
                     flex-direction: row;
                     align-items: center;
