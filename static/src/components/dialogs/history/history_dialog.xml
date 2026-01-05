@@ -439,13 +439,6 @@
                                                 </p>
                                             </div>
                                         </div>
-                                        <t t-if="reservation.notas">
-                                            <hr/>
-                                            <p class="mb-0">
-                                                <strong>Notas:</strong><br/>
-                                                <t t-esc="reservation.notas"/>
-                                            </p>
-                                        </t>
                                     </div>
                                 </div>
                             </t>
