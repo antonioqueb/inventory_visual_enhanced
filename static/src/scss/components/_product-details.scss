@@ -21,7 +21,7 @@
   
   // SOLICITUD: Fuente formal y tamaño pequeño (9px) en escritorio
   font-family: "Roboto", "Arial", sans-serif;
-  font-size: 9px;
+  font-size: 10px;
 
   thead {
     background: #F5F5F5;
@@ -33,7 +33,7 @@
       text-align: left;
       font-weight: 700;
       color: #2C2C2C;
-      font-size: 9px; // Texto pequeño
+      font-size: 10px; // Texto pequeño
       text-transform: uppercase;
       letter-spacing: 0.5px;
       border-right: 1px solid #E0E0E0;
@@ -76,7 +76,7 @@
       vertical-align: middle;
       color: #2C2C2C;
       border-right: 1px solid #E0E0E0;
-      font-size: 9px; // Texto 9px
+      font-size: 10px; // Texto 9px
       line-height: 1.2;
 
       &:last-child { border-right: none; }
@@ -101,11 +101,11 @@
         width: 18px;
         height: 18px;
         min-width: 18px; // Sobrescribir estilos globales
-        font-size: 9px;
+        font-size: 10px;
         border-radius: 3px; // Menos redondeado para verse más formal
         
         i.fa {
-            font-size: 9px;
+            font-size: 10px;
             line-height: 1;
         }
       }
@@ -127,17 +127,17 @@
 
   .col-location {
     font-weight: 500;
-    .fa-map-marker { color: #714B67; margin-right: 2px; font-size: 9px; }
+    .fa-map-marker { color: #714B67; margin-right: 2px; font-size: 10px; }
   }
 
   .col-dimensions {
     .dimensions-inline {
       display: inline-flex; align-items: center; gap: 4px;
-      white-space: nowrap; font-size: 9px; color: #7a7a7a;
+      white-space: nowrap; font-size: 10px; color: #7a7a7a;
     }
     .dimensions-total-inline {
       font-weight: 700; color: #714B67;
-      font-family: inherit; font-size: 9px; margin-left: 2px;
+      font-family: inherit; font-size: 10px; margin-left: 2px;
     }
   }
 
@@ -349,7 +349,7 @@
                 // === LOTE ===
                 &.col-lot {
                     grid-area: header;
-                    font-size: 9px;
+                    font-size: 10px;
                     font-weight: 700;
                     color: #714B67;
                     background-color: #f8f8f8;
@@ -482,7 +482,7 @@
                     .icon-btn, .status-badge-btn {
                         width: 18px;
                         height: 18px;
-                        font-size: 9px;
+                        font-size: 10px;
                         min-width: 18px;
                         border-radius: 3px;
                         border: none;
@@ -503,7 +503,7 @@
                         }
                         
                         i.fa {
-                            font-size: 9px;
+                            font-size: 10px;
                         }
                         
                         &.status-hold-active { 
