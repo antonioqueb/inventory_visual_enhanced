@@ -251,13 +251,13 @@
 
             tr {
                 display: grid;
-                // Grid simplificado: solo 4 campos técnicos (bloque, atado, pedimento, contenedor)
-                grid-template-columns: 24px 1fr 1fr 20px 20px 20px 20px;
+                // Grid corregido: 8 columnas, checkbox siempre en su lugar
+                grid-template-columns: 24px 1fr 1fr 1fr 20px 20px 20px 20px;
                 grid-template-areas:
-                    "check  header header  act1 act2 act3 act4"
-                    "check  loc    dims    act1 act2 act3 act4"
-                    "tech2  tech3  tech4   act1 act2 act3 act4"
-                    "tech5  tech5  tech5   act1 act2 act3 act4";
+                    "check  header header header  act1 act2 act3 act4"
+                    "check  loc    loc    dims    act1 act2 act3 act4"
+                    "check  tech4  tech2  tech3   act1 act2 act3 act4"
+                    "check  tech5  tech5  tech5   act1 act2 act3 act4";
                 
                 background: #FFFFFF;
                 border: 1px solid #ddd;
@@ -414,9 +414,11 @@
                 }
 
                 // === CAMPOS TÉCNICOS VISIBLES ===
+                // Fila 3: Pedimento | Bloque | Atado
+                &.col-pedimento { grid-area: tech4; }
                 &.col-bloque { grid-area: tech2; }
                 &.col-atado { grid-area: tech3; }
-                &.col-pedimento { grid-area: tech4; }
+                // Fila 4: Contenedor (ancho completo)
                 &.col-contenedor { grid-area: tech5; }
 
                 &.col-bloque, &.col-atado, 
@@ -457,7 +459,8 @@
                     }
                 }
                 
-                // Contenedor ocupa toda la fila inferior
+                // Quitar borde derecho del último de cada fila
+                &.col-atado,
                 &.col-contenedor {
                     border-right: none !important;
                 }
