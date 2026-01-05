@@ -251,12 +251,13 @@
 
             tr {
                 display: grid;
-                grid-template-columns: 24px 1fr 1fr 1fr 1fr 20px 20px 20px 20px;
+                // Grid simplificado: solo 4 campos técnicos (bloque, atado, pedimento, contenedor)
+                grid-template-columns: 24px 1fr 1fr 20px 20px 20px 20px;
                 grid-template-areas:
-                    "check  header header dims   dims   act1 act2 act3 act4"
-                    "check  loc    loc    loc    loc    act1 act2 act3 act4"
-                    "tech0  tech1  tech2  tech3  tech4  act1 act2 act3 act4"
-                    "tech5  tech5  tech6  tech6  tech6  act1 act2 act3 act4";
+                    "check  header header  act1 act2 act3 act4"
+                    "check  loc    dims    act1 act2 act3 act4"
+                    "tech2  tech3  tech4   act1 act2 act3 act4"
+                    "tech5  tech5  tech5   act1 act2 act3 act4";
                 
                 background: #FFFFFF;
                 border: 1px solid #ddd;
@@ -265,7 +266,7 @@
                 box-shadow: none;
                 overflow: hidden;
                 height: auto;
-                min-height: 52px;
+                min-height: 48px;
             }
 
             // Fila de resumen de grupo
@@ -377,9 +378,9 @@
                 // === DIMENSIONES ===
                 &.col-dimensions {
                     grid-area: dims;
-                    background-color: #f8f8f8;
-                    padding: 2px 4px !important;
-                    border-bottom: 1px solid #eee !important;
+                    background-color: #fff;
+                    padding: 1px 4px !important;
+                    border-bottom: 1px solid #f0f0f0 !important;
                     justify-content: flex-end;
                     
                     .dimensions-inline {
@@ -405,60 +406,60 @@
                     }
                 }
 
-                // === CAMPOS TÉCNICOS ===
-                &.col-color { grid-area: tech0; }
-                &.col-tipo { grid-area: tech1; }
+                // === CAMPOS OCULTOS EN MÓVIL ===
+                &.col-color,
+                &.col-tipo,
+                &.col-ref-proveedor {
+                    display: none !important;
+                }
+
+                // === CAMPOS TÉCNICOS VISIBLES ===
                 &.col-bloque { grid-area: tech2; }
                 &.col-atado { grid-area: tech3; }
                 &.col-pedimento { grid-area: tech4; }
                 &.col-contenedor { grid-area: tech5; }
-                &.col-ref-proveedor { grid-area: tech6; }
 
-                &.col-color,
-                &.col-tipo, &.col-bloque, &.col-atado, 
-                &.col-pedimento, &.col-contenedor, &.col-ref-proveedor {
-                    font-size: 7px;
-                    color: #555;
+                &.col-bloque, &.col-atado, 
+                &.col-pedimento, &.col-contenedor {
+                    font-size: 8px;
+                    color: #333;
                     flex-direction: row;
                     align-items: center;
-                    gap: 1px;
+                    gap: 2px;
                     border-right: 1px solid #f0f0f0 !important;
-                    min-height: 14px;
+                    min-height: 16px;
                     background: #fff;
                     width: auto !important;
                     min-width: 0 !important;
-                    padding: 1px 2px !important;
-                    overflow: hidden;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
+                    padding: 2px 4px !important;
                     
                     &:before {
                         content: "";
-                        font-size: 6px;
-                        color: #aaa;
+                        font-size: 7px;
+                        color: #999;
                         font-weight: 600;
                         flex-shrink: 0;
                     }
                     
-                    &.col-color:before { content: "C:"; }
-                    &.col-tipo:before { content: "T:"; }
                     &.col-bloque:before { content: "B:"; }
                     &.col-atado:before { content: "A:"; }
                     &.col-pedimento:before { content: "P:"; }
-                    &.col-contenedor:before { content: "Ct:"; }
-                    &.col-ref-proveedor:before { content: "Rf:"; }
+                    &.col-contenedor:before { content: "Cnt:"; }
                     
                     span { 
                         font-weight: 600; 
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        font-size: 7px;
+                        font-size: 8px;
                     }
                     
                     .text-muted {
-                        color: #ccc;
-                        font-size: 6px;
+                        color: #bbb;
+                        font-size: 7px;
                     }
+                }
+                
+                // Contenedor ocupa toda la fila inferior
+                &.col-contenedor {
+                    border-right: none !important;
                 }
 
                 // === BOTONES DE ACCIÓN ===
