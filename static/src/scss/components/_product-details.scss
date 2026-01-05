@@ -414,12 +414,12 @@
                 }
 
                 // === CAMPOS TÉCNICOS VISIBLES ===
-                // Fila 3: Pedimento | Bloque | Atado
-                &.col-pedimento { grid-area: tech4; }
+                // Fila 3: Contenedor | Bloque | Atado
+                &.col-contenedor { grid-area: tech4; }
                 &.col-bloque { grid-area: tech2; }
                 &.col-atado { grid-area: tech3; }
-                // Fila 4: Contenedor (ancho completo)
-                &.col-contenedor { grid-area: tech5; }
+                // Fila 4: Pedimento (ancho completo)
+                &.col-pedimento { grid-area: tech5; }
 
                 &.col-bloque, &.col-atado, 
                 &.col-pedimento, &.col-contenedor {
@@ -461,7 +461,7 @@
                 
                 // Quitar borde derecho del último de cada fila
                 &.col-atado,
-                &.col-contenedor {
+                &.col-pedimento {
                     border-right: none !important;
                 }
 
