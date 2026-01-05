@@ -200,25 +200,45 @@ export class PhotoGalleryDialog extends Component {
             }
             const byteArray = new Uint8Array(byteNumbers);
             const blob = new Blob([byteArray], { type: 'image/png' });
+            const fileName = this.currentPhoto.name || `foto_${this.photosData.lot_name}.png`;
             
-            // Crear Object URL para descarga
-            const blobUrl = URL.createObjectURL(blob);
+            // En móvil usar Web Share API (permite guardar a Fotos)
+            if (this.isMobile && navigator.share) {
+                const file = new File([blob], fileName, { type: 'image/png' });
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    navigator.share({
+                        files: [file],
+                        title: fileName,
+                    }).then(() => {
+                        this.notification.add("Usa 'Guardar imagen' en el menú", { type: "info" });
+                    }).catch(err => {
+                        if (err.name !== 'AbortError') {
+                            this.fallbackDownload(blob, fileName);
+                        }
+                    });
+                    return;
+                }
+            }
             
-            const link = document.createElement('a');
-            link.href = blobUrl;
-            link.download = this.currentPhoto.name || `foto_${this.photosData.lot_name}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            // Desktop: descarga directa
+            this.fallbackDownload(blob, fileName);
             
-            // Liberar memoria
-            setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
-            
-            this.notification.add("Imagen descargada", { type: "success" });
         } catch (err) {
             console.error("Error al descargar:", err);
             this.notification.add("Error al descargar la imagen", { type: "danger" });
         }
+    }
+    
+    fallbackDownload(blob, fileName) {
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+        this.notification.add("Imagen descargada", { type: "success" });
     }
 
     async shareCurrentImage() {
