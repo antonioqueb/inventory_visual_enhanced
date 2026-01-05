@@ -144,17 +144,43 @@
                             </div>
                         </div>
                         
+                        <!-- INFO + BOTONES DESCARGA/COMPARTIR -->
                         <div class="mt-2 p-2 bg-light rounded border">
-                            <h6 class="mb-1">
-                                <i class="fa fa-tag text-secondary me-2"></i>
-                                <strong t-esc="currentPhoto.name"></strong>
-                            </h6>
-                            <div class="d-flex gap-3">
-                                <small class="text-muted">
-                                    <i class="fa fa-calendar me-1"></i>
-                                    <t t-esc="currentPhoto.fecha_captura"/>
-                                </small>
-                                <small t-if="currentPhoto.notas" class="text-muted" t-esc="currentPhoto.notas"></small>
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">
+                                        <i class="fa fa-tag text-secondary me-2"></i>
+                                        <strong t-esc="currentPhoto.name"></strong>
+                                    </h6>
+                                    <div class="d-flex gap-3">
+                                        <small class="text-muted">
+                                            <i class="fa fa-calendar me-1"></i>
+                                            <t t-esc="currentPhoto.fecha_captura"/>
+                                        </small>
+                                        <small t-if="currentPhoto.notas" class="text-muted" t-esc="currentPhoto.notas"></small>
+                                    </div>
+                                </div>
+                                <!-- BOTONES DESCARGA Y COMPARTIR -->
+                                <div class="d-flex gap-2">
+                                    <button 
+                                        type="button"
+                                        class="btn btn-outline-primary btn-sm"
+                                        t-on-click="downloadCurrentImage"
+                                        title="Descargar imagen"
+                                    >
+                                        <i class="fa fa-download me-1"></i>
+                                        <span class="d-none d-md-inline">Descargar</span>
+                                    </button>
+                                    <button 
+                                        type="button"
+                                        class="btn btn-outline-success btn-sm"
+                                        t-on-click="shareCurrentImage"
+                                        title="Compartir imagen"
+                                    >
+                                        <i class="fa fa-share-alt me-1"></i>
+                                        <span class="d-none d-md-inline">Compartir</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         

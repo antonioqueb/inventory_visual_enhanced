@@ -79,10 +79,8 @@ export class PhotoGalleryDialog extends Component {
     
     toggleUploadForm() {
         if (!this.state.showUploadForm) {
-            // Al abrir, disparar directamente el file picker
             this.openFilePicker();
         } else {
-            // Al cerrar, limpiar
             this.state.showUploadForm = false;
             this.resetEditor();
         }
@@ -92,7 +90,6 @@ export class PhotoGalleryDialog extends Component {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/*';
-        // En móvil esto muestra el menú nativo con opciones de cámara/galería
         input.onchange = (e) => {
             if (e.target.files[0]) {
                 this.handleFileSelect(e.target.files[0]);
@@ -162,13 +159,81 @@ export class PhotoGalleryDialog extends Component {
         return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
     }
 
+    // === DESCARGA Y COMPARTIR ===
+
+    downloadCurrentImage() {
+        if (!this.currentPhoto) return;
+        
+        const link = document.createElement('a');
+        link.href = `data:image/png;base64,${this.currentPhoto.image}`;
+        link.download = this.currentPhoto.name || `foto_${this.photosData.lot_name}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        this.notification.add("Imagen descargada", { type: "success" });
+    }
+
+    async shareCurrentImage() {
+        if (!this.currentPhoto) return;
+        
+        // Convertir base64 a Blob
+        const byteCharacters = atob(this.currentPhoto.image);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'image/png' });
+        const file = new File([blob], this.currentPhoto.name || 'imagen.png', { type: 'image/png' });
+
+        // Web Share API (móvil)
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+                await navigator.share({
+                    title: `Foto - ${this.photosData.lot_name}`,
+                    text: `Imagen del lote ${this.photosData.lot_name}`,
+                    files: [file]
+                });
+                this.notification.add("Imagen compartida", { type: "success" });
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    this.copyImageToClipboard();
+                }
+            }
+        } else {
+            this.copyImageToClipboard();
+        }
+    }
+
+    async copyImageToClipboard() {
+        if (!this.currentPhoto) return;
+        
+        try {
+            const byteCharacters = atob(this.currentPhoto.image);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: 'image/png' });
+            
+            await navigator.clipboard.write([
+                new ClipboardItem({ 'image/png': blob })
+            ]);
+            
+            this.notification.add("Imagen copiada al portapapeles", { type: "success" });
+        } catch (err) {
+            this.notification.add("No se pudo copiar. Abriendo en nueva pestaña...", { type: "info" });
+            this.openImageInNewTab(this.currentPhoto.image);
+        }
+    }
+
     // === EDITOR DE DIBUJO FULLSCREEN ===
 
     openDrawingEditor() {
         this.state.showDrawingEditor = true;
-        document.body.style.overflow = 'hidden'; // Bloquear scroll
-        
-        // Esperar a que el DOM se actualice
+        document.body.style.overflow = 'hidden';
         setTimeout(() => this.initDrawingCanvas(), 50);
     }
 
@@ -189,12 +254,10 @@ export class PhotoGalleryDialog extends Component {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         
-        // Esperar a que la imagen cargue
         const setupCanvas = () => {
             const container = canvas.parentElement;
             const containerRect = container.getBoundingClientRect();
             
-            // Calcular tamaño manteniendo proporción
             const imgRatio = img.naturalWidth / img.naturalHeight;
             const containerRatio = containerRect.width / containerRect.height;
             
@@ -213,11 +276,9 @@ export class PhotoGalleryDialog extends Component {
             canvas.style.width = canvasWidth + 'px';
             canvas.style.height = canvasHeight + 'px';
             
-            // Configurar contexto
             this.ctx.lineCap = 'round';
             this.ctx.lineJoin = 'round';
             
-            // Redibujar historial existente
             this.redrawCanvas();
         };
 
@@ -278,7 +339,6 @@ export class PhotoGalleryDialog extends Component {
         this.ctx.strokeStyle = this.state.brushColor;
         this.ctx.lineWidth = this.state.brushSize;
         
-        // Dibujar un punto si solo es un tap
         this.ctx.lineTo(pos.x + 0.1, pos.y + 0.1);
         this.ctx.stroke();
     }
@@ -393,7 +453,6 @@ export class PhotoGalleryDialog extends Component {
                 ctx.imageSmoothingQuality = 'high';
                 ctx.drawImage(img, 0, 0, width, height);
                 
-                // Dibujar anotaciones si existen
                 if (this.drawingHistory.length > 0 && this.canvas) {
                     const scaleX = width / this.canvas.width;
                     const scaleY = height / this.canvas.height;
