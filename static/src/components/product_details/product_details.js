@@ -23,7 +23,8 @@ export class ProductDetails extends Component {
                     blockName: blockName,
                     items: [],      // Aquí guardaremos las filas originales
                     totalArea: 0,   // Acumulador de m2
-                    count: 0        // Acumulador de cantidad de placas
+                    count: 0,       // Acumulador de cantidad
+                    productType: null // <--- NUEVO: Guardaremos el tipo aquí
                 };
             }
 
@@ -33,12 +34,17 @@ export class ProductDetails extends Component {
             // Incrementamos contadores
             groups[blockName].count += 1;
             groups[blockName].totalArea += (detail.quantity || 0);
+
+            // <--- NUEVO: Detectar tipo (Placa/Formato/Pieza) del primer item que tenga dato
+            if (!groups[blockName].productType && detail.tipo) {
+                groups[blockName].productType = detail.tipo;
+            }
         }
 
         // 2. Conversión: Pasamos de Objeto a Array para poder iterar en el XML
         const groupArray = Object.values(groups);
 
-        // 3. Ordenamiento: Ponemos primero los bloques con más placas (Descendente)
+        // 3. Ordenamiento: Ponemos primero los bloques con más items (Descendente)
         groupArray.sort((a, b) => b.count - a.count);
 
         return groupArray;
@@ -64,7 +70,7 @@ ProductDetails.props = {
     onPhotoClick: { type: Function, optional: true },
     onNotesClick: { type: Function, optional: true },
     onDetailsClick: { type: Function, optional: true },
-    onHoldClick: { type: Function, optional: true },  // Solo para ver info de holds existentes
+    onHoldClick: { type: Function, optional: true },
     onSaleOrderClick: { type: Function, optional: true },
     formatNumber: { type: Function, optional: true },
     hasSalesPermissions: { type: Boolean, optional: true },

@@ -3,8 +3,7 @@
     <t t-name="inventory_visual_enhanced.ProductDetails" owl="1">
         <div class="details-wrapper">
             
-            <!-- BARRA DE SELECCIÓN MÓVIL (NUEVO) -->
-            <!-- Solo visible en móvil vía CSS, permite seleccionar todo cuando no hay cabecera -->
+            <!-- BARRA DE SELECCIÓN MÓVIL -->
             <div class="mobile-select-bar" t-on-click="onMobileSelectAll">
                 <div class="mobile-select-content">
                     <div class="checkbox-wrapper">
@@ -43,14 +42,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- NUEVO BUCLE EXTERNO: Itera sobre los GRUPOS (Bloques) ya ordenados -->
+                    <!-- BUCLE EXTERNO: Itera sobre los GRUPOS (Bloques) -->
                     <t t-foreach="groupedAndSortedDetails" t-as="group" t-key="group.blockName">
                         
-                        <!-- BUCLE INTERNO: Itera sobre los detalles originales dentro de ese bloque -->
-                        <!-- Aquí comienza la lógica original fila por fila -->
+                        <!-- BUCLE INTERNO: Itera sobre los detalles -->
                         <t t-foreach="group.items" t-as="detail" t-key="detail.id">
                             <tr>
-                                <!-- Checkbox: Con wrapper y stop-propagation para asegurar click en móvil -->
+                                <!-- Checkbox -->
                                 <td class="col-checkbox text-center">
                                     <div class="checkbox-wrapper" t-on-click.stop="">
                                         <input 
@@ -73,10 +71,9 @@
                                     <span t-esc="detail.location_name"></span>
                                 </td>
                                 
-                                <!-- Dimensiones: Estructura mejorada para separación visual -->
+                                <!-- Dimensiones -->
                                 <td class="col-dimensions">
                                     <span class="dimensions-inline">
-                                        <!-- Parte 1: Las medidas (Alto x Ancho) -->
                                         <span class="dims-text">
                                             <t t-if="detail.alto and detail.ancho">
                                                 <t t-esc="detail.alto"/>m × <t t-esc="detail.ancho"/>m
@@ -89,8 +86,6 @@
                                                 <t t-esc="detail.ancho"/>m
                                             </t>
                                         </span>
-                                        
-                                        <!-- Parte 2: El total en m² (Resaltado) -->
                                         <strong class="dimensions-total-inline">
                                             <t t-esc="props.formatNumber(detail.quantity)"/> m²
                                         </strong>
@@ -102,7 +97,7 @@
                                     <span t-if="detail.color" t-esc="detail.color"></span>
                                     <span t-else="" class="text-muted">-</span>
                                 </td>
-                                <!-- Datos Técnicos -->
+                                <!-- Tipo -->
                                 <td class="col-tipo">
                                     <span t-if="detail.tipo" t-esc="detail.tipo"></span>
                                     <span t-else="" class="text-muted">-</span>
@@ -133,7 +128,7 @@
                                     <span t-else="" class="text-muted">-</span>
                                 </td>
                                 
-                                <!-- ACCIONES (Botones) - Clases action-btn-cell cruciales para el CSS Grid -->
+                                <!-- ACCIONES -->
                                 <td class="col-icon action-btn-cell">
                                     <button 
                                         type="button"
@@ -168,7 +163,6 @@
                                     <span t-else="" class="icon-btn no-content"><i class="fa fa-history"></i></span>
                                 </td>
                                 
-                                <!-- ESTADO: Solo informativo, no permite crear apartados -->
                                 <td class="col-icon action-btn-cell">
                                     <button 
                                         t-if="detail.tiene_hold and props.hasSalesPermissions"
@@ -193,27 +187,30 @@
                             </tr>
                         </t>
 
-                        <!-- FILA DE RESUMEN (NUEVA): Se inserta al final de cada bloque -->
-                        <!-- Usa estilos inline para garantizar visibilidad sin romper CSS externo, background gris claro -->
+                        <!-- FILA DE RESUMEN: Lógica dinámica de nomenclatura -->
                         <tr class="group-summary-row" style="background-color: #f8f9fa; border-top: 2px solid #e9ecef;">
-                            <!-- Espacio Checkbox -->
                             <td></td>
                             
-                            <!-- Columna Lote: Total Placas -->
+                            <!-- Columna Lote: Total con Nomenclatura Dinámica -->
                             <td class="col-lot" style="font-weight: bold; color: #495057;">
-                                <span>Total Placas: <t t-esc="group.count"/></span>
+                                <t t-set="typeLabel" t-value="'Placas'"/>
+                                <!-- Convertimos a minúsculas para comparar por seguridad -->
+                                <t t-if="group.productType and group.productType.toLowerCase() === 'formato'">
+                                    <t t-set="typeLabel" t-value="'Formatos'"/>
+                                </t>
+                                <t t-elif="group.productType and group.productType.toLowerCase() === 'pieza'">
+                                    <t t-set="typeLabel" t-value="'Piezas'"/>
+                                </t>
+                                
+                                <span>Total <t t-esc="typeLabel"/>: <t t-esc="group.count"/></span>
                             </td>
                             
-                            <!-- Espacio Ubicación -->
                             <td></td>
                             
-                            <!-- Columna Dimensiones: Total Metros Cuadrados -->
                             <td class="col-dimensions" style="font-weight: bold; color: #212529;">
                                 <span>Total: <t t-esc="props.formatNumber(group.totalArea)"/> m²</span>
                             </td>
                             
-                            <!-- Relleno del resto de columnas para que no se vea vacío -->
-                            <!-- Combina las 10 columnas restantes y alinea el nombre del bloque a la derecha -->
                             <td colspan="10" style="text-align: right; vertical-align: middle; padding-right: 15px; color: #6c757d; font-style: italic;">
                                 <small>Fin del Bloque: <span t-esc="group.blockName" style="font-weight: 600;"/></small>
                             </td>
