@@ -125,7 +125,10 @@ ProductRow.props = {
     hasSalesPermissions: { type: Boolean, optional: true },
     hasInventoryPermissions: { type: Boolean, optional: true },
     isInCart: { type: Function, optional: true },
+    // Nuevas props para el manejo de cantidad manual
+    getDisplayQuantity: { type: Function, optional: true },
     toggleCartSelection: { type: Function, optional: true },
+    onInputManualQuantity: { type: Function, optional: true },
     areAllCurrentProductSelected: { type: Function, optional: true },
     selectAllCurrentProduct: { type: Function, optional: true },
     deselectAllCurrentProduct: { type: Function, optional: true },

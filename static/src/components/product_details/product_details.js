@@ -66,7 +66,11 @@ ProductDetails.props = {
     // Props existentes
     areAllCurrentProductSelected: { type: Function, optional: true },
     isInCart: { type: Function, optional: true },
+    // Nuevas props para lógica de cantidad manual
+    getDisplayQuantity: { type: Function, optional: true },
     toggleCartSelection: { type: Function, optional: true },
+    onInputManualQuantity: { type: Function, optional: true },
+    
     onPhotoClick: { type: Function, optional: true },
     onNotesClick: { type: Function, optional: true },
     onDetailsClick: { type: Function, optional: true },

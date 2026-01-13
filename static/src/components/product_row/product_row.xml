@@ -133,7 +133,7 @@
         <!-- Fila de detalles -->
         <tr class="o_inventory_details_row" t-if="props.isExpanded">
             <td colspan="4" class="details-cell">
-                <!-- Pasamos 'filteredDetails' en lugar de 'props.details' -->
+                <!-- Pasamos 'filteredDetails' y las nuevas props de cantidad manual -->
                 <ProductDetails 
                     details="filteredDetails"
                     onPhotoClick="props.onPhotoClick"
@@ -144,7 +144,11 @@
                     onSaleOrderClick="props.onSaleOrderClick"
                     formatNumber="props.formatNumber"
                     isInCart="props.isInCart"
+                    
+                    getDisplayQuantity="props.getDisplayQuantity"
                     toggleCartSelection="props.toggleCartSelection"
+                    onInputManualQuantity="props.onInputManualQuantity"
+                    
                     areAllCurrentProductSelected="props.areAllCurrentProductSelected"
                     selectAllCurrentProduct="props.selectAllCurrentProduct"
                     deselectAllCurrentProduct="props.deselectAllCurrentProduct"
