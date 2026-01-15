@@ -295,7 +295,7 @@ class StockQuant(models.Model):
                 'lot_id': quant.lot_id.id if quant.lot_id else False,
                 'lot_name': quant.lot_id.name if quant.lot_id else '',
                 'location_id': quant.location_id.id,
-                'location_name': quant.location_id.complete_name,
+                'location_name': quant.location_id.name,  # <--- CAMBIO AQUÍ: Usar name en vez de complete_name
                 'location_usage': quant.location_id.usage,
                 'quantity': quant.quantity,
                 'reserved_quantity': quant.reserved_quantity,
