@@ -33,11 +33,13 @@ class StockQuant(models.Model):
         """
         Agrupa el inventario por producto aplicando filtros
         Separa contadores para ubicaciones Internas vs Tránsito.
+        Devuelve un dict con 'products' y 'missing_lots' si se buscó por lote.
         """
         if not filters:
-            return []
+            return {'products': [], 'missing_lots': []}
         
         domain = [('quantity', '>', 0)]
+        search_lot_names = []  # Para almacenar los lotes buscados si aplica
         
         # Filtro por nombre de producto
         if filters.get('product_name'):
@@ -104,17 +106,16 @@ class StockQuant(models.Model):
             except (ValueError, TypeError):
                 pass
         
-        # --- MODIFICADO: Filtro por número de serie (Exacto y Multibúsqueda) ---
+        # === FILTRO POR NÚMERO DE SERIE (LOTES) ===
         if filters.get('numero_serie'):
-            # Obtener el texto ingresado
             raw_input = filters['numero_serie']
-            # Dividir por comas y limpiar espacios en blanco alrededor
-            lot_names = [name.strip() for name in raw_input.split(',') if name.strip()]
+            # Convertimos a lista limpiando espacios
+            search_lot_names = [name.strip() for name in raw_input.split(',') if name.strip()]
             
-            if lot_names:
-                # Usamos el operador 'in' que realiza búsqueda exacta en la lista
-                domain.append(('lot_id.name', 'in', lot_names))
-        # -----------------------------------------------------------------------
+            if search_lot_names:
+                # Búsqueda exacta en la lista (operador 'in')
+                domain.append(('lot_id.name', 'in', search_lot_names))
+        # ==========================================
         
         # Filtro por bloque
         if filters.get('bloque'):
@@ -161,6 +162,16 @@ class StockQuant(models.Model):
         
         # Buscar quants
         quants = self.search(domain)
+        
+        # === CÁLCULO DE LOTES FALTANTES ===
+        missing_lots = []
+        if search_lot_names:
+            # Obtener nombres de lotes encontrados (únicos)
+            found_lots = set(quants.mapped('lot_id.name'))
+            # Calcular diferencia: Buscados - Encontrados
+            missing_lots = list(set(search_lot_names) - found_lots)
+            missing_lots.sort() # Ordenar alfabéticamente
+        # ==================================
         
         # Agrupar por producto
         product_groups = {}
@@ -265,7 +276,11 @@ class StockQuant(models.Model):
                     product_groups[product_id]['available_qty'] += available
                     product_groups[product_id]['available_plates'] += 1
         
-        return list(product_groups.values())
+        # CAMBIO: Retornamos un diccionario con los productos y los lotes faltantes
+        return {
+            'products': list(product_groups.values()),
+            'missing_lots': missing_lots
+        }
     
     @api.model
     def get_quant_details(self, quant_ids=None):

@@ -208,7 +208,7 @@
                         <input 
                             type="text" 
                             class="form-control filter-input" 
-                            placeholder="Lote (ej: L1, L2)..." 
+                            placeholder="Lotes separados por coma (ej: L1, L2)..." 
                             t-model="state.filters.numero_serie" 
                             t-on-input="(ev) => this.onTextFilterChange('numero_serie', ev)"
                         />

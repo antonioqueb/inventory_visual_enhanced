@@ -68,12 +68,23 @@ class InventoryVisualController extends Component {
         this.state.error = null;
 
         try {
-            const products = await this.orm.call(
+            const result = await this.orm.call(
                 "stock.quant",
                 "get_inventory_grouped_by_product",
                 [],
                 { filters: filters }
             );
+
+            // Manejo de compatibilidad: Si viene como lista (versión anterior) o dict (nueva versión)
+            let products = [];
+            let missingLots = [];
+
+            if (Array.isArray(result)) {
+                products = result;
+            } else if (result && typeof result === 'object') {
+                products = result.products || [];
+                missingLots = result.missing_lots || [];
+            }
 
             this.state.products = products;
             this.state.hasSearched = true;
@@ -85,6 +96,15 @@ class InventoryVisualController extends Component {
                 this.notification.add(
                     "No se encontraron productos con los filtros aplicados",
                     { type: "info" }
+                );
+            }
+
+            // Notificación de lotes no encontrados (Efímera y no limitante)
+            if (missingLots.length > 0) {
+                const missingJson = JSON.stringify(missingLots);
+                this.notification.add(
+                    `Lotes no encontrados: ${missingJson}`, 
+                    { type: "warning", sticky: false } 
                 );
             }
 
