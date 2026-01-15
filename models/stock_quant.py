@@ -104,9 +104,17 @@ class StockQuant(models.Model):
             except (ValueError, TypeError):
                 pass
         
-        # Filtro por número de serie
+        # --- MODIFICADO: Filtro por número de serie (Exacto y Multibúsqueda) ---
         if filters.get('numero_serie'):
-            domain.append(('lot_id.name', 'ilike', filters['numero_serie']))
+            # Obtener el texto ingresado
+            raw_input = filters['numero_serie']
+            # Dividir por comas y limpiar espacios en blanco alrededor
+            lot_names = [name.strip() for name in raw_input.split(',') if name.strip()]
+            
+            if lot_names:
+                # Usamos el operador 'in' que realiza búsqueda exacta en la lista
+                domain.append(('lot_id.name', 'in', lot_names))
+        # -----------------------------------------------------------------------
         
         # Filtro por bloque
         if filters.get('bloque'):

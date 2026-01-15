@@ -222,7 +222,9 @@ export class SearchBar extends Component {
     }
 
     onTextFilterChange(filterName, ev) {
-        const value = ev.target.value.trim();
+        // CAMBIO IMPORTANTE: Quitamos .trim() para permitir escribir espacios cómodamente 
+        // (por ejemplo: "LOTE1, LOTE2"). El backend se encargará de limpiar los espacios.
+        const value = ev.target.value; 
         this.state.filters[filterName] = value;
         this.triggerSearch();
     }
