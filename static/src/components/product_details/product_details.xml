@@ -87,7 +87,7 @@
                                             </t>
                                         </span>
                                         <strong class="dimensions-total-inline">
-                                            <t t-esc="props.formatNumber(detail.quantity)"/> m²
+                                            <t t-esc="props.formatNumber(detail.quantity)"/> <t t-esc="getUnitLabel(detail.tipo)"/>
                                         </strong>
                                     </span>
                                 </td>
@@ -208,7 +208,7 @@
                             <td></td>
                             
                             <td class="col-dimensions" style="font-weight: bold; color: #212529;">
-                                <span>Total: <t t-esc="props.formatNumber(group.totalArea)"/> m²</span>
+                                <span>Total: <t t-esc="props.formatNumber(group.totalArea)"/> <t t-esc="getUnitLabel(group.productType)"/></span>
                             </td>
                             
                             <td colspan="10" style="text-align: right; vertical-align: middle; padding-right: 15px; color: #6c757d; font-style: italic;">

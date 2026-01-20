@@ -18,6 +18,15 @@ export class ProductRow extends Component {
     }
 
     /**
+     * Getter para determinar la unidad de medida a mostrar.
+     * Si es 'pieza', muestra 'pza', de lo contrario 'm²'.
+     */
+    get unitLabel() {
+        const type = this.props.product.tipo ? this.props.product.tipo.toString().toLowerCase() : '';
+        return type === 'pieza' ? 'pza' : 'm²';
+    }
+
+    /**
      * Maneja el click en los textos de estadísticas.
      */
     handleFilterClick(filterType) {

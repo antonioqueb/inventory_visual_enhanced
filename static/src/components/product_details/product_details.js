@@ -56,6 +56,15 @@ export class ProductDetails extends Component {
             this.props.onMobileSelectAll(ev);
         }
     }
+    
+    /**
+     * Método auxiliar para obtener el texto de la unidad
+     * Se usa en el XML para mostrar 'pza' si es Pieza, o 'm²' para Placa/Formato
+     */
+    getUnitLabel(type) {
+        const t = type ? type.toString().toLowerCase() : '';
+        return t === 'pieza' ? 'pza' : 'm²';
+    }
 }
 
 ProductDetails.template = "inventory_visual_enhanced.ProductDetails";

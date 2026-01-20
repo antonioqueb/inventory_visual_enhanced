@@ -31,7 +31,7 @@
                         <span class="inventory-label">In Stock</span>
                         <span class="inventory-value inventory-units" t-esc="props.product.stock_plates || 0"></span>
                         <span class="inventory-value inventory-measure">
-                            <t t-esc="props.formatNumber(props.product.stock_qty)"/> M²
+                            <t t-esc="props.formatNumber(props.product.stock_qty)"/> <t t-esc="unitLabel"/>
                         </span>
                     </div>
 
@@ -43,7 +43,7 @@
                         <span class="inventory-label">On Hold</span>
                         <span class="inventory-value inventory-units" t-esc="props.product.hold_plates || 0"></span>
                         <span class="inventory-value inventory-measure">
-                            <t t-esc="props.formatNumber(props.product.hold_qty)"/> M²
+                            <t t-esc="props.formatNumber(props.product.hold_qty)"/> <t t-esc="unitLabel"/>
                         </span>
                     </div>
 
@@ -55,7 +55,7 @@
                         <span class="inventory-label">Committed</span>
                         <span class="inventory-value inventory-units" t-esc="props.product.committed_plates || 0"></span>
                         <span class="inventory-value inventory-measure">
-                            <t t-esc="props.formatNumber(props.product.committed_qty)"/> M²
+                            <t t-esc="props.formatNumber(props.product.committed_qty)"/> <t t-esc="unitLabel"/>
                         </span>
                     </div>
 
@@ -67,7 +67,7 @@
                         <span class="inventory-label text-success">Disponible</span>
                         <span class="inventory-value inventory-units" t-esc="props.product.available_plates || 0"></span>
                         <span class="inventory-value inventory-measure text-success">
-                            <t t-esc="props.formatNumber(props.product.available_qty)"/> M²
+                            <t t-esc="props.formatNumber(props.product.available_qty)"/> <t t-esc="unitLabel"/>
                         </span>
                     </div>
 
@@ -85,7 +85,7 @@
                             <span class="inventory-label">T. Available</span>
                             <span class="inventory-value inventory-units" t-esc="props.product.transit_available_plates || 0"></span>
                             <span class="inventory-value inventory-measure">
-                                <t t-esc="props.formatNumber(props.product.transit_available_qty)"/> M²
+                                <t t-esc="props.formatNumber(props.product.transit_available_qty)"/> <t t-esc="unitLabel"/>
                             </span>
                         </div>
 
@@ -97,7 +97,7 @@
                             <span class="inventory-label">T. On Hold</span>
                             <span class="inventory-value inventory-units" t-esc="props.product.transit_hold_plates || 0"></span>
                             <span class="inventory-value inventory-measure">
-                                <t t-esc="props.formatNumber(props.product.transit_hold_qty)"/> M²
+                                <t t-esc="props.formatNumber(props.product.transit_hold_qty)"/> <t t-esc="unitLabel"/>
                             </span>
                         </div>
 
@@ -109,7 +109,7 @@
                             <span class="inventory-label">T. Committed</span>
                             <span class="inventory-value inventory-units" t-esc="props.product.transit_committed_plates || 0"></span>
                             <span class="inventory-value inventory-measure">
-                                <t t-esc="props.formatNumber(props.product.transit_committed_qty)"/> M²
+                                <t t-esc="props.formatNumber(props.product.transit_committed_qty)"/> <t t-esc="unitLabel"/>
                             </span>
                         </div>
                     </t>
