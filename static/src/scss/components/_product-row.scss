@@ -7,10 +7,7 @@
     border-bottom: 1px solid $border-color;
     background: $background-primary;
     transition: background-color $transition-fast;
-    // Fuente formal y pequeña global
     font-family: "Roboto", "Arial", sans-serif;
-    
-    // IMPORTANTE: Cursor pointer para indicar que toda la fila es clicable
     cursor: pointer; 
 
     &:hover {
@@ -19,18 +16,16 @@
 
     &.expanded {
       background: rgba($primary-color, 0.02);
-      // Borde lateral izquierdo para indicar activo (opcional, visualmente ayuda)
       border-left: 3px solid $primary-color;
     }
 
     td {
-      // PADDING REDUCIDO: Para que la fila sea delgada
       padding: 4px 6px; 
       vertical-align: top;
       color: $text-primary;
       border-right: 1px solid $border-color;
       line-height: 1.2;
-      font-size: 10px; // Texto base pequeño
+      font-size: 10px;
 
       &:last-child {
         border-right: none;
@@ -54,34 +49,32 @@
   .product-name-cell {
     display: flex;
     flex-direction: column;
-    gap: 2px; // Gap mínimo
+    gap: 2px;
   }
 
   .product-title {
     font-weight: 700;
     color: $text-primary;
-    font-size: 11px; // Título ligeramente más grande pero compacto
+    font-size: 11px;
     line-height: 1.2;
   }
 
   .product-sku {
-    font-size: 9px; // SKU muy pequeño
+    font-size: 9px;
     color: $text-secondary;
     font-family: "SF Mono", "Roboto Mono", monospace;
     line-height: 1.1;
   }
 }
 
-// === COLUMNA DE INVENTARIO (La más alta) ===
+// === COLUMNA DE INVENTARIO ===
 .col-inventory {
   .inventory-subgrid {
     display: flex;
     flex-direction: column;
-    // Ligeramente más espacio para que los hovers no se solapen visualmente
     gap: 1px; 
   }
 
-  // --- SEPARADOR DE TRÁNSITO ---
   .inventory-separator {
     text-align: center;
     border-bottom: 1px dashed #cccccc;
@@ -100,41 +93,33 @@
 
   .inventory-row {
     display: grid;
-    // Layout comprimido: Label | Unidades | M2
-    grid-template-columns: 70px 1fr 1fr; // Aumenté un poco el label para "Available"
+    grid-template-columns: 70px 1fr 1fr;
     gap: 4px;
     align-items: center;
-    line-height: 1.1; // Altura de línea mínima
-    
-    // === NUEVOS ESTILOS PARA INTERACTIVIDAD ===
-    min-height: 18px; // Un poco más alto para soportar el padding del botón
-    padding: 2px 4px; // Espacio interno para el fondo hover
-    border-radius: 4px; // Bordes redondeados
+    line-height: 1.1;
+    min-height: 18px;
+    padding: 2px 4px;
+    border-radius: 4px;
     transition: all 0.2s ease;
 
-    // Estado Clickable (Hover y Active)
     &.clickable-stat {
       cursor: pointer;
-      position: relative; // Para z-index si fuera necesario
-      z-index: 2; // Asegurar que está sobre la fila
+      position: relative;
+      z-index: 2;
 
-      // Hover sutil
       &:hover {
         background-color: rgba(0, 0, 0, 0.05);
         .inventory-label { color: #2C2C2C; }
       }
 
-      // Estado Activo (Filtro seleccionado)
       &.active-filter {
-        background-color: rgba($primary-color, 0.1); // Fondo del color primario (suave)
+        background-color: rgba($primary-color, 0.1);
         
-        // Label destacado
         .inventory-label {
           color: $primary-color;
           font-weight: 700;
         }
 
-        // Valores destacados
         .inventory-units, 
         .inventory-measure {
           color: $primary-color;
@@ -142,14 +127,13 @@
       }
     }
     
-    // Estilo especial para filas de tránsito
     &.transit-row {
         .inventory-label {
-            color: #795548; // Un café/marrón para distinguir del stock normal
+            color: #795548;
         }
         
         &.active-filter {
-            background-color: rgba(121, 85, 72, 0.1); // Fondo café suave
+            background-color: rgba(121, 85, 72, 0.1);
             
             .inventory-label, .inventory-units, .inventory-measure {
                 color: #795548;
@@ -160,7 +144,7 @@
 
   .inventory-label {
     font-size: 9px;
-    color: #666666; // Gris oscuro para legibilidad
+    color: #666666;
     font-weight: 400;
     text-align: left;
     white-space: nowrap;
@@ -181,7 +165,7 @@
   .inventory-measure {
     font-size: 9px;
     color: $text-primary;
-    font-weight: 700; // Negrita para destacar el m2
+    font-weight: 700;
     font-family: "Roboto", sans-serif;
     text-align: right;
     transition: color 0.2s ease;
@@ -200,18 +184,15 @@
 }
 
 // ==========================================
-// ESTILOS MÓVIL (COMPACTO)
+// ESTILOS MÓVIL
 // ==========================================
 @media (max-width: 992px) {
     .o_inventory_grid_table tbody tr.o_inventory_product_row {
-        // Reducir tamaño de la tarjeta en móvil
         padding: 6px 8px !important;
-        margin-bottom: 6px !important; // Menos espacio entre tarjetas
-        border-radius: 6px; // Bordes menos redondeados para ahorrar espacio visual
+        margin-bottom: 6px !important;
+        border-radius: 6px;
         
-        // Reorganizar grid interno del card móvil para compactar
         display: grid !important;
-        // Solo una columna principal (sin la flecha)
         grid-template-columns: 1fr !important;
         grid-template-areas: 
             "name"
@@ -229,47 +210,108 @@
             grid-area: name;
             margin-bottom: 2px;
             
-            .product-title { font-size: 12px; color: #714B67; }
+            .product-title { font-size: 13px; color: #714B67; }
             .product-sku { font-size: 10px; }
         }
 
-        // 2. Inventario (Grid compacto horizontal en móvil)
+        // 2. Inventario - TARJETAS GRANDES 2x2
         td.col-inventory {
             grid-area: inv;
             background: #f8f9fa;
-            border-radius: 4px;
-            padding: 4px !important;
+            border-radius: 6px;
+            padding: 6px !important;
             
             .inventory-subgrid {
-                // En móvil, intentamos poner pares en una línea si cabe, o lista compacta
                 display: grid;
-                grid-template-columns: 1fr 1fr; // Dos columnas de datos
-                gap: 4px 12px;
-                
-                .inventory-separator {
-                    grid-column: 1 / -1;
-                    margin: 8px 0 4px 0;
-                }
-                
-                .inventory-row {
-                    display: flex;
-                    justify-content: space-between;
-                    // Ajuste para el borde inferior en móvil para que no choque con el hover
-                    border-bottom: 1px dashed #e0e0e0;
-                    padding: 4px; // Padding suficiente para el dedo
-                    height: auto; // Auto altura en móvil
-                    
-                    // Mantener bordes redondeados en móvil también
-                    border-radius: 4px;
-                    
-                    &:last-child { border-bottom: none; }
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+            
+            .inventory-separator {
+                grid-column: 1 / -1;
+                margin: 4px 0 2px 0;
+                border-bottom-color: #ccc;
+            }
 
-                    // En móvil, si está activo, se nota el fondo
+            .inventory-row {
+                // Cada celda es una tarjeta
+                display: grid;
+                grid-template-columns: auto 1fr;
+                grid-template-rows: auto auto;
+                grid-template-areas:
+                    "label units"
+                    "label measure";
+                gap: 0 8px;
+                align-items: center;
+                
+                background: #fff;
+                border: 1px solid #e8e8e8;
+                border-radius: 8px;
+                padding: 10px 12px;
+                min-height: 52px;
+                
+                // Reset del grid desktop
+                border-bottom: none;
+
+                &:active {
+                    background: #f4f0f3;
+                }
+
+                &.clickable-stat {
+                    &:hover {
+                        background: #faf8fa;
+                    }
+
                     &.active-filter {
-                        background-color: rgba($primary-color, 0.1);
-                        border-bottom: 1px solid transparent; // Quitar el dashed si está activo
+                        background: rgba($primary-color, 0.06);
+                        border-color: rgba($primary-color, 0.25);
+                        box-shadow: 0 0 0 1px rgba($primary-color, 0.1);
                     }
                 }
+                
+                &.transit-row {
+                    background: #fdfdf8;
+                    border-color: #e8e6d8;
+                    
+                    &.active-filter {
+                        background: rgba(121, 85, 72, 0.06);
+                        border-color: rgba(121, 85, 72, 0.25);
+                    }
+                }
+            }
+
+            .inventory-label {
+                grid-area: label;
+                font-size: 11px;
+                font-weight: 600;
+                color: #777;
+                align-self: center;
+                text-align: left;
+                white-space: nowrap;
+            }
+
+            .inventory-units {
+                grid-area: units;
+                font-size: 20px;
+                font-weight: 800;
+                color: #333;
+                text-align: right;
+                line-height: 1;
+                min-width: auto;
+            }
+
+            .inventory-measure {
+                grid-area: measure;
+                font-size: 11px;
+                font-weight: 500;
+                color: #999;
+                text-align: right;
+                line-height: 1.1;
+                min-width: auto;
+            }
+
+            .text-success {
+                color: $success-color !important;
             }
         }
 
