@@ -251,24 +251,28 @@
             gap: 4px;
 
             // =============================================
-            // CARD DE LOTE - Grid principal
-            // =============================================
-            // Columnas: Checkbox fijo | 3 columnas fluidas
-            // Filas:
-            //   1: Lote (header completo)
-            //   2: Ubicación | Dimensiones
-            //   3: Contenedor | Bloque | Atado
-            //   4: Pedimento (ancho completo)
-            //   5: Botones de acción
+            // CARD DE LOTE
+            // Layout:
+            //   1: Lote (header)
+            //   2: Ubicación (fila completa)
+            //   3: Dimensiones (fila completa)
+            //   4: Contenedor (fila completa)
+            //   5: Bloque (fila completa)
+            //   6: Atado (fila completa)
+            //   7: Pedimento (fila completa)
+            //   8: Botones de acción
             // =============================================
             tr {
                 display: grid;
                 grid-template-columns: 42px 1fr 1fr 1fr;
-                grid-template-rows: auto auto auto auto auto;
+                grid-template-rows: repeat(8, auto);
                 grid-template-areas:
                     "check  header  header  header"
-                    "check  loc     loc     dims"
-                    "check  cnt     blq     atd"
+                    "check  loc     loc     loc"
+                    "check  dims    dims    dims"
+                    "check  cnt     cnt     cnt"
+                    "check  blq     blq     blq"
+                    "check  atd     atd     atd"
                     "check  ped     ped     ped"
                     "act1   act2    act3    act4";
                 
@@ -340,7 +344,7 @@
                 overflow: hidden;
                 
                 // =========================================
-                // 1. CHECKBOX (td:nth-child(1))
+                // 1. CHECKBOX
                 // =========================================
                 &.col-checkbox {
                     grid-area: check;
@@ -368,7 +372,7 @@
                 }
 
                 // =========================================
-                // 2. LOTE (td:nth-child(2))
+                // 2. LOTE
                 // =========================================
                 &.col-lot {
                     grid-area: header;
@@ -386,22 +390,22 @@
                 }
 
                 // =========================================
-                // 3. UBICACIÓN (td:nth-child(3))
+                // 3. UBICACIÓN (fila completa)
                 // =========================================
                 &.col-location {
                     grid-area: loc;
-                    font-size: 12px;
+                    font-size: 13px;
                     background-color: #fff;
-                    padding: 4px 10px !important;
+                    padding: 6px 10px !important;
                     color: #444;
                     border-bottom: 1px solid #f0f0f0 !important;
-                    min-height: 30px;
+                    min-height: 32px;
                     overflow: hidden;
                     
                     i { 
                         color: #714B67; 
                         margin-right: 5px; 
-                        font-size: 12px;
+                        font-size: 13px;
                         flex-shrink: 0;
                     }
                     
@@ -414,39 +418,41 @@
                 }
                 
                 // =========================================
-                // 4. DIMENSIONES (td:nth-child(4))
+                // 4. DIMENSIONES (fila completa)
                 // =========================================
                 &.col-dimensions {
                     grid-area: dims;
                     background-color: #fff;
-                    padding: 4px 10px !important;
+                    padding: 6px 10px !important;
                     border-bottom: 1px solid #f0f0f0 !important;
-                    justify-content: flex-end;
-                    min-height: 30px;
+                    justify-content: space-between;
+                    min-height: 32px;
                     
                     .dimensions-inline {
-                        font-size: 12px;
+                        font-size: 13px;
                         display: flex;
                         align-items: center;
-                        gap: 5px;
+                        gap: 8px;
                         color: #555;
                         flex-wrap: nowrap;
                         overflow: hidden;
+                        width: 100%;
+                        justify-content: space-between;
                     }
                     
                     .dimensions-total-inline {
                         background: #714B67;
                         color: #fff;
-                        padding: 2px 8px;
+                        padding: 3px 10px;
                         border-radius: 6px;
-                        font-size: 12px;
+                        font-size: 13px;
                         font-weight: 700;
                         white-space: nowrap;
                         flex-shrink: 0;
                     }
                     
                     .dims-text {
-                        font-size: 12px;
+                        font-size: 13px;
                         color: #292929;
                         white-space: nowrap;
                         overflow: hidden;
@@ -456,9 +462,6 @@
 
                 // =========================================
                 // 5,6,11. CAMPOS OCULTOS EN MÓVIL
-                // col-color (nth-child 5)
-                // col-tipo (nth-child 6)
-                // col-ref-proveedor (nth-child 11)
                 // =========================================
                 &.col-color,
                 &.col-tipo,
@@ -467,48 +470,48 @@
                 }
 
                 // =========================================
-                // 7. BLOQUE (td:nth-child(7))
+                // 7. BLOQUE (fila completa)
                 // =========================================
                 &.col-bloque {
                     grid-area: blq;
                 }
 
                 // =========================================
-                // 8. ATADO (td:nth-child(8))
+                // 8. ATADO (fila completa)
                 // =========================================
                 &.col-atado {
                     grid-area: atd;
                 }
 
                 // =========================================
-                // 9. PEDIMENTO (td:nth-child(9))
+                // 9. PEDIMENTO (fila completa)
                 // =========================================
                 &.col-pedimento {
                     grid-area: ped;
                 }
 
                 // =========================================
-                // 10. CONTENEDOR (td:nth-child(10))
+                // 10. CONTENEDOR (fila completa)
                 // =========================================
                 &.col-contenedor {
                     grid-area: cnt;
                 }
 
                 // =========================================
-                // Estilos compartidos para campos técnicos
+                // Estilos compartidos campos técnicos
                 // =========================================
                 &.col-bloque, &.col-atado, 
                 &.col-pedimento, &.col-contenedor {
-                    font-size: 11px;
+                    font-size: 12px;
                     color: #333;
                     flex-direction: row;
                     align-items: center;
-                    gap: 4px;
-                    min-height: 28px;
+                    gap: 6px;
+                    min-height: 30px;
                     background: #fff;
                     width: auto !important;
                     min-width: 0 !important;
-                    padding: 3px 10px !important;
+                    padding: 4px 10px !important;
                     border-bottom: 1px solid #f5f5f5 !important;
                     overflow: hidden;
                     
@@ -518,6 +521,7 @@
                         color: #999;
                         font-weight: 700;
                         flex-shrink: 0;
+                        min-width: 30px;
                     }
                     
                     &.col-bloque:before { content: "Blq:"; }
@@ -527,7 +531,7 @@
                     
                     span { 
                         font-weight: 600; 
-                        font-size: 11px;
+                        font-size: 12px;
                         overflow: hidden;
                         text-overflow: ellipsis;
                         white-space: nowrap;
@@ -540,21 +544,8 @@
                     }
                 }
 
-                // Bordes derechos entre campos técnicos (separadores visuales)
-                &.col-contenedor {
-                    border-right: 1px solid #f0f0f0 !important;
-                }
-                &.col-bloque {
-                    border-right: 1px solid #f0f0f0 !important;
-                }
-
                 // =========================================
                 // 12-15. BOTONES DE ACCIÓN
-                // Usamos nth-child para ser exactos con el DOM
-                // nth-child(12) = Fotos
-                // nth-child(13) = Notas
-                // nth-child(14) = Historial
-                // nth-child(15) = Estado/Hold
                 // =========================================
                 &.action-btn-cell {
                     justify-content: center;
@@ -563,10 +554,9 @@
                     background-color: #f5f5f5;
                     width: auto !important;
                     border-top: 1px solid #e0e0e0 !important;
-                    min-height: 34px;
+                    min-height: 36px;
                 }
 
-                // Asignar cada botón a su celda del grid
                 &.action-btn-cell:nth-child(12) { grid-area: act1; }
                 &.action-btn-cell:nth-child(13) { grid-area: act2; }
                 &.action-btn-cell:nth-child(14) { grid-area: act3; }
