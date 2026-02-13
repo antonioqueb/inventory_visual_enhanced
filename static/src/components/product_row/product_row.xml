@@ -2,28 +2,112 @@
 <templates xml:space="preserve">
     
     <t t-name="inventory_visual_enhanced.ProductRow" owl="1">
-        <!-- El evento click principal expande/contrae (toggle normal) -->
         <tr class="o_inventory_product_row" 
             t-att-class="{ expanded: props.isExpanded }"
             t-on-click="() => props.onToggle(props.product.quant_ids)"
             title="Click para ver detalles"
         >
             
-            <!-- Product Name -->
+            <!-- Product Name + Price Tooltip -->
             <td class="col-product-name">
                 <div class="product-name-cell">
-                    <div class="product-title" t-esc="props.product.product_name"></div>
+                    <div class="d-flex align-items-center gap-1">
+                        <div class="product-title" t-esc="props.product.product_name"></div>
+                        
+                        <!-- Icono ? con tooltip de precios -->
+                        <div class="price-tooltip-wrapper" 
+                             t-on-click.stop="() => {}"
+                             t-on-mouseenter="onPriceMouseEnter"
+                             t-on-mouseleave="onPriceMouseLeave"
+                             style="position: relative; display: inline-flex;">
+                            
+                            <span class="price-help-icon" 
+                                  style="cursor: help; color: #714B67; font-size: 13px; font-weight: 700; 
+                                         width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid #714B67;
+                                         display: inline-flex; align-items: center; justify-content: center;
+                                         line-height: 1; flex-shrink: 0;">?</span>
+                            
+                            <!-- Tooltip flotante -->
+                            <div t-if="state.showPriceTooltip" 
+                                 class="price-tooltip-popup"
+                                 style="position: absolute; top: 100%; left: 0; z-index: 9999; margin-top: 6px;
+                                        background: #fff; border: 1px solid #dee2e6; border-radius: 8px;
+                                        box-shadow: 0 4px 16px rgba(0,0,0,0.15); padding: 12px 16px;
+                                        min-width: 280px; white-space: nowrap;">
+                                
+                                <!-- Flecha -->
+                                <div style="position: absolute; top: -6px; left: 14px; width: 12px; height: 12px;
+                                            background: #fff; border-left: 1px solid #dee2e6; border-top: 1px solid #dee2e6;
+                                            transform: rotate(45deg);"></div>
+                                
+                                <!-- Loading -->
+                                <div t-if="state.priceLoading" class="text-center py-2">
+                                    <i class="fa fa-spinner fa-spin me-2"></i>
+                                    <span class="text-muted">Cargando precios...</span>
+                                </div>
+                                
+                                <!-- Sin datos -->
+                                <div t-elif="!state.priceData" class="text-center py-2">
+                                    <span class="text-muted">Sin información de precios</span>
+                                </div>
+                                
+                                <!-- Datos de precios -->
+                                <div t-else="">
+                                    <div style="font-weight: 700; font-size: 13px; color: #714B67; 
+                                                margin-bottom: 8px; border-bottom: 2px solid #714B67; 
+                                                padding-bottom: 4px;">
+                                        Precios de Referencia
+                                    </div>
+                                    
+                                    <table style="width: 100%; font-size: 12px; border-collapse: collapse;">
+                                        <thead>
+                                            <tr style="border-bottom: 1px solid #eee;">
+                                                <th style="padding: 3px 6px; text-align: left; color: #666;"></th>
+                                                <th style="padding: 3px 6px; text-align: right; color: #017E84; font-weight: 700;">USD</th>
+                                                <th style="padding: 3px 6px; text-align: right; color: #714B67; font-weight: 700;">MXN</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr style="border-bottom: 1px solid #f5f5f5;">
+                                                <td style="padding: 4px 6px; font-weight: 600;">
+                                                    <span style="color: #28a745;">●</span> Alto
+                                                </td>
+                                                <td style="padding: 4px 6px; text-align: right; font-family: monospace;">
+                                                    $<t t-esc="formatPrice(state.priceData.usd_high)"/>
+                                                </td>
+                                                <td style="padding: 4px 6px; text-align: right; font-family: monospace;">
+                                                    $<t t-esc="formatPrice(state.priceData.mxn_high)"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 4px 6px; font-weight: 600;">
+                                                    <span style="color: #ffc107;">●</span> Medio
+                                                </td>
+                                                <td style="padding: 4px 6px; text-align: right; font-family: monospace;">
+                                                    $<t t-esc="formatPrice(state.priceData.usd_medium)"/>
+                                                </td>
+                                                <td style="padding: 4px 6px; text-align: right; font-family: monospace;">
+                                                    $<t t-esc="formatPrice(state.priceData.mxn_medium)"/>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    
+                                    <div style="margin-top: 6px; font-size: 10px; color: #999; text-align: right;">
+                                        Precio por m²
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="product-sku" t-if="props.product.product_code" t-esc="props.product.product_code"></div>
                 </div>
             </td>
             
-            <!-- Inventory: AHORA CON FILTROS CLICKABLES + SECCIÓN TRÁNSITO -->
+            <!-- Inventory -->
             <td class="col-inventory">
                 <div class="inventory-subgrid">
                     
-                    <!-- === SECCIÓN STOCK (Interno) === -->
-                    
-                    <!-- IN STOCK (ALL) -->
                     <div class="inventory-row clickable-stat" 
                          t-att-class="{ 'active-filter': state.activeFilter === 'all' }"
                          t-on-click.stop="() => this.handleFilterClick('all')"
@@ -35,7 +119,6 @@
                         </span>
                     </div>
 
-                    <!-- ON HOLD -->
                     <div class="inventory-row clickable-stat"
                          t-att-class="{ 'active-filter': state.activeFilter === 'hold' }" 
                          t-on-click.stop="() => this.handleFilterClick('hold')"
@@ -47,7 +130,6 @@
                         </span>
                     </div>
 
-                    <!-- COMMITTED -->
                     <div class="inventory-row clickable-stat"
                          t-att-class="{ 'active-filter': state.activeFilter === 'committed' }" 
                          t-on-click.stop="() => this.handleFilterClick('committed')"
@@ -59,7 +141,6 @@
                         </span>
                     </div>
 
-                    <!-- AVAILABLE -->
                     <div class="inventory-row clickable-stat"
                          t-att-class="{ 'active-filter': state.activeFilter === 'available' }" 
                          t-on-click.stop="() => this.handleFilterClick('available')"
@@ -71,13 +152,11 @@
                         </span>
                     </div>
 
-                    <!-- === SECCIÓN TRÁNSITO (Si hay algo en tránsito) === -->
                     <t t-if="props.product.transit_qty > 0">
                         <div class="inventory-separator">
                             <span>En Tránsito</span>
                         </div>
 
-                        <!-- TRANSIT AVAILABLE -->
                         <div class="inventory-row clickable-stat transit-row"
                              t-att-class="{ 'active-filter': state.activeFilter === 'transit_available' }" 
                              t-on-click.stop="() => this.handleFilterClick('transit_available')"
@@ -89,7 +168,6 @@
                             </span>
                         </div>
 
-                        <!-- TRANSIT HOLD -->
                         <div class="inventory-row clickable-stat transit-row"
                              t-att-class="{ 'active-filter': state.activeFilter === 'transit_hold' }" 
                              t-on-click.stop="() => this.handleFilterClick('transit_hold')"
@@ -101,7 +179,6 @@
                             </span>
                         </div>
 
-                        <!-- TRANSIT COMMITTED -->
                         <div class="inventory-row clickable-stat transit-row"
                              t-att-class="{ 'active-filter': state.activeFilter === 'transit_committed' }" 
                              t-on-click.stop="() => this.handleFilterClick('transit_committed')"
@@ -133,7 +210,6 @@
         <!-- Fila de detalles -->
         <tr class="o_inventory_details_row" t-if="props.isExpanded">
             <td colspan="4" class="details-cell">
-                <!-- Pasamos 'filteredDetails' y las nuevas props de cantidad manual -->
                 <ProductDetails 
                     details="filteredDetails"
                     onPhotoClick="props.onPhotoClick"
