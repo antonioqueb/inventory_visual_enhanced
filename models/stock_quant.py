@@ -10,7 +10,6 @@ class StockQuant(models.Model):
     
     @api.model
     def get_current_user_info(self):
-        """Obtener información del usuario actual"""
         return {
             'id': self.env.user.id,
             'name': self.env.user.name
@@ -18,86 +17,126 @@ class StockQuant(models.Model):
     
     @api.model
     def check_sales_permissions(self):
-        """Verifica si el usuario tiene permisos de ventas"""
         return self.env.user.has_group('sales_team.group_sale_salesman') or \
                self.env.user.has_group('sales_team.group_sale_salesman_all_leads') or \
                self.env.user.has_group('sales_team.group_sale_manager')
     
     @api.model
     def check_inventory_permissions(self):
-        """Verifica si el usuario tiene permisos de inventario"""
         return self.env.user.has_group('stock.group_stock_user')
     
     @api.model
+    def _get_price_field_name(self, currency, level):
+        """Determina el campo de precio según divisa y nivel"""
+        field_map = {
+            ('USD', 'high'): 'x_price_usd_1',
+            ('USD', 'medium'): 'x_price_usd_2',
+            ('MXN', 'high'): 'x_price_mxn_1',
+            ('MXN', 'medium'): 'x_price_mxn_2',
+        }
+        return field_map.get((currency, level), 'x_price_usd_1')
+    
+    @api.model
+    def _filter_products_by_price(self, product_groups, filters):
+        """
+        Filtra productos por rango de precio post-agrupación.
+        Los precios están en product.template (x_price_usd_1/2, x_price_mxn_1/2).
+        """
+        price_min = filters.get('price_min', '')
+        price_max = filters.get('price_max', '')
+        
+        if not price_min and not price_max:
+            return product_groups
+        
+        currency = filters.get('price_currency') or 'USD'
+        level = filters.get('price_level') or 'high'
+        field_name = self._get_price_field_name(currency, level)
+        
+        try:
+            price_min_val = float(price_min) if price_min else None
+        except (ValueError, TypeError):
+            price_min_val = None
+        
+        try:
+            price_max_val = float(price_max) if price_max else None
+        except (ValueError, TypeError):
+            price_max_val = None
+        
+        if price_min_val is None and price_max_val is None:
+            return product_groups
+        
+        # Obtener IDs de productos agrupados
+        product_ids = list(product_groups.keys())
+        if not product_ids:
+            return product_groups
+        
+        # Leer precios desde product.product -> product.template
+        products = self.env['product.product'].browse(product_ids)
+        
+        filtered_groups = {}
+        for product in products:
+            tmpl = product.product_tmpl_id
+            price = getattr(tmpl, field_name, 0.0) or 0.0
+            
+            if price_min_val is not None and price < price_min_val:
+                continue
+            if price_max_val is not None and price > price_max_val:
+                continue
+            
+            filtered_groups[product.id] = product_groups[product.id]
+        
+        return filtered_groups
+    
+    @api.model
     def get_inventory_grouped_by_product(self, filters=None):
-        """
-        Agrupa el inventario por producto aplicando filtros
-        Separa contadores para ubicaciones Internas vs Tránsito.
-        Devuelve un dict con 'products' y 'missing_lots' si se buscó por lote.
-        """
         if not filters:
             return {'products': [], 'missing_lots': []}
         
         domain = [('quantity', '>', 0)]
-        search_lot_names = []  # Para almacenar los lotes buscados si aplica
+        search_lot_names = []
         
-        # Filtro por nombre de producto
         if filters.get('product_name'):
             domain.append(('product_id', 'ilike', filters['product_name']))
         
-        # Filtro por almacén
         if filters.get('almacen_id'):
             almacen = self.env['stock.warehouse'].browse(int(filters['almacen_id']))
             if almacen.view_location_id:
                 domain.append(('location_id', 'child_of', almacen.view_location_id.id))
         
-        # Filtro por ubicación específica
         if filters.get('ubicacion_id'):
             domain.append(('location_id', 'child_of', int(filters['ubicacion_id'])))
         
-        # Filtro por tipo
         if filters.get('tipo'):
             domain.append(('x_tipo', '=', filters['tipo']))
         
-        # Filtro por categoría
         if filters.get('categoria_name'):
-            # Buscar todas las categorías con ese nombre
             all_cats = self.env['product.category'].search([
                 ('name', 'ilike', filters['categoria_name'])
             ])
-            # Obtener IDs de categorías que son padres
             parent_ids = set(
                 self.env['product.category'].search([('parent_id', '!=', False)]).mapped('parent_id').ids
             )
-            # Filtrar solo las hojas (las que NO son padres de nadie)
             leaf_cat_ids = [cat.id for cat in all_cats if cat.id not in parent_ids]
             if leaf_cat_ids:
                 domain.append(('product_id.categ_id', 'in', leaf_cat_ids))
 
-
-        # Filtro por grupo
         if filters.get('grupo'):
             grupo_search = filters['grupo']
-            # Obtener el modelo relacionado del Many2many
             field = self._fields.get('x_grupo')
             if field and hasattr(field, 'comodel_name'):
-                # Buscar registros en el modelo relacionado que coincidan
                 related_model = self.env[field.comodel_name]
                 matching_records = related_model.search([('name', 'ilike', grupo_search)])
                 if matching_records:
                     domain.append(('x_grupo', 'in', matching_records.ids))
                 else:
-                    domain.append(('id', '=', 0))  # Forzar resultado vacío
+                    domain.append(('id', '=', 0))
         
-        # Filtro por acabado
         if filters.get('acabado'):
             domain.append(('x_acabado', '=', filters['acabado']))
 
-        # Filtro por color (ilike para búsqueda parcial y case-insensitive)
         if filters.get('color'):
             domain.append(('x_color', 'ilike', filters['color']))
         
-        # Filtro por grosor (con tolerancia para precisión de punto flotante)
         if filters.get('grosor'):
             try:
                 grosor_val = float(filters['grosor'])
@@ -106,27 +145,18 @@ class StockQuant(models.Model):
             except (ValueError, TypeError):
                 pass
         
-        # === FILTRO POR NÚMERO DE SERIE (LOTES) ===
         if filters.get('numero_serie'):
             raw_input = filters['numero_serie']
-            # Convertimos a lista limpiando espacios
             search_lot_names = [name.strip() for name in raw_input.split(',') if name.strip()]
-            
             if search_lot_names:
-                # Búsqueda exacta en la lista (operador 'in')
                 domain.append(('lot_id.name', 'in', search_lot_names))
-        # ==========================================
         
-        # Filtro por bloque
         if filters.get('bloque'):
             domain.append(('x_bloque', 'ilike', filters['bloque']))
         
-        # Filtro por pedimento
         if filters.get('pedimento'):
             pedimento_normalized = filters['pedimento'].replace(' ', '').replace('-', '')
-            # Buscar quants con pedimento no vacío
             quants_con_pedimento = self.search([('x_pedimento', '!=', False), ('quantity', '>', 0)])
-            # Filtrar los que coincidan exactamente al normalizar (sin espacios ni guiones)
             matching_quant_ids = [
                 q.id for q in quants_con_pedimento
                 if q.x_pedimento and q.x_pedimento.replace(' ', '').replace('-', '') == pedimento_normalized
@@ -134,52 +164,38 @@ class StockQuant(models.Model):
             if matching_quant_ids:
                 domain.append(('id', 'in', matching_quant_ids))
             else:
-                domain.append(('id', '=', 0))  # Forzar resultado vacío
+                domain.append(('id', '=', 0))
         
-        # Filtro por contenedor
         if filters.get('contenedor'):
             domain.append(('x_contenedor', 'ilike', filters['contenedor']))
         
-        # Filtro por atado
         if filters.get('atado'):
             domain.append(('x_atado', 'ilike', filters['atado']))
 
-        # Filtro por alto mínimo
         if filters.get('alto_min'):
             try:
-                alto_val = float(filters['alto_min'])
-                domain.append(('x_alto', '>=', alto_val))
+                domain.append(('x_alto', '>=', float(filters['alto_min'])))
             except (ValueError, TypeError):
                 pass
 
-        # Filtro por ancho mínimo
         if filters.get('ancho_min'):
             try:
-                ancho_val = float(filters['ancho_min'])
-                domain.append(('x_ancho', '>=', ancho_val))
+                domain.append(('x_ancho', '>=', float(filters['ancho_min'])))
             except (ValueError, TypeError):
                 pass
         
-        # Buscar quants
         quants = self.search(domain)
         
-        # === CÁLCULO DE LOTES FALTANTES ===
         missing_lots = []
         if search_lot_names:
-            # Obtener nombres de lotes encontrados (únicos)
             found_lots = set(quants.mapped('lot_id.name'))
-            # Calcular diferencia: Buscados - Encontrados
-            missing_lots = list(set(search_lot_names) - found_lots)
-            missing_lots.sort() # Ordenar alfabéticamente
-        # ==================================
+            missing_lots = sorted(list(set(search_lot_names) - found_lots))
         
-        # Agrupar por producto
         product_groups = {}
         for quant in quants:
             product_id = quant.product_id.id
             
             if product_id not in product_groups:
-                # Obtener el valor display del campo tipo
                 tipo_display = ''
                 if hasattr(quant, 'x_tipo') and quant.x_tipo:
                     try:
@@ -200,8 +216,6 @@ class StockQuant(models.Model):
                     'categ_name': quant.product_id.categ_id.display_name,
                     'tipo': tipo_display,
                     'quant_ids': [],
-                    
-                    # Contadores Internos (Stock normal)
                     'stock_qty': 0.0,
                     'stock_plates': 0,
                     'hold_qty': 0.0,
@@ -210,8 +224,6 @@ class StockQuant(models.Model):
                     'committed_plates': 0,
                     'available_qty': 0.0,
                     'available_plates': 0,
-                    
-                    # Contadores de Tránsito (NUEVO)
                     'transit_qty': 0.0,
                     'transit_plates': 0,
                     'transit_hold_qty': 0.0,
@@ -220,63 +232,55 @@ class StockQuant(models.Model):
                     'transit_committed_plates': 0,
                     'transit_available_qty': 0.0,
                     'transit_available_plates': 0,
-                    
                     'color': quant.x_color if hasattr(quant, 'x_color') else '',
                 }
             
             product_groups[product_id]['quant_ids'].append(quant.id)
             
-            # === LOGICA SEPARACIÓN TRÁNSITO VS INTERNO ===
             qty = quant.quantity
             reserved = quant.reserved_quantity
             available = qty - reserved
             has_hold = hasattr(quant, 'x_tiene_hold') and quant.x_tiene_hold
             
-            # Determinar si es Tránsito
             usage = quant.location_id.usage
             is_transit = (usage == 'transit')
             
             if is_transit:
-                # Métricas de Tránsito
                 product_groups[product_id]['transit_qty'] += qty
                 product_groups[product_id]['transit_plates'] += 1
                 
-                # Hold en tránsito
                 if has_hold:
                     product_groups[product_id]['transit_hold_qty'] += qty
                     product_groups[product_id]['transit_hold_plates'] += 1
                 
-                # Comprometido en tránsito
                 if reserved > 0:
                     product_groups[product_id]['transit_committed_qty'] += reserved
                     product_groups[product_id]['transit_committed_plates'] += 1
                 
-                # Disponible en tránsito
                 if not has_hold and available > 0:
                     product_groups[product_id]['transit_available_qty'] += available
                     product_groups[product_id]['transit_available_plates'] += 1
                     
             else:
-                # Métricas Normales (Stock Interno)
                 product_groups[product_id]['stock_qty'] += qty
                 product_groups[product_id]['stock_plates'] += 1
                 
-                # Hold Interno
                 if has_hold:
                     product_groups[product_id]['hold_qty'] += qty
                     product_groups[product_id]['hold_plates'] += 1
                 
-                # Comprometido Interno
                 if reserved > 0:
                     product_groups[product_id]['committed_qty'] += reserved
                     product_groups[product_id]['committed_plates'] += 1
                 
-                # Disponible Interno
                 if not has_hold and available > 0:
                     product_groups[product_id]['available_qty'] += available
                     product_groups[product_id]['available_plates'] += 1
         
-        # CAMBIO: Retornamos un diccionario con los productos y los lotes faltantes
+        # === FILTRO DE PRECIOS POST-AGRUPACIÓN ===
+        if filters.get('price_min') or filters.get('price_max'):
+            product_groups = self._filter_products_by_price(product_groups, filters)
+        
         return {
             'products': list(product_groups.values()),
             'missing_lots': missing_lots
@@ -284,22 +288,17 @@ class StockQuant(models.Model):
     
     @api.model
     def get_quant_details(self, quant_ids=None):
-        """
-        Obtiene detalles de quants específicos
-        """
         if not quant_ids:
             return []
         
         quants = self.browse(quant_ids)
         result = []
         
-        # Verificar permisos de ventas una sola vez
         is_sales_user = self.env.user.has_group('sales_team.group_sale_salesman') or \
                         self.env.user.has_group('sales_team.group_sale_salesman_all_leads') or \
                         self.env.user.has_group('sales_team.group_sale_manager')
         
         for quant in quants:
-            # Obtener el valor display del campo tipo
             tipo_display = ''
             if hasattr(quant, 'x_tipo') and quant.x_tipo:
                 try:
@@ -318,7 +317,7 @@ class StockQuant(models.Model):
                 'lot_id': quant.lot_id.id if quant.lot_id else False,
                 'lot_name': quant.lot_id.name if quant.lot_id else '',
                 'location_id': quant.location_id.id,
-                'location_name': quant.location_id.name,  # <--- CAMBIO AQUÍ: Usar name en vez de complete_name
+                'location_name': quant.location_id.name,
                 'location_usage': quant.location_id.usage,
                 'quantity': quant.quantity,
                 'reserved_quantity': quant.reserved_quantity,
@@ -340,11 +339,9 @@ class StockQuant(models.Model):
                 'sale_order_ids': [],
             }
             
-            # Fotos
             if quant.lot_id and hasattr(quant.lot_id, 'x_fotografia_ids'):
                 detail['cantidad_fotos'] = len(quant.lot_id.x_fotografia_ids)
             
-            # Hold info - SOLO SI ES USUARIO DE VENTAS
             if is_sales_user:
                 detail['tiene_hold'] = quant.x_tiene_hold if hasattr(quant, 'x_tiene_hold') else False
                 
@@ -361,7 +358,6 @@ class StockQuant(models.Model):
                         'notas': hold.notas if hasattr(hold, 'notas') else '',
                     }
             
-            # Sale orders - solo si el usuario tiene permisos de ventas
             if quant.lot_id and is_sales_user:
                 move_lines_with_lot = self.env['stock.move.line'].sudo().search([
                     ('lot_id', '=', quant.lot_id.id),
@@ -386,10 +382,6 @@ class StockQuant(models.Model):
     
     @api.model
     def get_lot_history(self, quant_id):
-        """
-        Obtiene el historial completo de un lote
-        RESTRINGIDO: Solo usuarios con permisos de ventas
-        """
         if not self.check_sales_permissions():
             raise UserError("No tiene permisos para ver el historial detallado. Contacte al administrador.")
         
@@ -545,7 +537,6 @@ class StockQuant(models.Model):
     
     @api.model
     def get_lot_photos(self, quant_id):
-        """Obtiene las fotografías de un lote"""
         quant = self.browse(quant_id)
         if not quant.exists() or not quant.lot_id:
             return {'error': 'Lote no encontrado'}
@@ -571,7 +562,6 @@ class StockQuant(models.Model):
     
     @api.model
     def get_lot_notes(self, quant_id):
-        """Obtiene las notas de un lote"""
         quant = self.browse(quant_id)
         if not quant.exists() or not quant.lot_id:
             return {'error': 'Lote no encontrado'}
@@ -586,7 +576,6 @@ class StockQuant(models.Model):
     
     @api.model
     def save_lot_photo(self, quant_id, photo_name, photo_data, sequence=10, notas=''):
-        """Guarda una fotografía para un lote"""
         quant = self.browse(quant_id)
         if not quant.exists() or not quant.lot_id:
             return {'success': False, 'error': 'Lote no encontrado'}
@@ -612,7 +601,6 @@ class StockQuant(models.Model):
     
     @api.model
     def save_lot_notes(self, quant_id, notes):
-        """Guarda las notas de un lote"""
         quant = self.browse(quant_id)
         if not quant.exists() or not quant.lot_id:
             return {'success': False, 'error': 'Lote no encontrado'}
@@ -634,7 +622,6 @@ class StockQuant(models.Model):
     
     @api.model
     def search_partners(self, name=''):
-        """Busca clientes/contactos"""
         if not self.check_sales_permissions():
             raise UserError("No tiene permisos para buscar clientes. Contacte al administrador.")
         
@@ -665,7 +652,6 @@ class StockQuant(models.Model):
     
     @api.model
     def create_partner(self, name, vat='', ref=''):
-        """Crea un nuevo cliente"""
         if not self.check_sales_permissions():
             raise UserError("No tiene permisos para crear clientes. Contacte al administrador.")
         
@@ -696,7 +682,6 @@ class StockQuant(models.Model):
     
     @api.model
     def get_projects(self, search_term=''):
-        """Obtiene proyectos de mármol"""
         if not self.check_sales_permissions():
             raise UserError("No tiene permisos para consultar proyectos. Contacte al administrador.")
         
@@ -721,7 +706,6 @@ class StockQuant(models.Model):
     
     @api.model
     def create_project(self, name):
-        """Crea un nuevo proyecto"""
         if not self.check_sales_permissions():
             raise UserError("No tiene permisos para crear proyectos. Contacte al administrador.")
         
@@ -750,7 +734,6 @@ class StockQuant(models.Model):
     
     @api.model
     def get_architects(self, search_term=''):
-        """Obtiene arquitectos"""
         if not self.check_sales_permissions():
             raise UserError("No tiene permisos para consultar arquitectos. Contacte al administrador.")
         
@@ -782,7 +765,6 @@ class StockQuant(models.Model):
     
     @api.model
     def create_architect(self, name, vat='', ref=''):
-        """Crea un nuevo arquitecto"""
         if not self.check_sales_permissions():
             raise UserError("No tiene permisos para crear arquitectos. Contacte al administrador.")
         
@@ -818,7 +800,6 @@ class StockQuant(models.Model):
     @api.model
     def create_lot_hold_enhanced(self, quant_id, partner_id, project_id, architect_id, 
                                   notas='', currency_code='USD', product_prices=None):
-        """Crea un apartado (hold) para un lote con información completa"""
         if not self.check_sales_permissions():
             raise UserError("No tiene permisos para crear apartados. Contacte al administrador.")
         
@@ -930,7 +911,6 @@ class StockQuant(models.Model):
     def create_price_authorization(self, operation_type, partner_id, project_id, 
                                    selected_lots, currency_code, product_prices, 
                                    product_groups, notes=None, architect_id=None):
-        """Crea solicitud de autorización de precio"""
         if not self.check_sales_permissions():
             raise UserError("No tiene permisos para crear autorizaciones. Contacte al administrador.")
         
@@ -984,7 +964,6 @@ class StockQuant(models.Model):
     
     @api.model
     def get_sale_order_info(self, sale_order_ids):
-        """Obtiene información de órdenes de venta"""
         if not sale_order_ids:
             return {'count': 0, 'orders': []}
         

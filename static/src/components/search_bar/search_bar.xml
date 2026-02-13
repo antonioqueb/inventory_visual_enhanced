@@ -282,6 +282,65 @@
                     </div>
                 </div>
 
+                <!-- === FILTRO DE PRECIOS === -->
+                <div class="price-filter-row mt-3" t-if="state.showAdvancedFilters" t-att-class="{ 'd-none': !state.mobileFiltersOpen, 'd-flex': state.mobileFiltersOpen, 'd-md-flex': true }">
+                    <div class="price-filter-container">
+                        <div class="price-filter-label">
+                            <i class="fa fa-dollar"></i>
+                            <span>Precio</span>
+                        </div>
+                        <div class="price-filter-controls">
+                            <select 
+                                class="form-select filter-select price-select"
+                                t-model="state.filters.price_currency"
+                                t-on-change="(ev) => this.onPriceSettingChange('price_currency', ev)"
+                            >
+                                <option value="">Divisa...</option>
+                                <option value="USD">USD</option>
+                                <option value="MXN">MXN</option>
+                            </select>
+                            
+                            <select 
+                                class="form-select filter-select price-select"
+                                t-model="state.filters.price_level"
+                                t-on-change="(ev) => this.onPriceSettingChange('price_level', ev)"
+                            >
+                                <option value="">Nivel...</option>
+                                <option value="high">Alto</option>
+                                <option value="medium">Medio</option>
+                            </select>
+                            
+                            <div class="price-range-input">
+                                <span class="price-range-prefix">Min</span>
+                                <input 
+                                    type="number" 
+                                    class="form-control filter-input"
+                                    placeholder="0.00"
+                                    t-model="state.filters.price_min"
+                                    t-on-input="(ev) => this.onPriceValueChange('price_min', ev)"
+                                    step="0.01"
+                                    min="0"
+                                />
+                            </div>
+                            
+                            <span class="price-range-separator">—</span>
+                            
+                            <div class="price-range-input">
+                                <span class="price-range-prefix">Max</span>
+                                <input 
+                                    type="number" 
+                                    class="form-control filter-input"
+                                    placeholder="999..."
+                                    t-model="state.filters.price_max"
+                                    t-on-input="(ev) => this.onPriceValueChange('price_max', ev)"
+                                    step="0.01"
+                                    min="0"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Info Resultados -->
                 <div class="filters-info mt-2 py-1" t-if="props.hasSearched">
                     <span class="results-count small">
