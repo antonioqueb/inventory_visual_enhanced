@@ -26,7 +26,7 @@
                                   style="cursor: help; color: #714B67; font-size: 13px; font-weight: 700; 
                                          width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid #714B67;
                                          display: inline-flex; align-items: center; justify-content: center;
-                                         line-height: 1; flex-shrink: 0;">?</span>
+                                         line-height: 1; flex-shrink: 0;">$</span>
                         </div>
                     </div>
                     <div class="product-sku" t-if="props.product.product_code" t-esc="props.product.product_code"></div>
