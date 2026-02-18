@@ -36,11 +36,12 @@ class StockQuant(models.Model):
         }
         return field_map.get((currency, level), 'x_price_usd_1')
     
+    
     @api.model
     def _filter_products_by_price(self, product_groups, filters):
         """
         Filtra productos por rango de precio post-agrupación.
-        Los precios están en product.template (x_price_usd_1/2, x_price_mxn_1/2).
+        Verifica si CUALQUIERA de los niveles de precio (1, 2 o 3) cae en el rango.
         """
         price_min = filters.get('price_min', '')
         price_max = filters.get('price_max', '')
@@ -49,8 +50,14 @@ class StockQuant(models.Model):
             return product_groups
         
         currency = filters.get('price_currency') or 'USD'
-        level = filters.get('price_level') or 'high'
-        field_name = self._get_price_field_name(currency, level)
+        
+        # Definir los campos a revisar según la moneda
+        if currency == 'USD':
+            # Revisamos x_price_usd_1, x_price_usd_2 y x_price_usd_3
+            price_fields = ['x_price_usd_1', 'x_price_usd_2', 'x_price_usd_3']
+        else:
+            # Revisamos x_price_mxn_1, x_price_mxn_2 y x_price_mxn_3
+            price_fields = ['x_price_mxn_1', 'x_price_mxn_2', 'x_price_mxn_3']
         
         try:
             price_min_val = float(price_min) if price_min else None
@@ -76,16 +83,33 @@ class StockQuant(models.Model):
         filtered_groups = {}
         for product in products:
             tmpl = product.product_tmpl_id
-            price = getattr(tmpl, field_name, 0.0) or 0.0
             
-            if price_min_val is not None and price < price_min_val:
-                continue
-            if price_max_val is not None and price > price_max_val:
-                continue
+            # Verificar si ALGUNO de los precios del producto cumple con el rango
+            match_found = False
             
-            filtered_groups[product.id] = product_groups[product.id]
+            for field_name in price_fields:
+                price = getattr(tmpl, field_name, 0.0) or 0.0
+                
+                # Ignorar precios en 0 si es estricto, o tratarlos como tal
+                if price <= 0.001: 
+                    continue
+                
+                # Chequeo de rango
+                is_valid = True
+                if price_min_val is not None and price < price_min_val:
+                    is_valid = False
+                if price_max_val is not None and price > price_max_val:
+                    is_valid = False
+                
+                if is_valid:
+                    match_found = True
+                    break # Si un precio cumple, el producto se muestra
+            
+            if match_found:
+                filtered_groups[product.id] = product_groups[product.id]
         
         return filtered_groups
+
     
     @api.model
     def get_inventory_grouped_by_product(self, filters=None):

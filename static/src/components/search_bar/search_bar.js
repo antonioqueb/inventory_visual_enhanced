@@ -28,7 +28,6 @@ export class SearchBar extends Component {
                 alto_min: '',
                 ancho_min: '',
                 price_currency: '',
-                price_level: '',
                 price_min: '',
                 price_max: '',
             },
@@ -267,7 +266,6 @@ export class SearchBar extends Component {
             alto_min: '',
             ancho_min: '',
             price_currency: '',
-            price_level: '',
             price_min: '',
             price_max: '',
         };

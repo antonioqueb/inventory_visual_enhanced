@@ -340,15 +340,7 @@
                                 <option value="MXN">MXN</option>
                             </select>
                             
-                            <select 
-                                class="form-select filter-select price-select"
-                                t-model="state.filters.price_level"
-                                t-on-change="(ev) => this.onPriceSettingChange('price_level', ev)"
-                            >
-                                <option value="">Nivel...</option>
-                                <option value="high">Alto</option>
-                                <option value="medium">Medio</option>
-                            </select>
+                            <!-- ELIMINADO EL SELECT DE NIVEL (HIGH/MEDIUM) -->
                             
                             <div class="price-range-input">
                                 <span class="price-range-prefix">Min</span>
@@ -380,7 +372,7 @@
                         </div>
                     </div>
                 </div>
-
+                
                 <!-- Info Resultados -->
                 <div class="filters-info mt-2 py-1" t-if="props.hasSearched">
                     <span class="results-count small">
