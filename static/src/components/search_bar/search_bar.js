@@ -16,8 +16,9 @@ export class SearchBar extends Component {
                 tipo: '',
                 categoria_name: '',
                 grupo: '',
+                marca: '',     // Filtro de Marca
                 acabado: '',
-                color: '',
+                color: '',     // Filtro de Color (vinculado al input del XML)
                 grosor: '',
                 numero_serie: '',
                 bloque: '',
@@ -37,9 +38,10 @@ export class SearchBar extends Component {
             tipos: [],
             categorias: [],
             grupos: [],
+            marcas: [],    // Lista para el datalist de Marcas
             acabados: [],
             grosores: [],
-            colores: [],
+            colores: [],   // Lista para el datalist de Colores
             
             showAdvancedFilters: false,
             mobileFiltersOpen: false,
@@ -80,11 +82,13 @@ export class SearchBar extends Component {
 
     async loadFilterOptions() {
         try {
+            // 1. Cargar Almacenes
             const almacenes = await this.orm.searchRead(
                 "stock.warehouse", [], ["id", "name"], { order: "name" }
             );
             this.state.almacenes = almacenes;
 
+            // 2. Cargar Categorías
             const allCategorias = await this.orm.searchRead(
                 "product.category", [],
                 ["id", "name", "complete_name", "parent_id"],
@@ -111,6 +115,21 @@ export class SearchBar extends Component {
                 a.name.localeCompare(b.name)
             );
 
+            // 3. Cargar Marcas (x_marca en product.template)
+            try {
+                const marcas = await this.orm.call(
+                    "product.template", "read_group",
+                    [[["x_marca", "!=", false]]],
+                    { groupby: ["x_marca"], fields: ["x_marca"] }
+                );
+                this.state.marcas = marcas.map(m => m.x_marca).filter(Boolean).sort();
+            } catch (e) {
+                console.warn("Error cargando marcas:", e);
+                this.state.marcas = [];
+            }
+
+            // 4. Cargar Colores (x_color en stock.quant)
+            // Esto llena la lista para tu datalist id="colores-datalist"
             try {
                 const colores = await this.orm.call(
                     "stock.quant", "read_group",
@@ -119,9 +138,11 @@ export class SearchBar extends Component {
                 );
                 this.state.colores = colores.map(c => c.x_color).filter(Boolean).sort();
             } catch (e) {
+                console.warn("Error cargando colores:", e);
                 this.state.colores = [];
             }
 
+            // 5. Cargar Selecciones (Tipo, Grupo, Acabado)
             const fieldInfo = await this.orm.call(
                 "stock.quant", "fields_get", [], { attributes: ["selection"] }
             );
@@ -136,6 +157,7 @@ export class SearchBar extends Component {
                 this.state.acabados = fieldInfo.x_acabado.selection;
             }
 
+            // 6. Cargar Grosores disponibles
             try {
                 const grosores = await this.orm.call(
                     "stock.quant", "read_group",
@@ -233,14 +255,15 @@ export class SearchBar extends Component {
             tipo: '',
             categoria_name: '',
             grupo: '',
+            marca: '',
             acabado: '',
+            color: '',     // Reset de color
             grosor: '',
             numero_serie: '',
             bloque: '',
             pedimento: '',
             contenedor: '',
             atado: '',
-            color: '',
             alto_min: '',
             ancho_min: '',
             price_currency: '',

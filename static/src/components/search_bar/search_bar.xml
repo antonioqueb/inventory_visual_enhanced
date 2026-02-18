@@ -158,6 +158,46 @@
                             </t>
                         </datalist>
                     </div>
+
+
+                    <!-- === MARCA === -->
+                    <div class="filter-group">
+                        <label class="filter-label d-none d-md-block">Marca</label>
+                        <input 
+                            type="text" 
+                            class="form-control filter-input" 
+                            placeholder="Buscar marca..." 
+                            t-model="state.filters.marca" 
+                            t-on-input="(ev) => this.onTextFilterChange('marca', ev)"
+                            list="marcas-datalist"
+                            autocomplete="off"
+                        />
+                        <datalist id="marcas-datalist">
+                            <t t-foreach="state.marcas" t-as="marca" t-key="marca">
+                                <option t-att-value="marca"/>
+                            </t>
+                        </datalist>
+                    </div>
+
+                    <!-- Color -->
+                    <div class="filter-group">
+                        <label class="filter-label d-none d-md-block">Color</label>
+                        <input 
+                            type="text" 
+                            class="form-control filter-input" 
+                            placeholder="Escribe o selecciona color..." 
+                            t-model="state.filters.color" 
+                            t-on-input="(ev) => this.onTextFilterChange('color', ev)"
+                            list="colores-datalist"
+                            autocomplete="off"
+                        />
+                        <datalist id="colores-datalist">
+                            <t t-foreach="state.colores" t-as="color" t-key="color">
+                                <option t-att-value="color"/>
+                            </t>
+                        </datalist>
+                    </div>
+       
                     
                     <!-- Espesor -->
                     <div class="filter-group">

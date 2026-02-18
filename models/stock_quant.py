@@ -108,6 +108,12 @@ class StockQuant(models.Model):
         
         if filters.get('tipo'):
             domain.append(('x_tipo', '=', filters['tipo']))
+
+        if filters.get('marca'):
+            domain.append(('product_id.product_tmpl_id.x_marca', 'ilike', filters['marca']))
+        
+        if filters.get('color'):
+            domain.append(('product_id.product_tmpl_id.x_color', 'ilike', filters['color']))
         
         if filters.get('categoria_name'):
             all_cats = self.env['product.category'].search([
