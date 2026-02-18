@@ -159,9 +159,9 @@
                         </datalist>
                     </div>
                     
-                    <!-- Grosor -->
+                    <!-- Espesor -->
                     <div class="filter-group">
-                        <label class="filter-label d-none d-md-block">Grosor</label>
+                        <label class="filter-label d-none d-md-block">Espesor</label>
                         <select 
                             class="form-select filter-select" 
                             t-model="state.filters.grosor" 
