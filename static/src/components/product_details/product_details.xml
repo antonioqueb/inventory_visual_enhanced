@@ -197,10 +197,8 @@
                         <tr class="group-summary-row" style="background-color: #f8f9fa; border-top: 2px solid #e9ecef;">
                             <td></td>
                             
-                            <!-- Columna Lote: Solo nombre del bloque -->
-                            <td class="col-lot" style="font-weight: bold; color: #495057;">
-                                <span>Bloque: <t t-esc="group.blockName"/></span>
-                            </td>
+                            <!-- Columna Lote: Vacía para no romper patrón visual -->
+                            <td class="col-lot"></td>
                             
                             <td></td>
                             
@@ -216,7 +214,12 @@
                                 <span><t t-esc="group.count"/> <t t-esc="typeLabel"/> | <t t-esc="props.formatNumber(group.totalArea)"/> <t t-esc="getUnitLabel(group.productType)"/></span>
                             </td>
                             
-                            <td colspan="11"></td>
+                            <td colspan="7"></td>
+                            
+                            <!-- Últimas columnas: Fin del Bloque -->
+                            <td colspan="4" style="text-align: right; vertical-align: middle; padding-right: 15px; color: #6c757d; font-style: italic;">
+                                <small>Fin del Bloque: <span t-esc="group.blockName" style="font-weight: 600;"/></small>
+                            </td>
                         </tr>
                         
                     </t>
