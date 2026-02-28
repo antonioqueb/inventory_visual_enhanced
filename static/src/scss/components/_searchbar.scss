@@ -30,8 +30,8 @@
     align-items: end;
 
     &.main-filters {
-      grid-template-columns: 1.5fr repeat(4, 1fr) auto;
-      
+      grid-template-columns: 1.5fr repeat(5, 1fr) auto;
+
       .search-product-name {
         grid-column: span 1;
       }
@@ -88,7 +88,7 @@
   .filter-actions {
     display: flex;
     gap: $spacing-sm;
-    align-items: center;
+    align-items: flex-end;
 
     .btn {
       height: 40px;
