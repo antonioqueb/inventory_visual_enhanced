@@ -47,6 +47,12 @@
                         
                         <!-- BUCLE INTERNO: Itera sobre los detalles -->
                         <t t-foreach="group.items" t-as="detail" t-key="detail.id">
+                            
+                            <!-- SEPARADOR DE CONTENEDOR: fila vacía cuando cambia el contenedor -->
+                            <tr t-if="detail._containerBreak" class="container-separator-row">
+                                <td colspan="15" style="height: 8px; padding: 0; border: none; background: transparent;"></td>
+                            </tr>
+
                             <tr>
                                 <!-- Checkbox -->
                                 <td class="col-checkbox text-center">
@@ -187,33 +193,30 @@
                             </tr>
                         </t>
 
-                        <!-- FILA DE RESUMEN: Lógica dinámica de nomenclatura -->
+                        <!-- FILA DE RESUMEN DEL BLOQUE -->
                         <tr class="group-summary-row" style="background-color: #f8f9fa; border-top: 2px solid #e9ecef;">
                             <td></td>
                             
-                            <!-- Columna Lote: Total con Nomenclatura Dinámica -->
+                            <!-- Columna Lote: Solo nombre del bloque -->
                             <td class="col-lot" style="font-weight: bold; color: #495057;">
+                                <span>Bloque: <t t-esc="group.blockName"/></span>
+                            </td>
+                            
+                            <td></td>
+                            
+                            <!-- Columna Dimensiones: Total piezas + Total área -->
+                            <td class="col-dimensions" style="font-weight: bold; color: #212529;">
                                 <t t-set="typeLabel" t-value="'Placas'"/>
-                                <!-- Convertimos a minúsculas para comparar por seguridad -->
                                 <t t-if="group.productType and group.productType.toLowerCase() === 'formato'">
                                     <t t-set="typeLabel" t-value="'Formatos'"/>
                                 </t>
                                 <t t-elif="group.productType and group.productType.toLowerCase() === 'pieza'">
                                     <t t-set="typeLabel" t-value="'Piezas'"/>
                                 </t>
-                                
-                                <span>Total <t t-esc="typeLabel"/>: <t t-esc="group.count"/></span>
+                                <span><t t-esc="group.count"/> <t t-esc="typeLabel"/> | <t t-esc="props.formatNumber(group.totalArea)"/> <t t-esc="getUnitLabel(group.productType)"/></span>
                             </td>
                             
-                            <td></td>
-                            
-                            <td class="col-dimensions" style="font-weight: bold; color: #212529;">
-                                <span>Total: <t t-esc="props.formatNumber(group.totalArea)"/> <t t-esc="getUnitLabel(group.productType)"/></span>
-                            </td>
-                            
-                            <td colspan="10" style="text-align: right; vertical-align: middle; padding-right: 15px; color: #6c757d; font-style: italic;">
-                                <small>Fin del Bloque: <span t-esc="group.blockName" style="font-weight: 600;"/></small>
-                            </td>
+                            <td colspan="11"></td>
                         </tr>
                         
                     </t>

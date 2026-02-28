@@ -1,9 +1,7 @@
 /** @odoo-module **/
-
 import { Component } from "@odoo/owl";
 
 export class ProductDetails extends Component {
-    
     /**
      * Getter principal que transforma la lista plana de detalles (props.details)
      * en una lista agrupada por Bloque, calculando totales y ordenando
@@ -16,26 +14,25 @@ export class ProductDetails extends Component {
         // 1. Agrupación: Recorremos todos los productos
         for (const detail of details) {
             // Si el campo bloque viene vacío, lo etiquetamos como "Sin Bloque"
-            const blockName = detail.bloque || 'Sin Bloque'; 
-            
+            const blockName = detail.bloque || 'Sin Bloque';
             if (!groups[blockName]) {
                 groups[blockName] = {
                     blockName: blockName,
                     items: [],      // Aquí guardaremos las filas originales
                     totalArea: 0,   // Acumulador de m2
                     count: 0,       // Acumulador de cantidad
-                    productType: null // <--- NUEVO: Guardaremos el tipo aquí
+                    productType: null // Guardaremos el tipo aquí
                 };
             }
 
             // Agregamos el item al grupo correspondiente
             groups[blockName].items.push(detail);
-            
+
             // Incrementamos contadores
             groups[blockName].count += 1;
             groups[blockName].totalArea += (detail.quantity || 0);
 
-            // <--- NUEVO: Detectar tipo (Placa/Formato/Pieza) del primer item que tenga dato
+            // Detectar tipo (Placa/Formato/Pieza) del primer item que tenga dato
             if (!groups[blockName].productType && detail.tipo) {
                 groups[blockName].productType = detail.tipo;
             }
@@ -47,6 +44,26 @@ export class ProductDetails extends Component {
         // 3. Ordenamiento: Ponemos primero los bloques con más items (Descendente)
         groupArray.sort((a, b) => b.count - a.count);
 
+        // 4. Ordenar items por contenedor dentro de cada bloque y marcar cambios de contenedor
+        for (const group of groupArray) {
+            group.items.sort((a, b) => {
+                const cA = (a.contenedor || '').toLowerCase();
+                const cB = (b.contenedor || '').toLowerCase();
+                return cA.localeCompare(cB);
+            });
+
+            let lastContenedor = null;
+            for (const item of group.items) {
+                const currentContenedor = item.contenedor || '';
+                if (lastContenedor !== null && currentContenedor !== lastContenedor) {
+                    item._containerBreak = true;
+                } else {
+                    item._containerBreak = false;
+                }
+                lastContenedor = currentContenedor;
+            }
+        }
+
         return groupArray;
     }
 
@@ -56,7 +73,7 @@ export class ProductDetails extends Component {
             this.props.onMobileSelectAll(ev);
         }
     }
-    
+
     /**
      * Método auxiliar para obtener el texto de la unidad
      * Se usa en el XML para mostrar 'pza' si es Pieza, o 'm²' para Placa/Formato
@@ -79,7 +96,6 @@ ProductDetails.props = {
     getDisplayQuantity: { type: Function, optional: true },
     toggleCartSelection: { type: Function, optional: true },
     onInputManualQuantity: { type: Function, optional: true },
-    
     onPhotoClick: { type: Function, optional: true },
     onNotesClick: { type: Function, optional: true },
     onDetailsClick: { type: Function, optional: true },
