@@ -45,10 +45,15 @@
                     <!-- BUCLE EXTERNO: Itera sobre los GRUPOS (Bloques) -->
                     <t t-foreach="groupedAndSortedDetails" t-as="group" t-key="group.blockName">
                         
+                        <!-- SEPARADOR ENTRE BLOQUES: fila vacía antes de cada bloque excepto el primero -->
+                        <tr t-if="!group_first" class="container-separator-row">
+                            <td colspan="15" style="height: 8px; padding: 0; border: none; background: transparent;"></td>
+                        </tr>
+
                         <!-- BUCLE INTERNO: Itera sobre los detalles -->
                         <t t-foreach="group.items" t-as="detail" t-key="detail.id">
                             
-                            <!-- SEPARADOR DE CONTENEDOR: fila vacía cuando cambia el contenedor -->
+                            <!-- SEPARADOR DE CONTENEDOR: fila vacía cuando cambia el contenedor dentro del mismo bloque -->
                             <tr t-if="detail._containerBreak" class="container-separator-row">
                                 <td colspan="15" style="height: 8px; padding: 0; border: none; background: transparent;"></td>
                             </tr>
@@ -218,7 +223,7 @@
                             
                             <!-- Últimas columnas: Fin del Bloque -->
                             <td colspan="4" style="text-align: right; vertical-align: middle; padding-right: 15px; color: #6c757d; font-style: italic;">
-                                <small><span t-esc="group.blockName" style="font-weight: 600;"/></small>
+                                <small>Fin del Bloque: <span t-esc="group.blockName" style="font-weight: 600;"/></small>
                             </td>
                         </tr>
                         
