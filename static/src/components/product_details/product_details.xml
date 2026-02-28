@@ -218,7 +218,7 @@
                             
                             <!-- Últimas columnas: Fin del Bloque -->
                             <td colspan="4" style="text-align: right; vertical-align: middle; padding-right: 15px; color: #6c757d; font-style: italic;">
-                                <small>Fin del Bloque: <span t-esc="group.blockName" style="font-weight: 600;"/></small>
+                                <small><span t-esc="group.blockName" style="font-weight: 600;"/></small>
                             </td>
                         </tr>
                         
