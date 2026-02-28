@@ -31,12 +31,12 @@
                     </button>
                 </div>
 
-                <!-- === CONTENEDOR DE FILTROS PRINCIPALES === -->
+                <!-- === FILTROS PRINCIPALES: Nombre, Lote, Bloque, Tipo, Categoría, Marca === -->
                 <div class="filters-row main-filters" t-att-class="{ 'd-none': !state.mobileFiltersOpen, 'd-grid': state.mobileFiltersOpen, 'd-md-grid': true }">
                     
-                    <!-- Búsqueda Desktop -->
+                    <!-- 1. Búsqueda Producto (Desktop) -->
                     <div class="filter-group search-product-name d-none d-md-flex">
-                        <label class="filter-label">Buscar Producto</label>
+                        <label class="filter-label">Nombre</label>
                         <input 
                             type="text" 
                             class="form-control filter-input" 
@@ -47,6 +47,113 @@
                         />
                     </div>
 
+                    <!-- 2. Lote -->
+                    <div class="filter-group">
+                        <label class="filter-label d-none d-md-block">Lote</label>
+                        <input 
+                            type="text" 
+                            class="form-control filter-input" 
+                            placeholder="Lotes separados por coma..." 
+                            t-model="state.filters.numero_serie" 
+                            t-on-input="(ev) => this.onTextFilterChange('numero_serie', ev)"
+                            t-att-disabled="props.isLoading"
+                        />
+                    </div>
+
+                    <!-- 3. Bloque -->
+                    <div class="filter-group">
+                        <label class="filter-label d-none d-md-block">Bloque</label>
+                        <input 
+                            type="text" 
+                            class="form-control filter-input" 
+                            placeholder="Bloque..." 
+                            t-model="state.filters.bloque" 
+                            t-on-input="(ev) => this.onTextFilterChange('bloque', ev)"
+                            t-att-disabled="props.isLoading"
+                        />
+                    </div>
+
+                    <!-- 4. Tipo -->
+                    <div class="filter-group">
+                        <label class="filter-label d-none d-md-block">Tipo</label>
+                        <select 
+                            class="form-select filter-select" 
+                            t-model="state.filters.tipo" 
+                            t-on-change="(ev) => this.onFilterChange('tipo', ev)" 
+                            t-att-disabled="props.isLoading"
+                        >
+                            <option value="">Todos los tipos</option>
+                            <t t-foreach="state.tipos" t-as="tipo" t-key="tipo_index">
+                                <option t-att-value="tipo[0]" t-esc="tipo[1]"></option>
+                            </t>
+                        </select>
+                    </div>
+
+                    <!-- 5. Categoría -->
+                    <div class="filter-group">
+                        <label class="filter-label d-none d-md-block">Categoría</label>
+                        <input 
+                            type="text" 
+                            class="form-control filter-input" 
+                            placeholder="Escribe categoría..." 
+                            t-model="state.filters.categoria_name" 
+                            t-on-input="(ev) => this.onTextFilterChange('categoria_name', ev)"
+                            list="categorias-datalist"
+                            autocomplete="off"
+                            t-att-disabled="props.isLoading"
+                        />
+                        <datalist id="categorias-datalist">
+                            <t t-foreach="state.categorias" t-as="categoria" t-key="categoria.name">
+                                <option t-att-value="categoria.name"/>
+                            </t>
+                        </datalist>
+                    </div>
+
+                    <!-- 6. Marca -->
+                    <div class="filter-group">
+                        <label class="filter-label d-none d-md-block">Marca</label>
+                        <input 
+                            type="text" 
+                            class="form-control filter-input" 
+                            placeholder="Buscar marca..." 
+                            t-model="state.filters.marca" 
+                            t-on-input="(ev) => this.onTextFilterChange('marca', ev)"
+                            list="marcas-datalist"
+                            autocomplete="off"
+                            t-att-disabled="props.isLoading"
+                        />
+                        <datalist id="marcas-datalist">
+                            <t t-foreach="state.marcas" t-as="marca" t-key="marca">
+                                <option t-att-value="marca"/>
+                            </t>
+                        </datalist>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="filter-actions d-flex justify-content-between gap-2">
+                        <button 
+                            class="btn btn-sm btn-light border flex-grow-1" 
+                            t-on-click="toggleAdvancedFilters" 
+                            title="Filtros avanzados"
+                        >
+                            <i class="fa fa-sliders me-1"></i> 
+                            <t t-if="!state.showAdvancedFilters">Más</t>
+                            <t t-else="">Menos</t>
+                        </button>
+                        <button 
+                            class="btn btn-sm btn-light border" 
+                            t-on-click="clearAllFilters" 
+                            t-att-disabled="!hasActiveFilters()" 
+                            title="Limpiar"
+                        >
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- === FILTROS AVANZADOS === -->
+                <div class="filters-row advanced-filters mt-3" t-if="state.showAdvancedFilters" t-att-class="{ 'd-none': !state.mobileFiltersOpen, 'd-grid': state.mobileFiltersOpen, 'd-md-grid': true }">
+                    
                     <!-- Almacén -->
                     <div class="filter-group">
                         <label class="filter-label d-none d-md-block">Almacén</label>
@@ -79,67 +186,6 @@
                         </select>
                     </div>
 
-                    <!-- Tipo -->
-                    <div class="filter-group">
-                        <label class="filter-label d-none d-md-block">Tipo</label>
-                        <select 
-                            class="form-select filter-select" 
-                            t-model="state.filters.tipo" 
-                            t-on-change="(ev) => this.onFilterChange('tipo', ev)" 
-                            t-att-disabled="props.isLoading"
-                        >
-                            <option value="">Todos los tipos</option>
-                            <t t-foreach="state.tipos" t-as="tipo" t-key="tipo_index">
-                                <option t-att-value="tipo[0]" t-esc="tipo[1]"></option>
-                            </t>
-                        </select>
-                    </div>
-
-                    <!-- Categoría -->
-                    <div class="filter-group">
-                        <label class="filter-label d-none d-md-block">Categoría</label>
-                        <input 
-                            type="text" 
-                            class="form-control filter-input" 
-                            placeholder="Escribe categoría..." 
-                            t-model="state.filters.categoria_name" 
-                            t-on-input="(ev) => this.onTextFilterChange('categoria_name', ev)"
-                            list="categorias-datalist"
-                            autocomplete="off"
-                            t-att-disabled="props.isLoading"
-                        />
-                        <datalist id="categorias-datalist">
-                            <t t-foreach="state.categorias" t-as="categoria" t-key="categoria.name">
-                                <option t-att-value="categoria.name"/>
-                            </t>
-                        </datalist>
-                    </div>
-
-                    <!-- Botones -->
-                    <div class="filter-actions d-flex justify-content-between gap-2">
-                        <button 
-                            class="btn btn-sm btn-light border flex-grow-1" 
-                            t-on-click="toggleAdvancedFilters" 
-                            title="Filtros avanzados"
-                        >
-                            <i class="fa fa-sliders me-1"></i> 
-                            <t t-if="!state.showAdvancedFilters">Más</t>
-                            <t t-else="">Menos</t>
-                        </button>
-                        <button 
-                            class="btn btn-sm btn-light border" 
-                            t-on-click="clearAllFilters" 
-                            t-att-disabled="!hasActiveFilters()" 
-                            title="Limpiar"
-                        >
-                            <i class="fa fa-times"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- === FILTROS AVANZADOS === -->
-                <div class="filters-row advanced-filters mt-3" t-if="state.showAdvancedFilters" t-att-class="{ 'd-none': !state.mobileFiltersOpen, 'd-grid': state.mobileFiltersOpen, 'd-md-grid': true }">
-                    
                     <!-- Grupo -->
                     <div class="filter-group">
                         <label class="filter-label d-none d-md-block">Grupo</label>
@@ -155,26 +201,6 @@
                         <datalist id="grupos-datalist">
                             <t t-foreach="state.grupos" t-as="grupo" t-key="grupo_index">
                                 <option t-att-value="grupo[1]"/>
-                            </t>
-                        </datalist>
-                    </div>
-
-
-                    <!-- === MARCA === -->
-                    <div class="filter-group">
-                        <label class="filter-label d-none d-md-block">Marca</label>
-                        <input 
-                            type="text" 
-                            class="form-control filter-input" 
-                            placeholder="Buscar marca..." 
-                            t-model="state.filters.marca" 
-                            t-on-input="(ev) => this.onTextFilterChange('marca', ev)"
-                            list="marcas-datalist"
-                            autocomplete="off"
-                        />
-                        <datalist id="marcas-datalist">
-                            <t t-foreach="state.marcas" t-as="marca" t-key="marca">
-                                <option t-att-value="marca"/>
                             </t>
                         </datalist>
                     </div>
@@ -198,7 +224,6 @@
                         </datalist>
                     </div>
        
-                    
                     <!-- Espesor -->
                     <div class="filter-group">
                         <label class="filter-label d-none d-md-block">Espesor</label>
@@ -241,31 +266,7 @@
                             min="0"
                         />
                     </div>
-                    
-                    <!-- Lote -->
-                    <div class="filter-group">
-                        <label class="filter-label d-none d-md-block">Lote</label>
-                        <input 
-                            type="text" 
-                            class="form-control filter-input" 
-                            placeholder="Lotes separados por coma (ej: L1, L2)..." 
-                            t-model="state.filters.numero_serie" 
-                            t-on-input="(ev) => this.onTextFilterChange('numero_serie', ev)"
-                        />
-                    </div>
-                    
-                    <!-- Bloque -->
-                    <div class="filter-group">
-                        <label class="filter-label d-none d-md-block">Bloque</label>
-                        <input 
-                            type="text" 
-                            class="form-control filter-input" 
-                            placeholder="Bloque..." 
-                            t-model="state.filters.bloque" 
-                            t-on-input="(ev) => this.onTextFilterChange('bloque', ev)"
-                        />
-                    </div>
-                    
+
                     <!-- Pedimento -->
                     <div class="filter-group">
                         <label class="filter-label d-none d-md-block">Pedimento</label>
@@ -301,25 +302,6 @@
                             t-on-input="(ev) => this.onTextFilterChange('atado', ev)"
                         />
                     </div>
-                    
-                    <!-- Color -->
-                    <div class="filter-group">
-                        <label class="filter-label d-none d-md-block">Color</label>
-                        <input 
-                            type="text" 
-                            class="form-control filter-input" 
-                            placeholder="Escribe o selecciona color..." 
-                            t-model="state.filters.color" 
-                            t-on-input="(ev) => this.onTextFilterChange('color', ev)"
-                            list="colores-datalist"
-                            autocomplete="off"
-                        />
-                        <datalist id="colores-datalist">
-                            <t t-foreach="state.colores" t-as="color" t-key="color">
-                                <option t-att-value="color"/>
-                            </t>
-                        </datalist>
-                    </div>
                 </div>
 
                 <!-- === FILTRO DE PRECIOS === -->
@@ -339,8 +321,6 @@
                                 <option value="USD">USD</option>
                                 <option value="MXN">MXN</option>
                             </select>
-                            
-                            <!-- ELIMINADO EL SELECT DE NIVEL (HIGH/MEDIUM) -->
                             
                             <div class="price-range-input">
                                 <span class="price-range-prefix">Min</span>
