@@ -34,6 +34,7 @@
                         <th class="col-atado">Atado</th>
                         <th class="col-pedimento">Pedimento</th>
                         <th class="col-contenedor">Contenedor</th>
+                        <th class="col-numero-placa">N. Placa</th>
                         <th class="col-ref-proveedor">Ref. Prov.</th>
                         <th class="col-icon">P</th>
                         <th class="col-icon">N</th>
@@ -47,7 +48,7 @@
                         
                         <!-- SEPARADOR ENTRE BLOQUES: fila vacía antes de cada bloque excepto el primero -->
                         <tr t-if="!group_first" class="container-separator-row">
-                            <td colspan="15" style="height: 8px; padding: 0; border: none; background: transparent;"></td>
+                            <td colspan="16" style="height: 8px; padding: 0; border: none; background: transparent;"></td>
                         </tr>
 
                         <!-- BUCLE INTERNO: Itera sobre los detalles -->
@@ -55,7 +56,7 @@
                             
                             <!-- SEPARADOR DE CONTENEDOR: fila vacía cuando cambia el contenedor dentro del mismo bloque -->
                             <tr t-if="detail._containerBreak" class="container-separator-row">
-                                <td colspan="15" style="height: 8px; padding: 0; border: none; background: transparent;"></td>
+                                <td colspan="16" style="height: 8px; padding: 0; border: none; background: transparent;"></td>
                             </tr>
 
                             <tr>
@@ -136,6 +137,11 @@
                                 
                                 <td class="col-ref-proveedor">
                                     <span t-if="detail.referencia_proveedor" t-esc="detail.referencia_proveedor"></span>
+                                    <span t-else="" class="text-muted">-</span>
+                                </td>
+
+                                <td class="col-num-placa">
+                                    <span t-if="detail.numero_placa" t-esc="detail.numero_placa"></span>
                                     <span t-else="" class="text-muted">-</span>
                                 </td>
                                 

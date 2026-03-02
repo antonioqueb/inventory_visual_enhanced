@@ -370,6 +370,8 @@ class StockQuant(models.Model):
                 'pedimento': quant.x_pedimento if hasattr(quant, 'x_pedimento') else '',
                 'contenedor': quant.x_contenedor if hasattr(quant, 'x_contenedor') else '',
                 'referencia_proveedor': quant.x_referencia_proveedor if hasattr(quant, 'x_referencia_proveedor') else '',
+                'numero_placa': quant.lot_id.x_numero_placa if quant.lot_id and hasattr(quant.lot_id, 'x_numero_placa') else '',
+                'numero_placa': quant.lot_id.x_numero_placa if quant.lot_id and hasattr(quant.lot_id, 'x_numero_placa') else '',
                 'cantidad_fotos': 0,
                 'detalles_placa': quant.x_detalles_placa if hasattr(quant, 'x_detalles_placa') else '',
                 'tiene_hold': False,
