@@ -179,7 +179,13 @@ class StockQuant(models.Model):
             raw_input = filters['numero_serie']
             search_lot_names = [name.strip() for name in raw_input.split(',') if name.strip()]
             if search_lot_names:
-                domain.append(('lot_id.name', 'in', search_lot_names))
+                if len(search_lot_names) == 1:
+                    domain.append(('lot_id.name', 'ilike', search_lot_names[0]))
+                else:
+                    lot_domain = ['|'] * (len(search_lot_names) - 1)
+                    for name in search_lot_names:
+                        lot_domain.append(('lot_id.name', 'ilike', name))
+                    domain.extend(lot_domain)
         
         if filters.get('bloque'):
             domain.append(('x_bloque', 'ilike', filters['bloque']))
@@ -218,8 +224,11 @@ class StockQuant(models.Model):
         
         missing_lots = []
         if search_lot_names:
-            found_lots = set(quants.mapped('lot_id.name'))
-            missing_lots = sorted(list(set(search_lot_names) - found_lots))
+            found_lot_names = set(quants.mapped('lot_id.name'))
+            for search_term in search_lot_names:
+                if not any(search_term.lower() in lot_name.lower() for lot_name in found_lot_names if lot_name):
+                    missing_lots.append(search_term)
+            missing_lots.sort()
         
         product_groups = {}
         for quant in quants:
