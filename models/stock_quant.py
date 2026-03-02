@@ -533,19 +533,97 @@ class StockQuant(models.Model):
                     'estado': dict(sol.order_id._fields['state'].selection).get(sol.order_id.state, ''),
                 })
         
+        # ==================== RESERVATIONS / APARTADOS ====================
         reservations = []
         if hasattr(quant, 'x_hold_ids'):
             for hold in quant.x_hold_ids:
                 statistics['total_apartados'] += 1
-                reservations.append({
+                
+                estado_raw = hold.estado or ''
+                try:
+                    estado_display = dict(hold._fields['estado'].selection).get(hold.estado, hold.estado)
+                except Exception:
+                    estado_display = estado_raw
+                
+                # Información de cancelación
+                cancel_info = {}
+                if estado_raw in ('cancelado', 'expirado'):
+                    cancel_info = {
+                        'tipo_cancelacion': 'Expiración automática' if estado_raw == 'expirado' else 'Cancelación manual',
+                        'cancelado_por': 'Sistema (Cron)' if estado_raw == 'expirado' else (hold.write_uid.name if hold.write_uid else 'Desconocido'),
+                        'fecha_cancelacion': hold.write_date.strftime('%Y-%m-%d %H:%M') if hold.write_date else '',
+                    }
+                
+                # Calcular duración
+                duracion_dias = 0
+                if hold.fecha_inicio:
+                    if estado_raw in ('cancelado', 'expirado') and hold.write_date:
+                        duracion_dias = (hold.write_date - hold.fecha_inicio).days
+                    else:
+                        duracion_dias = (fields.Datetime.now() - hold.fecha_inicio).days
+                
+                reservation_data = {
+                    'id': hold.id,
+                    'name': hold.name or '',
                     'tipo': 'Apartado Manual',
+                    'estado': estado_display,
+                    'estado_raw': estado_raw,
+                    # Cliente
                     'partner': hold.partner_id.name if hold.partner_id else '',
-                    'fecha_inicio': hold.fecha_inicio.strftime('%Y-%m-%d') if hold.fecha_inicio else '',
-                    'fecha_expiracion': hold.fecha_expiracion.strftime('%Y-%m-%d') if hold.fecha_expiracion else '',
-                    'estado': dict(hold._fields['estado'].selection).get(hold.estado, ''),
+                    'partner_ref': hold.partner_id.ref or '' if hold.partner_id else '',
+                    'partner_email': hold.partner_id.email or '' if hold.partner_id else '',
+                    # Vendedor
+                    'vendedor': hold.user_id.name if hold.user_id else '',
+                    'vendedor_email': hold.user_id.email if hold.user_id else '',
+                    # Proyecto y Arquitecto
+                    'proyecto': hold.project_id.name if hold.project_id else '',
+                    'arquitecto': hold.arquitecto_id.name if hold.arquitecto_id else '',
+                    # Fechas
+                    'fecha_inicio': hold.fecha_inicio.strftime('%Y-%m-%d %H:%M') if hold.fecha_inicio else '',
+                    'fecha_expiracion': hold.fecha_expiracion.strftime('%Y-%m-%d %H:%M') if hold.fecha_expiracion else '',
+                    'fecha_creacion': hold.create_date.strftime('%Y-%m-%d %H:%M') if hold.create_date else '',
+                    'ultima_modificacion': hold.write_date.strftime('%Y-%m-%d %H:%M') if hold.write_date else '',
+                    # Auditoría
+                    'creado_por': hold.create_uid.name if hold.create_uid else '',
+                    'modificado_por': hold.write_uid.name if hold.write_uid else '',
+                    # Lote y ubicación
+                    'lote_nombre': hold.lot_id.name if hold.lot_id else '',
+                    'ubicacion': hold.ubicacion_id.complete_name if hold.ubicacion_id else '',
+                    # Días
+                    'duracion_dias': duracion_dias,
+                    'dias_restantes': hold.dias_restantes if estado_raw == 'activo' else 0,
+                    # Notas
                     'notas': hold.notas or '',
-                })
+                    # Cancelación
+                    'cancel_info': cancel_info,
+                    # Orden de hold relacionada
+                    'hold_order_name': '',
+                    'hold_order_state': '',
+                    'hold_order_sale': '',
+                }
+                
+                # Buscar si este hold pertenece a una hold order
+                try:
+                    hold_order_line = self.env['stock.lot.hold.order.line'].search([
+                        ('hold_id', '=', hold.id)
+                    ], limit=1)
+                    if hold_order_line and hold_order_line.order_id:
+                        order = hold_order_line.order_id
+                        reservation_data['hold_order_name'] = order.name or ''
+                        reservation_data['hold_order_state'] = dict(order._fields['state'].selection).get(order.state, order.state)
+                        reservation_data['hold_order_sale'] = order.sale_order_id.name if order.sale_order_id else ''
+                except Exception:
+                    pass
+                
+                reservations.append(reservation_data)
+            
+            # Ordenar: activos primero, luego por fecha creación desc
+            reservations.sort(key=lambda r: (
+                0 if r['estado_raw'] == 'activo' else 1,
+                r.get('fecha_creacion', '') or ''
+            ))
         
+        # ==================== ENTREGAS ====================
         deliveries = []
         delivery_moves = self.env['stock.move.line'].search([
             ('lot_id', '=', lot.id),
