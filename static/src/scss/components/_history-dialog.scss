@@ -392,6 +392,87 @@ $brand-secondary: #017E84;
   }
 }
 
+// === PESTAÑA APARTADOS - CARDS CON ESTADO ===
+  .card {
+    // Headers con color de estado (override del header oscuro genérico)
+    .card-header.bg-warning.bg-opacity-25 {
+      background: rgba(#ffc107, 0.25) !important;
+      
+      h6, h6 i, small { color: $brand-primary !important; }
+      .badge.bg-warning { background: #ffc107 !important; color: #212529 !important; }
+      .badge.bg-light { background: #FFFFFF !important; color: $brand-primary !important; border: 1px solid $brand-primary; }
+    }
+    
+    .card-header.bg-danger.bg-opacity-10 {
+      background: rgba(#dc3545, 0.10) !important;
+      
+      h6, h6 i, small { color: #dc3545 !important; }
+      .badge.bg-danger { background: #dc3545 !important; color: #FFFFFF !important; }
+      .badge.bg-light { background: #FFFFFF !important; color: #dc3545 !important; border: 1px solid #dc3545; }
+    }
+    
+    .card-header.bg-secondary.bg-opacity-10 {
+      background: rgba($brand-gray, 0.10) !important;
+      
+      h6, h6 i, small { color: $brand-gray !important; }
+      .badge.bg-secondary { background: $brand-gray !important; color: #FFFFFF !important; }
+      .badge.bg-light { background: #FFFFFF !important; color: $brand-gray !important; border: 1px solid $brand-gray; }
+    }
+  }
+
+  // === SECCIONES INTERNAS DE APARTADOS ===
+  .card-body {
+    // Títulos de sección (Cliente, Vendedor, Fechas, etc.)
+    h6.text-muted {
+      color: $brand-secondary !important;
+      font-weight: 700;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      
+      i { color: $brand-secondary !important; }
+    }
+    
+    // Tablas internas de fechas y auditoría
+    .table-borderless {
+      td.text-muted { color: $brand-gray !important; }
+      td:not(.text-muted) { color: #212529; }
+      td.fw-bold { color: $brand-primary !important; }
+    }
+    
+    // Alerta de cancelación
+    .alert-danger.bg-danger.bg-opacity-10 {
+      background: rgba(#dc3545, 0.08) !important;
+      border: 1px solid rgba(#dc3545, 0.3) !important;
+      
+      h6.text-danger { color: #dc3545 !important; }
+      .text-muted { color: $brand-gray !important; }
+      strong { color: #212529 !important; }
+    }
+    
+    // Alerta de orden vinculada
+    .alert-info.bg-info.bg-opacity-10 {
+      background: rgba($brand-secondary, 0.08) !important;
+      border: 1px solid rgba($brand-secondary, 0.3) !important;
+      
+      h6.text-info { color: $brand-secondary !important; }
+      .text-muted { color: $brand-gray !important; }
+      strong { color: #212529 !important; }
+    }
+    
+    // Bloque de notas
+    .bg-light.rounded.border {
+      background: #FAFAFA !important;
+      border: 1px solid rgba($brand-gray, 0.2) !important;
+      
+      h6 { color: $brand-secondary !important; }
+      p { color: #212529; }
+    }
+  }
+
+
+
+
 // === RESPONSIVE ===
 @media (max-width: 768px) {
   .o_history_dialog {
