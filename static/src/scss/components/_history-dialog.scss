@@ -54,25 +54,39 @@ $brand-secondary: #017E84;
   .nav-tabs {
     background: #FFFFFF;
     border-bottom: 2px solid rgba($brand-primary, 0.2);
-    gap: 4px;
+    gap: 2px; // Espacio reducido entre pestañas
+    flex-wrap: nowrap; // Forzar a una sola línea
+    overflow-x: auto; // Permitir scroll si la pantalla es pequeña
+    
+    // Ocultar barra de scroll para estética limpia
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
     
     .nav-item {
       .nav-link {
         color: $brand-gray;
         border: none;
         border-radius: 8px 8px 0 0;
-        padding: 10px 16px;
+        padding: 8px 12px; // Padding más compacto
+        font-size: 13.5px; // Fuente ligeramente menor para ganar espacio
         font-weight: 600;
+        white-space: nowrap; // Evitar que el texto haga salto de línea interno
         transition: all 0.2s ease;
         background: #FFFFFF;
         
         i {
           color: $brand-gray;
+          margin-right: 6px !important; // Ajuste fino del icono
         }
         
         .badge {
           background: rgba($brand-gray, 0.15) !important;
           color: $brand-gray !important;
+          padding: 4px 6px;
+          font-size: 11px;
+          margin-left: 6px !important; // Ajuste fino del badge
         }
         
         &:hover {
@@ -477,6 +491,7 @@ $brand-secondary: #017E84;
 @media (max-width: 768px) {
   .o_history_dialog {
     .nav-tabs {
+      // En móvil ya forzábamos el no-wrap, pero ahora también está forzado en escritorio.
       flex-wrap: nowrap;
       overflow-x: auto;
       padding-bottom: 8px;
