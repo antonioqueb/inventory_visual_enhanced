@@ -114,6 +114,19 @@
                             <span class="badge bg-secondary ms-2" t-esc="history.deliveries.length"></span>
                         </button>
                     </li>
+                    <!-- NUEVA PESTAÑA: LOG COMBINADO GENERAL -->
+                    <li class="nav-item" role="presentation">
+                        <button 
+                            class="nav-link"
+                            t-att-class="{ active: isActiveTab('log') }"
+                            t-on-click="() => this.switchTab('log')"
+                            type="button"
+                        >
+                            <i class="fa fa-list me-2"></i>
+                            Log General
+                            <span t-if="history.general_logs" class="badge bg-secondary ms-2" t-esc="history.general_logs.length"></span>
+                        </button>
+                    </li>
                 </ul>
 
                 <!-- Contenido de las pestañas -->
@@ -586,6 +599,45 @@
                                                 <td class="text-end"><strong t-esc="formatNumber(delivery.cantidad)"></strong></td>
                                                 <td><small t-esc="delivery.origen"></small></td>
                                                 <td><span class="badge bg-secondary" t-esc="delivery.estado"></span></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+                    </div>
+
+                    <!-- PESTAÑA NUEVA: LOG COMBINADO GENERAL -->
+                    <div t-if="isActiveTab('log')" class="tab-pane fade show active">
+                        <t t-if="!history.general_logs or history.general_logs.length === 0">
+                            <div class="text-center py-5">
+                                <i class="fa fa-list-alt" style="font-size: 64px; color: #ccc;"></i>
+                                <p class="text-muted mt-3">No hay registros en el log general para este lote.</p>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="table-responsive">
+                                <!-- Estilo minimalista, tabla limpia con bordes sutiles -->
+                                <table class="table table-sm table-striped border mb-0" style="font-size: 13px;">
+                                    <thead class="table-light text-muted">
+                                        <tr>
+                                            <th style="width: 15%">Fecha</th>
+                                            <th style="width: 15%">Usuario</th>
+                                            <th style="width: 15%">Origen</th>
+                                            <th>Descripción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="history.general_logs" t-as="log" t-key="log_index">
+                                            <tr>
+                                                <td class="text-nowrap"><small t-esc="log.fecha"></small></td>
+                                                <td><small class="fw-bold text-secondary" t-esc="log.usuario"></small></td>
+                                                <td>
+                                                    <span class="badge bg-light text-dark border"><t t-esc="log.origen"/></span>
+                                                </td>
+                                                <td>
+                                                    <span t-esc="log.descripcion"></span>
+                                                </td>
                                             </tr>
                                         </t>
                                     </tbody>

@@ -1107,3 +1107,5 @@ class StockQuant(models.Model):
             'count': len(result),
             'orders': result,
         }
+
+    
