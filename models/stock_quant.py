@@ -451,9 +451,9 @@ class StockQuant(models.Model):
             ('lot_id', '=', lot.id)
         ])
         
+        from datetime import datetime
         dias_inventario = 0
         if lot.create_date:
-            from datetime import datetime
             dias_inventario = (datetime.now() - lot.create_date).days
         
         statistics = {
@@ -466,6 +466,13 @@ class StockQuant(models.Model):
             'dias_en_inventario': dias_inventario,
         }
         
+        # ==============================================================
+        # INICIALIZAMOS LA LISTA PARA EL LOG COMBINADO GENERAL
+        # ==============================================================
+        general_logs = []
+        min_date = datetime.min # Fecha segura por si algún registro no tiene
+
+        # 1. COMPRAS
         purchase_info = []
         if has_purchase_permissions:
             purchase_lines = self.env['purchase.order.line'].search([
@@ -483,7 +490,18 @@ class StockQuant(models.Model):
                     'moneda': pol.order_id.currency_id.symbol,
                     'estado': dict(pol.order_id._fields['state'].selection).get(pol.order_id.state, ''),
                 })
+                
+                # Agregar al Log Combinado
+                fecha_obj = pol.order_id.date_order or pol.create_date
+                general_logs.append({
+                    'fecha_obj': fecha_obj,
+                    'fecha': fecha_obj.strftime('%Y-%m-%d %H:%M') if fecha_obj else '',
+                    'usuario': pol.create_uid.name if pol.create_uid else 'Sistema',
+                    'origen': 'Compra',
+                    'descripcion': f"Orden de compra {pol.order_id.name} al proveedor {pol.order_id.partner_id.name} (Cant: {pol.product_qty})"
+                })
         
+        # 2. MOVIMIENTOS
         movements = []
         for ml in move_lines.sorted('date', reverse=True):
             icon = 'fa-arrow-right'
@@ -496,6 +514,7 @@ class StockQuant(models.Model):
                 icon = 'fa-arrow-up'
                 tipo = 'Salida'
             
+            ref = ml.reference or ml.picking_id.name if ml.picking_id else ''
             movements.append({
                 'fecha': ml.date.strftime('%Y-%m-%d %H:%M') if ml.date else '',
                 'tipo': tipo,
@@ -503,10 +522,21 @@ class StockQuant(models.Model):
                 'origen': ml.location_id.complete_name,
                 'destino': ml.location_dest_id.complete_name,
                 'cantidad': ml.qty_done,
-                'referencia': ml.reference or ml.picking_id.name if ml.picking_id else '',
+                'referencia': ref,
                 'usuario': ml.write_uid.name if ml.write_uid else '',
             })
+            
+            # Agregar al Log Combinado
+            fecha_obj = ml.date or ml.create_date
+            general_logs.append({
+                'fecha_obj': fecha_obj,
+                'fecha': fecha_obj.strftime('%Y-%m-%d %H:%M') if fecha_obj else '',
+                'usuario': ml.write_uid.name if ml.write_uid else 'Sistema',
+                'origen': f"Movimiento ({tipo})",
+                'descripcion': f"De: {ml.location_id.name} -> A: {ml.location_dest_id.name}. Documento: {ref}. Cantidad: {ml.qty_done}"
+            })
         
+        # 3. VENTAS
         sales_orders = []
         sale_lines = self.env['sale.order.line'].search([
             ('product_id', '=', lot.product_id.id),
@@ -532,8 +562,18 @@ class StockQuant(models.Model):
                     'moneda': sol.order_id.currency_id.symbol,
                     'estado': dict(sol.order_id._fields['state'].selection).get(sol.order_id.state, ''),
                 })
+                
+                # Agregar al Log Combinado
+                fecha_obj = sol.order_id.date_order or sol.create_date
+                general_logs.append({
+                    'fecha_obj': fecha_obj,
+                    'fecha': fecha_obj.strftime('%Y-%m-%d %H:%M') if fecha_obj else '',
+                    'usuario': sol.order_id.user_id.name if sol.order_id.user_id else 'Sistema',
+                    'origen': 'Venta',
+                    'descripcion': f"Orden de venta {sol.order_id.name} confirmada al cliente {sol.order_id.partner_id.name}"
+                })
         
-        # ==================== RESERVATIONS / APARTADOS ====================
+        # 4. APARTADOS
         reservations = []
         if hasattr(quant, 'x_hold_ids'):
             for hold in quant.x_hold_ids:
@@ -545,7 +585,6 @@ class StockQuant(models.Model):
                 except Exception:
                     estado_display = estado_raw
                 
-                # Información de cancelación
                 cancel_info = {}
                 if estado_raw in ('cancelado', 'expirado'):
                     cancel_info = {
@@ -554,7 +593,6 @@ class StockQuant(models.Model):
                         'fecha_cancelacion': hold.write_date.strftime('%Y-%m-%d %H:%M') if hold.write_date else '',
                     }
                 
-                # Calcular duración
                 duracion_dias = 0
                 if hold.fecha_inicio:
                     if estado_raw in ('cancelado', 'expirado') and hold.write_date:
@@ -562,51 +600,58 @@ class StockQuant(models.Model):
                     else:
                         duracion_dias = (fields.Datetime.now() - hold.fecha_inicio).days
                 
+                # Evento de creación de apartado para el LOG
+                general_logs.append({
+                    'fecha_obj': hold.create_date,
+                    'fecha': hold.create_date.strftime('%Y-%m-%d %H:%M') if hold.create_date else '',
+                    'usuario': hold.create_uid.name if hold.create_uid else 'Sistema',
+                    'origen': 'Apartado (Creación)',
+                    'descripcion': f"Apartado creado para cliente: {hold.partner_id.name if hold.partner_id else '-'}"
+                })
+
+                # Si se canceló/expiró, generar otro evento para el LOG
+                if estado_raw in ('cancelado', 'expirado') and hold.write_date:
+                    general_logs.append({
+                        'fecha_obj': hold.write_date,
+                        'fecha': hold.write_date.strftime('%Y-%m-%d %H:%M') if hold.write_date else '',
+                        'usuario': hold.write_uid.name if hold.write_uid and estado_raw != 'expirado' else 'Sistema',
+                        'origen': f"Apartado ({estado_raw.capitalize()})",
+                        'descripcion': f"El apartado cambió a estado: {estado_raw.upper()}"
+                    })
+
+                # Armar info del tab (se mantiene igual que tu codigo)
                 reservation_data = {
                     'id': hold.id,
                     'name': hold.name or '',
                     'tipo': 'Apartado Manual',
                     'estado': estado_display,
                     'estado_raw': estado_raw,
-                    # Cliente
                     'partner': hold.partner_id.name if hold.partner_id else '',
                     'partner_ref': hold.partner_id.ref or '' if hold.partner_id else '',
                     'partner_email': hold.partner_id.email or '' if hold.partner_id else '',
-                    # Vendedor
                     'vendedor': hold.user_id.name if hold.user_id else '',
                     'vendedor_email': hold.user_id.email if hold.user_id else '',
-                    # Proyecto y Arquitecto
                     'proyecto': hold.project_id.name if hold.project_id else '',
                     'arquitecto': hold.arquitecto_id.name if hold.arquitecto_id else '',
-                    # Fechas
                     'fecha_inicio': hold.fecha_inicio.strftime('%Y-%m-%d %H:%M') if hold.fecha_inicio else '',
                     'fecha_expiracion': hold.fecha_expiracion.strftime('%Y-%m-%d %H:%M') if hold.fecha_expiracion else '',
                     'fecha_creacion': hold.create_date.strftime('%Y-%m-%d %H:%M') if hold.create_date else '',
                     'ultima_modificacion': hold.write_date.strftime('%Y-%m-%d %H:%M') if hold.write_date else '',
-                    # Auditoría
                     'creado_por': hold.create_uid.name if hold.create_uid else '',
                     'modificado_por': hold.write_uid.name if hold.write_uid else '',
-                    # Lote y ubicación
                     'lote_nombre': hold.lot_id.name if hold.lot_id else '',
                     'ubicacion': hold.ubicacion_id.complete_name if hold.ubicacion_id else '',
-                    # Días
                     'duracion_dias': duracion_dias,
                     'dias_restantes': hold.dias_restantes if estado_raw == 'activo' else 0,
-                    # Notas
                     'notas': hold.notas or '',
-                    # Cancelación
                     'cancel_info': cancel_info,
-                    # Orden de hold relacionada
                     'hold_order_name': '',
                     'hold_order_state': '',
                     'hold_order_sale': '',
                 }
                 
-                # Buscar si este hold pertenece a una hold order
                 try:
-                    hold_order_line = self.env['stock.lot.hold.order.line'].search([
-                        ('hold_id', '=', hold.id)
-                    ], limit=1)
+                    hold_order_line = self.env['stock.lot.hold.order.line'].search([('hold_id', '=', hold.id)], limit=1)
                     if hold_order_line and hold_order_line.order_id:
                         order = hold_order_line.order_id
                         reservation_data['hold_order_name'] = order.name or ''
@@ -617,13 +662,9 @@ class StockQuant(models.Model):
                 
                 reservations.append(reservation_data)
             
-            # Ordenar: activos primero, luego por fecha creación desc
-            reservations.sort(key=lambda r: (
-                0 if r['estado_raw'] == 'activo' else 1,
-                r.get('fecha_creacion', '') or ''
-            ))
+            reservations.sort(key=lambda r: (0 if r['estado_raw'] == 'activo' else 1, r.get('fecha_creacion', '') or ''))
         
-        # ==================== ENTREGAS ====================
+        # 5. ENTREGAS
         deliveries = []
         delivery_moves = self.env['stock.move.line'].search([
             ('lot_id', '=', lot.id),
@@ -642,7 +683,18 @@ class StockQuant(models.Model):
                     'origen': dm.location_id.complete_name,
                     'estado': dict(dm.picking_id._fields['state'].selection).get(dm.picking_id.state, ''),
                 })
+                # No agregamos entregas al log combinado porque ya fueron capturadas en MOVIMIENTOS (como Salidas).
         
+        # ==============================================================
+        # PROCESAR Y ORDENAR EL LOG COMBINADO GENERAL
+        # ==============================================================
+        # Ordenamos los eventos usando la fecha real ('fecha_obj') de más nuevo a más viejo
+        general_logs.sort(key=lambda x: x.get('fecha_obj') or min_date, reverse=True)
+        
+        # Una vez ordenado, eliminamos el objeto datetime porque Odoo/JS necesita enviar JSON puro
+        for log in general_logs:
+            log.pop('fecha_obj', None)
+
         return {
             'general_info': general_info,
             'statistics': statistics,
@@ -652,6 +704,7 @@ class StockQuant(models.Model):
             'sales_orders': sales_orders,
             'reservations': reservations,
             'deliveries': deliveries,
+            'general_logs': general_logs,  # <- ¡AQUÍ ESTÁ LA NUEVA LLAVE QUE ENVÍA LOS DATOS AL FRONTEND!
         }
     
     @api.model
