@@ -176,7 +176,7 @@
 
 // === COLUMNAS SIMPLES (Tipo, Categoría) ===
 .col-type, .col-category {
-    font-size: 10px !important;
+    font-size: 11px !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -319,7 +319,7 @@
         td.col-type, td.col-category {
             grid-area: info;
             display: inline-block;
-            font-size: 9px !important;
+            font-size: 11px !important;
             color: #888;
             margin-right: 2.5rem;
             
