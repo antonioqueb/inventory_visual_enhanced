@@ -3,7 +3,8 @@ from odoo import models, api, fields
 from odoo.exceptions import UserError
 import logging
 
-_logger = logging.getLogger(__name__) 
+_logger = logging.getLogger(__name__)
+
 
 class StockQuant(models.Model):
     _inherit = 'stock.quant'
@@ -110,7 +111,7 @@ class StockQuant(models.Model):
         
         return filtered_groups
 
-    
+
     @api.model
     def get_inventory_grouped_by_product(self, filters=None):
         if not filters:
@@ -132,7 +133,7 @@ class StockQuant(models.Model):
         
         if filters.get('tipo'):
             domain.append(('x_tipo', '=', filters['tipo']))
-
+    
         if filters.get('marca'):
             domain.append(('product_id.product_tmpl_id.x_marca', 'ilike', filters['marca']))
         
@@ -299,7 +300,7 @@ class StockQuant(models.Model):
                 if not has_hold and available > 0:
                     product_groups[product_id]['transit_available_qty'] += available
                     product_groups[product_id]['transit_available_plates'] += 1
-                    
+                
             else:
                 product_groups[product_id]['stock_qty'] += qty
                 product_groups[product_id]['stock_plates'] += 1
@@ -371,7 +372,6 @@ class StockQuant(models.Model):
                 'contenedor': quant.x_contenedor if hasattr(quant, 'x_contenedor') else '',
                 'referencia_proveedor': quant.x_referencia_proveedor if hasattr(quant, 'x_referencia_proveedor') else '',
                 'numero_placa': quant.lot_id.x_numero_placa if quant.lot_id and hasattr(quant.lot_id, 'x_numero_placa') else '',
-                'numero_placa': quant.lot_id.x_numero_placa if quant.lot_id and hasattr(quant.lot_id, 'x_numero_placa') else '',
                 'cantidad_fotos': 0,
                 'detalles_placa': quant.x_detalles_placa if hasattr(quant, 'x_detalles_placa') else '',
                 'tiene_hold': False,
@@ -383,23 +383,29 @@ class StockQuant(models.Model):
             if quant.lot_id and hasattr(quant.lot_id, 'x_fotografia_ids'):
                 detail['cantidad_fotos'] = len(quant.lot_id.x_fotografia_ids)
             
-            if is_sales_user:
-                detail['tiene_hold'] = quant.x_tiene_hold if hasattr(quant, 'x_tiene_hold') else False
-                
-                if detail['tiene_hold'] and hasattr(quant, 'x_hold_activo_id') and quant.x_hold_activo_id:
-                    hold = quant.x_hold_activo_id
-                    detail['hold_info'] = {
-                        'id': hold.id,
-                        'partner_name': hold.partner_id.name if hold.partner_id else '',
-                        'proyecto_nombre': hold.project_id.name if hasattr(hold, 'project_id') and hold.project_id else '',
-                        'arquitecto_nombre': hold.arquitecto_id.name if hasattr(hold, 'arquitecto_id') and hold.arquitecto_id else '',
-                        'vendedor_nombre': hold.user_id.name if hold.user_id else '',
-                        'fecha_inicio': hold.fecha_inicio.strftime('%Y-%m-%d') if hasattr(hold, 'fecha_inicio') and hold.fecha_inicio else '',
-                        'fecha_expiracion': hold.fecha_expiracion.strftime('%Y-%m-%d') if hasattr(hold, 'fecha_expiracion') and hold.fecha_expiracion else '',
-                        'notas': hold.notas if hasattr(hold, 'notas') else '',
-                    }
+            # ================================================================
+            # tiene_hold: Se calcula SIEMPRE (necesario para bloqueo de carrito)
+            # ================================================================
+            detail['tiene_hold'] = quant.x_tiene_hold if hasattr(quant, 'x_tiene_hold') else False
             
-            if quant.lot_id and is_sales_user:
+            # hold_info: Solo se expone a usuarios de ventas (info sensible del cliente)
+            if detail['tiene_hold'] and is_sales_user and hasattr(quant, 'x_hold_activo_id') and quant.x_hold_activo_id:
+                hold = quant.x_hold_activo_id
+                detail['hold_info'] = {
+                    'id': hold.id,
+                    'partner_name': hold.partner_id.name if hold.partner_id else '',
+                    'proyecto_nombre': hold.project_id.name if hasattr(hold, 'project_id') and hold.project_id else '',
+                    'arquitecto_nombre': hold.arquitecto_id.name if hasattr(hold, 'arquitecto_id') and hold.arquitecto_id else '',
+                    'vendedor_nombre': hold.user_id.name if hold.user_id else '',
+                    'fecha_inicio': hold.fecha_inicio.strftime('%Y-%m-%d') if hasattr(hold, 'fecha_inicio') and hold.fecha_inicio else '',
+                    'fecha_expiracion': hold.fecha_expiracion.strftime('%Y-%m-%d') if hasattr(hold, 'fecha_expiracion') and hold.fecha_expiracion else '',
+                    'notas': hold.notas if hasattr(hold, 'notas') else '',
+                }
+            
+            # ================================================================
+            # en_orden_venta: Se calcula SIEMPRE (necesario para bloqueo de carrito)
+            # ================================================================
+            if quant.lot_id:
                 move_lines_with_lot = self.env['stock.move.line'].sudo().search([
                     ('lot_id', '=', quant.lot_id.id),
                     ('state', 'in', ['assigned', 'done']),
@@ -471,7 +477,7 @@ class StockQuant(models.Model):
         # ==============================================================
         general_logs = []
         min_date = datetime.min # Fecha segura por si algún registro no tiene
-
+        
         # 1. COMPRAS
         purchase_info = []
         if has_purchase_permissions:
@@ -970,8 +976,8 @@ class StockQuant(models.Model):
             return {'error': f'Error al crear arquitecto: {str(e)}'}
     
     @api.model
-    def create_lot_hold_enhanced(self, quant_id, partner_id, project_id, architect_id, 
-                                  notas='', currency_code='USD', product_prices=None):
+    def create_lot_hold_enhanced(self, quant_id, partner_id, project_id, architect_id,
+                                   notas='', currency_code='USD', product_prices=None):
         if not self.check_sales_permissions():
             raise UserError("No tiene permisos para crear apartados. Contacte al administrador.")
         
@@ -1080,9 +1086,9 @@ class StockQuant(models.Model):
             return {'error': f'Error al crear apartado: {str(e)}'}
     
     @api.model
-    def create_price_authorization(self, operation_type, partner_id, project_id, 
-                                   selected_lots, currency_code, product_prices, 
-                                   product_groups, notes=None, architect_id=None):
+    def create_price_authorization(self, operation_type, partner_id, project_id,
+                                    selected_lots, currency_code, product_prices,
+                                    product_groups, notes=None, architect_id=None):
         if not self.check_sales_permissions():
             raise UserError("No tiene permisos para crear autorizaciones. Contacte al administrador.")
         
@@ -1160,5 +1166,3 @@ class StockQuant(models.Model):
             'count': len(result),
             'orders': result,
         }
-
-    

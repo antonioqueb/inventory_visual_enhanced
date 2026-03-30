@@ -67,7 +67,9 @@
                                             type="checkbox"
                                             class="form-check-input cart-checkbox"
                                             t-att-checked="props.isInCart ? props.isInCart(detail.id) : false"
+                                            t-att-disabled="detail.tiene_hold or detail.en_orden_venta"
                                             t-on-change="() => props.toggleCartSelection ? props.toggleCartSelection(detail) : null"
+                                            t-att-title="detail.tiene_hold ? 'Lote con apartado activo' : (detail.en_orden_venta ? 'Lote en orden de venta confirmada' : '')"
                                         />
                                     </div>
                                 </td>
@@ -180,16 +182,20 @@
                                     <span t-else="" class="icon-btn no-content"><i class="fa fa-history"></i></span>
                                 </td>
                                 
+                                <!-- COLUMNA E (Estado): Prioridad -> 1. Hold activo, 2. En orden de venta, 3. Sin estado -->
                                 <td class="col-icon action-btn-cell">
+                                    <!-- 1. Tiene hold activo -->
                                     <button 
-                                        t-if="detail.tiene_hold and props.hasSalesPermissions"
+                                        t-if="detail.tiene_hold"
                                         type="button"
                                         class="status-badge-btn status-hold-active"
-                                        t-on-click="() => props.onHoldClick(detail.id, detail.hold_info)"
-                                        title="Ver información del apartado"
+                                        t-on-click="() => props.hasSalesPermissions ? props.onHoldClick(detail.id, detail.hold_info) : null"
+                                        t-att-title="props.hasSalesPermissions ? 'Ver información del apartado' : 'Lote con apartado activo'"
+                                        t-att-style="!props.hasSalesPermissions ? 'cursor: default;' : ''"
                                     >
                                         <i class="fa fa-hand-paper-o"></i>
                                     </button>
+                                    <!-- 2. En orden de venta confirmada -->
                                     <button 
                                         t-elif="detail.en_orden_venta"
                                         type="button"
@@ -199,6 +205,7 @@
                                     >
                                         <i class="fa fa-usd"></i>
                                     </button>
+                                    <!-- 3. Sin estado -->
                                     <span t-else="" class="status-badge-btn status-no-hold" title="Sin apartado"><i class="fa fa-hand-paper-o"></i></span>
                                 </td>
                             </tr>
