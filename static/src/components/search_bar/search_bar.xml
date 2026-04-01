@@ -17,6 +17,7 @@
                             placeholder="Buscar producto..."
                             t-model="state.filters.product_name"
                             t-on-input="(ev) => this.onTextFilterChange('product_name', ev)"
+                            t-on-keydown="(ev) => this.onTextFilterKeydown('product_name', ev)"
                             t-att-disabled="props.isLoading"
                         />
                     </div>
@@ -42,7 +43,8 @@
                             class="form-control filter-input" 
                             placeholder="Nombre o código..." 
                             t-model="state.filters.product_name" 
-                            t-on-input="(ev) => this.onTextFilterChange('product_name', ev)" 
+                            t-on-input="(ev) => this.onTextFilterChange('product_name', ev)"
+                            t-on-keydown="(ev) => this.onTextFilterKeydown('product_name', ev)"
                             t-att-disabled="props.isLoading"
                         />
                     </div>
@@ -56,6 +58,7 @@
                             placeholder="Lotes separados por coma..." 
                             t-model="state.filters.numero_serie" 
                             t-on-input="(ev) => this.onTextFilterChange('numero_serie', ev)"
+                            t-on-keydown="(ev) => this.onTextFilterKeydown('numero_serie', ev)"
                             t-att-disabled="props.isLoading"
                         />
                     </div>
@@ -69,6 +72,7 @@
                             placeholder="Bloque..." 
                             t-model="state.filters.bloque" 
                             t-on-input="(ev) => this.onTextFilterChange('bloque', ev)"
+                            t-on-keydown="(ev) => this.onTextFilterKeydown('bloque', ev)"
                             t-att-disabled="props.isLoading"
                         />
                     </div>
@@ -98,6 +102,7 @@
                             placeholder="Escribe categoría..." 
                             t-model="state.filters.categoria_name" 
                             t-on-input="(ev) => this.onTextFilterChange('categoria_name', ev)"
+                            t-on-keydown="(ev) => this.onTextFilterKeydown('categoria_name', ev)"
                             list="categorias-datalist"
                             autocomplete="off"
                             t-att-disabled="props.isLoading"
@@ -118,6 +123,7 @@
                             placeholder="Buscar marca..." 
                             t-model="state.filters.marca" 
                             t-on-input="(ev) => this.onTextFilterChange('marca', ev)"
+                            t-on-keydown="(ev) => this.onTextFilterKeydown('marca', ev)"
                             list="marcas-datalist"
                             autocomplete="off"
                             t-att-disabled="props.isLoading"
@@ -195,6 +201,7 @@
                             placeholder="Escribe grupo..." 
                             t-model="state.filters.grupo" 
                             t-on-input="(ev) => this.onTextFilterChange('grupo', ev)"
+                            t-on-keydown="(ev) => this.onTextFilterKeydown('grupo', ev)"
                             list="grupos-datalist"
                             autocomplete="off"
                         />
@@ -214,6 +221,7 @@
                             placeholder="Escribe o selecciona color..." 
                             t-model="state.filters.color" 
                             t-on-input="(ev) => this.onTextFilterChange('color', ev)"
+                            t-on-keydown="(ev) => this.onTextFilterKeydown('color', ev)"
                             list="colores-datalist"
                             autocomplete="off"
                         />
@@ -248,6 +256,7 @@
                             placeholder="Ej: 1.5" 
                             t-model="state.filters.alto_min" 
                             t-on-input="(ev) => this.onTextFilterChange('alto_min', ev)"
+                            t-on-keydown="(ev) => this.onTextFilterKeydown('alto_min', ev)"
                             step="0.01"
                             min="0"
                         />
@@ -262,6 +271,7 @@
                             placeholder="Ej: 2.0" 
                             t-model="state.filters.ancho_min" 
                             t-on-input="(ev) => this.onTextFilterChange('ancho_min', ev)"
+                            t-on-keydown="(ev) => this.onTextFilterKeydown('ancho_min', ev)"
                             step="0.01"
                             min="0"
                         />
@@ -276,6 +286,7 @@
                             placeholder="Pedimento..." 
                             t-model="state.filters.pedimento" 
                             t-on-input="(ev) => this.onTextFilterChange('pedimento', ev)"
+                            t-on-keydown="(ev) => this.onTextFilterKeydown('pedimento', ev)"
                         />
                     </div>
                     
@@ -288,6 +299,7 @@
                             placeholder="Contenedor..." 
                             t-model="state.filters.contenedor" 
                             t-on-input="(ev) => this.onTextFilterChange('contenedor', ev)"
+                            t-on-keydown="(ev) => this.onTextFilterKeydown('contenedor', ev)"
                         />
                     </div>
                     
@@ -300,6 +312,7 @@
                             placeholder="Atado..." 
                             t-model="state.filters.atado" 
                             t-on-input="(ev) => this.onTextFilterChange('atado', ev)"
+                            t-on-keydown="(ev) => this.onTextFilterKeydown('atado', ev)"
                         />
                     </div>
                 </div>
@@ -330,6 +343,7 @@
                                     placeholder="0.00"
                                     t-model="state.filters.price_min"
                                     t-on-input="(ev) => this.onPriceValueChange('price_min', ev)"
+                                    t-on-keydown="(ev) => this.onTextFilterKeydown('price_min', ev)"
                                     step="0.01"
                                     min="0"
                                 />
@@ -345,6 +359,7 @@
                                     placeholder="999..."
                                     t-model="state.filters.price_max"
                                     t-on-input="(ev) => this.onPriceValueChange('price_max', ev)"
+                                    t-on-keydown="(ev) => this.onTextFilterKeydown('price_max', ev)"
                                     step="0.01"
                                     min="0"
                                 />

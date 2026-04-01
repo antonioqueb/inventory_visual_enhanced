@@ -16,9 +16,9 @@ export class SearchBar extends Component {
                 tipo: '',
                 categoria_name: '',
                 grupo: '',
-                marca: '',     // Filtro de Marca
+                marca: '',
                 acabado: '',
-                color: '',     // Filtro de Color (vinculado al input del XML)
+                color: '',
                 grosor: '',
                 numero_serie: '',
                 bloque: '',
@@ -37,17 +37,22 @@ export class SearchBar extends Component {
             tipos: [],
             categorias: [],
             grupos: [],
-            marcas: [],    // Lista para el datalist de Marcas
+            marcas: [],
             acabados: [],
             grosores: [],
-            colores: [],   // Lista para el datalist de Colores
+            colores: [],
             
             showAdvancedFilters: false,
             mobileFiltersOpen: false,
         });
 
         this.searchTimeout = null;
-        this.searchDelay = 500;
+        this.selectSearchDelay = 300;   // Selects/dropdowns: respuesta rápida
+        this.textSearchDelay = 1200;    // Texto libre: esperar a que termine de escribir
+        this.minCharsToSearch = 3;      // No buscar con menos de 3 caracteres en texto
+
+        // Tracking para evitar búsquedas duplicadas
+        this._lastSearchPayload = null;
 
         onWillStart(async () => {
             await this.loadFilterOptions();
@@ -81,13 +86,11 @@ export class SearchBar extends Component {
 
     async loadFilterOptions() {
         try {
-            // 1. Cargar Almacenes
             const almacenes = await this.orm.searchRead(
                 "stock.warehouse", [], ["id", "name"], { order: "name" }
             );
             this.state.almacenes = almacenes;
 
-            // 2. Cargar Categorías
             const allCategorias = await this.orm.searchRead(
                 "product.category", [],
                 ["id", "name", "complete_name", "parent_id"],
@@ -114,7 +117,6 @@ export class SearchBar extends Component {
                 a.name.localeCompare(b.name)
             );
 
-            // 3. Cargar Marcas (x_marca en product.template)
             try {
                 const marcas = await this.orm.call(
                     "product.template", "read_group",
@@ -127,8 +129,6 @@ export class SearchBar extends Component {
                 this.state.marcas = [];
             }
 
-            // 4. Cargar Colores (x_color en stock.quant)
-            // Esto llena la lista para tu datalist id="colores-datalist"
             try {
                 const colores = await this.orm.call(
                     "stock.quant", "read_group",
@@ -141,7 +141,6 @@ export class SearchBar extends Component {
                 this.state.colores = [];
             }
 
-            // 5. Cargar Selecciones (Tipo, Grupo, Acabado)
             const fieldInfo = await this.orm.call(
                 "stock.quant", "fields_get", [], { attributes: ["selection"] }
             );
@@ -156,7 +155,6 @@ export class SearchBar extends Component {
                 this.state.acabados = fieldInfo.x_acabado.selection;
             }
 
-            // 6. Cargar Grosores disponibles
             try {
                 const grosores = await this.orm.call(
                     "stock.quant", "read_group",
@@ -199,39 +197,92 @@ export class SearchBar extends Component {
                 console.error("Error cargando ubicaciones:", error);
             }
         }
-        this.triggerSearch();
+        this._triggerSearchImmediate();
     }
 
+    // Para selects y dropdowns — búsqueda rápida
     onFilterChange(filterName, ev) {
         const value = ev.target.value;
         this.state.filters[filterName] = value || null;
-        this.triggerSearch();
+        this._triggerSearchImmediate();
     }
 
+    // Para campos de texto libre — debounce largo + mínimo de caracteres
     onTextFilterChange(filterName, ev) {
         this.state.filters[filterName] = ev.target.value;
-        this.triggerSearch();
+        this._triggerSearchDebounced(filterName);
+    }
+
+    // Enter en cualquier campo de texto = búsqueda inmediata
+    onTextFilterKeydown(filterName, ev) {
+        if (ev.key === 'Enter') {
+            ev.preventDefault();
+            if (this.searchTimeout) clearTimeout(this.searchTimeout);
+            this._executeSearch();
+        }
     }
 
     onPriceSettingChange(filterName, ev) {
         this.state.filters[filterName] = ev.target.value;
         if (this.state.filters.price_min || this.state.filters.price_max) {
-            this.triggerSearch();
+            this._triggerSearchDebounced(filterName);
         }
     }
 
     onPriceValueChange(filterName, ev) {
         this.state.filters[filterName] = ev.target.value;
-        this.triggerSearch();
+        this._triggerSearchDebounced(filterName);
     }
 
-    triggerSearch() {
+    // ── Estrategia de búsqueda ──────────────────────────────────────
+
+    /**
+     * Búsqueda inmediata (selects, dropdowns, almacén).
+     * Cancela cualquier debounce pendiente.
+     */
+    _triggerSearchImmediate() {
         if (this.searchTimeout) clearTimeout(this.searchTimeout);
+        this._executeSearch();
+    }
+
+    /**
+     * Búsqueda con debounce largo para campos de texto.
+     * Solo dispara si el valor cumple el mínimo de caracteres
+     * o si el campo quedó vacío (para limpiar el filtro).
+     */
+    _triggerSearchDebounced(filterName) {
+        if (this.searchTimeout) clearTimeout(this.searchTimeout);
+
+        const value = this.state.filters[filterName];
+        const isTextFilter = typeof value === 'string';
+
+        // Si el texto es muy corto (pero no vacío), no buscar aún
+        if (isTextFilter && value.length > 0 && value.length < this.minCharsToSearch) {
+            return;
+        }
+
         this.searchTimeout = setTimeout(() => {
-            if (this.props.onSearch) {
-                this.props.onSearch({ ...this.state.filters });
-            }
-        }, this.searchDelay);
+            this._executeSearch();
+        }, this.textSearchDelay);
+    }
+
+    /**
+     * Ejecuta la búsqueda real.
+     * Evita búsquedas duplicadas comparando el payload.
+     */
+    _executeSearch() {
+        if (!this.props.onSearch) return;
+
+        const payload = JSON.stringify(this.state.filters);
+        if (payload === this._lastSearchPayload) return;
+
+        this._lastSearchPayload = payload;
+        this.props.onSearch({ ...this.state.filters });
+    }
+
+    // ── Legacy wrapper (por si el template llama a triggerSearch) ────
+    triggerSearch() {
+        this._triggerSearchImmediate();
     }
 
     toggleAdvancedFilters() {
@@ -256,7 +307,7 @@ export class SearchBar extends Component {
             grupo: '',
             marca: '',
             acabado: '',
-            color: '',     // Reset de color
+            color: '',
             grosor: '',
             numero_serie: '',
             bloque: '',
@@ -270,6 +321,7 @@ export class SearchBar extends Component {
             price_max: '',
         };
         this.state.ubicaciones = [];
+        this._lastSearchPayload = null;
         if (this.props.onSearch) this.props.onSearch(null);
     }
 }
