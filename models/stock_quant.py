@@ -54,10 +54,8 @@ class StockQuant(models.Model):
         
         # Definir los campos a revisar según la moneda
         if currency == 'USD':
-            # Revisamos x_price_usd_1, x_price_usd_2 y x_price_usd_3
             price_fields = ['x_price_usd_1', 'x_price_usd_2', 'x_price_usd_3']
         else:
-            # Revisamos x_price_mxn_1, x_price_mxn_2 y x_price_mxn_3
             price_fields = ['x_price_mxn_1', 'x_price_mxn_2', 'x_price_mxn_3']
         
         try:
@@ -73,29 +71,24 @@ class StockQuant(models.Model):
         if price_min_val is None and price_max_val is None:
             return product_groups
         
-        # Obtener IDs de productos agrupados
         product_ids = list(product_groups.keys())
         if not product_ids:
             return product_groups
         
-        # Leer precios desde product.product -> product.template
         products = self.env['product.product'].browse(product_ids)
         
         filtered_groups = {}
         for product in products:
             tmpl = product.product_tmpl_id
             
-            # Verificar si ALGUNO de los precios del producto cumple con el rango
             match_found = False
             
             for field_name in price_fields:
                 price = getattr(tmpl, field_name, 0.0) or 0.0
                 
-                # Ignorar precios en 0 si es estricto, o tratarlos como tal
                 if price <= 0.001: 
                     continue
                 
-                # Chequeo de rango
                 is_valid = True
                 if price_min_val is not None and price < price_min_val:
                     is_valid = False
@@ -104,7 +97,7 @@ class StockQuant(models.Model):
                 
                 if is_valid:
                     match_found = True
-                    break # Si un precio cumple, el producto se muestra
+                    break
             
             if match_found:
                 filtered_groups[product.id] = product_groups[product.id]
@@ -117,7 +110,15 @@ class StockQuant(models.Model):
         if not filters:
             return {'products': [], 'missing_lots': []}
         
-        domain = [('quantity', '>', 0)]
+        # =====================================================================
+        # FIX 1: Solo ubicaciones internas y tránsito.
+        # Excluye customer, supplier, production, inventory (virtuales).
+        # Así los lotes ya entregados al cliente NO aparecen en la vista.
+        # =====================================================================
+        domain = [
+            ('quantity', '>', 0),
+            ('location_id.usage', 'in', ['internal', 'transit']),
+        ]
         search_lot_names = []
         
         if filters.get('product_name'):
@@ -403,13 +404,21 @@ class StockQuant(models.Model):
                 }
             
             # ================================================================
-            # en_orden_venta: Se calcula SIEMPRE (necesario para bloqueo de carrito)
+            # FIX 2: en_orden_venta — ahora por quant específico, no por lote
+            #
+            # Cambios:
+            # - Solo state='assigned' (pendiente de entregar).
+            #   'done' = ya entregado, no debe bloquear.
+            # - Filtro por location_id del quant: solo marca el quant que
+            #   está en la ubicación de origen del picking, no el remanente
+            #   que quedó en otra ubicación del mismo lote.
             # ================================================================
             if quant.lot_id:
                 move_lines_with_lot = self.env['stock.move.line'].sudo().search([
                     ('lot_id', '=', quant.lot_id.id),
-                    ('state', 'in', ['assigned', 'done']),
+                    ('state', '=', 'assigned'),
                     ('picking_id.picking_type_code', '=', 'outgoing'),
+                    ('location_id', '=', quant.location_id.id),
                 ])
                 
                 sale_order_ids = set()
@@ -472,11 +481,8 @@ class StockQuant(models.Model):
             'dias_en_inventario': dias_inventario,
         }
         
-        # ==============================================================
-        # INICIALIZAMOS LA LISTA PARA EL LOG COMBINADO GENERAL
-        # ==============================================================
         general_logs = []
-        min_date = datetime.min # Fecha segura por si algún registro no tiene
+        min_date = datetime.min
         
         # 1. COMPRAS
         purchase_info = []
@@ -497,7 +503,6 @@ class StockQuant(models.Model):
                     'estado': dict(pol.order_id._fields['state'].selection).get(pol.order_id.state, ''),
                 })
                 
-                # Agregar al Log Combinado
                 fecha_obj = pol.order_id.date_order or pol.create_date
                 general_logs.append({
                     'fecha_obj': fecha_obj,
@@ -532,7 +537,6 @@ class StockQuant(models.Model):
                 'usuario': ml.write_uid.name if ml.write_uid else '',
             })
             
-            # Agregar al Log Combinado
             fecha_obj = ml.date or ml.create_date
             general_logs.append({
                 'fecha_obj': fecha_obj,
@@ -569,7 +573,6 @@ class StockQuant(models.Model):
                     'estado': dict(sol.order_id._fields['state'].selection).get(sol.order_id.state, ''),
                 })
                 
-                # Agregar al Log Combinado
                 fecha_obj = sol.order_id.date_order or sol.create_date
                 general_logs.append({
                     'fecha_obj': fecha_obj,
@@ -606,7 +609,6 @@ class StockQuant(models.Model):
                     else:
                         duracion_dias = (fields.Datetime.now() - hold.fecha_inicio).days
                 
-                # Evento de creación de apartado para el LOG
                 general_logs.append({
                     'fecha_obj': hold.create_date,
                     'fecha': hold.create_date.strftime('%Y-%m-%d %H:%M') if hold.create_date else '',
@@ -615,7 +617,6 @@ class StockQuant(models.Model):
                     'descripcion': f"Apartado creado para cliente: {hold.partner_id.name if hold.partner_id else '-'}"
                 })
 
-                # Si se canceló/expiró, generar otro evento para el LOG
                 if estado_raw in ('cancelado', 'expirado') and hold.write_date:
                     general_logs.append({
                         'fecha_obj': hold.write_date,
@@ -625,7 +626,6 @@ class StockQuant(models.Model):
                         'descripcion': f"El apartado cambió a estado: {estado_raw.upper()}"
                     })
 
-                # Armar info del tab (se mantiene igual que tu codigo)
                 reservation_data = {
                     'id': hold.id,
                     'name': hold.name or '',
@@ -689,15 +689,9 @@ class StockQuant(models.Model):
                     'origen': dm.location_id.complete_name,
                     'estado': dict(dm.picking_id._fields['state'].selection).get(dm.picking_id.state, ''),
                 })
-                # No agregamos entregas al log combinado porque ya fueron capturadas en MOVIMIENTOS (como Salidas).
         
-        # ==============================================================
-        # PROCESAR Y ORDENAR EL LOG COMBINADO GENERAL
-        # ==============================================================
-        # Ordenamos los eventos usando la fecha real ('fecha_obj') de más nuevo a más viejo
         general_logs.sort(key=lambda x: x.get('fecha_obj') or min_date, reverse=True)
         
-        # Una vez ordenado, eliminamos el objeto datetime porque Odoo/JS necesita enviar JSON puro
         for log in general_logs:
             log.pop('fecha_obj', None)
 
@@ -710,7 +704,7 @@ class StockQuant(models.Model):
             'sales_orders': sales_orders,
             'reservations': reservations,
             'deliveries': deliveries,
-            'general_logs': general_logs,  # <- ¡AQUÍ ESTÁ LA NUEVA LLAVE QUE ENVÍA LOS DATOS AL FRONTEND!
+            'general_logs': general_logs,
         }
     
     @api.model
