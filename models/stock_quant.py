@@ -404,29 +404,30 @@ class StockQuant(models.Model):
                 }
             
             # ================================================================
-            # FIX 2: en_orden_venta — ahora por quant específico, no por lote
+            # en_orden_venta — por quant específico (lote + ubicación)
             #
-            # Cambios:
-            # - Solo state='assigned' (pendiente de entregar).
-            #   'done' = ya entregado, no debe bloquear.
-            # - Filtro por location_id del quant: solo marca el quant que
-            #   está en la ubicación de origen del picking, no el remanente
-            #   que quedó en otra ubicación del mismo lote.
+            # Filtros:
+            # - state='assigned' (pendiente). 'done' ya salió, no bloquea.
+            # - location_id del quant: solo el quant en la ubicación de
+            #   origen del move, no remanentes del mismo lote en otra parte.
+            # - move_id.sale_line_id: ata el move a una venta. Cubre rutas
+            #   multi-paso (PICK interno + OUT) sin depender del
+            #   picking_type_code, ya que en 2/3 pasos el PICK es 'internal'
+            #   y es el que sale desde Existencias.
             # ================================================================
             if quant.lot_id:
                 move_lines_with_lot = self.env['stock.move.line'].sudo().search([
                     ('lot_id', '=', quant.lot_id.id),
                     ('state', '=', 'assigned'),
-                    ('picking_id.picking_type_code', '=', 'outgoing'),
                     ('location_id', '=', quant.location_id.id),
+                    ('move_id.sale_line_id', '!=', False),
                 ])
-                
+
                 sale_order_ids = set()
                 for move_line in move_lines_with_lot:
-                    if move_line.move_id and move_line.move_id.sale_line_id:
-                        sale_order = move_line.move_id.sale_line_id.order_id
-                        if sale_order.state in ['sale', 'done']:
-                            sale_order_ids.add(sale_order.id)
+                    sale_order = move_line.move_id.sale_line_id.order_id
+                    if sale_order.state in ['sale', 'done']:
+                        sale_order_ids.add(sale_order.id)
                 
                 if sale_order_ids:
                     detail['en_orden_venta'] = True
