@@ -224,6 +224,34 @@ class StockQuant(models.Model):
         
         quants = self.search(domain)
         
+        # =====================================================================
+        # FILTRO: Cantidad mínima por bloque
+        # Agrupa quants por (producto, bloque) y suma su cantidad.
+        # Solo conserva los quants cuyo grupo alcance el mínimo solicitado.
+        # Los quants sin bloque se descartan cuando este filtro está activo.
+        # =====================================================================
+        if filters.get('cantidad_min_bloque'):
+            try:
+                min_bloque = float(filters['cantidad_min_bloque'])
+            except (ValueError, TypeError):
+                min_bloque = 0.0
+            
+            if min_bloque > 0 and quants:
+                bloque_totals = {}
+                for q in quants:
+                    bloque_val = q.x_bloque if hasattr(q, 'x_bloque') else ''
+                    if not bloque_val:
+                        continue
+                    key = (q.product_id.id, bloque_val)
+                    bloque_totals[key] = bloque_totals.get(key, 0.0) + q.quantity
+                
+                valid_keys = {k for k, total in bloque_totals.items() if total >= min_bloque}
+                
+                quants = quants.filtered(lambda q: (
+                    q.x_bloque and
+                    (q.product_id.id, q.x_bloque) in valid_keys
+                ))
+        
         missing_lots = []
         if search_lot_names:
             found_lot_names = set(quants.mapped('lot_id.name'))

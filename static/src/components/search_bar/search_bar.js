@@ -22,6 +22,7 @@ export class SearchBar extends Component {
                 grosor: '',
                 numero_serie: '',
                 bloque: '',
+                cantidad_min_bloque: '',
                 pedimento: '',
                 contenedor: '',
                 atado: '',
@@ -256,8 +257,12 @@ export class SearchBar extends Component {
         const value = this.state.filters[filterName];
         const isTextFilter = typeof value === 'string';
 
-        // Si el texto es muy corto (pero no vacío), no buscar aún
-        if (isTextFilter && value.length > 0 && value.length < this.minCharsToSearch) {
+        // Los filtros numéricos no aplican el mínimo de caracteres
+        const numericFilters = ['alto_min', 'ancho_min', 'cantidad_min_bloque', 'price_min', 'price_max'];
+        const isNumericFilter = numericFilters.includes(filterName);
+
+        // Si el texto es muy corto (pero no vacío), no buscar aún (salvo numéricos)
+        if (isTextFilter && !isNumericFilter && value.length > 0 && value.length < this.minCharsToSearch) {
             return;
         }
 
@@ -311,6 +316,7 @@ export class SearchBar extends Component {
             grosor: '',
             numero_serie: '',
             bloque: '',
+            cantidad_min_bloque: '',
             pedimento: '',
             contenedor: '',
             atado: '',

@@ -192,6 +192,21 @@
                         </select>
                     </div>
 
+                    <!-- Cant. Mín. Bloque (NUEVO) -->
+                    <div class="filter-group">
+                        <label class="filter-label d-none d-md-block">Cant. mín. Bloque (m²)</label>
+                        <input 
+                            type="number" 
+                            class="form-control filter-input" 
+                            placeholder="Ej: 200" 
+                            t-model="state.filters.cantidad_min_bloque" 
+                            t-on-input="(ev) => this.onTextFilterChange('cantidad_min_bloque', ev)"
+                            t-on-keydown="(ev) => this.onTextFilterKeydown('cantidad_min_bloque', ev)"
+                            step="0.01"
+                            min="0"
+                        />
+                    </div>
+
                     <!-- Grupo -->
                     <div class="filter-group">
                         <label class="filter-label d-none d-md-block">Grupo</label>
