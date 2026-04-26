@@ -8,9 +8,9 @@ export class ProductRow extends Component {
     setup() {
         this.orm = useService("orm");
         this.priceIconRef = useRef("priceIcon");
-        
+
         this.state = useState({
-            activeFilter: 'all',
+            activeFilter: "all",
             showPriceTooltip: false,
             priceData: null,
             priceLoading: false,
@@ -20,7 +20,7 @@ export class ProductRow extends Component {
 
         onWillUpdateProps((nextProps) => {
             if (this.props.isExpanded && !nextProps.isExpanded) {
-                this.state.activeFilter = 'all';
+                this.state.activeFilter = "all";
             }
         });
 
@@ -30,22 +30,21 @@ export class ProductRow extends Component {
     }
 
     get unitLabel() {
-        const type = this.props.product.tipo ? this.props.product.tipo.toString().toLowerCase() : '';
-        return type === 'pieza' ? 'pza' : 'm²';
+        const type = this.props.product.tipo ? this.props.product.tipo.toString().toLowerCase() : "";
+        return type === "pieza" ? "pza" : "m²";
     }
 
     handleFilterClick(filterType) {
         if (!this.props.isExpanded) {
             this.props.onToggle(this.props.product.quant_ids);
         }
-        if (this.state.activeFilter === filterType && filterType !== 'all') {
-            this.state.activeFilter = 'all';
+
+        if (this.state.activeFilter === filterType && filterType !== "all") {
+            this.state.activeFilter = "all";
         } else {
             this.state.activeFilter = filterType;
         }
     }
-
-    // ========== PRICE TOOLTIP (FIXED - rendered in body) ==========
 
     _removeTooltipEl() {
         if (this._tooltipEl && this._tooltipEl.parentNode) {
@@ -56,9 +55,9 @@ export class ProductRow extends Component {
 
     _createTooltipEl() {
         this._removeTooltipEl();
-        
-        const el = document.createElement('div');
-        el.className = 'price-tooltip-fixed';
+
+        const el = document.createElement("div");
+        el.className = "price-tooltip-fixed";
         el.style.cssText = `
             position: fixed;
             z-index: 99999;
@@ -80,23 +79,27 @@ export class ProductRow extends Component {
 
     _positionTooltip() {
         if (!this._tooltipEl || !this.priceIconRef.el) return;
-        
+
         const iconRect = this.priceIconRef.el.getBoundingClientRect();
         const tooltipWidth = 280;
         const tooltipHeight = this._tooltipEl.offsetHeight || 140;
         const margin = 8;
-        
+
         let top = iconRect.bottom + margin;
         let left = iconRect.left;
-        
+
         if (top + tooltipHeight > window.innerHeight) {
             top = iconRect.top - tooltipHeight - margin;
         }
+
         if (left + tooltipWidth > window.innerWidth) {
             left = window.innerWidth - tooltipWidth - 10;
         }
-        if (left < 10) left = 10;
-        
+
+        if (left < 10) {
+            left = 10;
+        }
+
         this._tooltipEl.style.top = `${top}px`;
         this._tooltipEl.style.left = `${left}px`;
     }
@@ -105,15 +108,15 @@ export class ProductRow extends Component {
         if (!this._tooltipEl) return;
         this._tooltipEl.innerHTML = content;
         this._positionTooltip();
-        this._tooltipEl.style.opacity = '1';
+        this._tooltipEl.style.opacity = "1";
     }
 
     async onPriceMouseEnter(ev) {
         ev.stopPropagation();
         this.state.showPriceTooltip = true;
-        
+
         this._createTooltipEl();
-        
+
         this._renderTooltipContent(`
             <div style="text-align: center; padding: 8px 0;">
                 <i class="fa fa-spinner fa-spin" style="margin-right: 6px; color: #714B67;"></i>
@@ -207,36 +210,52 @@ export class ProductRow extends Component {
 
     formatPrice(num) {
         if (!num && num !== 0) return "—";
-        return new Intl.NumberFormat('es-MX', {
+        return new Intl.NumberFormat("es-MX", {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
         }).format(num);
     }
 
-    // ========== FILTERS ==========
-
     get filteredDetails() {
         const details = this.props.details || [];
         const filter = this.state.activeFilter;
 
-        return details.filter(d => {
+        return details.filter((d) => {
             const availableQty = d.quantity - d.reserved_quantity;
-            const isTransit = d.location_usage === 'transit';
+            const isTransit = d.location_usage === "transit";
+            const transitState = d.transit_inventory_state || "";
 
-            if (filter === 'all') return !isTransit;
-            if (filter === 'hold') return !isTransit && d.tiene_hold;
-            if (filter === 'committed') return !isTransit && d.reserved_quantity > 0;
-            if (filter === 'available') return !isTransit && availableQty > 0 && !d.tiene_hold;
-            if (filter === 'transit_available') return isTransit && availableQty > 0 && !d.tiene_hold;
-            if (filter === 'transit_hold') return isTransit && d.tiene_hold;
-            if (filter === 'transit_committed') return isTransit && d.reserved_quantity > 0;
+            if (filter === "all") {
+                return !isTransit;
+            }
+
+            if (filter === "hold") {
+                return !isTransit && d.tiene_hold;
+            }
+
+            if (filter === "committed") {
+                return !isTransit && d.reserved_quantity > 0;
+            }
+
+            if (filter === "available") {
+                return !isTransit && availableQty > 0 && !d.tiene_hold;
+            }
+
+            if (filter === "transit_available") {
+                return isTransit && transitState === "available";
+            }
+
+            if (filter === "transit_committed") {
+                return isTransit && transitState === "committed";
+            }
+
             return true;
         });
     }
 
     formatNumber(num) {
         if (num === null || num === undefined) return "0";
-        return new Intl.NumberFormat('es-MX', {
+        return new Intl.NumberFormat("es-MX", {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
         }).format(num);
@@ -245,9 +264,9 @@ export class ProductRow extends Component {
     get shortCategoryName() {
         const fullName = this.props.product.categ_name;
         if (!fullName) return "";
-        const parts = fullName.split(' / ');
+        const parts = fullName.split(" / ");
         return parts[parts.length - 1];
-    }    
+    }
 }
 
 ProductRow.template = "inventory_visual_enhanced.ProductRow";

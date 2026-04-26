@@ -1,43 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
-    
+
     <t t-name="inventory_visual_enhanced.ProductRow" owl="1">
-        <tr class="o_inventory_product_row" 
+        <tr class="o_inventory_product_row"
             t-att-class="{ expanded: props.isExpanded }"
             t-on-click="() => props.onToggle(props.product.quant_ids)"
-            title="Click para ver detalles"
-        >
-            
-            <!-- Product Name + Price Tooltip -->
+            title="Click para ver detalles">
+
             <td class="col-product-name">
                 <div class="product-name-cell">
                     <div class="d-flex align-items-center gap-1">
                         <div class="product-title" t-esc="props.product.product_name"></div>
-                        
-                        <!-- Icono ? - el tooltip se renderiza en document.body via JS -->
-                        <div class="price-tooltip-wrapper" 
+
+                        <div class="price-tooltip-wrapper"
                              t-on-click.stop="() => {}"
                              t-on-mouseenter="onPriceMouseEnter"
                              t-on-mouseleave="onPriceMouseLeave"
                              t-ref="priceIcon"
                              style="display: inline-flex;">
-                            
-                            <span class="price-help-icon" 
-                                  style="cursor: help; color: #714B67; font-size: 13px; font-weight: 700; 
+
+                            <span class="price-help-icon"
+                                  style="cursor: help; color: #714B67; font-size: 13px; font-weight: 700;
                                          width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid #714B67;
                                          display: inline-flex; align-items: center; justify-content: center;
                                          line-height: 1; flex-shrink: 0;">$</span>
                         </div>
                     </div>
-                    <div class="product-sku" t-if="props.product.product_code" t-esc="props.product.product_code"></div>
+
+                    <div class="product-sku"
+                         t-if="props.product.product_code"
+                         t-esc="props.product.product_code"></div>
                 </div>
             </td>
-            
-            <!-- Inventory -->
+
             <td class="col-inventory">
                 <div class="inventory-subgrid">
-                    
-                    <div class="inventory-row clickable-stat" 
+
+                    <div class="inventory-row clickable-stat"
                          t-att-class="{ 'active-filter': state.activeFilter === 'all' }"
                          t-on-click.stop="() => this.handleFilterClick('all')"
                          title="Ver todo el inventario en almacén">
@@ -49,7 +48,7 @@
                     </div>
 
                     <div class="inventory-row clickable-stat"
-                         t-att-class="{ 'active-filter': state.activeFilter === 'hold' }" 
+                         t-att-class="{ 'active-filter': state.activeFilter === 'hold' }"
                          t-on-click.stop="() => this.handleFilterClick('hold')"
                          title="Filtrar apartados en almacén">
                         <span class="inventory-label">On Hold</span>
@@ -60,7 +59,7 @@
                     </div>
 
                     <div class="inventory-row clickable-stat"
-                         t-att-class="{ 'active-filter': state.activeFilter === 'committed' }" 
+                         t-att-class="{ 'active-filter': state.activeFilter === 'committed' }"
                          t-on-click.stop="() => this.handleFilterClick('committed')"
                          title="Filtrar comprometido en almacén">
                         <span class="inventory-label">Committed</span>
@@ -71,7 +70,7 @@
                     </div>
 
                     <div class="inventory-row clickable-stat"
-                         t-att-class="{ 'active-filter': state.activeFilter === 'available' }" 
+                         t-att-class="{ 'active-filter': state.activeFilter === 'available' }"
                          t-on-click.stop="() => this.handleFilterClick('available')"
                          title="Filtrar disponible para venta en almacén">
                         <span class="inventory-label text-success">Disponible</span>
@@ -87,9 +86,9 @@
                         </div>
 
                         <div class="inventory-row clickable-stat transit-row"
-                             t-att-class="{ 'active-filter': state.activeFilter === 'transit_available' }" 
+                             t-att-class="{ 'active-filter': state.activeFilter === 'transit_available' }"
                              t-on-click.stop="() => this.handleFilterClick('transit_available')"
-                             title="Disponible en Tránsito">
+                             title="Disponible en tránsito publicado">
                             <span class="inventory-label">T. Available</span>
                             <span class="inventory-value inventory-units" t-esc="props.product.transit_available_plates || 0"></span>
                             <span class="inventory-value inventory-measure">
@@ -98,20 +97,9 @@
                         </div>
 
                         <div class="inventory-row clickable-stat transit-row"
-                             t-att-class="{ 'active-filter': state.activeFilter === 'transit_hold' }" 
-                             t-on-click.stop="() => this.handleFilterClick('transit_hold')"
-                             title="Apartado en Tránsito">
-                            <span class="inventory-label">T. On Hold</span>
-                            <span class="inventory-value inventory-units" t-esc="props.product.transit_hold_plates || 0"></span>
-                            <span class="inventory-value inventory-measure">
-                                <t t-esc="props.formatNumber(props.product.transit_hold_qty)"/> <t t-esc="unitLabel"/>
-                            </span>
-                        </div>
-
-                        <div class="inventory-row clickable-stat transit-row"
-                             t-att-class="{ 'active-filter': state.activeFilter === 'transit_committed' }" 
+                             t-att-class="{ 'active-filter': state.activeFilter === 'transit_committed' }"
                              t-on-click.stop="() => this.handleFilterClick('transit_committed')"
-                             title="Comprometido en Tránsito">
+                             title="Comprometido en tránsito publicado">
                             <span class="inventory-label">T. Committed</span>
                             <span class="inventory-value inventory-units" t-esc="props.product.transit_committed_plates || 0"></span>
                             <span class="inventory-value inventory-measure">
@@ -122,24 +110,21 @@
 
                 </div>
             </td>
-            
-            <!-- Type -->
+
             <td class="col-type">
                 <span t-if="props.product.tipo" t-esc="props.product.tipo"/>
                 <span t-else="" class="text-muted">-</span>
             </td>
-            
-            <!-- Category -->
+
             <td class="col-category">
                 <span t-if="props.product.categ_name" t-esc="shortCategoryName"/>
                 <span t-else="" class="text-muted">-</span>
             </td>
         </tr>
-        
-        <!-- Fila de detalles -->
+
         <tr class="o_inventory_details_row" t-if="props.isExpanded">
             <td colspan="4" class="details-cell">
-                <ProductDetails 
+                <ProductDetails
                     details="filteredDetails"
                     onPhotoClick="props.onPhotoClick"
                     onNotesClick="props.onNotesClick"
@@ -149,11 +134,9 @@
                     onSaleOrderClick="props.onSaleOrderClick"
                     formatNumber="props.formatNumber"
                     isInCart="props.isInCart"
-                    
                     getDisplayQuantity="props.getDisplayQuantity"
                     toggleCartSelection="props.toggleCartSelection"
                     onInputManualQuantity="props.onInputManualQuantity"
-                    
                     areAllCurrentProductSelected="props.areAllCurrentProductSelected"
                     selectAllCurrentProduct="props.selectAllCurrentProduct"
                     deselectAllCurrentProduct="props.deselectAllCurrentProduct"
@@ -163,5 +146,5 @@
             </td>
         </tr>
     </t>
-    
+
 </templates>
