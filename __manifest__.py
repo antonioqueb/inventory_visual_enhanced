@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Inventario Visual Avanzado',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.0.1',
     'category': 'Inventory/Inventory',
     'summary': 'Vista visual mejorada y agrupada del inventario por producto',
     'description': """
@@ -16,7 +16,7 @@
         - Interfaz intuitiva y altamente legible
         - Colores personalizables mediante variables SCSS
         - Arquitectura modular con componentes separados
-        - Diálogos especializados para fotos, notas, historial y apartados
+        - Diálogos especializados para fotos, notas, historial, ventas y apartados
         - No modifica la lógica de negocio existente
         
         Este módulo NO altera la funcionalidad de Odoo, solo mejora la visualización.
@@ -36,7 +36,7 @@
     ],
     'assets': {
         'web.assets_backend': [
-            # Variables PRIMERO (pero dentro de assets_backend)
+            # Variables
             'inventory_visual_enhanced/static/src/scss/_variables.scss',
             
             # SCSS de componentes
@@ -50,9 +50,10 @@
             'inventory_visual_enhanced/static/src/scss/components/_notes-dialog.scss',
             'inventory_visual_enhanced/static/src/scss/components/_history-dialog.scss',
             'inventory_visual_enhanced/static/src/scss/components/_hold-info-dialog.scss',
+            'inventory_visual_enhanced/static/src/scss/components/_sale-order-dialog.scss',
             
             # JS
-            'inventory_visual_enhanced/static/src/components/search_bar/search_bar.js', # <--- NUEVO
+            'inventory_visual_enhanced/static/src/components/search_bar/search_bar.js',
             'inventory_visual_enhanced/static/src/components/product_details/product_details.js',
             'inventory_visual_enhanced/static/src/components/product_row/product_row.js',
             'inventory_visual_enhanced/static/src/components/inventory_view/inventory_controller.js',
@@ -64,7 +65,7 @@
             'inventory_visual_enhanced/static/src/components/dialogs/sale_order/sale_order_dialog.js',
             
             # XML
-            'inventory_visual_enhanced/static/src/components/search_bar/search_bar.xml', # <--- NUEVO
+            'inventory_visual_enhanced/static/src/components/search_bar/search_bar.xml',
             'inventory_visual_enhanced/static/src/components/product_details/product_details.xml',
             'inventory_visual_enhanced/static/src/components/product_row/product_row.xml',
             'inventory_visual_enhanced/static/src/components/inventory_view/inventory_controller.xml',

@@ -1,74 +1,172 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
-    
+
     <t t-name="inventory_visual_enhanced.SaleOrderDialog" owl="1">
-        <Dialog size="'lg'">
-            <div class="o_sale_order_dialog">
-                <t t-if="soInfo.orders.length === 0">
-                    <div class="text-center py-5">
-                        <i class="fa fa-shopping-cart" style="font-size: 64px; color: #ccc;"></i>
-                        <p class="text-muted mt-3">No hay órdenes de venta</p>
+        <Dialog size="'xl'" contentClass="'o_sale_order_dialog_content'">
+            <div class="o_sale_order_dialog o_sale_order_dialog_premium">
+
+                <t t-if="!hasOrders">
+                    <div class="sod-empty">
+                        <div class="sod-empty__orb">
+                            <i class="fa fa-usd"/>
+                        </div>
+                        <h3>No hay órdenes de venta vinculadas</h3>
+                        <p>
+                            Este lote está marcado como venta, pero no se recibió información
+                            de la orden asociada para mostrar en este popup.
+                        </p>
                     </div>
                 </t>
+
                 <t t-else="">
-                    <t t-foreach="soInfo.orders" t-as="order" t-key="order.id">
-                        <div class="card mb-3 border">
-                            <div class="card-header bg-light border-bottom">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h6 class="mb-0">
-                                        <i class="fa fa-file-text-o me-2"></i>
-                                        <strong t-esc="order.name"></strong>
-                                    </h6>
-                                    <span class="badge fs-6" t-att-class="getStateBadgeClass(order.state)">
-                                        <t t-esc="order.state_display"/>
-                                    </span>
+                    <!-- HERO -->
+                    <div class="sod-hero">
+                        <div class="sod-hero__pattern"/>
+                        <div class="sod-hero__content">
+                            <div class="sod-hero__left">
+                                <div class="sod-hero__icon">
+                                    <i class="fa fa-usd"/>
+                                </div>
+                                <div class="sod-hero__copy">
+                                    <span class="sod-eyebrow">Material comprometido</span>
+                                    <h2>Origen de venta</h2>
+                                    <p>
+                                        El lote está vinculado a una operación comercial.
+                                        Revisa aquí cliente, vendedor, fechas e importe.
+                                    </p>
                                 </div>
                             </div>
-                            <div class="card-body">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <div class="mb-2">
-                                            <i class="fa fa-user text-muted me-2"></i>
-                                            <strong>Cliente:</strong>
-                                            <span class="ms-1" t-esc="order.partner_name"></span>
-                                        </div>
-                                        <div class="mb-2" t-if="order.user_name">
-                                            <i class="fa fa-user-circle text-muted me-2"></i>
-                                            <strong>Vendedor:</strong>
-                                            <span class="ms-1" t-esc="order.user_name"></span>
-                                        </div>
-                                        <div>
-                                            <i class="fa fa-calendar text-muted me-2"></i>
-                                            <strong>Fecha:</strong>
-                                            <span class="ms-1" t-esc="order.date_order"></span>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 text-end">
-                                        <div t-if="order.commitment_date" class="mb-2">
-                                            <small class="text-muted">Fecha de compromiso:</small><br/>
-                                            <span class="badge bg-light text-dark border" t-esc="order.commitment_date"></span>
-                                        </div>
-                                        <div class="mt-2">
-                                            <small class="text-muted d-block">Total:</small>
-                                            <h4 class="mb-0 text-dark">
-                                                <t t-esc="formatCurrency(order.amount_total, order.currency_symbol)"/>
-                                            </h4>
-                                        </div>
-                                    </div>
+
+                            <div class="sod-hero__right">
+                                <div class="sod-hero-metric">
+                                    <span class="sod-hero-metric__label">Órdenes</span>
+                                    <strong t-esc="orderCount"/>
+                                </div>
+                                <div class="sod-hero-metric sod-hero-metric--money">
+                                    <span class="sod-hero-metric__label">Total</span>
+                                    <strong t-esc="totalAmountLabel"/>
                                 </div>
                             </div>
                         </div>
-                    </t>
+                    </div>
+
+                    <!-- SUMMARY -->
+                    <div class="sod-summary-grid">
+                        <div class="sod-summary-card">
+                            <div class="sod-summary-card__icon">
+                                <i class="fa fa-file-text-o"/>
+                            </div>
+                            <div>
+                                <span>Documento</span>
+                                <strong t-esc="orderCountLabel"/>
+                            </div>
+                        </div>
+
+                        <div class="sod-summary-card">
+                            <div class="sod-summary-card__icon">
+                                <i class="fa fa-user"/>
+                            </div>
+                            <div>
+                                <span>Cliente</span>
+                                <strong t-esc="customerSummary"/>
+                            </div>
+                        </div>
+
+                        <div class="sod-summary-card">
+                            <div class="sod-summary-card__icon">
+                                <i class="fa fa-flag"/>
+                            </div>
+                            <div>
+                                <span>Estado</span>
+                                <strong t-esc="primaryStateLabel"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ORDERS -->
+                    <div class="sod-orders">
+                        <t t-foreach="orders" t-as="order" t-key="order.id">
+                            <div class="sod-order-card">
+                                <div class="sod-order-card__top">
+                                    <div class="sod-order-card__identity">
+                                        <div class="sod-avatar" t-esc="getInitials(order.partner_name)"/>
+                                        <div>
+                                            <div class="sod-order-name">
+                                                <i class="fa fa-file-text-o"/>
+                                                <span t-esc="order.name"/>
+                                            </div>
+                                            <div class="sod-order-client" t-esc="order.partner_name"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="sod-order-card__actions">
+                                        <span t-att-class="getStateBadgeClass(order.state)">
+                                            <i t-attf-class="fa #{getStateIcon(order.state)}"/>
+                                            <t t-esc="getStateLabel(order)"/>
+                                        </span>
+
+                                        <button
+                                            type="button"
+                                            class="sod-open-btn"
+                                            t-on-click="(ev) => this.openSaleOrder(order.id, ev)"
+                                            title="Abrir orden de venta"
+                                        >
+                                            <i class="fa fa-external-link"/>
+                                            Abrir SO
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="sod-order-card__body">
+                                    <div class="sod-info-panel">
+                                        <div class="sod-info-item">
+                                            <span class="sod-info-item__label">
+                                                <i class="fa fa-user-circle"/>
+                                                Vendedor
+                                            </span>
+                                            <strong t-if="order.user_name" t-esc="order.user_name"/>
+                                            <strong t-else="">—</strong>
+                                        </div>
+
+                                        <div class="sod-info-item">
+                                            <span class="sod-info-item__label">
+                                                <i class="fa fa-calendar"/>
+                                                Fecha de orden
+                                            </span>
+                                            <strong t-esc="formatDate(order.date_order)"/>
+                                        </div>
+
+                                        <div class="sod-info-item">
+                                            <span class="sod-info-item__label">
+                                                <i class="fa fa-clock-o"/>
+                                                Compromiso
+                                            </span>
+                                            <strong t-esc="formatDate(order.commitment_date)"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="sod-amount-panel">
+                                        <span>Total de la orden</span>
+                                        <strong t-esc="formatCurrency(order.amount_total, order.currency_symbol)"/>
+                                        <small>
+                                            <i class="fa fa-info-circle"/>
+                                            Importe de la SO completa
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
                 </t>
             </div>
 
             <t t-set-slot="footer">
-                <button class="btn btn-secondary btn-lg" t-on-click="props.close">
-                    <i class="fa fa-times me-2"></i>
+                <button class="btn sod-close-btn" t-on-click="props.close">
+                    <i class="fa fa-times me-2"/>
                     Cerrar
                 </button>
             </t>
         </Dialog>
     </t>
-    
+
 </templates>
