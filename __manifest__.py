@@ -51,6 +51,7 @@
             'inventory_visual_enhanced/static/src/scss/components/_history-dialog.scss',
             'inventory_visual_enhanced/static/src/scss/components/_hold-info-dialog.scss',
             'inventory_visual_enhanced/static/src/scss/components/_sale-order-dialog.scss',
+            'inventory_visual_enhanced/static/src/scss/components/_photo-gallery-dialog.scss',
             
             # JS
             'inventory_visual_enhanced/static/src/components/search_bar/search_bar.js',
