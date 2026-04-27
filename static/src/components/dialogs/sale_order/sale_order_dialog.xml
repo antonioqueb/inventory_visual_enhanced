@@ -2,11 +2,15 @@
 <templates xml:space="preserve">
 
     <t t-name="inventory_visual_enhanced.SaleOrderDialog" owl="1">
-        <Dialog size="'xl'" contentClass="'o_sale_order_dialog_content'">
-            <div class="o_sale_order_dialog o_sale_order_dialog_premium">
+        <Dialog size="'xl'" title="''" contentClass="'o_sale_order_dialog_content o_sale_order_dialog_content_wood'">
+            <div class="o_sale_order_dialog o_sale_order_dialog_premium o_sale_order_dialog_wood">
 
                 <t t-if="!hasOrders">
                     <div class="sod-empty">
+                        <button class="sod-floating-close" type="button" t-on-click="props.close" title="Cerrar">
+                            <i class="fa fa-times"/>
+                        </button>
+
                         <div class="sod-empty__orb">
                             <i class="fa fa-usd"/>
                         </div>
@@ -21,7 +25,12 @@
                 <t t-else="">
                     <!-- HERO -->
                     <div class="sod-hero">
+                        <button class="sod-floating-close sod-floating-close--hero" type="button" t-on-click="props.close" title="Cerrar">
+                            <i class="fa fa-times"/>
+                        </button>
+
                         <div class="sod-hero__pattern"/>
+                        <div class="sod-hero__grain"/>
                         <div class="sod-hero__content">
                             <div class="sod-hero__left">
                                 <div class="sod-hero__icon">

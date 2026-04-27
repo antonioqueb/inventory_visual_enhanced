@@ -1,70 +1,131 @@
 // ============================================================
-// Sale Order Dialog Premium
+// Sale Order Dialog — Wood Warm Theme
 // Popup de venta para Inventario Visual
 // ============================================================
 
-$sod-primary: #714B67;
-$sod-secondary: #017E84;
-$sod-green: #528F76;
-$sod-gold: #E4A900;
-$sod-red: #E46E78;
-$sod-gray: #8F8F8F;
-$sod-ink: #202124;
-$sod-muted: #6b7280;
-$sod-line: #e7e3e8;
-$sod-bg: #f6f3f6;
+$sod-walnut: #3F2415;
+$sod-dark-walnut: #2A160D;
+$sod-cedar: #6F3F22;
+$sod-copper: #9B5B2E;
+$sod-caramel: #B8793E;
+$sod-honey: #D99A4A;
+$sod-oak: #F2D2A3;
+$sod-cream: #FFF6E8;
+$sod-parchment: #F8EAD6;
+$sod-sand: #E8CDA7;
+$sod-bark: #5A3A27;
+$sod-charcoal: #231811;
+$sod-muted: #8A6A52;
+$sod-line: #E8D0B1;
+$sod-soft-line: rgba(111, 63, 34, .16);
+$sod-sage: #526846;
+$sod-sage-dark: #394D32;
+$sod-redwood: #8E3F2B;
+$sod-amber: #C98228;
 
-.modal-content:has(.o_sale_order_dialog_premium) {
+// ============================================================
+// Eliminar header nativo del Dialog que muestra "Odoo"
+// ============================================================
+
+.modal-content:has(.o_sale_order_dialog_wood) {
   border: 0 !important;
-  border-radius: 26px !important;
+  border-radius: 30px !important;
   overflow: hidden;
+  background: $sod-cream;
   box-shadow:
-    0 34px 90px rgba(20, 20, 20, .28),
-    0 10px 28px rgba(20, 20, 20, .16);
+    0 36px 110px rgba(35, 24, 17, .34),
+    0 12px 34px rgba(63, 36, 21, .24);
 
   .modal-header {
-    background:
-      linear-gradient(135deg, rgba($sod-primary, .08), rgba($sod-secondary, .08)),
-      #ffffff;
-    border-bottom: 1px solid rgba($sod-primary, .12);
-    padding: 16px 22px;
-
-    .modal-title {
-      color: $sod-primary;
-      font-weight: 900;
-      letter-spacing: -.03em;
-    }
-
-    .btn-close {
-      border-radius: 999px;
-      box-shadow: none !important;
-
-      &:hover {
-        background-color: rgba($sod-primary, .08);
-      }
-    }
+    display: none !important;
   }
 
   .modal-body {
     padding: 0 !important;
-    background: $sod-bg;
+    background:
+      radial-gradient(circle at 8% 0%, rgba($sod-honey, .18), transparent 28%),
+      radial-gradient(circle at 95% 10%, rgba($sod-caramel, .14), transparent 34%),
+      linear-gradient(180deg, $sod-cream 0%, $sod-parchment 100%);
   }
 
   .modal-footer {
-    background: #ffffff;
-    border-top: 1px solid rgba($sod-primary, .12);
+    background:
+      linear-gradient(180deg, rgba(255, 246, 232, .94), rgba(248, 234, 214, .98));
+    border-top: 1px solid rgba($sod-cedar, .18);
     padding: 16px 22px;
   }
 }
 
-.o_sale_order_dialog_premium {
+.o_sale_order_dialog_wood {
   min-height: 420px;
+  position: relative;
+  color: $sod-charcoal;
   background:
-    radial-gradient(circle at 15% 5%, rgba($sod-primary, .10), transparent 28%),
-    radial-gradient(circle at 90% 0%, rgba($sod-secondary, .12), transparent 32%),
-    linear-gradient(180deg, #ffffff 0%, $sod-bg 100%);
-  color: $sod-ink;
+    radial-gradient(circle at 12% 3%, rgba($sod-honey, .20), transparent 28%),
+    radial-gradient(circle at 92% 0%, rgba($sod-copper, .14), transparent 32%),
+    linear-gradient(180deg, $sod-cream 0%, $sod-parchment 100%);
   overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: .20;
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(
+        7deg,
+        rgba($sod-cedar, .10) 0px,
+        rgba($sod-cedar, .10) 1px,
+        transparent 1px,
+        transparent 26px
+      ),
+      repeating-linear-gradient(
+        96deg,
+        rgba($sod-honey, .08) 0px,
+        rgba($sod-honey, .08) 1px,
+        transparent 1px,
+        transparent 42px
+      );
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+// ============================================================
+// Botón flotante de cierre
+// ============================================================
+
+.sod-floating-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 5;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba($sod-cream, .42);
+  border-radius: 999px;
+  color: $sod-cream;
+  background: rgba($sod-dark-walnut, .34);
+  backdrop-filter: blur(10px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform .16s ease, background .16s ease, box-shadow .16s ease;
+
+  &:hover {
+    transform: translateY(-1px) scale(1.04);
+    background: rgba($sod-dark-walnut, .58);
+    box-shadow: 0 12px 26px rgba($sod-dark-walnut, .24);
+  }
+
+  &--hero {
+    color: #fff7eb;
+  }
 }
 
 // ============================================================
@@ -73,7 +134,7 @@ $sod-bg: #f6f3f6;
 
 .sod-empty {
   min-height: 420px;
-  padding: 72px 32px;
+  padding: 76px 32px;
   text-align: center;
   display: flex;
   align-items: center;
@@ -81,31 +142,31 @@ $sod-bg: #f6f3f6;
   flex-direction: column;
 
   &__orb {
-    width: 96px;
-    height: 96px;
-    border-radius: 32px;
+    width: 104px;
+    height: 104px;
+    border-radius: 34px;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 22px;
     background:
-      radial-gradient(circle at 35% 25%, rgba(255, 255, 255, .85), transparent 35%),
-      linear-gradient(135deg, rgba($sod-green, .22), rgba($sod-primary, .16));
-    border: 1px solid rgba($sod-primary, .18);
+      radial-gradient(circle at 35% 25%, rgba(255, 255, 255, .72), transparent 34%),
+      linear-gradient(135deg, rgba($sod-honey, .56), rgba($sod-copper, .34));
+    border: 1px solid rgba($sod-cedar, .22);
     box-shadow:
-      0 20px 44px rgba($sod-primary, .18),
-      inset 0 0 0 1px rgba(255, 255, 255, .62);
+      0 22px 46px rgba($sod-copper, .22),
+      inset 0 0 0 1px rgba(255, 255, 255, .55);
 
     i {
-      font-size: 46px;
-      color: $sod-green;
-      filter: drop-shadow(0 8px 14px rgba($sod-green, .24));
+      font-size: 48px;
+      color: $sod-walnut;
+      filter: drop-shadow(0 8px 14px rgba($sod-copper, .22));
     }
   }
 
   h3 {
-    color: $sod-primary;
-    font-size: 24px;
+    color: $sod-walnut;
+    font-size: 25px;
     font-weight: 950;
     letter-spacing: -.04em;
     margin-bottom: 8px;
@@ -125,22 +186,44 @@ $sod-bg: #f6f3f6;
 
 .sod-hero {
   position: relative;
-  padding: 24px;
+  padding: 26px 24px;
   background:
     radial-gradient(circle at 12% 18%, rgba(255, 255, 255, .16), transparent 26%),
-    radial-gradient(circle at 88% 0%, rgba(255, 255, 255, .10), transparent 30%),
-    linear-gradient(135deg, darken($sod-primary, 12%) 0%, $sod-primary 52%, $sod-secondary 100%);
+    radial-gradient(circle at 88% 0%, rgba($sod-honey, .22), transparent 31%),
+    linear-gradient(135deg, $sod-dark-walnut 0%, $sod-walnut 38%, $sod-cedar 69%, $sod-copper 100%);
   overflow: hidden;
 
   &__pattern {
     position: absolute;
     inset: 0;
-    opacity: .34;
+    opacity: .36;
     background:
-      linear-gradient(rgba(255, 255, 255, .08) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, .08) 1px, transparent 1px);
+      linear-gradient(rgba(255, 246, 232, .07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 246, 232, .06) 1px, transparent 1px);
     background-size: 38px 38px;
     pointer-events: none;
+  }
+
+  &__grain {
+    position: absolute;
+    inset: 0;
+    opacity: .28;
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(
+        8deg,
+        rgba(255, 246, 232, .11) 0px,
+        rgba(255, 246, 232, .11) 1px,
+        transparent 1px,
+        transparent 18px
+      ),
+      repeating-linear-gradient(
+        98deg,
+        rgba(0, 0, 0, .08) 0px,
+        rgba(0, 0, 0, .08) 1px,
+        transparent 1px,
+        transparent 46px
+      );
   }
 
   &__content {
@@ -150,6 +233,7 @@ $sod-bg: #f6f3f6;
     align-items: stretch;
     justify-content: space-between;
     gap: 20px;
+    padding-right: 42px;
   }
 
   &__left {
@@ -160,24 +244,25 @@ $sod-bg: #f6f3f6;
   }
 
   &__icon {
-    width: 88px;
-    height: 88px;
+    width: 90px;
+    height: 90px;
     flex: 0 0 auto;
-    border-radius: 28px;
+    border-radius: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
     background:
-      linear-gradient(145deg, rgba(255, 255, 255, .26), rgba(255, 255, 255, .08));
-    border: 1px solid rgba(255, 255, 255, .28);
+      radial-gradient(circle at 30% 20%, rgba(255, 255, 255, .34), transparent 32%),
+      linear-gradient(145deg, rgba($sod-honey, .42), rgba($sod-oak, .12));
+    border: 1px solid rgba($sod-oak, .42);
     box-shadow:
-      0 24px 50px rgba(0, 0, 0, .22),
-      inset 0 0 0 1px rgba(255, 255, 255, .10);
+      0 26px 52px rgba(0, 0, 0, .24),
+      inset 0 0 0 1px rgba(255, 246, 232, .14);
 
     i {
-      color: #ffffff;
-      font-size: 46px;
-      text-shadow: 0 8px 18px rgba(0, 0, 0, .24);
+      color: #FFF7E8;
+      font-size: 48px;
+      text-shadow: 0 8px 18px rgba(0, 0, 0, .28);
     }
   }
 
@@ -185,8 +270,8 @@ $sod-bg: #f6f3f6;
     min-width: 0;
 
     h2 {
-      color: #ffffff;
-      font-size: 34px;
+      color: #FFF7E8;
+      font-size: 35px;
       line-height: 1;
       font-weight: 950;
       letter-spacing: -.055em;
@@ -194,8 +279,8 @@ $sod-bg: #f6f3f6;
     }
 
     p {
-      max-width: 560px;
-      color: rgba(255, 255, 255, .78);
+      max-width: 575px;
+      color: rgba(255, 246, 232, .78);
       margin: 0;
       font-size: 13px;
       line-height: 1.5;
@@ -204,18 +289,18 @@ $sod-bg: #f6f3f6;
 
   &__right {
     display: grid;
-    grid-template-columns: repeat(2, minmax(120px, 1fr));
+    grid-template-columns: repeat(2, minmax(122px, 1fr));
     gap: 10px;
     align-items: stretch;
-    min-width: 300px;
+    min-width: 310px;
   }
 }
 
 .sod-eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  color: rgba(255, 255, 255, .72);
+  gap: 7px;
+  color: rgba(255, 246, 232, .74);
   font-size: 10px;
   font-weight: 950;
   letter-spacing: .14em;
@@ -226,22 +311,25 @@ $sod-bg: #f6f3f6;
     width: 9px;
     height: 9px;
     border-radius: 50%;
-    background: #8ef0c3;
-    box-shadow: 0 0 18px rgba(142, 240, 195, .75);
+    background: $sod-honey;
+    box-shadow: 0 0 20px rgba($sod-honey, .78);
   }
 }
 
 .sod-hero-metric {
-  border-radius: 20px;
+  border-radius: 21px;
   padding: 16px;
-  background: rgba(255, 255, 255, .12);
-  border: 1px solid rgba(255, 255, 255, .18);
+  background:
+    linear-gradient(145deg, rgba(255, 246, 232, .16), rgba(255, 246, 232, .06));
+  border: 1px solid rgba($sod-oak, .24);
   backdrop-filter: blur(12px);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .05);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 246, 232, .04),
+    0 14px 32px rgba(0, 0, 0, .12);
 
   &__label {
     display: block;
-    color: rgba(255, 255, 255, .66);
+    color: rgba(255, 246, 232, .70);
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: .10em;
@@ -251,7 +339,7 @@ $sod-bg: #f6f3f6;
 
   strong {
     display: block;
-    color: #ffffff;
+    color: #FFF7E8;
     font-size: 22px;
     line-height: 1.1;
     font-weight: 950;
@@ -260,7 +348,7 @@ $sod-bg: #f6f3f6;
   }
 
   &--money strong {
-    color: #dfffee;
+    color: #FFE0A8;
   }
 }
 
@@ -281,24 +369,27 @@ $sod-bg: #f6f3f6;
   gap: 12px;
   min-width: 0;
   padding: 16px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, .82);
-  border: 1px solid rgba($sod-primary, .10);
+  border-radius: 20px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .86), rgba(255, 246, 232, .74));
+  border: 1px solid rgba($sod-cedar, .13);
   box-shadow:
-    0 12px 30px rgba(31, 41, 55, .06),
-    inset 0 0 0 1px rgba(255, 255, 255, .70);
+    0 13px 32px rgba(63, 36, 21, .07),
+    inset 0 0 0 1px rgba(255, 255, 255, .68);
 
   &__icon {
-    width: 44px;
-    height: 44px;
+    width: 46px;
+    height: 46px;
     flex: 0 0 auto;
-    border-radius: 16px;
+    border-radius: 17px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: $sod-primary;
+    color: $sod-walnut;
     background:
-      linear-gradient(145deg, rgba($sod-primary, .10), rgba($sod-secondary, .08));
+      radial-gradient(circle at 30% 20%, rgba(255, 255, 255, .56), transparent 32%),
+      linear-gradient(145deg, rgba($sod-honey, .34), rgba($sod-copper, .12));
+    border: 1px solid rgba($sod-copper, .15);
   }
 
   span {
@@ -313,7 +404,7 @@ $sod-bg: #f6f3f6;
 
   strong {
     display: block;
-    color: $sod-ink;
+    color: $sod-walnut;
     font-size: 14px;
     font-weight: 900;
     letter-spacing: -.02em;
@@ -337,20 +428,42 @@ $sod-bg: #f6f3f6;
 .sod-order-card {
   position: relative;
   overflow: hidden;
-  border-radius: 22px;
-  background: #ffffff;
-  border: 1px solid rgba($sod-primary, .12);
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .95), rgba(255, 246, 232, .88));
+  border: 1px solid rgba($sod-cedar, .15);
   box-shadow:
-    0 18px 42px rgba(31, 41, 55, .08),
-    0 2px 6px rgba(31, 41, 55, .05);
+    0 18px 44px rgba(63, 36, 21, .10),
+    0 2px 7px rgba(63, 36, 21, .06);
   animation: sodFadeUp .22s ease both;
 
   &::before {
     content: "";
     position: absolute;
     inset: 0 auto 0 0;
-    width: 5px;
-    background: linear-gradient(180deg, $sod-green, $sod-secondary);
+    width: 6px;
+    background: linear-gradient(180deg, $sod-honey, $sod-copper, $sod-walnut);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: .12;
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(
+        10deg,
+        rgba($sod-cedar, .12) 0px,
+        rgba($sod-cedar, .12) 1px,
+        transparent 1px,
+        transparent 34px
+      );
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
   }
 
   &__top {
@@ -359,10 +472,10 @@ $sod-bg: #f6f3f6;
     justify-content: space-between;
     gap: 18px;
     padding: 18px 20px 14px 24px;
-    border-bottom: 1px solid rgba($sod-primary, .08);
+    border-bottom: 1px solid rgba($sod-cedar, .10);
     background:
-      radial-gradient(circle at 0% 0%, rgba($sod-primary, .07), transparent 34%),
-      linear-gradient(180deg, #ffffff, #fbfafb);
+      radial-gradient(circle at 0% 0%, rgba($sod-honey, .13), transparent 34%),
+      linear-gradient(180deg, rgba(255, 255, 255, .68), rgba(255, 246, 232, .70));
   }
 
   &__identity {
@@ -382,42 +495,42 @@ $sod-bg: #f6f3f6;
 
   &__body {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 260px;
+    grid-template-columns: minmax(0, 1fr) 270px;
     gap: 18px;
     padding: 18px 20px 20px 24px;
   }
 }
 
 .sod-avatar {
-  width: 52px;
-  height: 52px;
+  width: 54px;
+  height: 54px;
   flex: 0 0 auto;
-  border-radius: 18px;
+  border-radius: 19px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  color: #FFF7E8;
   font-size: 17px;
   font-weight: 950;
   letter-spacing: -.04em;
   background:
-    radial-gradient(circle at 35% 25%, rgba(255, 255, 255, .22), transparent 32%),
-    linear-gradient(135deg, $sod-primary, $sod-secondary);
-  box-shadow: 0 14px 26px rgba($sod-primary, .18);
+    radial-gradient(circle at 35% 25%, rgba(255, 255, 255, .24), transparent 34%),
+    linear-gradient(135deg, $sod-walnut, $sod-copper);
+  box-shadow: 0 14px 28px rgba($sod-walnut, .19);
 }
 
 .sod-order-name {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: $sod-primary;
+  color: $sod-walnut;
   font-size: 18px;
   font-weight: 950;
   letter-spacing: -.04em;
   line-height: 1.15;
 
   i {
-    color: $sod-secondary;
+    color: $sod-copper;
     font-size: 15px;
   }
 }
@@ -432,6 +545,10 @@ $sod-bg: #f6f3f6;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+// ============================================================
+// States
+// ============================================================
 
 .sod-state {
   display: inline-flex;
@@ -451,41 +568,46 @@ $sod-bg: #f6f3f6;
   }
 
   &--draft {
-    color: #4b5563;
-    background: #f3f4f6;
-    border-color: #e5e7eb;
+    color: $sod-bark;
+    background: rgba($sod-sand, .56);
+    border-color: rgba($sod-copper, .18);
   }
 
   &--sent {
-    color: #075985;
-    background: #e0f2fe;
-    border-color: #bae6fd;
+    color: $sod-walnut;
+    background: rgba($sod-honey, .24);
+    border-color: rgba($sod-honey, .42);
   }
 
   &--sale {
-    color: #166534;
-    background: #dcfce7;
-    border-color: #bbf7d0;
+    color: #FFF7E8;
+    background: linear-gradient(135deg, $sod-sage, $sod-sage-dark);
+    border-color: rgba($sod-sage-dark, .22);
+    box-shadow: 0 8px 16px rgba($sod-sage, .18);
   }
 
   &--done {
-    color: #312e81;
-    background: #e0e7ff;
-    border-color: #c7d2fe;
+    color: #FFF7E8;
+    background: linear-gradient(135deg, $sod-walnut, $sod-dark-walnut);
+    border-color: rgba($sod-dark-walnut, .28);
   }
 
   &--cancel {
-    color: #991b1b;
-    background: #fee2e2;
-    border-color: #fecaca;
+    color: #FFF7E8;
+    background: linear-gradient(135deg, $sod-redwood, darken($sod-redwood, 10%));
+    border-color: rgba($sod-redwood, .30);
   }
 
   &--default {
     color: $sod-muted;
-    background: #f8fafc;
-    border-color: #e5e7eb;
+    background: rgba($sod-parchment, .76);
+    border-color: rgba($sod-cedar, .12);
   }
 }
+
+// ============================================================
+// Buttons
+// ============================================================
 
 .sod-open-btn {
   display: inline-flex;
@@ -494,24 +616,49 @@ $sod-bg: #f6f3f6;
   min-height: 34px;
   padding: 8px 13px;
   border-radius: 999px;
-  color: #ffffff;
-  background: linear-gradient(135deg, $sod-primary, darken($sod-primary, 7%));
+  color: #FFF7E8;
+  background: linear-gradient(135deg, $sod-cedar, $sod-walnut);
   border: 0;
   font-size: 11px;
   font-weight: 900;
-  box-shadow: 0 10px 22px rgba($sod-primary, .22);
+  box-shadow: 0 10px 22px rgba($sod-walnut, .22);
   transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
 
   &:hover {
     transform: translateY(-1px);
-    background: linear-gradient(135deg, $sod-secondary, darken($sod-secondary, 6%));
-    box-shadow: 0 14px 28px rgba($sod-secondary, .25);
+    background: linear-gradient(135deg, $sod-copper, $sod-cedar);
+    box-shadow: 0 14px 28px rgba($sod-copper, .26);
   }
 
   &:active {
     transform: translateY(0);
   }
 }
+
+.sod-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  color: #FFF7E8 !important;
+  background: linear-gradient(135deg, $sod-cedar, $sod-dark-walnut) !important;
+  border: 0 !important;
+  font-weight: 900;
+  box-shadow: 0 12px 24px rgba($sod-walnut, .20);
+  transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    background: linear-gradient(135deg, $sod-copper, $sod-cedar) !important;
+    box-shadow: 0 14px 28px rgba($sod-copper, .24);
+  }
+}
+
+// ============================================================
+// Info panels
+// ============================================================
 
 .sod-info-panel {
   display: grid;
@@ -522,9 +669,10 @@ $sod-bg: #f6f3f6;
 .sod-info-item {
   min-width: 0;
   padding: 14px;
-  border-radius: 16px;
-  background: #fafafa;
-  border: 1px solid rgba($sod-primary, .08);
+  border-radius: 17px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .78), rgba($sod-parchment, .72));
+  border: 1px solid rgba($sod-cedar, .10);
 
   &__label {
     display: flex;
@@ -538,14 +686,14 @@ $sod-bg: #f6f3f6;
     margin-bottom: 8px;
 
     i {
-      color: $sod-secondary;
+      color: $sod-copper;
       font-size: 12px;
     }
   }
 
   strong {
     display: block;
-    color: $sod-ink;
+    color: $sod-walnut;
     font-size: 13px;
     font-weight: 900;
     overflow: hidden;
@@ -557,17 +705,17 @@ $sod-bg: #f6f3f6;
 .sod-amount-panel {
   position: relative;
   min-width: 0;
-  padding: 16px;
-  border-radius: 18px;
+  padding: 17px;
+  border-radius: 20px;
   overflow: hidden;
   background:
     radial-gradient(circle at 90% 0%, rgba(255, 255, 255, .18), transparent 35%),
-    linear-gradient(135deg, darken($sod-green, 10%), $sod-green);
-  box-shadow: 0 16px 34px rgba($sod-green, .18);
+    linear-gradient(135deg, $sod-sage-dark, $sod-sage);
+  box-shadow: 0 17px 36px rgba($sod-sage, .20);
 
   span {
     display: block;
-    color: rgba(255, 255, 255, .74);
+    color: rgba(255, 246, 232, .76);
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: .10em;
@@ -577,7 +725,7 @@ $sod-bg: #f6f3f6;
 
   strong {
     display: block;
-    color: #ffffff;
+    color: #FFF7E8;
     font-size: 24px;
     line-height: 1.1;
     font-weight: 950;
@@ -589,36 +737,15 @@ $sod-bg: #f6f3f6;
     display: flex;
     align-items: center;
     gap: 5px;
-    color: rgba(255, 255, 255, .72);
+    color: rgba(255, 246, 232, .74);
     margin-top: 10px;
     font-size: 11px;
   }
 }
 
 // ============================================================
-// Footer
+// Animation
 // ============================================================
-
-.sod-close-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 40px;
-  padding: 10px 22px;
-  border-radius: 999px;
-  color: #ffffff !important;
-  background: linear-gradient(135deg, $sod-primary, darken($sod-primary, 8%)) !important;
-  border: 0 !important;
-  font-weight: 900;
-  box-shadow: 0 12px 24px rgba($sod-primary, .20);
-  transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
-
-  &:hover {
-    transform: translateY(-1px);
-    background: linear-gradient(135deg, $sod-secondary, darken($sod-secondary, 7%)) !important;
-    box-shadow: 0 14px 28px rgba($sod-secondary, .24);
-  }
-}
 
 @keyframes sodFadeUp {
   from {
@@ -638,10 +765,11 @@ $sod-bg: #f6f3f6;
 
 @media (max-width: 992px) {
   .sod-hero {
-    padding: 20px;
+    padding: 22px 18px;
 
     &__content {
       flex-direction: column;
+      padding-right: 0;
     }
 
     &__right {
@@ -681,8 +809,15 @@ $sod-bg: #f6f3f6;
 }
 
 @media (max-width: 576px) {
-  .modal-content:has(.o_sale_order_dialog_premium) {
+  .modal-content:has(.o_sale_order_dialog_wood) {
     border-radius: 18px !important;
+  }
+
+  .sod-floating-close {
+    top: 12px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
   }
 
   .sod-hero {
@@ -694,8 +829,8 @@ $sod-bg: #f6f3f6;
     }
 
     &__icon {
-      width: 62px;
-      height: 62px;
+      width: 64px;
+      height: 64px;
       border-radius: 20px;
 
       i {
