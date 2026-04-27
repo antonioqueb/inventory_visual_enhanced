@@ -1,5 +1,5 @@
 // ============================================================
-// HOLD INFO DIALOG — Wood Warm Light Theme
+// HOLD INFO DIALOG — Horizontal Wood Warm Light Theme
 // ============================================================
 
 $wood-walnut: #4A2A18;
@@ -57,7 +57,6 @@ $wood-amber: #C98228;
 
 .o_hold_info_dialog_wood {
   position: relative;
-  min-height: 520px;
   color: $wood-charcoal;
   background:
     radial-gradient(circle at 10% 3%, rgba($wood-honey, .14), transparent 30%),
@@ -133,7 +132,7 @@ $wood-amber: #C98228;
 
 .hold-info-hero {
   position: relative;
-  padding: 30px 28px;
+  padding: 28px 28px 20px;
   background:
     radial-gradient(circle at 9% 15%, rgba(255, 255, 255, .88), transparent 28%),
     radial-gradient(circle at 92% 0%, rgba($wood-honey, .28), transparent 34%),
@@ -168,15 +167,23 @@ $wood-amber: #C98228;
     z-index: 1;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 18px;
     padding-right: 46px;
   }
 
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    min-width: 0;
+  }
+
   &__icon {
-    width: 88px;
-    height: 88px;
+    width: 86px;
+    height: 86px;
     flex: 0 0 auto;
-    border-radius: 30px;
+    border-radius: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -190,7 +197,7 @@ $wood-amber: #C98228;
 
     i {
       color: $wood-walnut;
-      font-size: 44px;
+      font-size: 42px;
       text-shadow: 0 3px 10px rgba(255, 255, 255, .75);
     }
   }
@@ -208,7 +215,7 @@ $wood-amber: #C98228;
     }
 
     p {
-      max-width: 640px;
+      max-width: 720px;
       color: $wood-bark;
       margin: 0;
       font-size: 13px;
@@ -238,18 +245,19 @@ $wood-amber: #C98228;
 }
 
 // ============================================================
-// Product summary
+// Summary cards
 // ============================================================
 
-.hold-info-product {
+.hold-info-summary {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 14px;
-  padding: 18px 22px 6px;
+  grid-template-columns: 1.4fr .8fr .8fr .8fr;
+  gap: 12px;
+  padding: 18px 28px 8px;
 }
 
-.hold-info-product__main,
-.hold-info-product__meta > div {
+.hold-info-stat {
+  min-width: 0;
+  padding: 16px 18px;
   border-radius: 20px;
   background:
     linear-gradient(145deg, rgba(255, 255, 255, .96), rgba($wood-cream, .92));
@@ -257,10 +265,6 @@ $wood-amber: #C98228;
   box-shadow:
     0 12px 28px rgba($wood-walnut, .06),
     inset 0 0 0 1px rgba(255, 255, 255, .75);
-}
-
-.hold-info-product__main {
-  padding: 16px;
 
   span {
     display: block;
@@ -269,52 +273,39 @@ $wood-amber: #C98228;
     text-transform: uppercase;
     letter-spacing: .09em;
     font-weight: 950;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
   }
 
   strong {
-    color: $wood-walnut;
-    font-size: 18px;
-    font-weight: 950;
-    letter-spacing: -.03em;
-  }
-}
-
-.hold-info-product__meta {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-
-  div {
-    padding: 16px;
-  }
-
-  span {
     display: block;
-    color: $wood-muted;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: .09em;
+    color: $wood-walnut;
+    font-size: 16px;
     font-weight: 950;
-    margin-bottom: 5px;
+    line-height: 1.2;
+    letter-spacing: -.02em;
+    word-break: break-word;
   }
 
-  strong {
-    color: $wood-walnut;
-    font-size: 14px;
-    font-weight: 950;
+  &--status {
+    background:
+      linear-gradient(145deg, rgba($wood-sage-light, .92), rgba(#f7fbf2, .95));
+    border-color: rgba($wood-sage, .22);
+
+    strong {
+      color: $wood-sage-dark;
+    }
   }
 }
 
 // ============================================================
-// Status
+// Alert
 // ============================================================
 
 .hold-info-status {
   display: flex;
   align-items: flex-start;
   gap: 14px;
-  margin: 14px 22px;
+  margin: 12px 28px 0;
   padding: 16px;
   border-radius: 22px;
   background: rgba($wood-honey, .16);
@@ -336,6 +327,10 @@ $wood-amber: #C98228;
     }
   }
 
+  &__copy {
+    min-width: 0;
+  }
+
   strong {
     display: block;
     color: $wood-walnut;
@@ -353,15 +348,27 @@ $wood-amber: #C98228;
 }
 
 // ============================================================
-// Cards
+// Main horizontal layout
 // ============================================================
 
-.hold-info-grid {
+.hold-info-main {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 330px);
-  gap: 14px;
-  padding: 0 22px 24px;
+  grid-template-columns: minmax(0, 1.45fr) minmax(340px, .95fr);
+  gap: 16px;
+  padding: 18px 28px 24px;
+
+  &__left,
+  &__right {
+    min-width: 0;
+    display: grid;
+    gap: 16px;
+    align-content: start;
+  }
 }
+
+// ============================================================
+// Cards
+// ============================================================
 
 .hold-info-card {
   min-width: 0;
@@ -373,10 +380,6 @@ $wood-amber: #C98228;
     0 16px 38px rgba($wood-walnut, .08),
     0 2px 7px rgba($wood-walnut, .04);
   overflow: hidden;
-
-  &--wide {
-    grid-column: 1 / 2;
-  }
 
   &__header {
     display: flex;
@@ -403,82 +406,101 @@ $wood-amber: #C98228;
   }
 }
 
-.hold-info-list {
-  padding: 14px 16px;
+// ============================================================
+// Left data grid
+// ============================================================
+
+.hold-info-data-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  padding: 16px;
 }
 
-.hold-info-row {
-  display: grid;
-  grid-template-columns: 150px minmax(0, 1fr);
-  gap: 14px;
-  padding: 11px 0;
-  border-bottom: 1px solid rgba($wood-cedar, .08);
-
-  &:last-child {
-    border-bottom: 0;
-  }
+.hold-info-data-item {
+  min-width: 0;
+  padding: 14px;
+  border-radius: 18px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .96), rgba($wood-cream, .92));
+  border: 1px solid rgba($wood-cedar, .10);
 
   > span {
+    display: block;
+    color: $wood-muted;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    font-weight: 950;
+    margin-bottom: 8px;
+  }
+
+  strong {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    color: $wood-walnut;
+    font-size: 14px;
+    font-weight: 900;
+    line-height: 1.45;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+
+    i {
+      color: $wood-copper;
+      margin-top: 2px;
+      flex: 0 0 auto;
+    }
+  }
+}
+
+// ============================================================
+// Right side stack
+// ============================================================
+
+.hold-info-side-stack {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.hold-info-side-item {
+  min-width: 0;
+  padding: 14px;
+  border-radius: 18px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .96), rgba($wood-cream, .92));
+  border: 1px solid rgba($wood-cedar, .10);
+
+  > span {
+    display: block;
     color: $wood-muted;
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: .08em;
     font-weight: 950;
+    margin-bottom: 7px;
   }
 
   strong {
+    display: block;
     color: $wood-walnut;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 900;
-    min-width: 0;
+    line-height: 1.45;
     word-break: break-word;
+    overflow-wrap: anywhere;
 
     i {
       color: $wood-copper;
       margin-right: 6px;
-      width: 16px;
-      text-align: center;
     }
   }
 }
 
-.hold-date-stack,
-.hold-lot-grid {
-  display: grid;
-  gap: 12px;
-  padding: 16px;
-
-  > div {
-    padding: 13px;
-    border-radius: 17px;
-    background:
-      linear-gradient(145deg, rgba(255, 255, 255, .92), rgba($wood-cream, .88));
-    border: 1px solid rgba($wood-cedar, .10);
-
-    span {
-      display: block;
-      color: $wood-muted;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      font-weight: 950;
-      margin-bottom: 6px;
-    }
-
-    strong {
-      display: block;
-      color: $wood-walnut;
-      font-size: 13px;
-      font-weight: 900;
-      word-break: break-word;
-
-      i {
-        color: $wood-copper;
-        margin-right: 6px;
-      }
-    }
-  }
-}
+// ============================================================
+// Notes
+// ============================================================
 
 .hold-info-notes {
   padding: 16px;
@@ -526,34 +548,58 @@ $wood-amber: #C98228;
 // Responsive
 // ============================================================
 
-@media (max-width: 992px) {
+@media (max-width: 1200px) {
+  .hold-info-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hold-info-main {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
   .hold-info-hero {
-    padding: 24px 18px;
+    padding: 22px 18px 18px;
 
     &__content {
       padding-right: 0;
     }
+
+    &__left {
+      align-items: flex-start;
+    }
+
+    &__icon {
+      width: 68px;
+      height: 68px;
+      border-radius: 22px;
+
+      i {
+        font-size: 32px;
+      }
+    }
+
+    &__copy h2 {
+      font-size: 26px;
+    }
   }
 
-  .hold-info-product,
-  .hold-info-grid {
+  .hold-info-summary {
     grid-template-columns: 1fr;
-  }
-
-  .hold-info-product {
-    padding: 16px 18px 4px;
+    padding: 16px 18px 8px;
   }
 
   .hold-info-status {
-    margin: 14px 18px;
+    margin: 12px 18px 0;
   }
 
-  .hold-info-grid {
-    padding: 0 18px 20px;
+  .hold-info-main {
+    padding: 16px 18px 20px;
   }
 
-  .hold-info-card--wide {
-    grid-column: auto;
+  .hold-info-data-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -567,46 +613,6 @@ $wood-amber: #C98228;
     right: 12px;
     width: 34px;
     height: 34px;
-  }
-
-  .hold-info-hero {
-    padding: 20px 18px;
-
-    &__content {
-      align-items: flex-start;
-      gap: 12px;
-    }
-
-    &__icon {
-      width: 64px;
-      height: 64px;
-      border-radius: 20px;
-
-      i {
-        font-size: 32px;
-      }
-    }
-
-    &__copy h2 {
-      font-size: 26px;
-    }
-
-    &__copy p {
-      font-size: 12px;
-    }
-  }
-
-  .hold-info-product__meta {
-    grid-template-columns: 1fr;
-  }
-
-  .hold-info-status {
-    flex-direction: column;
-  }
-
-  .hold-info-row {
-    grid-template-columns: 1fr;
-    gap: 5px;
   }
 
   .hold-info-close-button {

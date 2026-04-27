@@ -2,7 +2,7 @@
 <templates xml:space="preserve">
 
     <t t-name="inventory_visual_enhanced.HoldInfoDialog" owl="1">
-        <Dialog size="'lg'" title="''" contentClass="'o_hold_info_dialog_content o_hold_info_dialog_content_wood'">
+        <Dialog size="'xl'" title="''" contentClass="'o_hold_info_dialog_content o_hold_info_dialog_content_wood'">
             <div class="o_hold_info_dialog o_hold_info_dialog_wood">
 
                 <button class="hold-info-floating-close" type="button" t-on-click="props.close" title="Cerrar">
@@ -13,45 +13,52 @@
                 <div class="hold-info-hero">
                     <div class="hold-info-hero__grain"/>
                     <div class="hold-info-hero__content">
-                        <div class="hold-info-hero__icon">
-                            <i class="fa fa-hand-paper-o"/>
-                        </div>
-                        <div class="hold-info-hero__copy">
-                            <span class="hold-info-eyebrow">Apartado activo</span>
-                            <h2>Material reservado</h2>
-                            <p>
-                                Este lote está apartado actualmente y no está disponible para otros clientes
-                                hasta que se libere o expire el apartado.
-                            </p>
+                        <div class="hold-info-hero__left">
+                            <div class="hold-info-hero__icon">
+                                <i class="fa fa-hand-paper-o"/>
+                            </div>
+
+                            <div class="hold-info-hero__copy">
+                                <span class="hold-info-eyebrow">Apartado activo</span>
+                                <h2>Material reservado</h2>
+                                <p>
+                                    Este lote está apartado actualmente y no está disponible para otros clientes
+                                    hasta que se libere o expire el apartado.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- PRODUCT SUMMARY -->
-                <div class="hold-info-product">
-                    <div class="hold-info-product__main">
+                <!-- QUICK SUMMARY -->
+                <div class="hold-info-summary">
+                    <div class="hold-info-stat">
                         <span>Producto</span>
                         <strong t-esc="detailData.product_name"/>
                     </div>
 
-                    <div class="hold-info-product__meta">
-                        <div>
-                            <span>Lote</span>
-                            <strong t-esc="detailData.lot_name"/>
-                        </div>
-                        <div>
-                            <span>Cantidad</span>
-                            <strong><t t-esc="detailData.quantity"/> m²</strong>
-                        </div>
+                    <div class="hold-info-stat">
+                        <span>Lote</span>
+                        <strong t-esc="detailData.lot_name"/>
+                    </div>
+
+                    <div class="hold-info-stat">
+                        <span>Cantidad</span>
+                        <strong><t t-esc="detailData.quantity"/> m²</strong>
+                    </div>
+
+                    <div class="hold-info-stat hold-info-stat--status">
+                        <span>Estatus</span>
+                        <strong>Apartado</strong>
                     </div>
                 </div>
 
-                <!-- STATUS -->
+                <!-- ALERT -->
                 <div class="hold-info-status">
                     <div class="hold-info-status__icon">
                         <i class="fa fa-exclamation-triangle"/>
                     </div>
-                    <div>
+                    <div class="hold-info-status__copy">
                         <strong>Este lote está apartado actualmente</strong>
                         <p>
                             El material está reservado y no debe asignarse a otra operación comercial mientras
@@ -60,119 +67,128 @@
                     </div>
                 </div>
 
-                <!-- DETAILS -->
-                <div class="hold-info-grid">
-                    <div class="hold-info-card hold-info-card--wide">
-                        <div class="hold-info-card__header">
-                            <i class="fa fa-user"/>
-                            <span>Datos comerciales</span>
+                <!-- HORIZONTAL LAYOUT -->
+                <div class="hold-info-main">
+                    <!-- LEFT -->
+                    <div class="hold-info-main__left">
+
+                        <div class="hold-info-card">
+                            <div class="hold-info-card__header">
+                                <i class="fa fa-briefcase"/>
+                                <span>Datos del apartado</span>
+                            </div>
+
+                            <div class="hold-info-data-grid">
+                                <div class="hold-info-data-item">
+                                    <span>Cliente</span>
+                                    <strong>
+                                        <i class="fa fa-user-circle"/>
+                                        <t t-esc="holdInfo.partner_name"/>
+                                    </strong>
+                                </div>
+
+                                <div class="hold-info-data-item" t-if="holdInfo.proyecto_nombre">
+                                    <span>Proyecto</span>
+                                    <strong>
+                                        <i class="fa fa-folder-open-o"/>
+                                        <t t-esc="holdInfo.proyecto_nombre"/>
+                                    </strong>
+                                </div>
+
+                                <div class="hold-info-data-item" t-if="holdInfo.arquitecto_nombre">
+                                    <span>Arquitecto</span>
+                                    <strong>
+                                        <i class="fa fa-user-circle-o"/>
+                                        <t t-esc="holdInfo.arquitecto_nombre"/>
+                                    </strong>
+                                </div>
+
+                                <div class="hold-info-data-item" t-if="holdInfo.vendedor_nombre">
+                                    <span>Vendedor</span>
+                                    <strong>
+                                        <i class="fa fa-id-badge"/>
+                                        <t t-esc="holdInfo.vendedor_nombre"/>
+                                    </strong>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="hold-info-list">
-                            <div class="hold-info-row">
-                                <span>Cliente</span>
-                                <strong>
-                                    <i class="fa fa-user-circle"/>
-                                    <t t-esc="holdInfo.partner_name"/>
-                                </strong>
+                        <div class="hold-info-card" t-if="holdInfo.notas">
+                            <div class="hold-info-card__header">
+                                <i class="fa fa-sticky-note-o"/>
+                                <span>Notas del apartado</span>
                             </div>
 
-                            <div class="hold-info-row" t-if="holdInfo.proyecto_nombre">
-                                <span>Proyecto</span>
-                                <strong>
-                                    <i class="fa fa-folder-open-o"/>
-                                    <t t-esc="holdInfo.proyecto_nombre"/>
-                                </strong>
-                            </div>
-
-                            <div class="hold-info-row" t-if="holdInfo.arquitecto_nombre">
-                                <span>Arquitecto</span>
-                                <strong>
-                                    <i class="fa fa-user-circle-o"/>
-                                    <t t-esc="holdInfo.arquitecto_nombre"/>
-                                </strong>
-                            </div>
-
-                            <div class="hold-info-row" t-if="holdInfo.vendedor_nombre">
-                                <span>Vendedor</span>
-                                <strong>
-                                    <i class="fa fa-id-badge"/>
-                                    <t t-esc="holdInfo.vendedor_nombre"/>
-                                </strong>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="hold-info-card">
-                        <div class="hold-info-card__header">
-                            <i class="fa fa-calendar"/>
-                            <span>Vigencia</span>
-                        </div>
-
-                        <div class="hold-date-stack">
-                            <div>
-                                <span>Inicio</span>
-                                <strong>
-                                    <i class="fa fa-calendar-check-o"/>
-                                    <t t-esc="holdInfo.fecha_inicio"/>
-                                </strong>
-                            </div>
-
-                            <div>
-                                <span>Expiración</span>
-                                <strong>
-                                    <i class="fa fa-calendar-times-o"/>
-                                    <t t-esc="holdInfo.fecha_expiracion"/>
-                                </strong>
+                            <div class="hold-info-notes">
+                                <p t-esc="holdInfo.notas"/>
                             </div>
                         </div>
                     </div>
 
-                    <div class="hold-info-card">
-                        <div class="hold-info-card__header">
-                            <i class="fa fa-cube"/>
-                            <span>Información del lote</span>
-                        </div>
+                    <!-- RIGHT -->
+                    <div class="hold-info-main__right">
 
-                        <div class="hold-lot-grid">
-                            <div>
-                                <span>Ubicación</span>
-                                <strong>
-                                    <i class="fa fa-map-marker"/>
-                                    <t t-esc="detailData.location_name"/>
-                                </strong>
+                        <div class="hold-info-card">
+                            <div class="hold-info-card__header">
+                                <i class="fa fa-calendar"/>
+                                <span>Vigencia</span>
                             </div>
 
-                            <div t-if="detailData.grosor or detailData.alto or detailData.ancho">
-                                <span>Dimensiones</span>
-                                <strong>
-                                    <t t-if="detailData.grosor"><t t-esc="detailData.grosor"/>cm × </t>
-                                    <t t-if="detailData.alto"><t t-esc="detailData.alto"/>m × </t>
-                                    <t t-if="detailData.ancho"><t t-esc="detailData.ancho"/>m</t>
-                                </strong>
-                            </div>
+                            <div class="hold-info-side-stack">
+                                <div class="hold-info-side-item">
+                                    <span>Inicio</span>
+                                    <strong>
+                                        <i class="fa fa-calendar-check-o"/>
+                                        <t t-esc="holdInfo.fecha_inicio"/>
+                                    </strong>
+                                </div>
 
-                            <div t-if="detailData.bloque">
-                                <span>Bloque</span>
-                                <strong t-esc="detailData.bloque"/>
-                            </div>
-
-                            <div t-if="detailData.atado">
-                                <span>Atado</span>
-                                <strong t-esc="detailData.atado"/>
+                                <div class="hold-info-side-item">
+                                    <span>Expiración</span>
+                                    <strong>
+                                        <i class="fa fa-calendar-times-o"/>
+                                        <t t-esc="holdInfo.fecha_expiracion"/>
+                                    </strong>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="hold-info-card hold-info-card--wide" t-if="holdInfo.notas">
-                        <div class="hold-info-card__header">
-                            <i class="fa fa-sticky-note-o"/>
-                            <span>Notas del apartado</span>
+                        <div class="hold-info-card">
+                            <div class="hold-info-card__header">
+                                <i class="fa fa-cube"/>
+                                <span>Información del lote</span>
+                            </div>
+
+                            <div class="hold-info-side-stack">
+                                <div class="hold-info-side-item">
+                                    <span>Ubicación</span>
+                                    <strong>
+                                        <i class="fa fa-map-marker"/>
+                                        <t t-esc="detailData.location_name"/>
+                                    </strong>
+                                </div>
+
+                                <div class="hold-info-side-item" t-if="detailData.grosor or detailData.alto or detailData.ancho">
+                                    <span>Dimensiones</span>
+                                    <strong>
+                                        <t t-if="detailData.grosor"><t t-esc="detailData.grosor"/>cm × </t>
+                                        <t t-if="detailData.alto"><t t-esc="detailData.alto"/>m × </t>
+                                        <t t-if="detailData.ancho"><t t-esc="detailData.ancho"/>m</t>
+                                    </strong>
+                                </div>
+
+                                <div class="hold-info-side-item" t-if="detailData.bloque">
+                                    <span>Bloque</span>
+                                    <strong t-esc="detailData.bloque"/>
+                                </div>
+
+                                <div class="hold-info-side-item" t-if="detailData.atado">
+                                    <span>Atado</span>
+                                    <strong t-esc="detailData.atado"/>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="hold-info-notes">
-                            <p t-esc="holdInfo.notas"/>
-                        </div>
                     </div>
                 </div>
             </div>
