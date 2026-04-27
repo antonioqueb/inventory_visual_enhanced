@@ -1,166 +1,192 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
-    
+
     <t t-name="inventory_visual_enhanced.HistoryDialog" owl="1">
-        <Dialog size="'xl'" contentClass="'h-100'">
+        <Dialog size="'xl'" contentClass="'h-100 ivh-history-dialog-shell'">
             <div class="o_history_dialog d-flex flex-column h-100">
-                
-                <!-- Header con información general -->
-                <div class="alert alert-light border-start border-4 border-secondary mb-3">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h5 class="mb-2 fw-bold">
-                                <i class="fa fa-cube fa-lg text-secondary me-2"></i>
-                                <t t-esc="history.general_info.product_name"/>
-                            </h5>
-                            <div class="d-flex gap-3 flex-wrap">
-                                <small class="text-muted">
-                                    <i class="fa fa-barcode me-1"></i>
-                                    Lote: <strong t-esc="history.general_info.lot_name"></strong>
-                                </small>
-                                <small class="text-muted" t-if="history.general_info.product_code">
-                                    <i class="fa fa-tag me-1"></i>
-                                    Código: <strong t-esc="history.general_info.product_code"></strong>
-                                </small>
-                            </div>
+
+                <!-- Botón de cierre propio para ocultar visualmente el header nativo de Odoo -->
+                <button class="ivh-dialog-close" type="button" t-on-click="props.close" title="Cerrar">
+                    <i class="fa fa-times"></i>
+                </button>
+
+                <!-- HERO / HEADER PREMIUM -->
+                <div class="ivh-history-hero">
+                    <div class="ivh-history-hero__icon">
+                        <i class="fa fa-cube"></i>
+                    </div>
+
+                    <div class="ivh-history-hero__content">
+                        <div class="ivh-history-hero__eyebrow">
+                            Historial integral del lote
                         </div>
-                        <div class="col-md-6 text-end">
-                            <div class="mb-2">
-                                <span class="badge bg-light text-dark border fs-6 px-3 py-2">
-                                    <i class="fa fa-calendar me-1"></i>
-                                    <t t-esc="history.statistics.dias_en_inventario"/> días en inventario
-                                </span>
-                            </div>
-                            <div>
-                                <span class="badge bg-secondary fs-6 px-3 py-2">
-                                    Estado: <strong t-esc="history.general_info.estado_actual"></strong>
-                                </span>
-                            </div>
+
+                        <h2 class="ivh-history-hero__title">
+                            <t t-esc="history.general_info.product_name"/>
+                        </h2>
+
+                        <div class="ivh-history-hero__meta">
+                            <span>
+                                <i class="fa fa-barcode"></i>
+                                Lote:
+                                <strong t-esc="history.general_info.lot_name"></strong>
+                            </span>
+
+                            <span t-if="history.general_info.product_code">
+                                <i class="fa fa-tag"></i>
+                                Código:
+                                <strong t-esc="history.general_info.product_code"></strong>
+                            </span>
+
+                            <span>
+                                <i class="fa fa-map-marker"></i>
+                                Ubicación:
+                                <strong t-esc="history.general_info.ubicacion_actual"></strong>
+                            </span>
                         </div>
+                    </div>
+
+                    <div class="ivh-history-hero__badges">
+                        <span class="ivh-soft-badge ivh-soft-badge--neutral">
+                            <i class="fa fa-calendar"></i>
+                            <t t-esc="history.statistics.dias_en_inventario"/>
+                            días en inventario
+                        </span>
+
+                        <span class="ivh-soft-badge ivh-soft-badge--strong">
+                            Estado:
+                            <strong t-esc="history.general_info.estado_actual"></strong>
+                        </span>
                     </div>
                 </div>
 
-                <!-- Navegación por pestañas -->
-                <ul class="nav nav-tabs mb-3" role="tablist">
+                <!-- NAVEGACIÓN POR PESTAÑAS -->
+                <ul class="nav nav-tabs ivh-history-tabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button 
+                        <button
                             class="nav-link"
                             t-att-class="{ active: isActiveTab('general') }"
                             t-on-click="() => this.switchTab('general')"
                             type="button"
                         >
-                            <i class="fa fa-info-circle me-2"></i>
+                            <i class="fa fa-info-circle"></i>
                             General
-                            <span class="badge bg-secondary ms-2">1</span>
+                            <span class="ivh-tab-count">1</span>
                         </button>
                     </li>
+
                     <li class="nav-item" role="presentation" t-if="history.has_purchase_permissions">
-                        <button 
+                        <button
                             class="nav-link"
                             t-att-class="{ active: isActiveTab('purchase') }"
                             t-on-click="() => this.switchTab('purchase')"
                             type="button"
                         >
-                            <i class="fa fa-shopping-cart me-2"></i>
+                            <i class="fa fa-shopping-cart"></i>
                             Compras
-                            <span class="badge bg-secondary ms-2" t-esc="history.purchase_info.length"></span>
+                            <span class="ivh-tab-count" t-esc="history.purchase_info.length"></span>
                         </button>
                     </li>
+
                     <li class="nav-item" role="presentation">
-                        <button 
+                        <button
                             class="nav-link"
                             t-att-class="{ active: isActiveTab('movements') }"
                             t-on-click="() => this.switchTab('movements')"
                             type="button"
                         >
-                            <i class="fa fa-exchange me-2"></i>
+                            <i class="fa fa-exchange"></i>
                             Movimientos
-                            <span class="badge bg-secondary ms-2" t-esc="history.statistics.total_movimientos"></span>
+                            <span class="ivh-tab-count" t-esc="history.statistics.total_movimientos"></span>
                         </button>
                     </li>
+
                     <li class="nav-item" role="presentation">
-                        <button 
+                        <button
                             class="nav-link"
                             t-att-class="{ active: isActiveTab('sales') }"
                             t-on-click="() => this.switchTab('sales')"
                             type="button"
                         >
-                            <i class="fa fa-usd me-2"></i>
+                            <i class="fa fa-usd"></i>
                             Ventas
-                            <span class="badge bg-secondary ms-2" t-esc="history.sales_orders.length"></span>
+                            <span class="ivh-tab-count" t-esc="history.sales_orders.length"></span>
                         </button>
                     </li>
+
                     <li class="nav-item" role="presentation">
-                        <button 
+                        <button
                             class="nav-link"
                             t-att-class="{ active: isActiveTab('reservations') }"
                             t-on-click="() => this.switchTab('reservations')"
                             type="button"
                         >
-                            <i class="fa fa-hand-paper-o me-2"></i>
+                            <i class="fa fa-hand-paper-o"></i>
                             Apartados
-                            <span class="badge bg-secondary ms-2" t-esc="history.reservations.length"></span>
+                            <span class="ivh-tab-count" t-esc="history.reservations.length"></span>
                         </button>
                     </li>
+
                     <li class="nav-item" role="presentation">
-                        <button 
+                        <button
                             class="nav-link"
                             t-att-class="{ active: isActiveTab('deliveries') }"
                             t-on-click="() => this.switchTab('deliveries')"
                             type="button"
                         >
-                            <i class="fa fa-truck me-2"></i>
+                            <i class="fa fa-truck"></i>
                             Entregas
-                            <span class="badge bg-secondary ms-2" t-esc="history.deliveries.length"></span>
+                            <span class="ivh-tab-count" t-esc="history.deliveries.length"></span>
                         </button>
                     </li>
-                    <!-- NUEVA PESTAÑA: LOG COMBINADO GENERAL -->
+
                     <li class="nav-item" role="presentation">
-                        <button 
+                        <button
                             class="nav-link"
                             t-att-class="{ active: isActiveTab('log') }"
                             t-on-click="() => this.switchTab('log')"
                             type="button"
                         >
-                            <i class="fa fa-list me-2"></i>
+                            <i class="fa fa-list"></i>
                             Log General
-                            <span t-if="history.general_logs" class="badge bg-secondary ms-2" t-esc="history.general_logs.length"></span>
+                            <span t-if="history.general_logs" class="ivh-tab-count" t-esc="history.general_logs.length"></span>
                         </button>
                     </li>
                 </ul>
 
-                <!-- Contenido de las pestañas -->
-                <div class="tab-content flex-grow-1 overflow-auto">
-                    
-                    <!-- PESTAÑA: GENERAL -->
+                <!-- CONTENIDO -->
+                <div class="tab-content ivh-history-content flex-grow-1 overflow-auto">
+
+                    <!-- PESTAÑA GENERAL -->
                     <div t-if="isActiveTab('general')" class="tab-pane fade show active">
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <div class="card h-100 border">
-                                    <div class="card-header bg-light border-bottom">
-                                        <h6 class="mb-0">
-                                            <i class="fa fa-info-circle me-2"></i>
-                                            Información Básica
+                                <div class="ivh-card h-100">
+                                    <div class="ivh-card__header">
+                                        <h6>
+                                            <i class="fa fa-info-circle"></i>
+                                            Información básica
                                         </h6>
                                     </div>
-                                    <div class="card-body">
-                                        <table class="table table-sm">
+
+                                    <div class="ivh-card__body">
+                                        <table class="ivh-info-table">
                                             <tr>
-                                                <td class="fw-bold">Fecha de creación:</td>
+                                                <td>Fecha de creación</td>
                                                 <td t-esc="history.general_info.fecha_creacion"></td>
                                             </tr>
                                             <tr>
-                                                <td class="fw-bold">Estado actual:</td>
+                                                <td>Estado actual</td>
                                                 <td>
-                                                    <span class="badge bg-secondary" t-esc="history.general_info.estado_actual"></span>
+                                                    <span class="ivh-soft-badge ivh-soft-badge--strong" t-esc="history.general_info.estado_actual"></span>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="fw-bold">Ubicación actual:</td>
+                                                <td>Ubicación actual</td>
                                                 <td t-esc="history.general_info.ubicacion_actual"></td>
                                             </tr>
                                             <tr>
-                                                <td class="fw-bold">Días en inventario:</td>
+                                                <td>Días en inventario</td>
                                                 <td t-esc="history.statistics.dias_en_inventario"></td>
                                             </tr>
                                         </table>
@@ -169,31 +195,32 @@
                             </div>
 
                             <div class="col-md-6">
-                                <div class="card h-100 border">
-                                    <div class="card-header bg-light border-bottom">
-                                        <h6 class="mb-0">
-                                            <i class="fa fa-cubes me-2"></i>
-                                            Cantidades (m²)
+                                <div class="ivh-card h-100">
+                                    <div class="ivh-card__header">
+                                        <h6>
+                                            <i class="fa fa-cubes"></i>
+                                            Cantidades m²
                                         </h6>
                                     </div>
-                                    <div class="card-body">
-                                        <table class="table table-sm">
+
+                                    <div class="ivh-card__body">
+                                        <table class="ivh-info-table">
                                             <tr>
-                                                <td class="fw-bold">Cantidad actual:</td>
+                                                <td>Cantidad actual</td>
                                                 <td class="text-end">
-                                                    <span class="badge bg-light text-dark border fs-6" t-esc="formatNumber(history.general_info.cantidad_actual)"></span>
+                                                    <span class="ivh-number-pill" t-esc="formatNumber(history.general_info.cantidad_actual)"></span>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="fw-bold">Cantidad reservada:</td>
+                                                <td>Cantidad reservada</td>
                                                 <td class="text-end">
-                                                    <span class="badge bg-light text-dark border fs-6" t-esc="formatNumber(history.general_info.cantidad_reservada)"></span>
+                                                    <span class="ivh-number-pill ivh-number-pill--hold" t-esc="formatNumber(history.general_info.cantidad_reservada)"></span>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="fw-bold">Cantidad disponible:</td>
+                                                <td>Cantidad disponible</td>
                                                 <td class="text-end">
-                                                    <span class="badge bg-secondary fs-6" t-esc="formatNumber(history.general_info.cantidad_disponible)"></span>
+                                                    <span class="ivh-number-pill ivh-number-pill--success" t-esc="formatNumber(history.general_info.cantidad_disponible)"></span>
                                                 </td>
                                             </tr>
                                         </table>
@@ -202,50 +229,39 @@
                             </div>
 
                             <div class="col-12">
-                                <div class="card border">
-                                    <div class="card-header bg-light border-bottom">
-                                        <h6 class="mb-0">
-                                            <i class="fa fa-bar-chart me-2"></i>
-                                            Estadísticas Generales
+                                <div class="ivh-card ivh-card--featured">
+                                    <div class="ivh-card__header">
+                                        <h6>
+                                            <i class="fa fa-bar-chart"></i>
+                                            Estadísticas generales
                                         </h6>
                                     </div>
-                                    <div class="card-body">
-                                        <div class="row g-3 text-center">
-                                            <div class="col-md-2">
-                                                <div class="p-3 bg-light rounded border">
-                                                    <h3 class="text-secondary mb-1" t-esc="history.statistics.total_movimientos"></h3>
-                                                    <small class="text-muted">Movimientos</small>
-                                                </div>
+
+                                    <div class="ivh-card__body">
+                                        <div class="ivh-stats-grid">
+                                            <div class="ivh-stat-card">
+                                                <h3 t-esc="history.statistics.total_movimientos"></h3>
+                                                <span>Movimientos</span>
                                             </div>
-                                            <div class="col-md-2">
-                                                <div class="p-3 bg-light rounded border">
-                                                    <h3 class="text-secondary mb-1" t-esc="history.statistics.total_entradas"></h3>
-                                                    <small class="text-muted">Entradas</small>
-                                                </div>
+                                            <div class="ivh-stat-card">
+                                                <h3 t-esc="history.statistics.total_entradas"></h3>
+                                                <span>Entradas</span>
                                             </div>
-                                            <div class="col-md-2">
-                                                <div class="p-3 bg-light rounded border">
-                                                    <h3 class="text-secondary mb-1" t-esc="history.statistics.total_salidas"></h3>
-                                                    <small class="text-muted">Salidas</small>
-                                                </div>
+                                            <div class="ivh-stat-card">
+                                                <h3 t-esc="history.statistics.total_salidas"></h3>
+                                                <span>Salidas</span>
                                             </div>
-                                            <div class="col-md-2">
-                                                <div class="p-3 bg-light rounded border">
-                                                    <h3 class="text-secondary mb-1" t-esc="history.statistics.total_ventas"></h3>
-                                                    <small class="text-muted">Ventas</small>
-                                                </div>
+                                            <div class="ivh-stat-card">
+                                                <h3 t-esc="history.statistics.total_ventas"></h3>
+                                                <span>Ventas</span>
                                             </div>
-                                            <div class="col-md-2">
-                                                <div class="p-3 bg-light rounded border">
-                                                    <h3 class="text-secondary mb-1" t-esc="history.statistics.total_apartados"></h3>
-                                                    <small class="text-muted">Apartados</small>
-                                                </div>
+                                            <div class="ivh-stat-card">
+                                                <h3 t-esc="history.statistics.total_apartados"></h3>
+                                                <span>Apartados</span>
                                             </div>
-                                            <div class="col-md-2">
-                                                <div class="p-3 bg-light rounded border">
-                                                    <h3 class="text-secondary mb-1" t-esc="history.statistics.total_entregas"></h3>
-                                                    <small class="text-muted">Entregas</small>
-                                                </div>
+                                            <div class="ivh-stat-card">
+                                                <h3 t-esc="history.statistics.total_entregas"></h3>
+                                                <span>Entregas</span>
                                             </div>
                                         </div>
                                     </div>
@@ -254,49 +270,52 @@
                         </div>
                     </div>
 
-                    <!-- PESTAÑA: COMPRAS -->
+                    <!-- PESTAÑA COMPRAS -->
                     <div t-if="isActiveTab('purchase') and history.has_purchase_permissions" class="tab-pane fade show active">
                         <t t-if="history.purchase_info.length === 0">
-                            <div class="text-center py-5">
-                                <i class="fa fa-shopping-cart" style="font-size: 64px; color: #ccc;"></i>
-                                <p class="text-muted mt-3">No hay información de compras para este lote</p>
+                            <div class="ivh-empty-state">
+                                <i class="fa fa-shopping-cart"></i>
+                                <p>No hay información de compras para este lote</p>
                             </div>
                         </t>
+
                         <t t-else="">
                             <t t-foreach="history.purchase_info" t-as="purchase" t-key="purchase_index">
-                                <div class="card mb-3 border">
-                                    <div class="card-header bg-light border-bottom">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <h6 class="mb-0">
-                                                <i class="fa fa-file-text-o me-2"></i>
-                                                <t t-esc="purchase.orden_compra"/>
-                                            </h6>
-                                            <span class="badge bg-secondary" t-esc="purchase.estado"></span>
-                                        </div>
+                                <div class="ivh-card ivh-record-card mb-3">
+                                    <div class="ivh-card__header">
+                                        <h6>
+                                            <i class="fa fa-file-text-o"></i>
+                                            <t t-esc="purchase.orden_compra"/>
+                                        </h6>
+                                        <span class="ivh-soft-badge ivh-soft-badge--neutral" t-esc="purchase.estado"></span>
                                     </div>
-                                    <div class="card-body">
-                                        <div class="row">
+
+                                    <div class="ivh-card__body">
+                                        <div class="row g-3">
                                             <div class="col-md-6">
-                                                <p class="mb-2">
-                                                    <strong>Proveedor:</strong> <t t-esc="purchase.proveedor"/>
-                                                </p>
-                                                <p class="mb-2">
-                                                    <strong>Fecha de orden:</strong> <t t-esc="purchase.fecha_orden"/>
-                                                </p>
+                                                <div class="ivh-field-block">
+                                                    <span>Proveedor</span>
+                                                    <strong t-esc="purchase.proveedor"></strong>
+                                                </div>
+                                                <div class="ivh-field-block">
+                                                    <span>Fecha de orden</span>
+                                                    <strong t-esc="purchase.fecha_orden"></strong>
+                                                </div>
                                             </div>
-                                            <div class="col-md-6 text-end">
-                                                <p class="mb-2">
-                                                    <strong>Cantidad:</strong> <t t-esc="formatNumber(purchase.cantidad)"/> m²
-                                                </p>
-                                                <p class="mb-2">
-                                                    <strong>Precio unitario:</strong> <t t-esc="formatCurrency(purchase.precio_unitario, purchase.moneda)"/>
-                                                </p>
-                                                <p class="mb-0">
-                                                    <strong>Total:</strong> 
-                                                    <span class="fs-5 text-dark fw-bold">
-                                                        <t t-esc="formatCurrency(purchase.total, purchase.moneda)"/>
-                                                    </span>
-                                                </p>
+
+                                            <div class="col-md-6 text-md-end">
+                                                <div class="ivh-field-block">
+                                                    <span>Cantidad</span>
+                                                    <strong><t t-esc="formatNumber(purchase.cantidad)"/> m²</strong>
+                                                </div>
+                                                <div class="ivh-field-block">
+                                                    <span>Precio unitario</span>
+                                                    <strong t-esc="formatCurrency(purchase.precio_unitario, purchase.moneda)"></strong>
+                                                </div>
+                                                <div class="ivh-total-pill">
+                                                    <span>Total</span>
+                                                    <strong t-esc="formatCurrency(purchase.total, purchase.moneda)"></strong>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -305,18 +324,19 @@
                         </t>
                     </div>
 
-                    <!-- PESTAÑA: MOVIMIENTOS -->
+                    <!-- PESTAÑA MOVIMIENTOS -->
                     <div t-if="isActiveTab('movements')" class="tab-pane fade show active">
                         <t t-if="history.movements.length === 0">
-                            <div class="text-center py-5">
-                                <i class="fa fa-exchange" style="font-size: 64px; color: #ccc;"></i>
-                                <p class="text-muted mt-3">No hay movimientos registrados</p>
+                            <div class="ivh-empty-state">
+                                <i class="fa fa-exchange"></i>
+                                <p>No hay movimientos registrados</p>
                             </div>
                         </t>
+
                         <t t-else="">
-                            <div class="table-responsive">
-                                <table class="table table-hover border">
-                                    <thead class="table-light">
+                            <div class="ivh-table-wrap">
+                                <table class="ivh-table">
+                                    <thead>
                                         <tr>
                                             <th>Fecha</th>
                                             <th>Tipo</th>
@@ -332,7 +352,7 @@
                                             <tr>
                                                 <td><small t-esc="movement.fecha"></small></td>
                                                 <td>
-                                                    <span class="badge bg-secondary">
+                                                    <span class="ivh-soft-badge ivh-soft-badge--neutral">
                                                         <i class="fa" t-att-class="movement.icon"></i>
                                                         <t t-esc="movement.tipo"/>
                                                     </span>
@@ -350,40 +370,56 @@
                         </t>
                     </div>
 
-                    <!-- PESTAÑA: VENTAS -->
+                    <!-- PESTAÑA VENTAS -->
                     <div t-if="isActiveTab('sales')" class="tab-pane fade show active">
                         <t t-if="history.sales_orders.length === 0">
-                            <div class="text-center py-5">
-                                <i class="fa fa-usd" style="font-size: 64px; color: #ccc;"></i>
-                                <p class="text-muted mt-3">No hay órdenes de venta para este lote</p>
+                            <div class="ivh-empty-state">
+                                <i class="fa fa-usd"></i>
+                                <p>No hay órdenes de venta para este lote</p>
                             </div>
                         </t>
+
                         <t t-else="">
                             <t t-foreach="history.sales_orders" t-as="sale" t-key="sale_index">
-                                <div class="card mb-3 border">
-                                    <div class="card-header bg-light border-bottom">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <h6 class="mb-0">
-                                                <i class="fa fa-file-text-o me-2"></i>
-                                                <t t-esc="sale.orden_venta"/>
-                                            </h6>
-                                            <span class="badge bg-secondary" t-esc="sale.estado"></span>
-                                        </div>
+                                <div class="ivh-card ivh-record-card ivh-record-card--sale mb-3">
+                                    <div class="ivh-card__header">
+                                        <h6>
+                                            <i class="fa fa-file-text-o"></i>
+                                            <t t-esc="sale.orden_venta"/>
+                                        </h6>
+                                        <span class="ivh-soft-badge ivh-soft-badge--success" t-esc="sale.estado"></span>
                                     </div>
-                                    <div class="card-body">
-                                        <div class="row">
+
+                                    <div class="ivh-card__body">
+                                        <div class="row g-3">
                                             <div class="col-md-6">
-                                                <p class="mb-2"><strong>Cliente:</strong> <t t-esc="sale.cliente"/></p>
-                                                <p class="mb-2"><strong>Vendedor:</strong> <t t-esc="sale.vendedor"/></p>
-                                                <p class="mb-2"><strong>Fecha de orden:</strong> <t t-esc="sale.fecha_orden"/></p>
+                                                <div class="ivh-field-block">
+                                                    <span>Cliente</span>
+                                                    <strong t-esc="sale.cliente"></strong>
+                                                </div>
+                                                <div class="ivh-field-block">
+                                                    <span>Vendedor</span>
+                                                    <strong t-esc="sale.vendedor"></strong>
+                                                </div>
+                                                <div class="ivh-field-block">
+                                                    <span>Fecha de orden</span>
+                                                    <strong t-esc="sale.fecha_orden"></strong>
+                                                </div>
                                             </div>
-                                            <div class="col-md-6 text-end">
-                                                <p class="mb-2"><strong>Cantidad:</strong> <t t-esc="formatNumber(sale.cantidad)"/> m²</p>
-                                                <p class="mb-2"><strong>Precio unitario:</strong> <t t-esc="formatCurrency(sale.precio_unitario, sale.moneda)"/></p>
-                                                <p class="mb-0">
-                                                    <strong>Total:</strong> 
-                                                    <span class="fs-5 text-dark fw-bold"><t t-esc="formatCurrency(sale.total, sale.moneda)"/></span>
-                                                </p>
+
+                                            <div class="col-md-6 text-md-end">
+                                                <div class="ivh-field-block">
+                                                    <span>Cantidad</span>
+                                                    <strong><t t-esc="formatNumber(sale.cantidad)"/> m²</strong>
+                                                </div>
+                                                <div class="ivh-field-block">
+                                                    <span>Precio unitario</span>
+                                                    <strong t-esc="formatCurrency(sale.precio_unitario, sale.moneda)"></strong>
+                                                </div>
+                                                <div class="ivh-total-pill ivh-total-pill--success">
+                                                    <span>Total</span>
+                                                    <strong t-esc="formatCurrency(sale.total, sale.moneda)"></strong>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -392,174 +428,199 @@
                         </t>
                     </div>
 
-                    <!-- PESTAÑA: APARTADOS/RESERVAS -->
+                    <!-- PESTAÑA APARTADOS -->
                     <div t-if="isActiveTab('reservations')" class="tab-pane fade show active">
                         <t t-if="history.reservations.length === 0">
-                            <div class="text-center py-5">
-                                <i class="fa fa-hand-paper-o" style="font-size: 64px; color: #ccc;"></i>
-                                <p class="text-muted mt-3">No hay apartados o reservas</p>
+                            <div class="ivh-empty-state">
+                                <i class="fa fa-hand-paper-o"></i>
+                                <p>No hay apartados o reservas</p>
                             </div>
                         </t>
+
                         <t t-else="">
                             <t t-foreach="history.reservations" t-as="reservation" t-key="reservation_index">
-                                <div class="card mb-3 border">
-                                    <!-- Header con color según estado -->
-                                    <div class="card-header border-bottom"
-                                         t-att-class="{
-                                             'bg-warning bg-opacity-25': reservation.estado_raw === 'activo',
-                                             'bg-danger bg-opacity-10': reservation.estado_raw === 'cancelado',
-                                             'bg-secondary bg-opacity-10': reservation.estado_raw === 'expirado',
-                                             'bg-light': reservation.estado_raw !== 'activo' and reservation.estado_raw !== 'cancelado' and reservation.estado_raw !== 'expirado'
-                                         }">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <h6 class="mb-0">
-                                                <i class="fa fa-hand-paper-o me-2"></i>
-                                                <t t-esc="reservation.tipo"/>
-                                                <small class="text-muted ms-2" t-if="reservation.name">
-                                                    — <t t-esc="reservation.name"/>
-                                                </small>
-                                            </h6>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <span t-if="reservation.estado_raw === 'activo' and reservation.dias_restantes" class="badge bg-light text-dark border">
-                                                    <i class="fa fa-clock-o me-1"></i>
-                                                    <t t-esc="reservation.dias_restantes"/> días restantes
-                                                </span>
-                                                <span t-if="reservation.duracion_dias !== undefined" class="badge bg-light text-dark border">
-                                                    <i class="fa fa-hourglass-half me-1"></i>
-                                                    Duración: <t t-esc="reservation.duracion_dias"/> días
-                                                </span>
-                                                <span class="badge fs-6 px-3 py-1"
-                                                      t-att-class="{
-                                                          'bg-warning text-dark': reservation.estado_raw === 'activo',
-                                                          'bg-danger': reservation.estado_raw === 'cancelado',
-                                                          'bg-secondary': reservation.estado_raw === 'expirado'
-                                                      }"
-                                                      t-esc="reservation.estado">
-                                                </span>
-                                            </div>
+                                <div class="ivh-card ivh-record-card ivh-record-card--hold mb-3"
+                                     t-att-class="{
+                                         'ivh-record-card--active': reservation.estado_raw === 'activo',
+                                         'ivh-record-card--cancelled': reservation.estado_raw === 'cancelado',
+                                         'ivh-record-card--expired': reservation.estado_raw === 'expirado'
+                                     }">
+
+                                    <div class="ivh-card__header">
+                                        <h6>
+                                            <i class="fa fa-hand-paper-o"></i>
+                                            <t t-esc="reservation.tipo"/>
+                                            <small t-if="reservation.name">
+                                                — <t t-esc="reservation.name"/>
+                                            </small>
+                                        </h6>
+
+                                        <div class="ivh-header-badges">
+                                            <span t-if="reservation.estado_raw === 'activo' and reservation.dias_restantes" class="ivh-soft-badge ivh-soft-badge--hold">
+                                                <i class="fa fa-clock-o"></i>
+                                                <t t-esc="reservation.dias_restantes"/> días restantes
+                                            </span>
+
+                                            <span t-if="reservation.duracion_dias !== undefined" class="ivh-soft-badge ivh-soft-badge--neutral">
+                                                <i class="fa fa-hourglass-half"></i>
+                                                Duración:
+                                                <t t-esc="reservation.duracion_dias"/> días
+                                            </span>
+
+                                            <span class="ivh-soft-badge"
+                                                  t-att-class="{
+                                                      'ivh-soft-badge--hold': reservation.estado_raw === 'activo',
+                                                      'ivh-soft-badge--danger': reservation.estado_raw === 'cancelado',
+                                                      'ivh-soft-badge--neutral': reservation.estado_raw === 'expirado'
+                                                  }"
+                                                  t-esc="reservation.estado">
+                                            </span>
                                         </div>
                                     </div>
 
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <!-- Columna izquierda: Cliente, Vendedor, Proyecto, Arquitecto -->
+                                    <div class="ivh-card__body">
+                                        <div class="row g-4">
                                             <div class="col-md-6">
-                                                <h6 class="text-muted mb-2"><i class="fa fa-user me-1"></i> Cliente</h6>
-                                                <p class="mb-1 fw-bold" t-esc="reservation.partner"></p>
-                                                <p class="mb-1 text-muted" t-if="reservation.partner_ref">
-                                                    <small>Ref: <t t-esc="reservation.partner_ref"/></small>
+                                                <div class="ivh-section-title">
+                                                    <i class="fa fa-user"></i>
+                                                    Cliente
+                                                </div>
+                                                <p class="ivh-main-value" t-esc="reservation.partner"></p>
+                                                <p class="ivh-muted-value" t-if="reservation.partner_ref">
+                                                    Ref: <t t-esc="reservation.partner_ref"/>
                                                 </p>
-                                                <p class="mb-3 text-muted" t-if="reservation.partner_email">
-                                                    <small><i class="fa fa-envelope me-1"></i><t t-esc="reservation.partner_email"/></small>
+                                                <p class="ivh-muted-value" t-if="reservation.partner_email">
+                                                    <i class="fa fa-envelope"></i>
+                                                    <t t-esc="reservation.partner_email"/>
                                                 </p>
 
-                                                <h6 class="text-muted mb-2"><i class="fa fa-id-badge me-1"></i> Vendedor</h6>
-                                                <p class="mb-1 fw-bold" t-esc="reservation.vendedor"></p>
-                                                <p class="mb-3 text-muted" t-if="reservation.vendedor_email">
-                                                    <small><i class="fa fa-envelope me-1"></i><t t-esc="reservation.vendedor_email"/></small>
+                                                <div class="ivh-section-title mt-3">
+                                                    <i class="fa fa-id-badge"></i>
+                                                    Vendedor
+                                                </div>
+                                                <p class="ivh-main-value" t-esc="reservation.vendedor"></p>
+                                                <p class="ivh-muted-value" t-if="reservation.vendedor_email">
+                                                    <i class="fa fa-envelope"></i>
+                                                    <t t-esc="reservation.vendedor_email"/>
                                                 </p>
 
                                                 <div t-if="reservation.proyecto">
-                                                    <h6 class="text-muted mb-2"><i class="fa fa-building me-1"></i> Proyecto</h6>
-                                                    <p class="mb-3 fw-bold" t-esc="reservation.proyecto"></p>
+                                                    <div class="ivh-section-title mt-3">
+                                                        <i class="fa fa-building"></i>
+                                                        Proyecto
+                                                    </div>
+                                                    <p class="ivh-main-value" t-esc="reservation.proyecto"></p>
                                                 </div>
 
                                                 <div t-if="reservation.arquitecto">
-                                                    <h6 class="text-muted mb-2"><i class="fa fa-pencil-square-o me-1"></i> Arquitecto</h6>
-                                                    <p class="mb-3 fw-bold" t-esc="reservation.arquitecto"></p>
+                                                    <div class="ivh-section-title mt-3">
+                                                        <i class="fa fa-pencil-square-o"></i>
+                                                        Arquitecto
+                                                    </div>
+                                                    <p class="ivh-main-value" t-esc="reservation.arquitecto"></p>
                                                 </div>
                                             </div>
 
-                                            <!-- Columna derecha: Fechas y Auditoría -->
                                             <div class="col-md-6">
-                                                <h6 class="text-muted mb-2"><i class="fa fa-calendar me-1"></i> Fechas</h6>
-                                                <table class="table table-sm table-borderless mb-3">
+                                                <div class="ivh-section-title">
+                                                    <i class="fa fa-calendar"></i>
+                                                    Fechas
+                                                </div>
+                                                <table class="ivh-info-table ivh-info-table--compact mb-3">
                                                     <tr>
-                                                        <td class="text-muted" style="width:150px;">Creación:</td>
+                                                        <td>Creación</td>
                                                         <td t-esc="reservation.fecha_creacion"></td>
                                                     </tr>
                                                     <tr>
-                                                        <td class="text-muted">Inicio:</td>
+                                                        <td>Inicio</td>
                                                         <td t-esc="reservation.fecha_inicio"></td>
                                                     </tr>
                                                     <tr>
-                                                        <td class="text-muted">Expiración:</td>
-                                                        <td class="fw-bold" t-esc="reservation.fecha_expiracion"></td>
+                                                        <td>Expiración</td>
+                                                        <td><strong t-esc="reservation.fecha_expiracion"></strong></td>
                                                     </tr>
                                                 </table>
 
-                                                <h6 class="text-muted mb-2"><i class="fa fa-history me-1"></i> Auditoría</h6>
-                                                <table class="table table-sm table-borderless mb-3">
+                                                <div class="ivh-section-title">
+                                                    <i class="fa fa-history"></i>
+                                                    Auditoría
+                                                </div>
+                                                <table class="ivh-info-table ivh-info-table--compact mb-3">
                                                     <tr>
-                                                        <td class="text-muted" style="width:150px;">Creado por:</td>
+                                                        <td>Creado por</td>
                                                         <td t-esc="reservation.creado_por"></td>
                                                     </tr>
                                                     <tr>
-                                                        <td class="text-muted">Última modif.:</td>
+                                                        <td>Última modif.</td>
                                                         <td t-esc="reservation.ultima_modificacion"></td>
                                                     </tr>
                                                     <tr>
-                                                        <td class="text-muted">Modificado por:</td>
+                                                        <td>Modificado por</td>
                                                         <td t-esc="reservation.modificado_por"></td>
                                                     </tr>
                                                 </table>
 
                                                 <div t-if="reservation.ubicacion">
-                                                    <h6 class="text-muted mb-2"><i class="fa fa-map-marker me-1"></i> Ubicación</h6>
-                                                    <p class="mb-0" t-esc="reservation.ubicacion"></p>
+                                                    <div class="ivh-section-title">
+                                                        <i class="fa fa-map-marker"></i>
+                                                        Ubicación
+                                                    </div>
+                                                    <p class="ivh-main-value" t-esc="reservation.ubicacion"></p>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <!-- Bloque de cancelación -->
                                         <div t-if="reservation.cancel_info and (reservation.estado_raw === 'cancelado' or reservation.estado_raw === 'expirado')"
-                                             class="alert alert-danger bg-danger bg-opacity-10 border-danger mt-3 mb-3">
-                                            <h6 class="mb-2 text-danger">
-                                                <i class="fa fa-times-circle me-1"></i>
-                                                Información de Cancelación
+                                             class="ivh-alert-box ivh-alert-box--danger mt-3">
+                                            <h6>
+                                                <i class="fa fa-times-circle"></i>
+                                                Información de cancelación
                                             </h6>
-                                            <div class="row">
+
+                                            <div class="row g-3">
                                                 <div class="col-md-4">
-                                                    <small class="text-muted d-block">Tipo:</small>
+                                                    <span>Tipo</span>
                                                     <strong t-esc="reservation.cancel_info.tipo_cancelacion"></strong>
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <small class="text-muted d-block">Cancelado por:</small>
+                                                    <span>Cancelado por</span>
                                                     <strong t-esc="reservation.cancel_info.cancelado_por"></strong>
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <small class="text-muted d-block">Fecha:</small>
+                                                    <span>Fecha</span>
                                                     <strong t-esc="reservation.cancel_info.fecha_cancelacion"></strong>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <!-- Orden de Hold relacionada -->
-                                        <div t-if="reservation.hold_order_name" class="alert alert-info bg-info bg-opacity-10 border-info mt-3 mb-3">
-                                            <h6 class="mb-2 text-info">
-                                                <i class="fa fa-link me-1"></i>
-                                                Orden de Reserva Vinculada
+                                        <div t-if="reservation.hold_order_name" class="ivh-alert-box ivh-alert-box--link mt-3">
+                                            <h6>
+                                                <i class="fa fa-link"></i>
+                                                Orden de reserva vinculada
                                             </h6>
-                                            <div class="row">
+
+                                            <div class="row g-3">
                                                 <div class="col-md-4">
-                                                    <small class="text-muted d-block">Orden:</small>
+                                                    <span>Orden</span>
                                                     <strong t-esc="reservation.hold_order_name"></strong>
                                                 </div>
                                                 <div class="col-md-4" t-if="reservation.hold_order_state">
-                                                    <small class="text-muted d-block">Estado:</small>
+                                                    <span>Estado</span>
                                                     <strong t-esc="reservation.hold_order_state"></strong>
                                                 </div>
                                                 <div class="col-md-4" t-if="reservation.hold_order_sale">
-                                                    <small class="text-muted d-block">Orden de Venta:</small>
+                                                    <span>Orden de venta</span>
                                                     <strong t-esc="reservation.hold_order_sale"></strong>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <!-- Notas -->
-                                        <div t-if="reservation.notas" class="mt-2 p-3 bg-light rounded border">
-                                            <h6 class="text-muted mb-1"><i class="fa fa-sticky-note-o me-1"></i> Notas</h6>
-                                            <p class="mb-0" style="white-space: pre-line;" t-esc="reservation.notas"></p>
+                                        <div t-if="reservation.notas" class="ivh-note-box mt-3">
+                                            <h6>
+                                                <i class="fa fa-sticky-note-o"></i>
+                                                Notas
+                                            </h6>
+                                            <p t-esc="reservation.notas"></p>
                                         </div>
                                     </div>
                                 </div>
@@ -567,18 +628,19 @@
                         </t>
                     </div>
 
-                    <!-- PESTAÑA: ENTREGAS -->
+                    <!-- PESTAÑA ENTREGAS -->
                     <div t-if="isActiveTab('deliveries')" class="tab-pane fade show active">
                         <t t-if="history.deliveries.length === 0">
-                            <div class="text-center py-5">
-                                <i class="fa fa-truck" style="font-size: 64px; color: #ccc;"></i>
-                                <p class="text-muted mt-3">No hay entregas registradas</p>
+                            <div class="ivh-empty-state">
+                                <i class="fa fa-truck"></i>
+                                <p>No hay entregas registradas</p>
                             </div>
                         </t>
+
                         <t t-else="">
-                            <div class="table-responsive">
-                                <table class="table table-hover border">
-                                    <thead class="table-light">
+                            <div class="ivh-table-wrap">
+                                <table class="ivh-table">
+                                    <thead>
                                         <tr>
                                             <th>Referencia</th>
                                             <th>Cliente</th>
@@ -598,7 +660,9 @@
                                                 <td><small t-esc="delivery.fecha_efectiva"></small></td>
                                                 <td class="text-end"><strong t-esc="formatNumber(delivery.cantidad)"></strong></td>
                                                 <td><small t-esc="delivery.origen"></small></td>
-                                                <td><span class="badge bg-secondary" t-esc="delivery.estado"></span></td>
+                                                <td>
+                                                    <span class="ivh-soft-badge ivh-soft-badge--neutral" t-esc="delivery.estado"></span>
+                                                </td>
                                             </tr>
                                         </t>
                                     </tbody>
@@ -607,19 +671,19 @@
                         </t>
                     </div>
 
-                    <!-- PESTAÑA NUEVA: LOG COMBINADO GENERAL -->
+                    <!-- PESTAÑA LOG GENERAL -->
                     <div t-if="isActiveTab('log')" class="tab-pane fade show active">
                         <t t-if="!history.general_logs or history.general_logs.length === 0">
-                            <div class="text-center py-5">
-                                <i class="fa fa-list-alt" style="font-size: 64px; color: #ccc;"></i>
-                                <p class="text-muted mt-3">No hay registros en el log general para este lote.</p>
+                            <div class="ivh-empty-state">
+                                <i class="fa fa-list-alt"></i>
+                                <p>No hay registros en el log general para este lote.</p>
                             </div>
                         </t>
+
                         <t t-else="">
-                            <div class="table-responsive">
-                                <!-- Estilo minimalista, tabla limpia con bordes sutiles -->
-                                <table class="table table-sm table-striped border mb-0" style="font-size: 13px;">
-                                    <thead class="table-light text-muted">
+                            <div class="ivh-table-wrap">
+                                <table class="ivh-table ivh-table--compact">
+                                    <thead>
                                         <tr>
                                             <th style="width: 15%">Fecha</th>
                                             <th style="width: 15%">Usuario</th>
@@ -631,9 +695,9 @@
                                         <t t-foreach="history.general_logs" t-as="log" t-key="log_index">
                                             <tr>
                                                 <td class="text-nowrap"><small t-esc="log.fecha"></small></td>
-                                                <td><small class="fw-bold text-secondary" t-esc="log.usuario"></small></td>
+                                                <td><strong t-esc="log.usuario"></strong></td>
                                                 <td>
-                                                    <span class="badge bg-light text-dark border"><t t-esc="log.origen"/></span>
+                                                    <span class="ivh-soft-badge ivh-soft-badge--neutral" t-esc="log.origen"></span>
                                                 </td>
                                                 <td>
                                                     <span t-esc="log.descripcion"></span>
@@ -650,12 +714,12 @@
             </div>
 
             <t t-set-slot="footer">
-                <button class="btn btn-secondary btn-lg" t-on-click="props.close">
-                    <i class="fa fa-times me-2"></i>
+                <button class="btn ivh-footer-close-btn" t-on-click="props.close">
+                    <i class="fa fa-times"></i>
                     Cerrar
                 </button>
             </t>
         </Dialog>
     </t>
-    
+
 </templates>

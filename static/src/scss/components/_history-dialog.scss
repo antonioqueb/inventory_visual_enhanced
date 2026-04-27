@@ -1,533 +1,1141 @@
 // ==========================================
-// HISTORY DIALOG - Paleta Odoo Brand (Fondo Blanco)
+// HISTORY DIALOG - Tema Maderero Cálido Claro
+// inventory_visual_enhanced
 // ==========================================
 
-$brand-primary: #714B67;
-$brand-gray: #8F8F8F;
-$brand-secondary: #017E84;
+// Paleta principal
+$ivh-nogal: #4A2A18;
+$ivh-nogal-dark: #2F1B10;
+$ivh-cedro: #7A4424;
+$ivh-cobre: #A76735;
+$ivh-caramelo: #C58A4A;
+$ivh-miel: #E4B66A;
+$ivh-roble: #F1D6AA;
+$ivh-roble-light: #F9E8CC;
+$ivh-crema: #FFFDF7;
+$ivh-crema-alt: #FFF8EC;
+$ivh-pergamino: #FCF0DC;
+$ivh-pergamino-strong: #F8E7CB;
+$ivh-arena: #E9CDA5;
+$ivh-corteza: #6A4A32;
+$ivh-carbon: #2A1A12;
+$ivh-muted: #92735A;
+$ivh-line: #EBD5B5;
+$ivh-salvia: #61724C;
+$ivh-salvia-dark: #415136;
+$ivh-salvia-light: #EEF4E7;
+$ivh-redwood: #9A4A32;
+$ivh-ambar: #C98228;
 
-.o_history_dialog {
-  background: #FFFFFF;
+// Sombras
+$ivh-shadow-soft: 0 14px 38px rgba($ivh-nogal-dark, 0.10);
+$ivh-shadow-card: 0 10px 26px rgba($ivh-nogal-dark, 0.08);
+$ivh-shadow-hover: 0 14px 32px rgba($ivh-cobre, 0.14);
 
-  // === HEADER PRINCIPAL ===
-  .alert-light {
-    background: #FFFFFF !important;
-    border-color: $brand-primary !important;
-    border-left-width: 5px !important;
-    
-    h5 {
-      color: $brand-primary !important;
-      
-      .fa-cube {
-        color: $brand-secondary !important;
-      }
-    }
-    
-    .text-muted {
-      color: $brand-gray !important;
-      
-      strong {
-        color: $brand-primary;
-      }
-    }
-    
-    // Badge de días en inventario
-    .badge.bg-light {
-      background: #FFFFFF !important;
-      border: 2px solid $brand-primary !important;
-      color: $brand-primary !important;
-      
-      .fa-calendar {
-        color: $brand-secondary;
-      }
-    }
-    
-    // Badge de estado - FONDO OSCURO = TEXTO BLANCO
-    .badge.bg-secondary {
-      background: $brand-primary !important;
-      color: #FFFFFF !important;
-      border: none;
-    }
+// ==========================================
+// CONTENEDOR MODAL NATIVO
+// ==========================================
+
+.modal-content:has(.o_history_dialog) {
+  border: 0 !important;
+  border-radius: 30px !important;
+  overflow: hidden !important;
+  background: $ivh-crema !important;
+  box-shadow:
+    0 28px 80px rgba($ivh-nogal-dark, 0.24),
+    0 10px 28px rgba($ivh-cobre, 0.12) !important;
+
+  .modal-header {
+    display: none !important;
   }
 
-  // === NAVEGACIÓN POR PESTAÑAS ===
-  .nav-tabs {
-    background: #FFFFFF;
-    border-bottom: 2px solid rgba($brand-primary, 0.2);
-    gap: 2px; // Espacio reducido entre pestañas
-    flex-wrap: nowrap; // Forzar a una sola línea
-    overflow-x: auto; // Permitir scroll si la pantalla es pequeña
-    
-    // Ocultar barra de scroll para estética limpia
-    scrollbar-width: none;
-    &::-webkit-scrollbar {
-      display: none;
-    }
-    
-    .nav-item {
-      .nav-link {
-        color: $brand-gray;
-        border: none;
-        border-radius: 8px 8px 0 0;
-        padding: 8px 12px; // Padding más compacto
-        font-size: 13.5px; // Fuente ligeramente menor para ganar espacio
-        font-weight: 600;
-        white-space: nowrap; // Evitar que el texto haga salto de línea interno
-        transition: all 0.2s ease;
-        background: #FFFFFF;
-        
-        i {
-          color: $brand-gray;
-          margin-right: 6px !important; // Ajuste fino del icono
-        }
-        
-        .badge {
-          background: rgba($brand-gray, 0.15) !important;
-          color: $brand-gray !important;
-          padding: 4px 6px;
-          font-size: 11px;
-          margin-left: 6px !important; // Ajuste fino del badge
-        }
-        
-        &:hover {
-          background: rgba($brand-primary, 0.05);
-          color: $brand-primary;
-          
-          i {
-            color: $brand-primary;
-          }
-        }
-        
-        // TAB ACTIVO - FONDO OSCURO = TEXTO BLANCO
-        &.active {
-          background: $brand-primary;
-          color: #FFFFFF;
-          
-          i {
-            color: #FFFFFF;
-          }
-          
-          .badge {
-            background: #FFFFFF !important;
-            color: $brand-primary !important;
-          }
-        }
-      }
-    }
+  .modal-body {
+    padding: 0 !important;
+    background:
+      radial-gradient(circle at 12% 0%, rgba($ivh-miel, 0.18), transparent 30%),
+      radial-gradient(circle at 92% 8%, rgba($ivh-roble, 0.32), transparent 28%),
+      linear-gradient(180deg, #FFFFFF 0%, $ivh-crema 42%, $ivh-crema-alt 100%) !important;
   }
 
-  // === CONTENIDO DE PESTAÑAS ===
-  .tab-content {
-    background: #FFFFFF;
-    padding: 16px 0;
-    
-    // Scrollbar
-    scrollbar-width: thin;
-    scrollbar-color: $brand-primary #FFFFFF;
-    
-    &::-webkit-scrollbar {
-      width: 8px;
-    }
-    
-    &::-webkit-scrollbar-track {
-      background: #F5F5F5;
-      border-radius: 4px;
-    }
-    
-    &::-webkit-scrollbar-thumb {
-      background: $brand-primary;
-      border-radius: 4px;
-      
-      &:hover {
-        background: $brand-secondary;
-      }
-    }
-  }
-
-  // === TARJETAS GENERALES ===
-  .card {
-    background: #FFFFFF;
-    border: 1px solid rgba($brand-gray, 0.25) !important;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    transition: all 0.2s ease;
-    
-    &:hover {
-      box-shadow: 0 4px 12px rgba($brand-primary, 0.1);
-      border-color: $brand-primary !important;
-    }
-    
-    // CARD HEADER - FONDO OSCURO = TEXTO BLANCO
-    .card-header {
-      background: $brand-primary !important;
-      border-bottom: none !important;
-      
-      h6 {
-        color: #FFFFFF !important;
-        font-weight: 700;
-        
-        i {
-          color: #FFFFFF !important;
-        }
-      }
-      
-      .badge.bg-secondary {
-        background: #FFFFFF !important;
-        color: $brand-primary !important;
-      }
-    }
-    
-    .card-body {
-      background: #FFFFFF;
-      
-      // Tablas dentro de cards
-      .table {
-        margin-bottom: 0;
-        background: #FFFFFF;
-        
-        tr {
-          border-bottom: 1px solid rgba($brand-gray, 0.15);
-          
-          &:last-child {
-            border-bottom: none;
-          }
-          
-          td {
-            padding: 10px 8px;
-            background: #FFFFFF;
-            
-            &.fw-bold {
-              color: $brand-primary;
-            }
-          }
-        }
-        
-        // Badges en tablas - FONDO OSCURO = TEXTO BLANCO
-        .badge.bg-secondary {
-          background: $brand-secondary !important;
-          color: #FFFFFF !important;
-        }
-        
-        .badge.bg-light {
-          background: #FFFFFF !important;
-          color: $brand-primary !important;
-          border: 1px solid $brand-primary;
-        }
-      }
-    }
-  }
-
-  // === ESTADÍSTICAS (Cajas numéricas) ===
-  .row.g-3.text-center {
-    .col-md-2 {
-      > div {
-        background: #FFFFFF !important;
-        border: 2px solid $brand-primary !important;
-        border-radius: 10px;
-        transition: all 0.2s ease;
-        
-        // HOVER - FONDO OSCURO = TEXTO BLANCO
-        &:hover {
-          background: $brand-primary !important;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba($brand-primary, 0.25);
-          
-          h3 {
-            color: #FFFFFF !important;
-          }
-          
-          small {
-            color: #FFFFFF !important;
-            opacity: 0.9;
-          }
-        }
-        
-        h3 {
-          color: $brand-primary !important;
-          font-weight: 800;
-        }
-        
-        small {
-          color: $brand-secondary !important;
-          font-weight: 600;
-        }
-      }
-    }
-  }
-
-  // === TABLAS (Movimientos, Entregas) ===
-  .table-responsive {
-    .table {
-      background: #FFFFFF;
-      border: 1px solid rgba($brand-gray, 0.2);
-      border-radius: 8px;
-      overflow: hidden;
-      
-      // THEAD - FONDO OSCURO = TEXTO BLANCO
-      thead {
-        background: $brand-secondary !important;
-        
-        th {
-          color: #FFFFFF !important;
-          font-weight: 700;
-          border-bottom: none;
-          padding: 12px 10px;
-        }
-      }
-      
-      tbody {
-        tr {
-          transition: all 0.15s ease;
-          background: #FFFFFF;
-          
-          &:nth-child(odd) {
-            background: #FAFAFA;
-          }
-          
-          &:hover {
-            background: rgba($brand-primary, 0.05);
-          }
-          
-          td {
-            padding: 10px;
-            vertical-align: middle;
-            border-bottom: 1px solid rgba($brand-gray, 0.1);
-            
-            // Badges de tipo - FONDO OSCURO = TEXTO BLANCO
-            .badge.bg-secondary {
-              background: $brand-primary !important;
-              color: #FFFFFF !important;
-              padding: 4px 8px;
-              
-              i {
-                margin-right: 4px;
-                color: #FFFFFF;
-              }
-            }
-            
-            strong {
-              color: $brand-primary;
-            }
-            
-            small {
-              color: $brand-gray;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // === ESTADOS VACÍOS ===
-  .text-center.py-5 {
-    padding: 48px 24px !important;
-    background: #FFFFFF;
-    border-radius: 12px;
-    border: 2px dashed rgba($brand-gray, 0.3);
-    
-    i {
-      color: $brand-gray !important;
-      opacity: 0.5;
-    }
-    
-    p {
-      color: $brand-gray !important;
-      font-weight: 500;
-    }
-  }
-
-  // === CARDS DE COMPRAS/VENTAS/RESERVAS ===
-  .card.mb-3 {
-    .card-body {
-      background: #FFFFFF;
-      
-      .row {
-        .col-md-6 {
-          p {
-            strong {
-              color: $brand-secondary;
-            }
-          }
-          
-          &.text-end {
-            p {
-              strong {
-                color: $brand-primary;
-              }
-              
-              // Total destacado - FONDO OSCURO = TEXTO BLANCO
-              .fs-5.fw-bold {
-                background: $brand-primary !important;
-                color: #FFFFFF !important;
-                padding: 6px 14px;
-                border-radius: 6px;
-                display: inline-block;
-              }
-            }
-          }
-        }
-      }
-      
-      // Notas con separador
-      hr {
-        border-color: rgba($brand-gray, 0.2);
-      }
-    }
+  .modal-footer {
+    background:
+      linear-gradient(180deg, rgba(#FFFFFF, 0.92), rgba($ivh-crema-alt, 0.95)) !important;
+    border-top: 1px solid rgba($ivh-cedro, 0.14) !important;
+    padding: 16px 24px !important;
   }
 }
 
-// === FOOTER DEL DIÁLOGO ===
-.o_history_dialog + .modal-footer,
-.modal-content:has(.o_history_dialog) .modal-footer {
-  background: #FFFFFF;
-  border-top: 1px solid rgba($brand-gray, 0.2);
-  padding: 16px 24px;
-  
-  // BOTÓN - FONDO OSCURO = TEXTO BLANCO
-  .btn-secondary {
-    background: $brand-primary !important;
-    border: none !important;
-    color: #FFFFFF !important;
-    font-weight: 600;
-    padding: 10px 24px;
-    box-shadow: 0 2px 8px rgba($brand-primary, 0.3);
-    transition: all 0.2s ease;
-    
-    &:hover {
-      background: $brand-secondary !important;
-      box-shadow: 0 4px 12px rgba($brand-secondary, 0.4);
-      transform: translateY(-1px);
+.ivh-history-dialog-shell {
+  height: 100%;
+}
+
+// ==========================================
+// DIALOG BASE
+// ==========================================
+
+.o_history_dialog {
+  position: relative;
+  min-height: 0;
+  background:
+    radial-gradient(circle at 8% 0%, rgba($ivh-miel, 0.12), transparent 34%),
+    radial-gradient(circle at 94% 16%, rgba($ivh-roble, 0.24), transparent 34%),
+    linear-gradient(180deg, #FFFFFF 0%, $ivh-crema 45%, $ivh-crema-alt 100%);
+  color: $ivh-carbon;
+  isolation: isolate;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.12;
+    background-image:
+      repeating-linear-gradient(
+        8deg,
+        rgba($ivh-cedro, 0.09) 0,
+        rgba($ivh-cedro, 0.09) 1px,
+        transparent 1px,
+        transparent 13px
+      );
+    mix-blend-mode: multiply;
+    z-index: -1;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba($ivh-cedro, 0.55) rgba($ivh-roble-light, 0.65);
+  }
+
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: rgba($ivh-roble-light, 0.65);
+    border-radius: 999px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, $ivh-cobre, $ivh-cedro);
+    border-radius: 999px;
+  }
+}
+
+// ==========================================
+// CLOSE BUTTON
+// ==========================================
+
+.ivh-dialog-close {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  z-index: 20;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba($ivh-cedro, 0.16);
+  border-radius: 999px;
+  background: rgba($ivh-crema, 0.92);
+  color: $ivh-cedro;
+  box-shadow: 0 8px 20px rgba($ivh-nogal-dark, 0.10);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    background: $ivh-pergamino;
+    color: $ivh-nogal;
+    border-color: rgba($ivh-cobre, 0.30);
+    box-shadow: 0 10px 24px rgba($ivh-cobre, 0.16);
+  }
+
+  i {
+    font-size: 15px;
+  }
+}
+
+// ==========================================
+// HERO
+// ==========================================
+
+.ivh-history-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding: 28px 76px 24px 28px;
+  border-bottom: 1px solid rgba($ivh-cedro, 0.14);
+  background:
+    radial-gradient(circle at 7% 8%, rgba($ivh-miel, 0.28), transparent 28%),
+    radial-gradient(circle at 78% 4%, rgba($ivh-roble, 0.38), transparent 32%),
+    linear-gradient(135deg, #FFFFFF 0%, $ivh-crema 42%, $ivh-roble-light 100%);
+
+  &__icon {
+    width: 82px;
+    height: 82px;
+    border-radius: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      linear-gradient(135deg, rgba($ivh-miel, 0.92), rgba($ivh-roble, 0.78));
+    border: 1px solid rgba($ivh-cobre, 0.22);
+    box-shadow:
+      inset 0 1px 0 rgba(#FFFFFF, 0.75),
+      0 16px 32px rgba($ivh-cobre, 0.14);
+
+    i {
+      font-size: 34px;
+      color: $ivh-nogal;
     }
-    
+  }
+
+  &__content {
+    min-width: 0;
+  }
+
+  &__eyebrow {
+    margin-bottom: 4px;
+    color: $ivh-cobre;
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  &__title {
+    margin: 0;
+    color: $ivh-nogal;
+    font-size: 32px;
+    line-height: 1.08;
+    font-weight: 950;
+    letter-spacing: -0.035em;
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    margin-top: 12px;
+    color: $ivh-muted;
+    font-size: 12.5px;
+
+    span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    i {
+      color: $ivh-cobre;
+    }
+
+    strong {
+      color: $ivh-corteza;
+      font-weight: 850;
+    }
+  }
+
+  &__badges {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 9px;
+  }
+}
+
+// ==========================================
+// BADGES / PILLS
+// ==========================================
+
+.ivh-soft-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: fit-content;
+  max-width: 100%;
+  padding: 7px 11px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.025em;
+  white-space: nowrap;
+  border: 1px solid rgba($ivh-cedro, 0.16);
+  background: $ivh-pergamino;
+  color: $ivh-corteza;
+
+  i {
+    font-size: 12px;
+  }
+
+  &--strong {
+    background: linear-gradient(135deg, $ivh-cedro, $ivh-nogal);
+    color: #FFFFFF;
+    border-color: transparent;
+    box-shadow: 0 8px 18px rgba($ivh-nogal, 0.16);
+
+    strong,
     i {
       color: #FFFFFF;
     }
   }
+
+  &--neutral {
+    background: rgba($ivh-roble-light, 0.72);
+    color: $ivh-corteza;
+    border-color: rgba($ivh-cedro, 0.14);
+
+    i {
+      color: $ivh-cobre;
+    }
+  }
+
+  &--success {
+    background: $ivh-salvia-light;
+    color: $ivh-salvia-dark;
+    border-color: rgba($ivh-salvia, 0.24);
+
+    i {
+      color: $ivh-salvia;
+    }
+  }
+
+  &--hold {
+    background: rgba($ivh-miel, 0.25);
+    color: $ivh-cedro;
+    border-color: rgba($ivh-ambar, 0.26);
+
+    i {
+      color: $ivh-ambar;
+    }
+  }
+
+  &--danger {
+    background: rgba($ivh-redwood, 0.10);
+    color: $ivh-redwood;
+    border-color: rgba($ivh-redwood, 0.24);
+
+    i {
+      color: $ivh-redwood;
+    }
+  }
 }
 
-// === PESTAÑA APARTADOS - CARDS CON ESTADO ===
-  .card {
-    // Headers con color de estado (override del header oscuro genérico)
-    .card-header.bg-warning.bg-opacity-25 {
-      background: rgba(#ffc107, 0.25) !important;
-      
-      h6, h6 i, small { color: $brand-primary !important; }
-      .badge.bg-warning { background: #ffc107 !important; color: #212529 !important; }
-      .badge.bg-light { background: #FFFFFF !important; color: $brand-primary !important; border: 1px solid $brand-primary; }
-    }
-    
-    .card-header.bg-danger.bg-opacity-10 {
-      background: rgba(#dc3545, 0.10) !important;
-      
-      h6, h6 i, small { color: #dc3545 !important; }
-      .badge.bg-danger { background: #dc3545 !important; color: #FFFFFF !important; }
-      .badge.bg-light { background: #FFFFFF !important; color: #dc3545 !important; border: 1px solid #dc3545; }
-    }
-    
-    .card-header.bg-secondary.bg-opacity-10 {
-      background: rgba($brand-gray, 0.10) !important;
-      
-      h6, h6 i, small { color: $brand-gray !important; }
-      .badge.bg-secondary { background: $brand-gray !important; color: #FFFFFF !important; }
-      .badge.bg-light { background: #FFFFFF !important; color: $brand-gray !important; border: 1px solid $brand-gray; }
-    }
+.ivh-number-pill {
+  display: inline-flex;
+  justify-content: center;
+  min-width: 92px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba($ivh-roble-light, 0.76);
+  border: 1px solid rgba($ivh-cedro, 0.14);
+  color: $ivh-corteza;
+  font-weight: 900;
+
+  &--hold {
+    background: rgba($ivh-miel, 0.24);
+    color: $ivh-cedro;
+    border-color: rgba($ivh-ambar, 0.26);
   }
 
-  // === SECCIONES INTERNAS DE APARTADOS ===
-  .card-body {
-    // Títulos de sección (Cliente, Vendedor, Fechas, etc.)
-    h6.text-muted {
-      color: $brand-secondary !important;
-      font-weight: 700;
+  &--success {
+    background: $ivh-salvia-light;
+    color: $ivh-salvia-dark;
+    border-color: rgba($ivh-salvia, 0.24);
+  }
+}
+
+// ==========================================
+// TABS
+// ==========================================
+
+.ivh-history-tabs {
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 14px 24px 0;
+  border-bottom: 1px solid rgba($ivh-cedro, 0.14) !important;
+  background: rgba($ivh-crema, 0.76);
+
+  .nav-item {
+    margin-bottom: 0;
+  }
+
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 40px;
+    padding: 8px 12px;
+    border: 1px solid rgba($ivh-cedro, 0.13) !important;
+    border-bottom: 0 !important;
+    border-radius: 16px 16px 0 0 !important;
+    background: rgba(#FFFFFF, 0.76) !important;
+    color: $ivh-muted !important;
+    font-size: 12.5px;
+    font-weight: 900;
+    white-space: nowrap;
+    transition: all 0.18s ease;
+
+    i {
+      color: $ivh-cobre;
       font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      
-      i { color: $brand-secondary !important; }
     }
-    
-    // Tablas internas de fechas y auditoría
-    .table-borderless {
-      td.text-muted { color: $brand-gray !important; }
-      td:not(.text-muted) { color: #212529; }
-      td.fw-bold { color: $brand-primary !important; }
+
+    &:hover {
+      transform: translateY(-1px);
+      background: $ivh-pergamino !important;
+      color: $ivh-nogal !important;
+      border-color: rgba($ivh-cobre, 0.22) !important;
     }
-    
-    // Alerta de cancelación
-    .alert-danger.bg-danger.bg-opacity-10 {
-      background: rgba(#dc3545, 0.08) !important;
-      border: 1px solid rgba(#dc3545, 0.3) !important;
-      
-      h6.text-danger { color: #dc3545 !important; }
-      .text-muted { color: $brand-gray !important; }
-      strong { color: #212529 !important; }
+
+    &.active {
+      background: linear-gradient(135deg, $ivh-cedro, $ivh-nogal) !important;
+      color: #FFFFFF !important;
+      border-color: transparent !important;
+      box-shadow: 0 10px 20px rgba($ivh-nogal, 0.14);
+
+      i {
+        color: #FFFFFF;
+      }
+
+      .ivh-tab-count {
+        background: #FFFFFF;
+        color: $ivh-nogal;
+        border-color: transparent;
+      }
     }
-    
-    // Alerta de orden vinculada
-    .alert-info.bg-info.bg-opacity-10 {
-      background: rgba($brand-secondary, 0.08) !important;
-      border: 1px solid rgba($brand-secondary, 0.3) !important;
-      
-      h6.text-info { color: $brand-secondary !important; }
-      .text-muted { color: $brand-gray !important; }
-      strong { color: #212529 !important; }
-    }
-    
-    // Bloque de notas
-    .bg-light.rounded.border {
-      background: #FAFAFA !important;
-      border: 1px solid rgba($brand-gray, 0.2) !important;
-      
-      h6 { color: $brand-secondary !important; }
-      p { color: #212529; }
+  }
+}
+
+.ivh-tab-count {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba($ivh-roble, 0.48);
+  border: 1px solid rgba($ivh-cedro, 0.12);
+  color: $ivh-corteza;
+  font-size: 10px;
+  font-weight: 950;
+}
+
+// ==========================================
+// CONTENT
+// ==========================================
+
+.ivh-history-content {
+  padding: 20px 24px 24px;
+  min-height: 0;
+  background:
+    linear-gradient(180deg, rgba(#FFFFFF, 0.82), rgba($ivh-crema-alt, 0.82));
+}
+
+// ==========================================
+// CARDS
+// ==========================================
+
+.ivh-card {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(#FFFFFF, 0.94), rgba($ivh-crema, 0.94));
+  border: 1px solid rgba($ivh-cedro, 0.13);
+  border-radius: 22px;
+  box-shadow: $ivh-shadow-card;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: $ivh-shadow-hover;
+    border-color: rgba($ivh-cobre, 0.28);
+  }
+
+  &--featured {
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 6px;
+      background: linear-gradient(180deg, $ivh-miel, $ivh-cobre, $ivh-cedro);
     }
   }
 
+  &__header {
+    min-height: 54px;
+    padding: 15px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    background:
+      linear-gradient(180deg, rgba($ivh-roble-light, 0.72), rgba($ivh-pergamino, 0.62));
+    border-bottom: 1px solid rgba($ivh-cedro, 0.12);
 
+    h6 {
+      margin: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: $ivh-nogal;
+      font-size: 14px;
+      font-weight: 950;
+      letter-spacing: -0.01em;
 
+      i {
+        color: $ivh-cobre;
+      }
 
-// === RESPONSIVE ===
+      small {
+        color: $ivh-muted;
+        font-weight: 800;
+      }
+    }
+  }
+
+  &__body {
+    padding: 18px;
+    background:
+      linear-gradient(180deg, rgba(#FFFFFF, 0.82), rgba($ivh-crema, 0.88));
+  }
+}
+
+.ivh-record-card {
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    background: linear-gradient(180deg, $ivh-miel, $ivh-cobre);
+  }
+
+  &--sale::before {
+    background: linear-gradient(180deg, $ivh-salvia, $ivh-salvia-dark);
+  }
+
+  &--hold::before,
+  &--active::before {
+    background: linear-gradient(180deg, $ivh-miel, $ivh-ambar, $ivh-cobre);
+  }
+
+  &--cancelled::before {
+    background: linear-gradient(180deg, rgba($ivh-redwood, 0.85), $ivh-redwood);
+  }
+
+  &--expired::before {
+    background: linear-gradient(180deg, $ivh-arena, $ivh-corteza);
+  }
+}
+
+.ivh-header-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+// ==========================================
+// INFO TABLES
+// ==========================================
+
+.ivh-info-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+
+  tr {
+    &:not(:last-child) td {
+      border-bottom: 1px solid rgba($ivh-cedro, 0.10);
+    }
+  }
+
+  td {
+    padding: 11px 8px;
+    color: $ivh-carbon;
+    vertical-align: middle;
+    font-size: 13px;
+
+    &:first-child {
+      width: 42%;
+      color: $ivh-muted;
+      font-size: 10.5px;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+    }
+
+    &:last-child {
+      color: $ivh-carbon;
+      font-weight: 750;
+    }
+
+    strong {
+      color: $ivh-nogal;
+      font-weight: 950;
+    }
+  }
+
+  &--compact {
+    td {
+      padding: 8px 6px;
+
+      &:first-child {
+        width: 38%;
+      }
+    }
+  }
+}
+
+// ==========================================
+// STATS
+// ==========================================
+
+.ivh-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ivh-stat-card {
+  min-height: 104px;
+  padding: 16px 12px;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba($ivh-miel, 0.20), transparent 42%),
+    linear-gradient(180deg, rgba(#FFFFFF, 0.94), rgba($ivh-roble-light, 0.52));
+  border: 1px solid rgba($ivh-cedro, 0.14);
+  box-shadow: inset 0 1px 0 rgba(#FFFFFF, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    background:
+      radial-gradient(circle at 50% 0%, rgba($ivh-miel, 0.26), transparent 44%),
+      linear-gradient(180deg, rgba($ivh-pergamino, 0.92), rgba($ivh-roble-light, 0.72));
+    border-color: rgba($ivh-cobre, 0.28);
+    box-shadow: 0 10px 22px rgba($ivh-cobre, 0.12);
+  }
+
+  h3 {
+    margin: 0 0 4px;
+    color: $ivh-nogal;
+    font-size: 28px;
+    line-height: 1;
+    font-weight: 950;
+    letter-spacing: -0.04em;
+  }
+
+  span {
+    color: $ivh-muted;
+    font-size: 10.5px;
+    font-weight: 950;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+  }
+}
+
+// ==========================================
+// FIELDS / TOTALS
+// ==========================================
+
+.ivh-field-block {
+  margin-bottom: 12px;
+
+  span {
+    display: block;
+    margin-bottom: 3px;
+    color: $ivh-muted;
+    font-size: 10.5px;
+    font-weight: 950;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+  }
+
+  strong {
+    color: $ivh-carbon;
+    font-size: 13.5px;
+    font-weight: 850;
+  }
+}
+
+.ivh-total-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, $ivh-cedro, $ivh-nogal);
+  color: #FFFFFF;
+  box-shadow: 0 10px 22px rgba($ivh-nogal, 0.16);
+
+  span {
+    color: rgba(#FFFFFF, 0.82);
+    font-size: 10px;
+    font-weight: 950;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+  }
+
+  strong {
+    color: #FFFFFF;
+    font-size: 15px;
+    font-weight: 950;
+  }
+
+  &--success {
+    background: linear-gradient(135deg, $ivh-salvia, $ivh-salvia-dark);
+    box-shadow: 0 10px 22px rgba($ivh-salvia-dark, 0.14);
+  }
+}
+
+// ==========================================
+// SECTION VALUES
+// ==========================================
+
+.ivh-section-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+  color: $ivh-cobre;
+  font-size: 10.5px;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+
+  i {
+    color: $ivh-cobre;
+  }
+}
+
+.ivh-main-value {
+  margin: 0 0 5px;
+  color: $ivh-carbon;
+  font-size: 13.5px;
+  font-weight: 850;
+}
+
+.ivh-muted-value {
+  margin: 0 0 5px;
+  color: $ivh-muted;
+  font-size: 12px;
+
+  i {
+    color: $ivh-cobre;
+    margin-right: 5px;
+  }
+}
+
+// ==========================================
+// ALERT / NOTE BOXES
+// ==========================================
+
+.ivh-alert-box {
+  padding: 15px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba($ivh-cedro, 0.14);
+  background: rgba($ivh-pergamino, 0.72);
+
+  h6 {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0 0 12px;
+    color: $ivh-nogal;
+    font-size: 12px;
+    font-weight: 950;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+
+    i {
+      color: $ivh-cobre;
+    }
+  }
+
+  span {
+    display: block;
+    margin-bottom: 3px;
+    color: $ivh-muted;
+    font-size: 10.5px;
+    font-weight: 950;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+  }
+
+  strong {
+    color: $ivh-carbon;
+    font-weight: 850;
+  }
+
+  &--danger {
+    background: rgba($ivh-redwood, 0.08);
+    border-color: rgba($ivh-redwood, 0.22);
+
+    h6,
+    h6 i {
+      color: $ivh-redwood;
+    }
+  }
+
+  &--link {
+    background: rgba($ivh-roble-light, 0.68);
+    border-color: rgba($ivh-cobre, 0.20);
+
+    h6,
+    h6 i {
+      color: $ivh-cobre;
+    }
+  }
+}
+
+.ivh-note-box {
+  padding: 15px 16px;
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba($ivh-pergamino, 0.88), rgba($ivh-crema-alt, 0.92));
+  border: 1px solid rgba($ivh-cedro, 0.16);
+
+  h6 {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0 0 8px;
+    color: $ivh-cobre;
+    font-size: 11px;
+    font-weight: 950;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+  }
+
+  p {
+    margin: 0;
+    color: $ivh-carbon;
+    font-size: 13px;
+    line-height: 1.55;
+    white-space: pre-line;
+  }
+}
+
+// ==========================================
+// TABLES
+// ==========================================
+
+.ivh-table-wrap {
+  overflow: auto;
+  border-radius: 20px;
+  border: 1px solid rgba($ivh-cedro, 0.14);
+  background: rgba(#FFFFFF, 0.90);
+  box-shadow: $ivh-shadow-card;
+}
+
+.ivh-table {
+  width: 100%;
+  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: transparent;
+  color: $ivh-carbon;
+  font-size: 13px;
+
+  thead {
+    background:
+      linear-gradient(180deg, rgba($ivh-pergamino, 0.96), rgba($ivh-roble-light, 0.84));
+
+    th {
+      padding: 13px 12px;
+      color: $ivh-corteza;
+      font-size: 10.5px;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+      border-bottom: 1px solid rgba($ivh-cedro, 0.14);
+      white-space: nowrap;
+    }
+  }
+
+  tbody {
+    tr {
+      background: rgba(#FFFFFF, 0.78);
+      transition: background 0.15s ease;
+
+      &:nth-child(even) {
+        background: rgba($ivh-crema-alt, 0.62);
+      }
+
+      &:hover {
+        background: rgba($ivh-miel, 0.14);
+      }
+
+      &:not(:last-child) td {
+        border-bottom: 1px solid rgba($ivh-cedro, 0.09);
+      }
+    }
+
+    td {
+      padding: 12px;
+      color: $ivh-carbon;
+      vertical-align: middle;
+
+      strong {
+        color: $ivh-nogal;
+        font-weight: 900;
+      }
+
+      small {
+        color: $ivh-muted;
+        font-weight: 650;
+      }
+    }
+  }
+
+  &--compact {
+    font-size: 12.5px;
+
+    thead th {
+      padding: 11px 10px;
+    }
+
+    tbody td {
+      padding: 10px;
+    }
+  }
+}
+
+// ==========================================
+// EMPTY STATE
+// ==========================================
+
+.ivh-empty-state {
+  min-height: 280px;
+  padding: 54px 24px;
+  border-radius: 24px;
+  border: 2px dashed rgba($ivh-cedro, 0.20);
+  background:
+    radial-gradient(circle at 50% 0%, rgba($ivh-miel, 0.16), transparent 40%),
+    linear-gradient(180deg, rgba(#FFFFFF, 0.76), rgba($ivh-crema-alt, 0.82));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  i {
+    margin-bottom: 14px;
+    color: rgba($ivh-cobre, 0.45);
+    font-size: 58px;
+  }
+
+  p {
+    margin: 0;
+    color: $ivh-muted;
+    font-size: 13px;
+    font-weight: 800;
+  }
+}
+
+// ==========================================
+// FOOTER BUTTON
+// ==========================================
+
+.ivh-footer-close-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 10px 22px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, $ivh-cedro, $ivh-nogal) !important;
+  color: #FFFFFF !important;
+  font-size: 13px;
+  font-weight: 950 !important;
+  box-shadow: 0 10px 22px rgba($ivh-nogal, 0.18);
+  transition: all 0.18s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    background: linear-gradient(135deg, $ivh-cobre, $ivh-cedro) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 12px 28px rgba($ivh-cobre, 0.22);
+  }
+
+  i {
+    color: #FFFFFF;
+  }
+}
+
+// ==========================================
+// OVERRIDES BOOTSTRAP HEREDADOS DENTRO DEL DIALOG
+// ==========================================
+
+.o_history_dialog {
+  .text-muted {
+    color: $ivh-muted !important;
+  }
+
+  .text-secondary {
+    color: $ivh-cobre !important;
+  }
+
+  .text-dark {
+    color: $ivh-carbon !important;
+  }
+
+  .bg-light {
+    background-color: $ivh-pergamino !important;
+  }
+
+  .bg-secondary {
+    background-color: $ivh-cedro !important;
+    color: #FFFFFF !important;
+  }
+
+  .bg-warning {
+    background-color: rgba($ivh-miel, 0.28) !important;
+    color: $ivh-cedro !important;
+  }
+
+  .bg-danger {
+    background-color: $ivh-redwood !important;
+    color: #FFFFFF !important;
+  }
+
+  .border,
+  .border-bottom,
+  .border-start {
+    border-color: rgba($ivh-cedro, 0.14) !important;
+  }
+
+  .badge {
+    border-radius: 999px;
+    font-weight: 900;
+  }
+}
+
+// ==========================================
+// RESPONSIVE
+// ==========================================
+
+@media (max-width: 992px) {
+  .ivh-history-hero {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding-right: 70px;
+
+    &__badges {
+      grid-column: 1 / -1;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-start;
+    }
+  }
+
+  .ivh-stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
-  .o_history_dialog {
-    .nav-tabs {
-      // En móvil ya forzábamos el no-wrap, pero ahora también está forzado en escritorio.
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      padding-bottom: 8px;
-      background: #FFFFFF;
-      
-      .nav-link {
-        padding: 8px 12px;
-        font-size: 12px;
-        white-space: nowrap;
-        
-        i {
-          margin-right: 4px !important;
-        }
-        
-        .badge {
-          display: none;
-        }
+  .modal-content:has(.o_history_dialog) {
+    border-radius: 22px !important;
+  }
+
+  .ivh-dialog-close {
+    top: 14px;
+    right: 14px;
+  }
+
+  .ivh-history-hero {
+    grid-template-columns: 1fr;
+    padding: 24px 62px 20px 20px;
+
+    &__icon {
+      width: 66px;
+      height: 66px;
+      border-radius: 22px;
+
+      i {
+        font-size: 28px;
       }
     }
-    
-    .row.g-3.text-center {
-      .col-md-2 {
-        flex: 0 0 50%;
-        max-width: 50%;
-      }
+
+    &__title {
+      font-size: 25px;
     }
-    
-    // Cards en móvil
-    .card {
-      .card-header {
-        padding: 10px 12px;
-        
-        h6 {
-          font-size: 14px;
-        }
-      }
+
+    &__meta {
+      flex-direction: column;
+      gap: 8px;
     }
+  }
+
+  .ivh-history-tabs {
+    padding: 12px 16px 0;
+
+    .nav-link {
+      min-height: 38px;
+      padding: 8px 11px;
+      font-size: 12px;
+    }
+
+    .ivh-tab-count {
+      display: none;
+    }
+  }
+
+  .ivh-history-content {
+    padding: 16px;
+  }
+
+  .ivh-card {
+    border-radius: 18px;
+
+    &__header {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+
+  .ivh-header-badges {
+    justify-content: flex-start;
+  }
+
+  .ivh-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ivh-table {
+    min-width: 760px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ivh-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ivh-total-pill {
+    width: 100%;
+    justify-content: space-between;
   }
 }
