@@ -1,5 +1,6 @@
 // ============================================================
 // HOLD INFO DIALOG — Horizontal Wood Warm Light Theme
+// Más espacio para información del lote
 // ============================================================
 
 $wood-walnut: #4A2A18;
@@ -215,7 +216,7 @@ $wood-amber: #C98228;
     }
 
     p {
-      max-width: 720px;
+      max-width: 760px;
       color: $wood-bark;
       margin: 0;
       font-size: 13px;
@@ -250,7 +251,7 @@ $wood-amber: #C98228;
 
 .hold-info-summary {
   display: grid;
-  grid-template-columns: 1.4fr .8fr .8fr .8fr;
+  grid-template-columns: minmax(280px, 1.5fr) minmax(130px, .6fr) minmax(130px, .6fr) minmax(130px, .6fr);
   gap: 12px;
   padding: 18px 28px 8px;
 }
@@ -281,9 +282,14 @@ $wood-amber: #C98228;
     color: $wood-walnut;
     font-size: 16px;
     font-weight: 950;
-    line-height: 1.2;
+    line-height: 1.25;
     letter-spacing: -.02em;
-    word-break: break-word;
+    word-break: normal;
+    overflow-wrap: anywhere;
+  }
+
+  &--product strong {
+    font-size: 15px;
   }
 
   &--status {
@@ -353,7 +359,7 @@ $wood-amber: #C98228;
 
 .hold-info-main {
   display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(340px, .95fr);
+  grid-template-columns: minmax(330px, .82fr) minmax(0, 1.55fr);
   gap: 16px;
   padding: 18px 28px 24px;
 
@@ -394,6 +400,7 @@ $wood-amber: #C98228;
     i {
       color: $wood-copper;
       font-size: 15px;
+      flex: 0 0 auto;
     }
 
     span {
@@ -402,6 +409,7 @@ $wood-amber: #C98228;
       font-weight: 950;
       text-transform: uppercase;
       letter-spacing: .08em;
+      line-height: 1.3;
     }
   }
 }
@@ -412,8 +420,8 @@ $wood-amber: #C98228;
 
 .hold-info-data-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: 1fr;
+  gap: 12px;
   padding: 16px;
 }
 
@@ -443,8 +451,9 @@ $wood-amber: #C98228;
     font-size: 14px;
     font-weight: 900;
     line-height: 1.45;
-    word-break: break-word;
+    word-break: normal;
     overflow-wrap: anywhere;
+    min-width: 0;
 
     i {
       color: $wood-copper;
@@ -454,16 +463,29 @@ $wood-amber: #C98228;
   }
 }
 
-// ============================================================
-// Right side stack
-// ============================================================
-
-.hold-info-side-stack {
+.hold-info-date-grid {
   display: grid;
+  grid-template-columns: 1fr;
   gap: 12px;
   padding: 16px;
 }
 
+// ============================================================
+// Lot information expanded
+// ============================================================
+
+.hold-info-lot-card {
+  min-height: 100%;
+}
+
+.hold-info-lot-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
+  gap: 12px;
+  padding: 16px;
+}
+
+.hold-info-lot-item,
 .hold-info-side-item {
   min-width: 0;
   padding: 14px;
@@ -483,38 +505,33 @@ $wood-amber: #C98228;
   }
 
   strong {
-    display: block;
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
     color: $wood-walnut;
     font-size: 14px;
     font-weight: 900;
     line-height: 1.45;
-    word-break: break-word;
+    word-break: normal;
     overflow-wrap: anywhere;
+    min-width: 0;
 
     i {
       color: $wood-copper;
-      margin-right: 6px;
+      margin-top: 2px;
+      flex: 0 0 auto;
+      width: 15px;
+      text-align: center;
     }
   }
 }
 
-// ============================================================
-// Notes
-// ============================================================
+.hold-info-lot-item--wide {
+  grid-column: span 2;
+}
 
-.hold-info-notes {
-  padding: 16px;
-
-  p {
-    white-space: pre-line;
-    color: $wood-bark;
-    line-height: 1.6;
-    margin: 0;
-    padding: 16px;
-    border-radius: 18px;
-    background: $wood-parchment;
-    border: 1px solid rgba($wood-cedar, .12);
-  }
+.hold-info-lot-item--full {
+  grid-column: 1 / -1;
 }
 
 // ============================================================
@@ -555,6 +572,10 @@ $wood-amber: #C98228;
 
   .hold-info-main {
     grid-template-columns: 1fr;
+  }
+
+  .hold-info-lot-grid {
+    grid-template-columns: repeat(2, minmax(160px, 1fr));
   }
 }
 
@@ -598,8 +619,13 @@ $wood-amber: #C98228;
     padding: 16px 18px 20px;
   }
 
-  .hold-info-data-grid {
+  .hold-info-lot-grid {
     grid-template-columns: 1fr;
+  }
+
+  .hold-info-lot-item--wide,
+  .hold-info-lot-item--full {
+    grid-column: auto;
   }
 }
 
@@ -613,6 +639,10 @@ $wood-amber: #C98228;
     right: 12px;
     width: 34px;
     height: 34px;
+  }
+
+  .hold-info-status {
+    flex-direction: column;
   }
 
   .hold-info-close-button {
