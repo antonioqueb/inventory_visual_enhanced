@@ -1,160 +1,189 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
-    
+
     <t t-name="inventory_visual_enhanced.HoldInfoDialog" owl="1">
-        <Dialog size="'lg'">
-            <div class="o_hold_info_dialog">
-                <!-- Header con información del producto -->
-                <div class="alert alert-light border-start border-4 border-warning mb-4">
-                    <div class="d-flex align-items-center">
-                        <i class="fa fa-hand-paper-o fa-2x text-warning me-3"></i>
-                        <div>
-                            <h5 class="mb-1 fw-bold">
-                                <t t-esc="detailData.product_name"/>
-                            </h5>
-                            <small class="text-muted">
-                                <i class="fa fa-barcode me-1"></i>
-                                Lote: <strong t-esc="detailData.lot_name"></strong>
-                            </small>
+        <Dialog size="'lg'" title="''" contentClass="'o_hold_info_dialog_content o_hold_info_dialog_content_wood'">
+            <div class="o_hold_info_dialog o_hold_info_dialog_wood">
+
+                <button class="hold-info-floating-close" type="button" t-on-click="props.close" title="Cerrar">
+                    <i class="fa fa-times"/>
+                </button>
+
+                <!-- HERO -->
+                <div class="hold-info-hero">
+                    <div class="hold-info-hero__grain"/>
+                    <div class="hold-info-hero__content">
+                        <div class="hold-info-hero__icon">
+                            <i class="fa fa-hand-paper-o"/>
+                        </div>
+                        <div class="hold-info-hero__copy">
+                            <span class="hold-info-eyebrow">Apartado activo</span>
+                            <h2>Material reservado</h2>
+                            <p>
+                                Este lote está apartado actualmente y no está disponible para otros clientes
+                                hasta que se libere o expire el apartado.
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Estado del apartado -->
-                <div class="card border-warning mb-4">
-                    <div class="card-header bg-warning bg-opacity-10 border-bottom border-warning">
-                        <h5 class="mb-0">
-                            <i class="fa fa-info-circle me-2"></i>
-                            Estado del Apartado
-                        </h5>
+                <!-- PRODUCT SUMMARY -->
+                <div class="hold-info-product">
+                    <div class="hold-info-product__main">
+                        <span>Producto</span>
+                        <strong t-esc="detailData.product_name"/>
                     </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-12">
-                                <div class="alert alert-warning mb-0">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fa fa-exclamation-triangle fa-2x me-3"></i>
-                                        <div>
-                                            <strong class="d-block mb-1">Este lote está apartado actualmente</strong>
-                                            <p class="mb-0 small">
-                                                El material está reservado y no disponible para otros clientes hasta que se libere o expire el apartado.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
+
+                    <div class="hold-info-product__meta">
+                        <div>
+                            <span>Lote</span>
+                            <strong t-esc="detailData.lot_name"/>
+                        </div>
+                        <div>
+                            <span>Cantidad</span>
+                            <strong><t t-esc="detailData.quantity"/> m²</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STATUS -->
+                <div class="hold-info-status">
+                    <div class="hold-info-status__icon">
+                        <i class="fa fa-exclamation-triangle"/>
+                    </div>
+                    <div>
+                        <strong>Este lote está apartado actualmente</strong>
+                        <p>
+                            El material está reservado y no debe asignarse a otra operación comercial mientras
+                            el apartado permanezca activo.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- DETAILS -->
+                <div class="hold-info-grid">
+                    <div class="hold-info-card hold-info-card--wide">
+                        <div class="hold-info-card__header">
+                            <i class="fa fa-user"/>
+                            <span>Datos comerciales</span>
+                        </div>
+
+                        <div class="hold-info-list">
+                            <div class="hold-info-row">
+                                <span>Cliente</span>
+                                <strong>
+                                    <i class="fa fa-user-circle"/>
+                                    <t t-esc="holdInfo.partner_name"/>
+                                </strong>
+                            </div>
+
+                            <div class="hold-info-row" t-if="holdInfo.proyecto_nombre">
+                                <span>Proyecto</span>
+                                <strong>
+                                    <i class="fa fa-folder-open-o"/>
+                                    <t t-esc="holdInfo.proyecto_nombre"/>
+                                </strong>
+                            </div>
+
+                            <div class="hold-info-row" t-if="holdInfo.arquitecto_nombre">
+                                <span>Arquitecto</span>
+                                <strong>
+                                    <i class="fa fa-user-circle-o"/>
+                                    <t t-esc="holdInfo.arquitecto_nombre"/>
+                                </strong>
+                            </div>
+
+                            <div class="hold-info-row" t-if="holdInfo.vendedor_nombre">
+                                <span>Vendedor</span>
+                                <strong>
+                                    <i class="fa fa-id-badge"/>
+                                    <t t-esc="holdInfo.vendedor_nombre"/>
+                                </strong>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Información del apartado -->
-                <div class="card border mb-4">
-                    <div class="card-header bg-light border-bottom">
-                        <h6 class="mb-0">
-                            <i class="fa fa-user me-2"></i>
-                            Detalles del Apartado
-                        </h6>
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-borderless mb-0">
-                            <tbody>
-                                <tr>
-                                    <td class="fw-bold" style="width: 40%;">Cliente:</td>
-                                    <td>
-                                        <span class="badge bg-light text-dark border fs-6 px-3 py-2">
-                                            <i class="fa fa-user-circle me-2"></i>
-                                            <t t-esc="holdInfo.partner_name"/>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr t-if="holdInfo.proyecto_nombre">
-                                    <td class="fw-bold">Proyecto:</td>
-                                    <td>
-                                        <i class="fa fa-folder text-secondary me-2"></i>
-                                        <t t-esc="holdInfo.proyecto_nombre"/>
-                                    </td>
-                                </tr>
-                                <tr t-if="holdInfo.arquitecto_nombre">
-                                    <td class="fw-bold">Arquitecto:</td>
-                                    <td>
-                                        <i class="fa fa-user-circle-o text-secondary me-2"></i>
-                                        <t t-esc="holdInfo.arquitecto_nombre"/>
-                                    </td>
-                                </tr>
-                                <tr t-if="holdInfo.vendedor_nombre">
-                                    <td class="fw-bold">Vendedor:</td>
-                                    <td>
-                                        <i class="fa fa-user text-info me-2"></i>
-                                        <strong t-esc="holdInfo.vendedor_nombre"></strong>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">Fecha de inicio:</td>
-                                    <td>
-                                        <i class="fa fa-calendar-check-o text-success me-2"></i>
-                                        <t t-esc="holdInfo.fecha_inicio"/>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">Fecha de expiración:</td>
-                                    <td>
-                                        <i class="fa fa-calendar-times-o text-danger me-2"></i>
-                                        <t t-esc="holdInfo.fecha_expiracion"/>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                    <div class="hold-info-card">
+                        <div class="hold-info-card__header">
+                            <i class="fa fa-calendar"/>
+                            <span>Vigencia</span>
+                        </div>
 
-                <!-- Información del lote -->
-                <div class="card border">
-                    <div class="card-header bg-light border-bottom">
-                        <h6 class="mb-0">
-                            <i class="fa fa-cube me-2"></i>
-                            Información del Lote
-                        </h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <small class="text-muted d-block mb-1">Ubicación</small>
+                        <div class="hold-date-stack">
+                            <div>
+                                <span>Inicio</span>
                                 <strong>
-                                    <i class="fa fa-map-marker text-secondary me-1"></i>
+                                    <i class="fa fa-calendar-check-o"/>
+                                    <t t-esc="holdInfo.fecha_inicio"/>
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span>Expiración</span>
+                                <strong>
+                                    <i class="fa fa-calendar-times-o"/>
+                                    <t t-esc="holdInfo.fecha_expiracion"/>
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hold-info-card">
+                        <div class="hold-info-card__header">
+                            <i class="fa fa-cube"/>
+                            <span>Información del lote</span>
+                        </div>
+
+                        <div class="hold-lot-grid">
+                            <div>
+                                <span>Ubicación</span>
+                                <strong>
+                                    <i class="fa fa-map-marker"/>
                                     <t t-esc="detailData.location_name"/>
                                 </strong>
                             </div>
-                            <div class="col-md-6">
-                                <small class="text-muted d-block mb-1">Cantidad Total</small>
-                                <strong class="text-secondary fs-5">
-                                    <t t-esc="detailData.quantity"/> m²
-                                </strong>
-                            </div>
-                            <div class="col-md-6" t-if="detailData.grosor or detailData.alto or detailData.ancho">
-                                <small class="text-muted d-block mb-1">Dimensiones</small>
+
+                            <div t-if="detailData.grosor or detailData.alto or detailData.ancho">
+                                <span>Dimensiones</span>
                                 <strong>
                                     <t t-if="detailData.grosor"><t t-esc="detailData.grosor"/>cm × </t>
                                     <t t-if="detailData.alto"><t t-esc="detailData.alto"/>m × </t>
                                     <t t-if="detailData.ancho"><t t-esc="detailData.ancho"/>m</t>
                                 </strong>
                             </div>
-                            <div class="col-md-6" t-if="detailData.bloque">
-                                <small class="text-muted d-block mb-1">Bloque</small>
-                                <strong><t t-esc="detailData.bloque"/></strong>
+
+                            <div t-if="detailData.bloque">
+                                <span>Bloque</span>
+                                <strong t-esc="detailData.bloque"/>
                             </div>
+
+                            <div t-if="detailData.atado">
+                                <span>Atado</span>
+                                <strong t-esc="detailData.atado"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hold-info-card hold-info-card--wide" t-if="holdInfo.notas">
+                        <div class="hold-info-card__header">
+                            <i class="fa fa-sticky-note-o"/>
+                            <span>Notas del apartado</span>
+                        </div>
+
+                        <div class="hold-info-notes">
+                            <p t-esc="holdInfo.notas"/>
                         </div>
                     </div>
                 </div>
             </div>
 
             <t t-set-slot="footer">
-                <button class="btn btn-light border btn-lg" t-on-click="props.close">
-                    <i class="fa fa-times me-2"></i>
+                <button class="hold-info-close-button" type="button" t-on-click="props.close">
+                    <i class="fa fa-times"/>
                     Cerrar
                 </button>
-              
             </t>
         </Dialog>
     </t>
-    
+
 </templates>

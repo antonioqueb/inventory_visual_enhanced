@@ -1,634 +1,692 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
-    
+
     <t t-name="inventory_visual_enhanced.CreateHoldDialog" owl="1">
-        <Dialog size="'lg'">
-            <div class="o_create_hold_dialog">
-                <!-- Header con información del producto -->
-                <div class="alert alert-light border-start border-4 border-secondary mb-4">
-                    <div class="d-flex align-items-center">
-                        <i class="fa fa-cube fa-2x text-secondary me-3"></i>
-                        <div>
-                            <h5 class="mb-1 fw-bold">
-                                <t t-esc="detailData.product_name"/>
-                            </h5>
-                            <small class="text-muted">
-                                <i class="fa fa-barcode me-1"></i>
-                                Lote: <strong t-esc="detailData.lot_name"></strong>
-                            </small>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Indicador de pasos -->
-                <div class="steps-indicator mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="step-item" t-att-class="{ active: state.currentStep >= 1, completed: state.currentStep > 1 }">
-                            <div class="step-number">1</div>
-                            <div class="step-label">Cliente</div>
-                        </div>
-                        <div class="step-line" t-att-class="{ active: state.currentStep > 1 }"></div>
-                        <div class="step-item" t-att-class="{ active: state.currentStep >= 2, completed: state.currentStep > 2 }">
-                            <div class="step-number">2</div>
-                            <div class="step-label">Proyecto</div>
-                        </div>
-                        <div class="step-line" t-att-class="{ active: state.currentStep > 2 }"></div>
-                        <div class="step-item" t-att-class="{ active: state.currentStep >= 3, completed: state.currentStep > 3 }">
-                            <div class="step-number">3</div>
-                            <div class="step-label">Arquitecto</div>
-                        </div>
-                        <div class="step-line" t-att-class="{ active: state.currentStep > 3 }"></div>
-                        <div class="step-item" t-att-class="{ active: state.currentStep >= 4, completed: state.currentStep > 4 }">
-                            <div class="step-number">4</div>
-                            <div class="step-label">Precios</div>
-                        </div>
-                        <div class="step-line" t-att-class="{ active: state.currentStep > 4 }"></div>
-                        <div class="step-item" t-att-class="{ active: state.currentStep >= 5 }">
-                            <div class="step-number">5</div>
-                            <div class="step-label">Confirmar</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- PASO 1: CLIENTE -->
-                <div class="step-content" t-if="state.currentStep === 1">
-                    <h5 class="mb-3">
-                        <i class="fa fa-user text-secondary me-2"></i>
-                        Seleccionar Cliente
-                    </h5>
-                    
-                    <!-- Toggle: Seleccionar o Crear -->
-                    <div class="btn-group w-100 mb-3" role="group">
-                        <button 
-                            type="button" 
-                            class="btn"
-                            t-att-class="!state.showCreatePartner ? 'btn-secondary' : 'btn-outline-secondary'"
-                            t-on-click="() => this.state.showCreatePartner = false"
-                        >
-                            <i class="fa fa-search me-2"></i>
-                            Buscar Existente
-                        </button>
-                        <button 
-                            type="button" 
-                            class="btn"
-                            t-att-class="state.showCreatePartner ? 'btn-secondary' : 'btn-outline-secondary'"
-                            t-on-click="toggleCreatePartner"
-                        >
-                            <i class="fa fa-plus me-2"></i>
-                            Crear Nuevo
-                        </button>
-                    </div>
-                    
-                    <!-- Buscar cliente existente -->
-                    <t t-if="!state.showCreatePartner">
-                        <div class="input-group mb-2">
-                            <span class="input-group-text">
-                                <i class="fa fa-search"></i>
-                            </span>
-                            <input 
-                                type="text"
-                                class="form-control"
-                                placeholder="Buscar por nombre, RFC o referencia..."
-                                t-model="state.searchPartnerTerm"
-                                t-on-input="onSearchPartner"
-                            />
-                        </div>
-                        
-                        <!-- Cliente seleccionado -->
-                        <div class="alert alert-light border d-flex align-items-center mb-3" t-if="state.selectedPartnerName">
-                            <i class="fa fa-check-circle fa-2x text-success me-3"></i>
-                            <div>
-                                <strong>Cliente seleccionado:</strong><br/>
-                                <t t-esc="state.selectedPartnerName"/>
+        <Dialog size="'xl'" title="''" contentClass="'o_create_hold_dialog_content o_create_hold_dialog_content_wood'">
+            <div class="o_create_hold_dialog o_create_hold_dialog_wood">
+
+                <button class="hold-floating-close" type="button" t-on-click="props.close" title="Cerrar">
+                    <i class="fa fa-times"/>
+                </button>
+
+                <!-- HERO -->
+                <div class="hold-hero">
+                    <div class="hold-hero__grain"/>
+                    <div class="hold-hero__content">
+                        <div class="hold-hero__left">
+                            <div class="hold-hero__icon">
+                                <i class="fa fa-hand-paper-o"/>
+                            </div>
+                            <div class="hold-hero__copy">
+                                <span class="hold-eyebrow">Nuevo apartado</span>
+                                <h2>Reservar material</h2>
+                                <p>
+                                    Configura cliente, proyecto, arquitecto y precio para apartar este lote
+                                    durante 5 días hábiles.
+                                </p>
                             </div>
                         </div>
-                        
-                        <!-- Lista de resultados -->
-                        <div class="list-group" style="max-height: 300px; overflow-y: auto;" t-if="state.partners.length > 0 and !state.selectedPartnerName">
-                            <t t-foreach="state.partners" t-as="partner" t-key="partner.id">
-                                <button 
-                                    type="button"
-                                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-                                    t-on-click="() => this.selectPartner(partner)"
-                                >
-                                    <div>
-                                        <strong t-esc="partner.name"></strong>
-                                        <small class="text-muted ms-2" t-if="partner.ref">
-                                            [<t t-esc="partner.ref"/>]
-                                        </small>
-                                        <small class="text-muted ms-2" t-if="partner.vat">
-                                            RFC: <t t-esc="partner.vat"/>
-                                        </small>
-                                    </div>
-                                    <i class="fa fa-chevron-right text-muted"></i>
-                                </button>
-                            </t>
+
+                        <div class="hold-hero__right">
+                            <div class="hold-product-card">
+                                <span class="hold-product-card__label">Producto</span>
+                                <strong t-esc="detailData.product_name"/>
+                                <small>
+                                    <i class="fa fa-barcode"/>
+                                    Lote <t t-esc="detailData.lot_name"/>
+                                </small>
+                            </div>
+
+                            <div class="hold-product-card hold-product-card--qty">
+                                <span class="hold-product-card__label">Cantidad</span>
+                                <strong>
+                                    <t t-esc="formatNumber(detailData.quantity)"/>
+                                </strong>
+                                <small>m² disponibles para apartado</small>
+                            </div>
                         </div>
-                    </t>
-                    
-                    <!-- Crear nuevo cliente -->
-                    <t t-if="state.showCreatePartner">
-                        <div class="card bg-light border mb-3">
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">
-                                        Nombre del Cliente <span class="text-danger">*</span>
-                                    </label>
-                                    <input 
-                                        type="text"
-                                        class="form-control"
-                                        placeholder="Nombre completo o razón social..."
-                                        t-model="state.newPartnerName"
-                                    />
+                    </div>
+                </div>
+
+                <!-- STEPS -->
+                <div class="hold-steps">
+                    <div class="hold-step-item" t-att-class="{ active: state.currentStep >= 1, completed: state.currentStep > 1 }">
+                        <div class="hold-step-number">
+                            <t t-if="state.currentStep > 1"><i class="fa fa-check"/></t>
+                            <t t-else="">1</t>
+                        </div>
+                        <div class="hold-step-label">Cliente</div>
+                    </div>
+
+                    <div class="hold-step-line" t-att-class="{ active: state.currentStep > 1 }"/>
+
+                    <div class="hold-step-item" t-att-class="{ active: state.currentStep >= 2, completed: state.currentStep > 2 }">
+                        <div class="hold-step-number">
+                            <t t-if="state.currentStep > 2"><i class="fa fa-check"/></t>
+                            <t t-else="">2</t>
+                        </div>
+                        <div class="hold-step-label">Proyecto</div>
+                    </div>
+
+                    <div class="hold-step-line" t-att-class="{ active: state.currentStep > 2 }"/>
+
+                    <div class="hold-step-item" t-att-class="{ active: state.currentStep >= 3, completed: state.currentStep > 3 }">
+                        <div class="hold-step-number">
+                            <t t-if="state.currentStep > 3"><i class="fa fa-check"/></t>
+                            <t t-else="">3</t>
+                        </div>
+                        <div class="hold-step-label">Arquitecto</div>
+                    </div>
+
+                    <div class="hold-step-line" t-att-class="{ active: state.currentStep > 3 }"/>
+
+                    <div class="hold-step-item" t-att-class="{ active: state.currentStep >= 4, completed: state.currentStep > 4 }">
+                        <div class="hold-step-number">
+                            <t t-if="state.currentStep > 4"><i class="fa fa-check"/></t>
+                            <t t-else="">4</t>
+                        </div>
+                        <div class="hold-step-label">Precio</div>
+                    </div>
+
+                    <div class="hold-step-line" t-att-class="{ active: state.currentStep > 4 }"/>
+
+                    <div class="hold-step-item" t-att-class="{ active: state.currentStep >= 5 }">
+                        <div class="hold-step-number">5</div>
+                        <div class="hold-step-label">Confirmar</div>
+                    </div>
+                </div>
+
+                <!-- BODY -->
+                <div class="hold-body">
+
+                    <!-- PASO 1: CLIENTE -->
+                    <div class="hold-step-panel" t-if="state.currentStep === 1">
+                        <div class="hold-step-panel__header">
+                            <div class="hold-section-icon">
+                                <i class="fa fa-user"/>
+                            </div>
+                            <div>
+                                <span class="hold-section-eyebrow">Paso 1</span>
+                                <h3>Seleccionar cliente</h3>
+                                <p>Busca un cliente existente o crea uno nuevo para este apartado.</p>
+                            </div>
+                        </div>
+
+                        <div class="hold-mode-toggle">
+                            <button
+                                type="button"
+                                class="hold-mode-btn"
+                                t-att-class="{ active: !state.showCreatePartner }"
+                                t-on-click="() => this.state.showCreatePartner = false"
+                            >
+                                <i class="fa fa-search"/>
+                                Buscar existente
+                            </button>
+
+                            <button
+                                type="button"
+                                class="hold-mode-btn"
+                                t-att-class="{ active: state.showCreatePartner }"
+                                t-on-click="toggleCreatePartner"
+                            >
+                                <i class="fa fa-plus"/>
+                                Crear nuevo
+                            </button>
+                        </div>
+
+                        <t t-if="!state.showCreatePartner">
+                            <div class="hold-search-box">
+                                <div class="hold-search-box__icon">
+                                    <i class="fa fa-search"/>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">RFC (opcional)</label>
-                                        <input 
+                                <input
+                                    type="text"
+                                    class="hold-input"
+                                    placeholder="Buscar por nombre, RFC, referencia o email..."
+                                    t-model="state.searchPartnerTerm"
+                                    t-on-input="onSearchPartner"
+                                />
+                            </div>
+
+                            <div class="hold-selected-card" t-if="state.selectedPartnerName">
+                                <div class="hold-selected-card__icon">
+                                    <i class="fa fa-check"/>
+                                </div>
+                                <div>
+                                    <span>Cliente seleccionado</span>
+                                    <strong t-esc="state.selectedPartnerName"/>
+                                </div>
+                            </div>
+
+                            <div class="hold-result-list" t-if="state.partners.length > 0 and !state.selectedPartnerName">
+                                <t t-foreach="state.partners" t-as="partner" t-key="partner.id">
+                                    <button
+                                        type="button"
+                                        class="hold-result-item"
+                                        t-on-click="() => this.selectPartner(partner)"
+                                    >
+                                        <div class="hold-result-avatar">
+                                            <i class="fa fa-building-o"/>
+                                        </div>
+                                        <div class="hold-result-main">
+                                            <strong t-esc="partner.name"/>
+                                            <div class="hold-result-meta">
+                                                <span t-if="partner.ref">Ref: <t t-esc="partner.ref"/></span>
+                                                <span t-if="partner.vat">RFC: <t t-esc="partner.vat"/></span>
+                                                <span t-if="partner.email"><t t-esc="partner.email"/></span>
+                                            </div>
+                                        </div>
+                                        <i class="fa fa-chevron-right hold-result-arrow"/>
+                                    </button>
+                                </t>
+                            </div>
+
+                            <div class="hold-empty-hint" t-if="state.searchPartnerTerm and state.searchPartnerTerm.length > 0 and state.partners.length === 0 and !state.selectedPartnerName">
+                                <i class="fa fa-info-circle"/>
+                                No se encontraron clientes con ese criterio. Puedes crearlo desde la pestaña “Crear nuevo”.
+                            </div>
+                        </t>
+
+                        <t t-if="state.showCreatePartner">
+                            <div class="hold-form-card">
+                                <div class="hold-form-grid hold-form-grid--one">
+                                    <div class="hold-field">
+                                        <label>Nombre del cliente <span>*</span></label>
+                                        <input
                                             type="text"
-                                            class="form-control"
-                                            placeholder="RFC..."
+                                            class="hold-input"
+                                            placeholder="Nombre completo o razón social..."
+                                            t-model="state.newPartnerName"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div class="hold-form-grid">
+                                    <div class="hold-field">
+                                        <label>RFC</label>
+                                        <input
+                                            type="text"
+                                            class="hold-input"
+                                            placeholder="RFC opcional..."
                                             t-model="state.newPartnerVat"
                                         />
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Referencia (opcional)</label>
-                                        <input 
+
+                                    <div class="hold-field">
+                                        <label>Referencia</label>
+                                        <input
                                             type="text"
-                                            class="form-control"
+                                            class="hold-input"
                                             placeholder="Código de referencia..."
                                             t-model="state.newPartnerRef"
                                         />
                                     </div>
                                 </div>
-                                <button 
-                                    class="btn btn-secondary w-100"
-                                    t-on-click="createPartner"
-                                >
-                                    <i class="fa fa-plus-circle me-2"></i>
-                                    Crear Cliente
+
+                                <button type="button" class="hold-primary-button hold-full-button" t-on-click="createPartner">
+                                    <i class="fa fa-plus-circle"/>
+                                    Crear cliente
                                 </button>
                             </div>
-                        </div>
-                    </t>
-                </div>
-                
-                <!-- PASO 2: PROYECTO -->
-                <div class="step-content" t-if="state.currentStep === 2">
-                    <h5 class="mb-3">
-                        <i class="fa fa-folder text-secondary me-2"></i>
-                        Seleccionar Proyecto
-                    </h5>
-                    
-                    <!-- Toggle: Seleccionar o Crear -->
-                    <div class="btn-group w-100 mb-3" role="group">
-                        <button 
-                            type="button" 
-                            class="btn"
-                            t-att-class="!state.showCreateProject ? 'btn-secondary' : 'btn-outline-secondary'"
-                            t-on-click="() => this.state.showCreateProject = false"
-                        >
-                            <i class="fa fa-search me-2"></i>
-                            Buscar Existente
-                        </button>
-                        <button 
-                            type="button" 
-                            class="btn"
-                            t-att-class="state.showCreateProject ? 'btn-secondary' : 'btn-outline-secondary'"
-                            t-on-click="toggleCreateProject"
-                        >
-                            <i class="fa fa-plus me-2"></i>
-                            Crear Nuevo
-                        </button>
+                        </t>
                     </div>
-                    
-                    <!-- Buscar proyecto existente -->
-                    <t t-if="!state.showCreateProject">
-                        <div class="input-group mb-2">
-                            <span class="input-group-text">
-                                <i class="fa fa-search"></i>
-                            </span>
-                            <input 
-                                type="text"
-                                class="form-control"
-                                placeholder="Buscar proyecto..."
-                                t-model="state.searchProjectTerm"
-                                t-on-input="onSearchProject"
-                            />
-                        </div>
-                        
-                        <!-- Proyecto seleccionado -->
-                        <div class="alert alert-light border d-flex align-items-center mb-3" t-if="state.selectedProjectName">
-                            <i class="fa fa-check-circle fa-2x text-success me-3"></i>
+
+                    <!-- PASO 2: PROYECTO -->
+                    <div class="hold-step-panel" t-if="state.currentStep === 2">
+                        <div class="hold-step-panel__header">
+                            <div class="hold-section-icon">
+                                <i class="fa fa-folder-open-o"/>
+                            </div>
                             <div>
-                                <strong>Proyecto seleccionado:</strong><br/>
-                                <t t-esc="state.selectedProjectName"/>
+                                <span class="hold-section-eyebrow">Paso 2</span>
+                                <h3>Seleccionar proyecto</h3>
+                                <p>Asocia el material a un proyecto para mantener trazabilidad comercial.</p>
                             </div>
                         </div>
-                        
-                        <!-- Lista de resultados -->
-                        <div class="list-group" style="max-height: 300px; overflow-y: auto;" t-if="state.projects.length > 0 and !state.selectedProjectName">
-                            <t t-foreach="state.projects" t-as="project" t-key="project.id">
-                                <button 
-                                    type="button"
-                                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-                                    t-on-click="() => this.selectProject(project)"
-                                >
-                                    <div>
-                                        <strong t-esc="project.name"></strong>
-                                    </div>
-                                    <i class="fa fa-chevron-right text-muted"></i>
-                                </button>
-                            </t>
+
+                        <div class="hold-mode-toggle">
+                            <button
+                                type="button"
+                                class="hold-mode-btn"
+                                t-att-class="{ active: !state.showCreateProject }"
+                                t-on-click="() => this.state.showCreateProject = false"
+                            >
+                                <i class="fa fa-search"/>
+                                Buscar existente
+                            </button>
+
+                            <button
+                                type="button"
+                                class="hold-mode-btn"
+                                t-att-class="{ active: state.showCreateProject }"
+                                t-on-click="toggleCreateProject"
+                            >
+                                <i class="fa fa-plus"/>
+                                Crear nuevo
+                            </button>
                         </div>
-                    </t>
-                    
-                    <!-- Crear nuevo proyecto -->
-                    <t t-if="state.showCreateProject">
-                        <div class="card bg-light border mb-3">
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">
-                                        Nombre del Proyecto <span class="text-danger">*</span>
-                                    </label>
-                                    <input 
-                                        type="text"
-                                        class="form-control"
-                                        placeholder="Nombre del proyecto..."
-                                        t-model="state.newProjectName"
-                                    />
+
+                        <t t-if="!state.showCreateProject">
+                            <div class="hold-search-box">
+                                <div class="hold-search-box__icon">
+                                    <i class="fa fa-search"/>
                                 </div>
-                                <button 
-                                    class="btn btn-secondary w-100"
-                                    t-on-click="createProject"
-                                >
-                                    <i class="fa fa-plus-circle me-2"></i>
-                                    Crear Proyecto
-                                </button>
+                                <input
+                                    type="text"
+                                    class="hold-input"
+                                    placeholder="Buscar proyecto..."
+                                    t-model="state.searchProjectTerm"
+                                    t-on-input="onSearchProject"
+                                />
                             </div>
-                        </div>
-                    </t>
-                </div>
-                
-                <!-- PASO 3: ARQUITECTO -->
-                <div class="step-content" t-if="state.currentStep === 3">
-                    <h5 class="mb-3">
-                        <i class="fa fa-user-circle text-secondary me-2"></i>
-                        Seleccionar Arquitecto
-                    </h5>
-                    
-                    <!-- Toggle: Seleccionar o Crear -->
-                    <div class="btn-group w-100 mb-3" role="group">
-                        <button 
-                            type="button" 
-                            class="btn"
-                            t-att-class="!state.showCreateArchitect ? 'btn-secondary' : 'btn-outline-secondary'"
-                            t-on-click="() => this.state.showCreateArchitect = false"
-                        >
-                            <i class="fa fa-search me-2"></i>
-                            Buscar Existente
-                        </button>
-                        <button 
-                            type="button" 
-                            class="btn"
-                            t-att-class="state.showCreateArchitect ? 'btn-secondary' : 'btn-outline-secondary'"
-                            t-on-click="toggleCreateArchitect"
-                        >
-                            <i class="fa fa-plus me-2"></i>
-                            Crear Nuevo
-                        </button>
-                    </div>
-                    
-                    <!-- Buscar arquitecto existente -->
-                    <t t-if="!state.showCreateArchitect">
-                        <div class="input-group mb-2">
-                            <span class="input-group-text">
-                                <i class="fa fa-search"></i>
-                            </span>
-                            <input 
-                                type="text"
-                                class="form-control"
-                                placeholder="Buscar arquitecto..."
-                                t-model="state.searchArchitectTerm"
-                                t-on-input="onSearchArchitect"
-                            />
-                        </div>
-                        
-                        <!-- Arquitecto seleccionado -->
-                        <div class="alert alert-light border d-flex align-items-center mb-3" t-if="state.selectedArchitectName">
-                            <i class="fa fa-check-circle fa-2x text-success me-3"></i>
-                            <div>
-                                <strong>Arquitecto seleccionado:</strong><br/>
-                                <t t-esc="state.selectedArchitectName"/>
-                            </div>
-                        </div>
-                        
-                        <!-- Lista de resultados -->
-                        <div class="list-group" style="max-height: 300px; overflow-y: auto;" t-if="state.architects.length > 0 and !state.selectedArchitectName">
-                            <t t-foreach="state.architects" t-as="architect" t-key="architect.id">
-                                <button 
-                                    type="button"
-                                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-                                    t-on-click="() => this.selectArchitect(architect)"
-                                >
-                                    <div>
-                                        <strong t-esc="architect.name"></strong>
-                                        <small class="text-muted ms-2" t-if="architect.ref">
-                                            [<t t-esc="architect.ref"/>]
-                                        </small>
-                                        <small class="text-muted ms-2" t-if="architect.vat">
-                                            RFC: <t t-esc="architect.vat"/>
-                                        </small>
-                                    </div>
-                                    <i class="fa fa-chevron-right text-muted"></i>
-                                </button>
-                            </t>
-                        </div>
-                    </t>
-                    
-                    <!-- Crear nuevo arquitecto -->
-                    <t t-if="state.showCreateArchitect">
-                        <div class="card bg-light border mb-3">
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">
-                                        Nombre del Arquitecto <span class="text-danger">*</span>
-                                    </label>
-                                    <input 
-                                        type="text"
-                                        class="form-control"
-                                        placeholder="Nombre completo..."
-                                        t-model="state.newArchitectName"
-                                    />
+
+                            <div class="hold-selected-card" t-if="state.selectedProjectName">
+                                <div class="hold-selected-card__icon">
+                                    <i class="fa fa-check"/>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">RFC (opcional)</label>
-                                        <input 
+                                <div>
+                                    <span>Proyecto seleccionado</span>
+                                    <strong t-esc="state.selectedProjectName"/>
+                                </div>
+                            </div>
+
+                            <div class="hold-result-list" t-if="state.projects.length > 0 and !state.selectedProjectName">
+                                <t t-foreach="state.projects" t-as="project" t-key="project.id">
+                                    <button
+                                        type="button"
+                                        class="hold-result-item"
+                                        t-on-click="() => this.selectProject(project)"
+                                    >
+                                        <div class="hold-result-avatar">
+                                            <i class="fa fa-folder-o"/>
+                                        </div>
+                                        <div class="hold-result-main">
+                                            <strong t-esc="project.name"/>
+                                            <div class="hold-result-meta">
+                                                <span>Proyecto disponible</span>
+                                            </div>
+                                        </div>
+                                        <i class="fa fa-chevron-right hold-result-arrow"/>
+                                    </button>
+                                </t>
+                            </div>
+                        </t>
+
+                        <t t-if="state.showCreateProject">
+                            <div class="hold-form-card">
+                                <div class="hold-form-grid hold-form-grid--one">
+                                    <div class="hold-field">
+                                        <label>Nombre del proyecto <span>*</span></label>
+                                        <input
                                             type="text"
-                                            class="form-control"
-                                            placeholder="RFC..."
+                                            class="hold-input"
+                                            placeholder="Nombre del proyecto..."
+                                            t-model="state.newProjectName"
+                                        />
+                                    </div>
+                                </div>
+
+                                <button type="button" class="hold-primary-button hold-full-button" t-on-click="createProject">
+                                    <i class="fa fa-plus-circle"/>
+                                    Crear proyecto
+                                </button>
+                            </div>
+                        </t>
+                    </div>
+
+                    <!-- PASO 3: ARQUITECTO -->
+                    <div class="hold-step-panel" t-if="state.currentStep === 3">
+                        <div class="hold-step-panel__header">
+                            <div class="hold-section-icon">
+                                <i class="fa fa-user-circle-o"/>
+                            </div>
+                            <div>
+                                <span class="hold-section-eyebrow">Paso 3</span>
+                                <h3>Seleccionar arquitecto</h3>
+                                <p>Registra el arquitecto o contacto técnico vinculado al proyecto.</p>
+                            </div>
+                        </div>
+
+                        <div class="hold-mode-toggle">
+                            <button
+                                type="button"
+                                class="hold-mode-btn"
+                                t-att-class="{ active: !state.showCreateArchitect }"
+                                t-on-click="() => this.state.showCreateArchitect = false"
+                            >
+                                <i class="fa fa-search"/>
+                                Buscar existente
+                            </button>
+
+                            <button
+                                type="button"
+                                class="hold-mode-btn"
+                                t-att-class="{ active: state.showCreateArchitect }"
+                                t-on-click="toggleCreateArchitect"
+                            >
+                                <i class="fa fa-plus"/>
+                                Crear nuevo
+                            </button>
+                        </div>
+
+                        <t t-if="!state.showCreateArchitect">
+                            <div class="hold-search-box">
+                                <div class="hold-search-box__icon">
+                                    <i class="fa fa-search"/>
+                                </div>
+                                <input
+                                    type="text"
+                                    class="hold-input"
+                                    placeholder="Buscar arquitecto..."
+                                    t-model="state.searchArchitectTerm"
+                                    t-on-input="onSearchArchitect"
+                                />
+                            </div>
+
+                            <div class="hold-selected-card" t-if="state.selectedArchitectName">
+                                <div class="hold-selected-card__icon">
+                                    <i class="fa fa-check"/>
+                                </div>
+                                <div>
+                                    <span>Arquitecto seleccionado</span>
+                                    <strong t-esc="state.selectedArchitectName"/>
+                                </div>
+                            </div>
+
+                            <div class="hold-result-list" t-if="state.architects.length > 0 and !state.selectedArchitectName">
+                                <t t-foreach="state.architects" t-as="architect" t-key="architect.id">
+                                    <button
+                                        type="button"
+                                        class="hold-result-item"
+                                        t-on-click="() => this.selectArchitect(architect)"
+                                    >
+                                        <div class="hold-result-avatar">
+                                            <i class="fa fa-user-circle-o"/>
+                                        </div>
+                                        <div class="hold-result-main">
+                                            <strong t-esc="architect.name"/>
+                                            <div class="hold-result-meta">
+                                                <span t-if="architect.ref">Ref: <t t-esc="architect.ref"/></span>
+                                                <span t-if="architect.vat">RFC: <t t-esc="architect.vat"/></span>
+                                            </div>
+                                        </div>
+                                        <i class="fa fa-chevron-right hold-result-arrow"/>
+                                    </button>
+                                </t>
+                            </div>
+                        </t>
+
+                        <t t-if="state.showCreateArchitect">
+                            <div class="hold-form-card">
+                                <div class="hold-form-grid hold-form-grid--one">
+                                    <div class="hold-field">
+                                        <label>Nombre del arquitecto <span>*</span></label>
+                                        <input
+                                            type="text"
+                                            class="hold-input"
+                                            placeholder="Nombre completo..."
+                                            t-model="state.newArchitectName"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div class="hold-form-grid">
+                                    <div class="hold-field">
+                                        <label>RFC</label>
+                                        <input
+                                            type="text"
+                                            class="hold-input"
+                                            placeholder="RFC opcional..."
                                             t-model="state.newArchitectVat"
                                         />
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Referencia (opcional)</label>
-                                        <input 
+
+                                    <div class="hold-field">
+                                        <label>Referencia</label>
+                                        <input
                                             type="text"
-                                            class="form-control"
+                                            class="hold-input"
                                             placeholder="Código de referencia..."
                                             t-model="state.newArchitectRef"
                                         />
                                     </div>
                                 </div>
-                                <button 
-                                    class="btn btn-secondary w-100"
-                                    t-on-click="createArchitect"
-                                >
-                                    <i class="fa fa-plus-circle me-2"></i>
-                                    Crear Arquitecto
+
+                                <button type="button" class="hold-primary-button hold-full-button" t-on-click="createArchitect">
+                                    <i class="fa fa-plus-circle"/>
+                                    Crear arquitecto
                                 </button>
                             </div>
-                        </div>
-                    </t>
-                </div>
-                
-                <!-- PASO 4: PRECIOS -->
-                <div class="step-content" t-if="state.currentStep === 4">
-                    <h5 class="mb-3">
-                        <i class="fa fa-dollar text-secondary me-2"></i>
-                        Configurar Precio
-                    </h5>
-                    
-                    <div class="card border-secondary mb-3">
-                        <div class="card-header bg-light border-bottom">
-                            <h6 class="mb-0">
-                                <i class="fa fa-cube me-2"></i>
-                                <t t-esc="detailData.product_name"/>
-                            </h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <strong>Lote:</strong>
-                                    <div class="text-muted">
-                                        <t t-esc="detailData.lot_name"/>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <strong>Cantidad:</strong>
-                                    <div class="text-muted">
-                                        <t t-esc="formatNumber(detailData.quantity)"/> m²
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Divisa / Lista de Precios *</label>
-                                <select class="form-select" t-model="state.selectedCurrency" t-on-change="onCurrencyChange">
-                                    <option value="USD">USD - Dólares</option>
-                                    <option value="MXN">MXN - Pesos</option>
-                                </select>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Precio por m² *</label>
-                                <t t-if="state.productPriceOptions and state.productPriceOptions.length > 0">
-                                    <select 
-                                        class="form-select mb-2"
-                                        t-on-change="(ev) => this.onPriceChange(ev.target.value)"
-                                    >
-                                        <t t-foreach="state.productPriceOptions" t-as="option" t-key="option_index">
-                                            <option 
-                                                t-att-value="option.value"
-                                                t-att-selected="state.productPrice === option.value"
-                                            >
-                                                <t t-esc="option.label"/> - <t t-esc="formatNumber(option.value)"/>
-                                            </option>
-                                        </t>
-                                    </select>
-                                </t>
-                                <input 
-                                    type="number"
-                                    class="form-control"
-                                    placeholder="Precio personalizado"
-                                    t-att-value="state.productPrice"
-                                    t-on-input="(ev) => this.onPriceChange(ev.target.value)"
-                                    step="0.01"
-                                    min="0"
-                                />
-                            </div>
-                            
-                            <div class="alert alert-light border">
-                                <strong>Total estimado:</strong>
-                                <div class="h4 mb-0 text-secondary">
-                                    <t t-esc="formatNumber(detailData.quantity * (state.productPrice || 0))"/>
-                                    <small><t t-esc="state.selectedCurrency"/></small>
-                                </div>
-                            </div>
-                        </div>
+                        </t>
                     </div>
-                </div>
-                
-                <!-- PASO 5: CONFIRMAR -->
-                <div class="step-content" t-if="state.currentStep === 5">
-                    <h5 class="mb-3">
-                        <i class="fa fa-check-circle text-success me-2"></i>
-                        Confirmar Apartado
-                    </h5>
-                    
-                    <!-- Resumen -->
-                    <div class="card border mb-3">
-                        <div class="card-body">
-                            <h6 class="card-title mb-3">Resumen del Apartado</h6>
-                            
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <strong>Cliente:</strong><br/>
-                                    <t t-esc="state.selectedPartnerName"/>
-                                </div>
-                                <div class="col-md-6">
-                                    <strong>Proyecto:</strong><br/>
-                                    <t t-esc="state.selectedProjectName"/>
-                                </div>
-                                <div class="col-md-6">
-                                    <strong>Arquitecto:</strong><br/>
-                                    <t t-esc="state.selectedArchitectName"/>
-                                </div>
-                                <div class="col-md-6">
-                                    <strong>Vendedor:</strong><br/>
-                                    <span class="badge bg-info text-dark">
-                                        <i class="fa fa-user me-1"></i>
-                                        <t t-esc="state.sellerName"/>
-                                    </span>
-                                </div>
-                                <div class="col-md-6">
-                                    <strong>Lote:</strong><br/>
-                                    <t t-esc="detailData.lot_name"/>
-                                </div>
-                                <div class="col-md-6">
-                                    <strong>Cantidad:</strong><br/>
-                                    <t t-esc="formatNumber(detailData.quantity)"/> m²
-                                </div>
+
+                    <!-- PASO 4: PRECIOS -->
+                    <div class="hold-step-panel" t-if="state.currentStep === 4">
+                        <div class="hold-step-panel__header">
+                            <div class="hold-section-icon">
+                                <i class="fa fa-usd"/>
                             </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Resumen de Precio -->
-                    <div class="card border mb-3" t-if="state.productPrice and state.productPrice > 0">
-                        <div class="card-header bg-light border-bottom">
-                            <h6 class="mb-0">
-                                <i class="fa fa-usd text-secondary me-2"></i>
-                                Precio Configurado
-                            </h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <small class="text-muted d-block">Precio/m²:</small>
-                                    <strong><t t-esc="formatNumber(state.productPrice)"/> <t t-esc="state.selectedCurrency"/></strong>
-                                </div>
-                                <div class="col-md-4">
-                                    <small class="text-muted d-block">Cantidad:</small>
-                                    <strong><t t-esc="formatNumber(detailData.quantity)"/> m²</strong>
-                                </div>
-                                <div class="col-md-4">
-                                    <small class="text-muted d-block">Total:</small>
-                                    <h5 class="mb-0 text-secondary">
-                                        <t t-esc="formatNumber(detailData.quantity * state.productPrice)"/> 
-                                        <t t-esc="state.selectedCurrency"/>
-                                    </h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Notas -->
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">
-                            <i class="fa fa-commenting text-secondary me-2"></i>
-                            Notas adicionales (opcional)
-                        </label>
-                        <textarea 
-                            class="form-control"
-                            rows="3"
-                            placeholder="Ej: Para proyecto X, Cotización #123, Condiciones especiales, etc."
-                            t-model="state.notas"
-                            t-on-input="onNotasChange"
-                        ></textarea>
-                    </div>
-                    
-                    <!-- Info de expiración -->
-                    <div class="alert alert-light border">
-                        <div class="d-flex align-items-start">
-                            <i class="fa fa-clock-o fa-2x text-muted me-3"></i>
                             <div>
-                                <strong class="d-block mb-1">Duración del Apartado</strong>
-                                <p class="mb-0">
-                                    El apartado tendrá una duración de <strong>5 días hábiles</strong> a partir de hoy.
+                                <span class="hold-section-eyebrow">Paso 4</span>
+                                <h3>Configurar precio</h3>
+                                <p>Define moneda, lista de precio y precio por m² antes de crear el apartado.</p>
+                            </div>
+                        </div>
+
+                        <div class="hold-price-layout">
+                            <div class="hold-price-product">
+                                <span>Material</span>
+                                <strong t-esc="detailData.product_name"/>
+                                <div class="hold-price-product__meta">
+                                    <div>
+                                        <small>Lote</small>
+                                        <b t-esc="detailData.lot_name"/>
+                                    </div>
+                                    <div>
+                                        <small>Cantidad</small>
+                                        <b><t t-esc="formatNumber(detailData.quantity)"/> m²</b>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="hold-price-form">
+                                <div class="hold-field">
+                                    <label>Divisa / lista de precios <span>*</span></label>
+                                    <select class="hold-select" t-model="state.selectedCurrency" t-on-change="onCurrencyChange">
+                                        <option value="USD">USD - Dólares</option>
+                                        <option value="MXN">MXN - Pesos</option>
+                                    </select>
+                                </div>
+
+                                <div class="hold-field">
+                                    <label>Precio por m² <span>*</span></label>
+
+                                    <t t-if="state.productPriceOptions and state.productPriceOptions.length > 0">
+                                        <select
+                                            class="hold-select hold-price-select"
+                                            t-on-change="(ev) => this.onPriceChange(ev.target.value)"
+                                        >
+                                            <t t-foreach="state.productPriceOptions" t-as="option" t-key="option_index">
+                                                <option
+                                                    t-att-value="option.value"
+                                                    t-att-selected="state.productPrice === option.value"
+                                                >
+                                                    <t t-esc="option.label"/> — <t t-esc="formatNumber(option.value)"/>
+                                                </option>
+                                            </t>
+                                        </select>
+                                    </t>
+
+                                    <input
+                                        type="number"
+                                        class="hold-input"
+                                        placeholder="Precio personalizado"
+                                        t-att-value="state.productPrice"
+                                        t-on-input="(ev) => this.onPriceChange(ev.target.value)"
+                                        step="0.01"
+                                        min="0"
+                                    />
+                                </div>
+
+                                <div class="hold-total-card">
+                                    <span>Total estimado</span>
+                                    <strong>
+                                        <t t-esc="formatNumber(detailData.quantity * (state.productPrice || 0))"/>
+                                        <small t-esc="state.selectedCurrency"/>
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PASO 5: CONFIRMAR -->
+                    <div class="hold-step-panel" t-if="state.currentStep === 5">
+                        <div class="hold-step-panel__header">
+                            <div class="hold-section-icon hold-section-icon--success">
+                                <i class="fa fa-check-circle"/>
+                            </div>
+                            <div>
+                                <span class="hold-section-eyebrow">Paso 5</span>
+                                <h3>Confirmar apartado</h3>
+                                <p>Revisa la información final antes de reservar el material.</p>
+                            </div>
+                        </div>
+
+                        <div class="hold-confirm-grid">
+                            <div class="hold-confirm-card">
+                                <span>Cliente</span>
+                                <strong t-esc="state.selectedPartnerName"/>
+                            </div>
+
+                            <div class="hold-confirm-card">
+                                <span>Proyecto</span>
+                                <strong t-esc="state.selectedProjectName"/>
+                            </div>
+
+                            <div class="hold-confirm-card">
+                                <span>Arquitecto</span>
+                                <strong t-esc="state.selectedArchitectName"/>
+                            </div>
+
+                            <div class="hold-confirm-card">
+                                <span>Vendedor</span>
+                                <strong>
+                                    <i class="fa fa-user"/>
+                                    <t t-esc="state.sellerName"/>
+                                </strong>
+                            </div>
+
+                            <div class="hold-confirm-card">
+                                <span>Lote</span>
+                                <strong t-esc="detailData.lot_name"/>
+                            </div>
+
+                            <div class="hold-confirm-card">
+                                <span>Cantidad</span>
+                                <strong><t t-esc="formatNumber(detailData.quantity)"/> m²</strong>
+                            </div>
+                        </div>
+
+                        <div class="hold-price-summary" t-if="state.productPrice and state.productPrice > 0">
+                            <div>
+                                <span>Precio/m²</span>
+                                <strong><t t-esc="formatNumber(state.productPrice)"/> <t t-esc="state.selectedCurrency"/></strong>
+                            </div>
+                            <div>
+                                <span>Cantidad</span>
+                                <strong><t t-esc="formatNumber(detailData.quantity)"/> m²</strong>
+                            </div>
+                            <div class="hold-price-summary__total">
+                                <span>Total</span>
+                                <strong>
+                                    <t t-esc="formatNumber(detailData.quantity * state.productPrice)"/>
+                                    <t t-esc="state.selectedCurrency"/>
+                                </strong>
+                            </div>
+                        </div>
+
+                        <div class="hold-field hold-notes-field">
+                            <label>
+                                <i class="fa fa-commenting-o"/>
+                                Notas adicionales
+                            </label>
+                            <textarea
+                                class="hold-textarea"
+                                rows="4"
+                                placeholder="Ej: Para proyecto X, cotización #123, condiciones especiales, observaciones comerciales..."
+                                t-model="state.notas"
+                                t-on-input="onNotasChange"
+                            ></textarea>
+                        </div>
+
+                        <div class="hold-duration-card">
+                            <div class="hold-duration-card__icon">
+                                <i class="fa fa-clock-o"/>
+                            </div>
+                            <div>
+                                <strong>Duración del apartado</strong>
+                                <p>
+                                    El apartado tendrá una duración de <b>5 días hábiles</b> a partir de hoy.
                                     Podrás renovarlo desde la gestión de apartados si es necesario.
                                 </p>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
 
             <t t-set-slot="footer">
-                <!-- Botones de navegación -->
-                <button 
-                    class="btn btn-light border btn-lg"
-                    t-on-click="prevStep"
-                    t-if="state.currentStep > 1 and state.currentStep &lt; 5"
-                >
-                    <i class="fa fa-chevron-left me-2"></i>
-                    Anterior
-                </button>
-                
-                <button 
-                    class="btn btn-light border btn-lg"
-                    t-on-click="props.close"
-                    t-if="state.currentStep === 1"
-                >
-                    <i class="fa fa-times me-2"></i>
-                    Cancelar
-                </button>
-                
-                <button 
-                    class="btn btn-secondary btn-lg"
-                    t-on-click="nextStep"
-                    t-if="state.currentStep &lt; 5"
-                >
-                    Siguiente
-                    <i class="fa fa-chevron-right ms-2"></i>
-                </button>
-                
-                <button 
-                    class="btn btn-light border btn-lg"
-                    t-on-click="prevStep"
-                    t-if="state.currentStep === 5"
-                >
-                    <i class="fa fa-chevron-left me-2"></i>
-                    Anterior
-                </button>
-                
-                <button 
-                    class="btn btn-secondary btn-lg"
-                    t-on-click="createHold"
-                    t-if="state.currentStep === 5"
-                    t-att-disabled="state.isCreating"
-                >
-                    <t t-if="!state.isCreating">
-                        <i class="fa fa-hand-paper-o me-2"></i>
-                        Crear Apartado
-                    </t>
-                    <t t-else="">
-                        <i class="fa fa-spinner fa-spin me-2"></i>
-                        Creando...
-                    </t>
-                </button>
+                <div class="hold-footer-actions">
+                    <button
+                        type="button"
+                        class="hold-secondary-button"
+                        t-on-click="prevStep"
+                        t-if="state.currentStep > 1"
+                    >
+                        <i class="fa fa-chevron-left"/>
+                        Anterior
+                    </button>
+
+                    <button
+                        type="button"
+                        class="hold-secondary-button"
+                        t-on-click="props.close"
+                        t-if="state.currentStep === 1"
+                    >
+                        <i class="fa fa-times"/>
+                        Cancelar
+                    </button>
+
+                    <button
+                        type="button"
+                        class="hold-primary-button"
+                        t-on-click="nextStep"
+                        t-if="state.currentStep &lt; 5"
+                    >
+                        Siguiente
+                        <i class="fa fa-chevron-right"/>
+                    </button>
+
+                    <button
+                        type="button"
+                        class="hold-primary-button"
+                        t-on-click="createHold"
+                        t-if="state.currentStep === 5"
+                        t-att-disabled="state.isCreating"
+                    >
+                        <t t-if="!state.isCreating">
+                            <i class="fa fa-hand-paper-o"/>
+                            Crear apartado
+                        </t>
+                        <t t-else="">
+                            <i class="fa fa-spinner fa-spin"/>
+                            Creando...
+                        </t>
+                    </button>
+                </div>
             </t>
         </Dialog>
     </t>
-    
+
 </templates>

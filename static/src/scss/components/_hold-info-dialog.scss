@@ -1,297 +1,615 @@
-// ==========================================
-// HOLD INFO DIALOG - Estilos Limpios
-// ==========================================
+// ============================================================
+// HOLD INFO DIALOG — Wood Warm Light Theme
+// ============================================================
 
-$brand-primary: #714B67;
-$brand-gray: #8F8F8F;
-$brand-secondary: #017E84;
+$wood-walnut: #4A2A18;
+$wood-dark-walnut: #2F1B10;
+$wood-cedar: #7A4424;
+$wood-copper: #A76735;
+$wood-caramel: #C58A4A;
+$wood-honey: #E4B66A;
+$wood-oak: #F1D6AA;
+$wood-light-oak: #F9E8CC;
+$wood-cream: #FFFDF7;
+$wood-cream-2: #FFF8EC;
+$wood-parchment: #FCF0DC;
+$wood-parchment-2: #F8E7CB;
+$wood-sand: #E9CDA5;
+$wood-bark: #6A4A32;
+$wood-charcoal: #2A1A12;
+$wood-muted: #92735A;
+$wood-line: #EBD5B5;
 
-.o_hold_info_dialog {
-  background: #FFFFFF;
-  padding: 8px;
+$wood-sage: #61724C;
+$wood-sage-dark: #415136;
+$wood-sage-light: #EEF4E7;
+$wood-redwood: #9A4A32;
+$wood-amber: #C98228;
 
-  // === HEADER DEL PRODUCTO ===
-  .alert-light {
-    background: #FFFFFF !important;
-    border: none !important;
-    border-left: 4px solid $brand-secondary !important;
-    border-radius: 0 8px 8px 0;
-    padding: 16px 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+.modal-content:has(.o_hold_info_dialog_wood) {
+  border: 0 !important;
+  border-radius: 30px !important;
+  overflow: hidden;
+  background: $wood-cream !important;
+  box-shadow:
+    0 34px 90px rgba($wood-walnut, .18),
+    0 10px 28px rgba($wood-walnut, .10);
 
-    .fa-hand-paper-o {
-      color: $brand-secondary !important;
-      opacity: 0.9;
-    }
+  .modal-header {
+    display: none !important;
+  }
 
-    h5 {
-      color: $brand-primary;
-      font-weight: 700;
-      font-size: 16px;
-      margin: 0;
-    }
+  .modal-body {
+    padding: 0 !important;
+    background:
+      radial-gradient(circle at 8% 0%, rgba($wood-honey, .16), transparent 28%),
+      radial-gradient(circle at 96% 4%, rgba($wood-oak, .22), transparent 34%),
+      linear-gradient(180deg, $wood-cream 0%, $wood-cream-2 55%, $wood-parchment 100%) !important;
+  }
 
-    small.text-muted {
-      color: $brand-gray !important;
-      font-size: 13px;
+  .modal-footer {
+    background:
+      linear-gradient(180deg, rgba($wood-cream, .98), rgba($wood-cream-2, .98)) !important;
+    border-top: 1px solid rgba($wood-cedar, .14) !important;
+    padding: 16px 22px !important;
+  }
+}
 
-      strong {
-        color: $brand-primary;
-        font-weight: 600;
-      }
+.o_hold_info_dialog_wood {
+  position: relative;
+  min-height: 520px;
+  color: $wood-charcoal;
+  background:
+    radial-gradient(circle at 10% 3%, rgba($wood-honey, .14), transparent 30%),
+    radial-gradient(circle at 92% 0%, rgba($wood-oak, .24), transparent 34%),
+    linear-gradient(180deg, #ffffff 0%, $wood-cream 38%, $wood-cream-2 100%);
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: .10;
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(
+        8deg,
+        rgba($wood-cedar, .08) 0px,
+        rgba($wood-cedar, .08) 1px,
+        transparent 1px,
+        transparent 30px
+      ),
+      repeating-linear-gradient(
+        96deg,
+        rgba($wood-honey, .08) 0px,
+        rgba($wood-honey, .08) 1px,
+        transparent 1px,
+        transparent 48px
+      );
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+// ============================================================
+// Floating close
+// ============================================================
+
+.hold-info-floating-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 8;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba($wood-cedar, .20);
+  border-radius: 999px;
+  color: $wood-walnut;
+  background: rgba(255, 253, 247, .82);
+  backdrop-filter: blur(10px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow:
+    0 10px 24px rgba($wood-walnut, .10),
+    inset 0 0 0 1px rgba(255, 255, 255, .70);
+  transition: transform .16s ease, background .16s ease, box-shadow .16s ease, color .16s ease;
+
+  &:hover {
+    transform: translateY(-1px) scale(1.04);
+    color: #ffffff;
+    background: linear-gradient(135deg, $wood-cedar, $wood-walnut);
+    box-shadow: 0 14px 28px rgba($wood-walnut, .18);
+  }
+}
+
+// ============================================================
+// Hero
+// ============================================================
+
+.hold-info-hero {
+  position: relative;
+  padding: 30px 28px;
+  background:
+    radial-gradient(circle at 9% 15%, rgba(255, 255, 255, .88), transparent 28%),
+    radial-gradient(circle at 92% 0%, rgba($wood-honey, .28), transparent 34%),
+    linear-gradient(135deg, #FFFDF7 0%, $wood-cream-2 34%, $wood-parchment 70%, $wood-light-oak 100%);
+  border-bottom: 1px solid rgba($wood-cedar, .12);
+  overflow: hidden;
+
+  &__grain {
+    position: absolute;
+    inset: 0;
+    opacity: .18;
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(
+        8deg,
+        rgba($wood-cedar, .08) 0px,
+        rgba($wood-cedar, .08) 1px,
+        transparent 1px,
+        transparent 20px
+      ),
+      repeating-linear-gradient(
+        98deg,
+        rgba($wood-honey, .10) 0px,
+        rgba($wood-honey, .10) 1px,
+        transparent 1px,
+        transparent 50px
+      );
+  }
+
+  &__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding-right: 46px;
+  }
+
+  &__icon {
+    width: 88px;
+    height: 88px;
+    flex: 0 0 auto;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(255, 255, 255, .82), transparent 32%),
+      linear-gradient(145deg, rgba($wood-honey, .58), rgba($wood-oak, .55));
+    border: 1px solid rgba($wood-copper, .18);
+    box-shadow:
+      0 22px 44px rgba($wood-walnut, .12),
+      inset 0 0 0 1px rgba(255, 255, 255, .48);
+
+    i {
+      color: $wood-walnut;
+      font-size: 44px;
+      text-shadow: 0 3px 10px rgba(255, 255, 255, .75);
     }
   }
 
-  // === CARDS GENERALES ===
-  .card {
-    background: #FFFFFF;
-    border: 1px solid rgba($brand-gray, 0.2) !important;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
-    margin-bottom: 16px;
+  &__copy {
+    min-width: 0;
 
-    // Card de estado (warning)
-    &.border-warning {
-      border: 1px solid rgba($brand-secondary, 0.3) !important;
-
-      .card-header {
-        background: rgba($brand-secondary, 0.06) !important;
-        border-bottom: 1px solid rgba($brand-secondary, 0.15) !important;
-        padding: 14px 18px;
-
-        h5 {
-          color: $brand-primary;
-          font-weight: 700;
-          font-size: 14px;
-          margin: 0;
-
-          .fa-info-circle {
-            color: $brand-secondary;
-            margin-right: 8px;
-          }
-        }
-      }
-    }
-
-    // Card normal
-    .card-header {
-      background: #FAFAFA !important;
-      border-bottom: 1px solid rgba($brand-gray, 0.15) !important;
-      padding: 12px 18px;
-
-      h6 {
-        color: $brand-primary;
-        font-weight: 700;
-        font-size: 13px;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-
-        i {
-          color: $brand-secondary;
-          font-size: 14px;
-        }
-      }
-    }
-
-    .card-body {
-      padding: 16px 18px;
-      background: #FFFFFF;
-    }
-  }
-
-  // === ALERTA DE ESTADO ===
-  .alert-warning {
-    background: rgba($brand-secondary, 0.04) !important;
-    border: 1px solid rgba($brand-secondary, 0.15) !important;
-    border-radius: 8px;
-    padding: 14px 16px;
-
-    .fa-exclamation-triangle {
-      color: $brand-secondary !important;
-      font-size: 20px !important;
-    }
-
-    strong {
-      color: $brand-primary;
-      font-size: 14px;
+    h2 {
+      color: $wood-walnut;
+      font-size: 34px;
+      line-height: 1;
+      font-weight: 950;
+      letter-spacing: -.055em;
+      margin: 4px 0 8px;
     }
 
     p {
-      color: $brand-gray;
-      font-size: 12px;
-      line-height: 1.5;
-    }
-  }
-
-  // === TABLA DE DETALLES ===
-  .table-borderless {
-    margin: 0;
-
-    tbody tr {
-      border-bottom: 1px solid rgba($brand-gray, 0.08);
-
-      &:last-child {
-        border-bottom: none;
-      }
-
-      td {
-        padding: 10px 4px;
-        vertical-align: middle;
-        font-size: 13px;
-
-        &.fw-bold {
-          color: $brand-gray;
-          font-weight: 600;
-          width: 35%;
-        }
-
-        // Badge de cliente
-        .badge {
-          background: #FFFFFF !important;
-          color: $brand-primary !important;
-          border: 1px solid rgba($brand-primary, 0.2) !important;
-          font-weight: 600;
-          font-size: 13px;
-          padding: 8px 14px;
-          border-radius: 6px;
-
-          .fa-user-circle {
-            color: $brand-secondary;
-            margin-right: 6px;
-          }
-        }
-
-        // Iconos en la tabla
-        i.fa {
-          width: 18px;
-          text-align: center;
-          font-size: 13px;
-
-          &.fa-folder { color: $brand-gray; }
-          &.fa-user-circle-o { color: $brand-gray; }
-          &.fa-user { color: $brand-secondary; }
-          &.fa-calendar-check-o { color: $brand-secondary; }
-          &.fa-calendar-times-o { color: $brand-primary; }
-        }
-
-        strong {
-          color: $brand-primary;
-        }
-      }
-    }
-  }
-
-  // === INFORMACIÓN DEL LOTE ===
-  .row.g-3 {
-    .col-md-6 {
-      small.text-muted {
-        color: $brand-gray !important;
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-        font-weight: 600;
-        margin-bottom: 4px;
-      }
-
-      strong {
-        color: $brand-primary;
-        font-size: 14px;
-        display: block;
-        margin-top: 2px;
-
-        &.text-secondary {
-          color: $brand-secondary !important;
-          font-size: 18px;
-          font-weight: 700;
-        }
-
-        i.fa-map-marker {
-          color: $brand-secondary;
-          margin-right: 6px;
-        }
-      }
+      max-width: 640px;
+      color: $wood-bark;
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.55;
     }
   }
 }
 
-// === FOOTER DEL DIÁLOGO ===
-.modal-content:has(.o_hold_info_dialog) .modal-footer,
-.o_hold_info_dialog + .modal-footer {
-  background: #FAFAFA;
-  border-top: 1px solid rgba($brand-gray, 0.15);
-  padding: 14px 20px;
+.hold-info-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: $wood-copper;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: .14em;
+  text-transform: uppercase;
 
-  .btn-light {
-    background: #FFFFFF !important;
-    color: $brand-gray !important;
-    border: 1px solid rgba($brand-gray, 0.3) !important;
-    font-weight: 600;
+  &::before {
+    content: "";
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: $wood-honey;
+    box-shadow: 0 0 18px rgba($wood-honey, .75);
+  }
+}
+
+// ============================================================
+// Product summary
+// ============================================================
+
+.hold-info-product {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 14px;
+  padding: 18px 22px 6px;
+}
+
+.hold-info-product__main,
+.hold-info-product__meta > div {
+  border-radius: 20px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .96), rgba($wood-cream, .92));
+  border: 1px solid rgba($wood-cedar, .12);
+  box-shadow:
+    0 12px 28px rgba($wood-walnut, .06),
+    inset 0 0 0 1px rgba(255, 255, 255, .75);
+}
+
+.hold-info-product__main {
+  padding: 16px;
+
+  span {
+    display: block;
+    color: $wood-muted;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    font-weight: 950;
+    margin-bottom: 5px;
+  }
+
+  strong {
+    color: $wood-walnut;
+    font-size: 18px;
+    font-weight: 950;
+    letter-spacing: -.03em;
+  }
+}
+
+.hold-info-product__meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  div {
+    padding: 16px;
+  }
+
+  span {
+    display: block;
+    color: $wood-muted;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    font-weight: 950;
+    margin-bottom: 5px;
+  }
+
+  strong {
+    color: $wood-walnut;
     font-size: 14px;
-    padding: 10px 24px;
-    border-radius: 6px;
-    transition: all 0.2s ease;
+    font-weight: 950;
+  }
+}
 
-    &:hover {
-      background: $brand-primary !important;
-      color: #FFFFFF !important;
-      border-color: $brand-primary !important;
-    }
+// ============================================================
+// Status
+// ============================================================
+
+.hold-info-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin: 14px 22px;
+  padding: 16px;
+  border-radius: 22px;
+  background: rgba($wood-honey, .16);
+  border: 1px solid rgba($wood-amber, .18);
+
+  &__icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 18px;
+    color: $wood-amber;
+    background: rgba($wood-honey, .22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
 
     i {
-      margin-right: 6px;
+      font-size: 23px;
+    }
+  }
+
+  strong {
+    display: block;
+    color: $wood-walnut;
+    font-size: 15px;
+    font-weight: 950;
+    margin-bottom: 4px;
+  }
+
+  p {
+    color: $wood-bark;
+    font-size: 12px;
+    line-height: 1.55;
+    margin: 0;
+  }
+}
+
+// ============================================================
+// Cards
+// ============================================================
+
+.hold-info-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 330px);
+  gap: 14px;
+  padding: 0 22px 24px;
+}
+
+.hold-info-card {
+  min-width: 0;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .98), rgba($wood-cream, .96));
+  border: 1px solid rgba($wood-cedar, .13);
+  box-shadow:
+    0 16px 38px rgba($wood-walnut, .08),
+    0 2px 7px rgba($wood-walnut, .04);
+  overflow: hidden;
+
+  &--wide {
+    grid-column: 1 / 2;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 14px 16px;
+    background:
+      radial-gradient(circle at 0% 0%, rgba($wood-honey, .10), transparent 34%),
+      linear-gradient(180deg, rgba(255, 255, 255, .80), rgba($wood-cream, .82));
+    border-bottom: 1px solid rgba($wood-cedar, .10);
+
+    i {
+      color: $wood-copper;
+      font-size: 15px;
+    }
+
+    span {
+      color: $wood-walnut;
+      font-size: 12px;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: .08em;
     }
   }
 }
 
-// === RESPONSIVE ===
-@media (max-width: 768px) {
-  .o_hold_info_dialog {
-    padding: 4px;
+.hold-info-list {
+  padding: 14px 16px;
+}
 
-    .alert-light {
-      padding: 12px 14px;
-      
-      h5 {
-        font-size: 14px;
+.hold-info-row {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 14px;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba($wood-cedar, .08);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  > span {
+    color: $wood-muted;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-weight: 950;
+  }
+
+  strong {
+    color: $wood-walnut;
+    font-size: 13px;
+    font-weight: 900;
+    min-width: 0;
+    word-break: break-word;
+
+    i {
+      color: $wood-copper;
+      margin-right: 6px;
+      width: 16px;
+      text-align: center;
+    }
+  }
+}
+
+.hold-date-stack,
+.hold-lot-grid {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+
+  > div {
+    padding: 13px;
+    border-radius: 17px;
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, .92), rgba($wood-cream, .88));
+    border: 1px solid rgba($wood-cedar, .10);
+
+    span {
+      display: block;
+      color: $wood-muted;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-weight: 950;
+      margin-bottom: 6px;
+    }
+
+    strong {
+      display: block;
+      color: $wood-walnut;
+      font-size: 13px;
+      font-weight: 900;
+      word-break: break-word;
+
+      i {
+        color: $wood-copper;
+        margin-right: 6px;
+      }
+    }
+  }
+}
+
+.hold-info-notes {
+  padding: 16px;
+
+  p {
+    white-space: pre-line;
+    color: $wood-bark;
+    line-height: 1.6;
+    margin: 0;
+    padding: 16px;
+    border-radius: 18px;
+    background: $wood-parchment;
+    border: 1px solid rgba($wood-cedar, .12);
+  }
+}
+
+// ============================================================
+// Footer button
+// ============================================================
+
+.hold-info-close-button {
+  min-height: 42px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: linear-gradient(135deg, $wood-cedar, $wood-walnut);
+  border: 0;
+  font-size: 13px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 10px 22px rgba($wood-walnut, .18);
+  transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    background: linear-gradient(135deg, $wood-copper, $wood-cedar);
+    box-shadow: 0 14px 28px rgba($wood-copper, .22);
+  }
+}
+
+// ============================================================
+// Responsive
+// ============================================================
+
+@media (max-width: 992px) {
+  .hold-info-hero {
+    padding: 24px 18px;
+
+    &__content {
+      padding-right: 0;
+    }
+  }
+
+  .hold-info-product,
+  .hold-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hold-info-product {
+    padding: 16px 18px 4px;
+  }
+
+  .hold-info-status {
+    margin: 14px 18px;
+  }
+
+  .hold-info-grid {
+    padding: 0 18px 20px;
+  }
+
+  .hold-info-card--wide {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 576px) {
+  .modal-content:has(.o_hold_info_dialog_wood) {
+    border-radius: 18px !important;
+  }
+
+  .hold-info-floating-close {
+    top: 12px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+  }
+
+  .hold-info-hero {
+    padding: 20px 18px;
+
+    &__content {
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    &__icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 20px;
+
+      i {
+        font-size: 32px;
       }
     }
 
-    .card {
-      margin-bottom: 12px;
-
-      .card-header {
-        padding: 10px 14px;
-      }
-
-      .card-body {
-        padding: 12px 14px;
-      }
+    &__copy h2 {
+      font-size: 26px;
     }
 
-    .table-borderless tbody tr td {
+    &__copy p {
       font-size: 12px;
-      padding: 8px 2px;
-
-      &.fw-bold {
-        width: 40%;
-      }
-
-      .badge {
-        font-size: 12px;
-        padding: 6px 10px;
-      }
     }
+  }
 
-    .row.g-3 .col-md-6 {
-      margin-bottom: 12px;
+  .hold-info-product__meta {
+    grid-template-columns: 1fr;
+  }
 
-      strong.text-secondary {
-        font-size: 16px !important;
-      }
-    }
+  .hold-info-status {
+    flex-direction: column;
+  }
+
+  .hold-info-row {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .hold-info-close-button {
+    width: 100%;
   }
 }
