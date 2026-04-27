@@ -1,40 +1,47 @@
 // ============================================================
-// Sale Order Dialog — Wood Warm Theme
+// Sale Order Dialog — Wood Warm Light Theme
 // Popup de venta para Inventario Visual
+// Fondo claro + tonos madereros cálidos
 // ============================================================
 
-$sod-walnut: #3F2415;
-$sod-dark-walnut: #2A160D;
-$sod-cedar: #6F3F22;
-$sod-copper: #9B5B2E;
-$sod-caramel: #B8793E;
-$sod-honey: #D99A4A;
-$sod-oak: #F2D2A3;
-$sod-cream: #FFF6E8;
-$sod-parchment: #F8EAD6;
-$sod-sand: #E8CDA7;
-$sod-bark: #5A3A27;
-$sod-charcoal: #231811;
-$sod-muted: #8A6A52;
-$sod-line: #E8D0B1;
-$sod-soft-line: rgba(111, 63, 34, .16);
-$sod-sage: #526846;
-$sod-sage-dark: #394D32;
-$sod-redwood: #8E3F2B;
+$sod-walnut: #4A2A18;
+$sod-dark-walnut: #2F1B10;
+$sod-cedar: #7A4424;
+$sod-copper: #A76735;
+$sod-caramel: #C58A4A;
+$sod-honey: #E4B66A;
+$sod-oak: #F1D6AA;
+$sod-light-oak: #F9E8CC;
+$sod-cream: #FFFDF7;
+$sod-cream-2: #FFF8EC;
+$sod-parchment: #FCF0DC;
+$sod-parchment-2: #F8E7CB;
+$sod-sand: #E9CDA5;
+$sod-bark: #6A4A32;
+$sod-charcoal: #2A1A12;
+$sod-muted: #92735A;
+$sod-line: #EBD5B5;
+$sod-soft-line: rgba(122, 68, 36, .14);
+$sod-soft-shadow: rgba(74, 42, 24, .10);
+$sod-sage: #61724C;
+$sod-sage-dark: #415136;
+$sod-sage-light: #EEF4E7;
+$sod-redwood: #9A4A32;
 $sod-amber: #C98228;
 
 // ============================================================
 // Eliminar header nativo del Dialog que muestra "Odoo"
 // ============================================================
 
-.modal-content:has(.o_sale_order_dialog_wood) {
+.modal-content:has(.o_sale_order_dialog_wood),
+.modal-content:has(.o_sale_order_dialog_premium) {
   border: 0 !important;
   border-radius: 30px !important;
   overflow: hidden;
-  background: $sod-cream;
+  background: $sod-cream !important;
   box-shadow:
-    0 36px 110px rgba(35, 24, 17, .34),
-    0 12px 34px rgba(63, 36, 21, .24);
+    0 34px 90px rgba(74, 42, 24, .18),
+    0 10px 28px rgba(74, 42, 24, .10);
 
   .modal-header {
     display: none !important;
@@ -43,49 +50,50 @@ $sod-amber: #C98228;
   .modal-body {
     padding: 0 !important;
     background:
-      radial-gradient(circle at 8% 0%, rgba($sod-honey, .18), transparent 28%),
-      radial-gradient(circle at 95% 10%, rgba($sod-caramel, .14), transparent 34%),
-      linear-gradient(180deg, $sod-cream 0%, $sod-parchment 100%);
+      radial-gradient(circle at 8% 0%, rgba($sod-honey, .16), transparent 28%),
+      radial-gradient(circle at 96% 4%, rgba($sod-oak, .22), transparent 34%),
+      linear-gradient(180deg, $sod-cream 0%, $sod-cream-2 55%, $sod-parchment 100%) !important;
   }
 
   .modal-footer {
     background:
-      linear-gradient(180deg, rgba(255, 246, 232, .94), rgba(248, 234, 214, .98));
-    border-top: 1px solid rgba($sod-cedar, .18);
+      linear-gradient(180deg, rgba($sod-cream, .98), rgba($sod-cream-2, .98)) !important;
+    border-top: 1px solid rgba($sod-cedar, .14) !important;
     padding: 16px 22px;
   }
 }
 
-.o_sale_order_dialog_wood {
+.o_sale_order_dialog_wood,
+.o_sale_order_dialog_premium {
   min-height: 420px;
   position: relative;
   color: $sod-charcoal;
   background:
-    radial-gradient(circle at 12% 3%, rgba($sod-honey, .20), transparent 28%),
-    radial-gradient(circle at 92% 0%, rgba($sod-copper, .14), transparent 32%),
-    linear-gradient(180deg, $sod-cream 0%, $sod-parchment 100%);
+    radial-gradient(circle at 10% 3%, rgba($sod-honey, .14), transparent 30%),
+    radial-gradient(circle at 92% 0%, rgba($sod-oak, .24), transparent 34%),
+    linear-gradient(180deg, #ffffff 0%, $sod-cream 38%, $sod-cream-2 100%);
   overflow: hidden;
 
   &::before {
     content: "";
     position: absolute;
     inset: 0;
-    opacity: .20;
+    opacity: .12;
     pointer-events: none;
     background:
       repeating-linear-gradient(
-        7deg,
-        rgba($sod-cedar, .10) 0px,
-        rgba($sod-cedar, .10) 1px,
+        8deg,
+        rgba($sod-cedar, .09) 0px,
+        rgba($sod-cedar, .09) 1px,
         transparent 1px,
-        transparent 26px
+        transparent 30px
       ),
       repeating-linear-gradient(
         96deg,
         rgba($sod-honey, .08) 0px,
         rgba($sod-honey, .08) 1px,
         transparent 1px,
-        transparent 42px
+        transparent 48px
       );
   }
 
@@ -106,25 +114,29 @@ $sod-amber: #C98228;
   z-index: 5;
   width: 38px;
   height: 38px;
-  border: 1px solid rgba($sod-cream, .42);
+  border: 1px solid rgba($sod-cedar, .20);
   border-radius: 999px;
-  color: $sod-cream;
-  background: rgba($sod-dark-walnut, .34);
+  color: $sod-walnut;
+  background: rgba(255, 253, 247, .82);
   backdrop-filter: blur(10px);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform .16s ease, background .16s ease, box-shadow .16s ease;
+  box-shadow:
+    0 10px 24px rgba($sod-walnut, .10),
+    inset 0 0 0 1px rgba(255, 255, 255, .70);
+  transition: transform .16s ease, background .16s ease, box-shadow .16s ease, color .16s ease;
 
   &:hover {
     transform: translateY(-1px) scale(1.04);
-    background: rgba($sod-dark-walnut, .58);
-    box-shadow: 0 12px 26px rgba($sod-dark-walnut, .24);
+    color: #ffffff;
+    background: linear-gradient(135deg, $sod-cedar, $sod-walnut);
+    box-shadow: 0 14px 28px rgba($sod-walnut, .18);
   }
 
   &--hero {
-    color: #fff7eb;
+    color: $sod-walnut;
   }
 }
 
@@ -150,17 +162,17 @@ $sod-amber: #C98228;
     justify-content: center;
     margin-bottom: 22px;
     background:
-      radial-gradient(circle at 35% 25%, rgba(255, 255, 255, .72), transparent 34%),
-      linear-gradient(135deg, rgba($sod-honey, .56), rgba($sod-copper, .34));
-    border: 1px solid rgba($sod-cedar, .22);
+      radial-gradient(circle at 35% 25%, rgba(255, 255, 255, .90), transparent 34%),
+      linear-gradient(135deg, rgba($sod-honey, .42), rgba($sod-oak, .60));
+    border: 1px solid rgba($sod-cedar, .18);
     box-shadow:
-      0 22px 46px rgba($sod-copper, .22),
-      inset 0 0 0 1px rgba(255, 255, 255, .55);
+      0 22px 46px rgba($sod-copper, .13),
+      inset 0 0 0 1px rgba(255, 255, 255, .72);
 
     i {
       font-size: 48px;
       color: $sod-walnut;
-      filter: drop-shadow(0 8px 14px rgba($sod-copper, .22));
+      filter: drop-shadow(0 8px 14px rgba($sod-copper, .16));
     }
   }
 
@@ -181,25 +193,26 @@ $sod-amber: #C98228;
 }
 
 // ============================================================
-// Hero
+// Hero claro
 // ============================================================
 
 .sod-hero {
   position: relative;
-  padding: 26px 24px;
+  padding: 28px 24px;
   background:
-    radial-gradient(circle at 12% 18%, rgba(255, 255, 255, .16), transparent 26%),
-    radial-gradient(circle at 88% 0%, rgba($sod-honey, .22), transparent 31%),
-    linear-gradient(135deg, $sod-dark-walnut 0%, $sod-walnut 38%, $sod-cedar 69%, $sod-copper 100%);
+    radial-gradient(circle at 9% 15%, rgba(255, 255, 255, .88), transparent 28%),
+    radial-gradient(circle at 92% 0%, rgba($sod-honey, .28), transparent 34%),
+    linear-gradient(135deg, #FFFDF7 0%, $sod-cream-2 34%, $sod-parchment 70%, $sod-light-oak 100%);
+  border-bottom: 1px solid rgba($sod-cedar, .12);
   overflow: hidden;
 
   &__pattern {
     position: absolute;
     inset: 0;
-    opacity: .36;
+    opacity: .20;
     background:
-      linear-gradient(rgba(255, 246, 232, .07) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 246, 232, .06) 1px, transparent 1px);
+      linear-gradient(rgba($sod-cedar, .10) 1px, transparent 1px),
+      linear-gradient(90deg, rgba($sod-cedar, .08) 1px, transparent 1px);
     background-size: 38px 38px;
     pointer-events: none;
   }
@@ -207,22 +220,22 @@ $sod-amber: #C98228;
   &__grain {
     position: absolute;
     inset: 0;
-    opacity: .28;
+    opacity: .18;
     pointer-events: none;
     background:
       repeating-linear-gradient(
         8deg,
-        rgba(255, 246, 232, .11) 0px,
-        rgba(255, 246, 232, .11) 1px,
+        rgba($sod-cedar, .08) 0px,
+        rgba($sod-cedar, .08) 1px,
         transparent 1px,
-        transparent 18px
+        transparent 20px
       ),
       repeating-linear-gradient(
         98deg,
-        rgba(0, 0, 0, .08) 0px,
-        rgba(0, 0, 0, .08) 1px,
+        rgba($sod-honey, .10) 0px,
+        rgba($sod-honey, .10) 1px,
         transparent 1px,
-        transparent 46px
+        transparent 50px
       );
   }
 
@@ -252,17 +265,17 @@ $sod-amber: #C98228;
     align-items: center;
     justify-content: center;
     background:
-      radial-gradient(circle at 30% 20%, rgba(255, 255, 255, .34), transparent 32%),
-      linear-gradient(145deg, rgba($sod-honey, .42), rgba($sod-oak, .12));
-    border: 1px solid rgba($sod-oak, .42);
+      radial-gradient(circle at 30% 20%, rgba(255, 255, 255, .82), transparent 32%),
+      linear-gradient(145deg, rgba($sod-honey, .58), rgba($sod-oak, .55));
+    border: 1px solid rgba($sod-copper, .18);
     box-shadow:
-      0 26px 52px rgba(0, 0, 0, .24),
-      inset 0 0 0 1px rgba(255, 246, 232, .14);
+      0 22px 44px rgba($sod-walnut, .12),
+      inset 0 0 0 1px rgba(255, 255, 255, .48);
 
     i {
-      color: #FFF7E8;
+      color: $sod-walnut;
       font-size: 48px;
-      text-shadow: 0 8px 18px rgba(0, 0, 0, .28);
+      text-shadow: 0 3px 10px rgba(255, 255, 255, .75);
     }
   }
 
@@ -270,8 +283,8 @@ $sod-amber: #C98228;
     min-width: 0;
 
     h2 {
-      color: #FFF7E8;
-      font-size: 35px;
+      color: $sod-walnut;
+      font-size: 36px;
       line-height: 1;
       font-weight: 950;
       letter-spacing: -.055em;
@@ -280,10 +293,10 @@ $sod-amber: #C98228;
 
     p {
       max-width: 575px;
-      color: rgba(255, 246, 232, .78);
+      color: $sod-bark;
       margin: 0;
       font-size: 13px;
-      line-height: 1.5;
+      line-height: 1.55;
     }
   }
 
@@ -300,7 +313,7 @@ $sod-amber: #C98228;
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  color: rgba(255, 246, 232, .74);
+  color: $sod-copper;
   font-size: 10px;
   font-weight: 950;
   letter-spacing: .14em;
@@ -312,7 +325,7 @@ $sod-amber: #C98228;
     height: 9px;
     border-radius: 50%;
     background: $sod-honey;
-    box-shadow: 0 0 20px rgba($sod-honey, .78);
+    box-shadow: 0 0 18px rgba($sod-honey, .75);
   }
 }
 
@@ -320,16 +333,16 @@ $sod-amber: #C98228;
   border-radius: 21px;
   padding: 16px;
   background:
-    linear-gradient(145deg, rgba(255, 246, 232, .16), rgba(255, 246, 232, .06));
-  border: 1px solid rgba($sod-oak, .24);
+    linear-gradient(145deg, rgba(255, 255, 255, .78), rgba($sod-cream, .82));
+  border: 1px solid rgba($sod-cedar, .13);
   backdrop-filter: blur(12px);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 246, 232, .04),
-    0 14px 32px rgba(0, 0, 0, .12);
+    0 14px 32px rgba($sod-walnut, .08),
+    inset 0 0 0 1px rgba(255, 255, 255, .74);
 
   &__label {
     display: block;
-    color: rgba(255, 246, 232, .70);
+    color: $sod-muted;
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: .10em;
@@ -339,7 +352,7 @@ $sod-amber: #C98228;
 
   strong {
     display: block;
-    color: #FFF7E8;
+    color: $sod-walnut;
     font-size: 22px;
     line-height: 1.1;
     font-weight: 950;
@@ -348,7 +361,7 @@ $sod-amber: #C98228;
   }
 
   &--money strong {
-    color: #FFE0A8;
+    color: $sod-sage-dark;
   }
 }
 
@@ -361,6 +374,7 @@ $sod-amber: #C98228;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
   padding: 18px 22px 6px;
+  background: transparent;
 }
 
 .sod-summary-card {
@@ -371,11 +385,11 @@ $sod-amber: #C98228;
   padding: 16px;
   border-radius: 20px;
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, .86), rgba(255, 246, 232, .74));
-  border: 1px solid rgba($sod-cedar, .13);
+    linear-gradient(145deg, rgba(255, 255, 255, .96), rgba($sod-cream, .92));
+  border: 1px solid rgba($sod-cedar, .12);
   box-shadow:
-    0 13px 32px rgba(63, 36, 21, .07),
-    inset 0 0 0 1px rgba(255, 255, 255, .68);
+    0 12px 28px rgba(74, 42, 24, .06),
+    inset 0 0 0 1px rgba(255, 255, 255, .75);
 
   &__icon {
     width: 46px;
@@ -387,9 +401,9 @@ $sod-amber: #C98228;
     justify-content: center;
     color: $sod-walnut;
     background:
-      radial-gradient(circle at 30% 20%, rgba(255, 255, 255, .56), transparent 32%),
-      linear-gradient(145deg, rgba($sod-honey, .34), rgba($sod-copper, .12));
-    border: 1px solid rgba($sod-copper, .15);
+      radial-gradient(circle at 30% 20%, rgba(255, 255, 255, .74), transparent 32%),
+      linear-gradient(145deg, rgba($sod-honey, .32), rgba($sod-oak, .36));
+    border: 1px solid rgba($sod-copper, .13);
   }
 
   span {
@@ -430,11 +444,11 @@ $sod-amber: #C98228;
   overflow: hidden;
   border-radius: 24px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, .95), rgba(255, 246, 232, .88));
-  border: 1px solid rgba($sod-cedar, .15);
+    linear-gradient(180deg, rgba(255, 255, 255, .98), rgba($sod-cream, .96));
+  border: 1px solid rgba($sod-cedar, .13);
   box-shadow:
-    0 18px 44px rgba(63, 36, 21, .10),
-    0 2px 7px rgba(63, 36, 21, .06);
+    0 16px 38px rgba(74, 42, 24, .08),
+    0 2px 7px rgba(74, 42, 24, .04);
   animation: sodFadeUp .22s ease both;
 
   &::before {
@@ -442,22 +456,22 @@ $sod-amber: #C98228;
     position: absolute;
     inset: 0 auto 0 0;
     width: 6px;
-    background: linear-gradient(180deg, $sod-honey, $sod-copper, $sod-walnut);
+    background: linear-gradient(180deg, $sod-honey, $sod-copper, $sod-cedar);
   }
 
   &::after {
     content: "";
     position: absolute;
     inset: 0;
-    opacity: .12;
+    opacity: .07;
     pointer-events: none;
     background:
       repeating-linear-gradient(
         10deg,
-        rgba($sod-cedar, .12) 0px,
-        rgba($sod-cedar, .12) 1px,
+        rgba($sod-cedar, .10) 0px,
+        rgba($sod-cedar, .10) 1px,
         transparent 1px,
-        transparent 34px
+        transparent 36px
       );
   }
 
@@ -474,8 +488,8 @@ $sod-amber: #C98228;
     padding: 18px 20px 14px 24px;
     border-bottom: 1px solid rgba($sod-cedar, .10);
     background:
-      radial-gradient(circle at 0% 0%, rgba($sod-honey, .13), transparent 34%),
-      linear-gradient(180deg, rgba(255, 255, 255, .68), rgba(255, 246, 232, .70));
+      radial-gradient(circle at 0% 0%, rgba($sod-honey, .10), transparent 34%),
+      linear-gradient(180deg, rgba(255, 255, 255, .80), rgba($sod-cream, .82));
   }
 
   &__identity {
@@ -509,14 +523,14 @@ $sod-amber: #C98228;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #FFF7E8;
+  color: #ffffff;
   font-size: 17px;
   font-weight: 950;
   letter-spacing: -.04em;
   background:
     radial-gradient(circle at 35% 25%, rgba(255, 255, 255, .24), transparent 34%),
     linear-gradient(135deg, $sod-walnut, $sod-copper);
-  box-shadow: 0 14px 28px rgba($sod-walnut, .19);
+  box-shadow: 0 14px 28px rgba($sod-walnut, .15);
 }
 
 .sod-order-name {
@@ -569,38 +583,38 @@ $sod-amber: #C98228;
 
   &--draft {
     color: $sod-bark;
-    background: rgba($sod-sand, .56);
-    border-color: rgba($sod-copper, .18);
+    background: rgba($sod-sand, .42);
+    border-color: rgba($sod-copper, .16);
   }
 
   &--sent {
     color: $sod-walnut;
     background: rgba($sod-honey, .24);
-    border-color: rgba($sod-honey, .42);
+    border-color: rgba($sod-honey, .38);
   }
 
   &--sale {
-    color: #FFF7E8;
-    background: linear-gradient(135deg, $sod-sage, $sod-sage-dark);
-    border-color: rgba($sod-sage-dark, .22);
-    box-shadow: 0 8px 16px rgba($sod-sage, .18);
+    color: $sod-sage-dark;
+    background: $sod-sage-light;
+    border-color: rgba($sod-sage, .28);
+    box-shadow: 0 7px 14px rgba($sod-sage, .10);
   }
 
   &--done {
-    color: #FFF7E8;
-    background: linear-gradient(135deg, $sod-walnut, $sod-dark-walnut);
-    border-color: rgba($sod-dark-walnut, .28);
+    color: $sod-walnut;
+    background: rgba($sod-oak, .52);
+    border-color: rgba($sod-cedar, .16);
   }
 
   &--cancel {
-    color: #FFF7E8;
-    background: linear-gradient(135deg, $sod-redwood, darken($sod-redwood, 10%));
-    border-color: rgba($sod-redwood, .30);
+    color: $sod-redwood;
+    background: rgba($sod-redwood, .10);
+    border-color: rgba($sod-redwood, .24);
   }
 
   &--default {
     color: $sod-muted;
-    background: rgba($sod-parchment, .76);
+    background: rgba($sod-parchment, .78);
     border-color: rgba($sod-cedar, .12);
   }
 }
@@ -616,18 +630,18 @@ $sod-amber: #C98228;
   min-height: 34px;
   padding: 8px 13px;
   border-radius: 999px;
-  color: #FFF7E8;
+  color: #ffffff;
   background: linear-gradient(135deg, $sod-cedar, $sod-walnut);
   border: 0;
   font-size: 11px;
   font-weight: 900;
-  box-shadow: 0 10px 22px rgba($sod-walnut, .22);
+  box-shadow: 0 10px 22px rgba($sod-walnut, .18);
   transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
 
   &:hover {
     transform: translateY(-1px);
     background: linear-gradient(135deg, $sod-copper, $sod-cedar);
-    box-shadow: 0 14px 28px rgba($sod-copper, .26);
+    box-shadow: 0 14px 28px rgba($sod-copper, .22);
   }
 
   &:active {
@@ -642,17 +656,17 @@ $sod-amber: #C98228;
   min-height: 40px;
   padding: 10px 22px;
   border-radius: 999px;
-  color: #FFF7E8 !important;
+  color: #ffffff !important;
   background: linear-gradient(135deg, $sod-cedar, $sod-dark-walnut) !important;
   border: 0 !important;
   font-weight: 900;
-  box-shadow: 0 12px 24px rgba($sod-walnut, .20);
+  box-shadow: 0 12px 24px rgba($sod-walnut, .18);
   transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
 
   &:hover {
     transform: translateY(-1px);
     background: linear-gradient(135deg, $sod-copper, $sod-cedar) !important;
-    box-shadow: 0 14px 28px rgba($sod-copper, .24);
+    box-shadow: 0 14px 28px rgba($sod-copper, .22);
   }
 }
 
@@ -671,7 +685,7 @@ $sod-amber: #C98228;
   padding: 14px;
   border-radius: 17px;
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, .78), rgba($sod-parchment, .72));
+    linear-gradient(145deg, rgba(255, 255, 255, .92), rgba($sod-cream, .88));
   border: 1px solid rgba($sod-cedar, .10);
 
   &__label {
@@ -709,13 +723,16 @@ $sod-amber: #C98228;
   border-radius: 20px;
   overflow: hidden;
   background:
-    radial-gradient(circle at 90% 0%, rgba(255, 255, 255, .18), transparent 35%),
-    linear-gradient(135deg, $sod-sage-dark, $sod-sage);
-  box-shadow: 0 17px 36px rgba($sod-sage, .20);
+    radial-gradient(circle at 90% 0%, rgba(255, 255, 255, .56), transparent 36%),
+    linear-gradient(135deg, #F5FAEF, $sod-sage-light);
+  border: 1px solid rgba($sod-sage, .24);
+  box-shadow:
+    0 14px 28px rgba($sod-sage, .10),
+    inset 0 0 0 1px rgba(255, 255, 255, .72);
 
   span {
     display: block;
-    color: rgba(255, 246, 232, .76);
+    color: $sod-sage-dark;
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: .10em;
@@ -725,7 +742,7 @@ $sod-amber: #C98228;
 
   strong {
     display: block;
-    color: #FFF7E8;
+    color: $sod-sage-dark;
     font-size: 24px;
     line-height: 1.1;
     font-weight: 950;
@@ -737,7 +754,7 @@ $sod-amber: #C98228;
     display: flex;
     align-items: center;
     gap: 5px;
-    color: rgba(255, 246, 232, .74);
+    color: rgba($sod-sage-dark, .78);
     margin-top: 10px;
     font-size: 11px;
   }
@@ -809,7 +826,8 @@ $sod-amber: #C98228;
 }
 
 @media (max-width: 576px) {
-  .modal-content:has(.o_sale_order_dialog_wood) {
+  .modal-content:has(.o_sale_order_dialog_wood),
+  .modal-content:has(.o_sale_order_dialog_premium) {
     border-radius: 18px !important;
   }
 
