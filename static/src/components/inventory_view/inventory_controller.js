@@ -300,27 +300,44 @@ class InventoryVisualController extends Component {
         if (!holdInfo || !holdInfo.id) {
             if (!this.state.hasSalesPermissions) {
                 this.notification.add(
-                    "No tiene permisos para crear apartados. Contacte al administrador.", 
+                    "No tiene permisos para crear apartados. Contacte al administrador.",
                     { type: "warning" }
                 );
                 return;
             }
+
             await this.openCreateHoldDialog(detailId);
             return;
         }
 
         let detailData = null;
+
         for (const [productId, details] of Object.entries(this.state.productDetails)) {
-            const detail = details.find(d => d.id === detailId);
+            const detail = details.find((d) => d.id === detailId);
+
             if (detail) {
-                detailData = detail;
+                const numericProductId = parseInt(productId);
+                const product = this.state.products.find((p) => p.product_id === numericProductId);
+
+                detailData = {
+                    ...detail,
+                    product_id: numericProductId,
+                    product_name: product ? product.product_name : (detail.product_name || ""),
+                    product_code: product ? product.product_code : (detail.product_code || ""),
+                    categ_name: product ? product.categ_name : (detail.categ_name || ""),
+                };
+
                 break;
             }
         }
-        
+
         if (!detailData) {
             this.notification.add("No se encontró información del lote", { type: "danger" });
             return;
+        }
+
+        if (!detailData.product_name) {
+            detailData.product_name = "Producto sin nombre";
         }
 
         this.openHoldInfoDialog(holdInfo, detailData);
