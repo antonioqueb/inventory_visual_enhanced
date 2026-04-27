@@ -234,11 +234,11 @@ export class ProductRow extends Component {
             }
 
             if (filter === "committed") {
-                return !isTransit && d.reserved_quantity > 0;
+                return !isTransit && (d.reserved_quantity > 0 || d.en_orden_venta);
             }
 
             if (filter === "available") {
-                return !isTransit && availableQty > 0 && !d.tiene_hold;
+                return !isTransit && availableQty > 0 && !d.tiene_hold && !d.en_orden_venta;
             }
 
             if (filter === "transit_available") {

@@ -55,6 +55,157 @@ class StockQuantTransitVisibility(models.Model):
             ("quant_id", "=", quant.id),
         ], limit=1)
 
+    # -------------------------------------------------------------------------
+    # DETECCIÓN NORMAL DE SO PARA INVENTARIO INTERNO
+    # -------------------------------------------------------------------------
+
+    @api.model
+    def _iv_resolve_sale_orders_from_move_line(self, move_line):
+        """
+        Resuelve la SO origen de una línea operativa pendiente.
+
+        Cubre:
+        - move_id.sale_line_id.order_id
+        - picking.sale_id, si existe
+        - procurement group de la SO
+        - origin del picking/move, cuando contiene la referencia de la SO
+
+        Solo se usa para inventario interno normal. No se usa en tránsito.
+        """
+        SaleOrder = self.env["sale.order"].sudo()
+        orders = SaleOrder
+
+        if not move_line or not move_line.exists():
+            return orders
+
+        move = move_line.move_id
+        picking = move_line.picking_id
+
+        # 1) Ruta normal: stock.move -> sale.order.line -> sale.order
+        if move and "sale_line_id" in move._fields and move.sale_line_id:
+            orders |= move.sale_line_id.order_id
+
+        # 2) Compatibilidad: picking.sale_id si existe
+        if picking and "sale_id" in picking._fields and picking.sale_id:
+            orders |= picking.sale_id
+
+        # 3) Procurement group
+        group = False
+
+        if move and "group_id" in move._fields and move.group_id:
+            group = move.group_id
+        elif picking and "group_id" in picking._fields and picking.group_id:
+            group = picking.group_id
+
+        if group:
+            if "procurement_group_id" in SaleOrder._fields:
+                orders |= SaleOrder.search([
+                    ("procurement_group_id", "=", group.id),
+                    ("state", "in", ["sale", "done"]),
+                ], limit=20)
+            elif "group_id" in SaleOrder._fields:
+                orders |= SaleOrder.search([
+                    ("group_id", "=", group.id),
+                    ("state", "in", ["sale", "done"]),
+                ], limit=20)
+
+        # 4) Origin fallback
+        origin = ""
+
+        if picking and picking.origin:
+            origin = picking.origin
+        elif move and "origin" in move._fields and move.origin:
+            origin = move.origin
+
+        if origin:
+            refs = [
+                ref.strip()
+                for ref in origin.replace(";", ",").split(",")
+                if ref.strip()
+            ]
+
+            if refs:
+                orders |= SaleOrder.search([
+                    ("name", "in", refs),
+                    ("state", "in", ["sale", "done"]),
+                ], limit=20)
+
+        return orders.filtered(lambda order: order.state in ("sale", "done"))
+
+    @api.model
+    def _iv_get_normal_sale_order_ids_for_quant(self, quant):
+        """
+        Detecta si un quant interno normal está comprometido con una SO.
+
+        Importante:
+        - NO aplica a tránsito.
+        - NO cambia la lógica de T. Available / T. Committed.
+        - Sirve para que la columna E muestre el signo $ verde en Inventario Visual.
+
+        Casos cubiertos:
+        1. Lote en picking/entrega asignada o pendiente con sale_line_id.
+        2. Lote seleccionado en sale.order.line.lot_ids antes de remisión.
+        """
+        sale_order_ids = set()
+
+        if (
+            not quant
+            or not quant.exists()
+            or not quant.lot_id
+            or not quant.product_id
+            or quant.location_id.usage != "internal"
+        ):
+            return []
+
+        # ---------------------------------------------------------------------
+        # 1) Detección logística:
+        #    Picking / operación pendiente con lote asignado.
+        #
+        #    En rutas multi-step puede ser internal, no necesariamente outgoing.
+        #    Por eso NO filtramos picking_type_code.
+        # ---------------------------------------------------------------------
+        move_lines_with_lot = self.env["stock.move.line"].sudo().search([
+            ("lot_id", "=", quant.lot_id.id),
+            ("product_id", "=", quant.product_id.id),
+            ("location_id", "=", quant.location_id.id),
+            ("state", "not in", ["done", "cancel"]),
+            ("move_id.state", "not in", ["done", "cancel"]),
+        ], order="id desc")
+
+        for move_line in move_lines_with_lot:
+            orders = self._iv_resolve_sale_orders_from_move_line(move_line)
+            sale_order_ids.update(orders.ids)
+
+        # ---------------------------------------------------------------------
+        # 2) Detección comercial:
+        #    El lote ya está seleccionado en la línea de venta, pero todavía
+        #    puede no existir move_line asignada.
+        #
+        #    Esto cubre la etapa previa a remisión.
+        # ---------------------------------------------------------------------
+        SaleLine = self.env["sale.order.line"].sudo()
+
+        if "lot_ids" in SaleLine._fields:
+            sale_lines = SaleLine.search([
+                ("order_id.state", "in", ["sale", "done"]),
+                ("display_type", "=", False),
+                ("product_id", "=", quant.product_id.id),
+                ("lot_ids", "in", [quant.lot_id.id]),
+            ])
+
+            for sale_line in sale_lines:
+                if not sale_line.order_id:
+                    continue
+
+                # Si existe qty_delivered, solo consideramos líneas con pendiente.
+                if "qty_delivered" in sale_line._fields:
+                    if (sale_line.product_uom_qty or 0.0) <= (sale_line.qty_delivered or 0.0):
+                        continue
+
+                sale_order_ids.add(sale_line.order_id.id)
+
+        return sorted(sale_order_ids)
+
     @api.model
     def get_inventory_grouped_by_product(self, filters=None):
         if not filters:
@@ -278,6 +429,14 @@ class StockQuantTransitVisibility(models.Model):
 
                 continue
 
+            # -----------------------------------------------------------------
+            # Inventario interno normal
+            # -----------------------------------------------------------------
+            normal_sale_order_ids = self._iv_get_normal_sale_order_ids_for_quant(quant)
+
+            is_committed_by_stock = reserved > 0
+            is_committed_by_sale = bool(normal_sale_order_ids)
+
             product_groups[product_id]["stock_qty"] += qty
             product_groups[product_id]["stock_plates"] += 1
 
@@ -285,11 +444,12 @@ class StockQuantTransitVisibility(models.Model):
                 product_groups[product_id]["hold_qty"] += qty
                 product_groups[product_id]["hold_plates"] += 1
 
-            if reserved > 0:
-                product_groups[product_id]["committed_qty"] += reserved
+            if is_committed_by_stock or is_committed_by_sale:
+                committed_qty = reserved if reserved > 0 else qty
+                product_groups[product_id]["committed_qty"] += committed_qty
                 product_groups[product_id]["committed_plates"] += 1
 
-            if not has_hold and available > 0:
+            if not has_hold and not is_committed_by_sale and available > 0:
                 product_groups[product_id]["available_qty"] += available
                 product_groups[product_id]["available_plates"] += 1
 
@@ -390,6 +550,9 @@ class StockQuantTransitVisibility(models.Model):
             if quant.lot_id and hasattr(quant.lot_id, "x_fotografia_ids"):
                 detail["cantidad_fotos"] = len(quant.lot_id.x_fotografia_ids)
 
+            # -----------------------------------------------------------------
+            # TRÁNSITO: NO SE TOCA LA LÓGICA ACTUAL.
+            # -----------------------------------------------------------------
             if is_transit:
                 if transit_state == "committed":
                     detail["en_orden_venta"] = True
@@ -398,6 +561,9 @@ class StockQuantTransitVisibility(models.Model):
                 result.append(detail)
                 continue
 
+            # -----------------------------------------------------------------
+            # INVENTARIO INTERNO NORMAL
+            # -----------------------------------------------------------------
             detail["tiene_hold"] = quant.x_tiene_hold if hasattr(quant, "x_tiene_hold") else False
 
             if (
@@ -418,23 +584,11 @@ class StockQuantTransitVisibility(models.Model):
                     "notas": hold.notas if hasattr(hold, "notas") else "",
                 }
 
-            if quant.lot_id:
-                move_lines_with_lot = self.env["stock.move.line"].sudo().search([
-                    ("lot_id", "=", quant.lot_id.id),
-                    ("state", "=", "assigned"),
-                    ("location_id", "=", quant.location_id.id),
-                    ("move_id.sale_line_id", "!=", False),
-                ])
+            sale_order_ids = self._iv_get_normal_sale_order_ids_for_quant(quant)
 
-                sale_order_ids = set()
-                for move_line in move_lines_with_lot:
-                    sale_order = move_line.move_id.sale_line_id.order_id
-                    if sale_order.state in ["sale", "done"]:
-                        sale_order_ids.add(sale_order.id)
-
-                if sale_order_ids:
-                    detail["en_orden_venta"] = True
-                    detail["sale_order_ids"] = list(sale_order_ids)
+            if sale_order_ids:
+                detail["en_orden_venta"] = True
+                detail["sale_order_ids"] = sale_order_ids
 
             result.append(detail)
 
