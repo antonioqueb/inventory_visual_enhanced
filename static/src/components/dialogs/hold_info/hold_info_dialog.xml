@@ -114,6 +114,12 @@
                             </div>
                         </div>
 
+                    </div>
+
+                    <!-- RIGHT: VIGENCIA + INFORMACIÓN DEL LOTE -->
+                    <div class="hold-info-main__right">
+
+                        <!-- VIGENCIA ARRIBA DE INFORMACIÓN DEL LOTE -->
                         <div class="hold-info-card">
                             <div class="hold-info-card__header">
                                 <i class="fa fa-calendar"/>
@@ -139,11 +145,7 @@
                             </div>
                         </div>
 
-                    </div>
-
-                    <!-- RIGHT: INFORMACIÓN DEL LOTE AMPLIADA -->
-                    <div class="hold-info-main__right">
-
+                        <!-- INFORMACIÓN DEL LOTE AMPLIADA -->
                         <div class="hold-info-card hold-info-lot-card">
                             <div class="hold-info-card__header">
                                 <i class="fa fa-cube"/>
@@ -179,7 +181,7 @@
                                 <div class="hold-info-lot-item" t-if="detailData.grosor">
                                     <span>Grosor</span>
                                     <strong>
-                                        <i class="fa fa-arrows-v"/>
+                                        <i class="fa fa-compress"/>
                                         <t t-esc="detailData.grosor"/> cm
                                     </strong>
                                 </div>
