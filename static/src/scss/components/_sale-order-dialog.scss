@@ -1,28 +1,23 @@
 // ============================================================
-// Sale Order Dialog — Wood Warm Light Theme
-// Popup de venta para Inventario Visual
-// Fondo claro + tonos madereros cálidos
+// Sale Order Dialog — Inventario Visual
+// Branding cálido maderero + diseño simple sin redundancia
 // ============================================================
 
 $sod-walnut: #4A2A18;
 $sod-dark-walnut: #2F1B10;
 $sod-cedar: #7A4424;
 $sod-copper: #A76735;
-$sod-caramel: #C58A4A;
 $sod-honey: #E4B66A;
 $sod-oak: #F1D6AA;
 $sod-light-oak: #F9E8CC;
 $sod-cream: #FFFDF7;
 $sod-cream-2: #FFF8EC;
 $sod-parchment: #FCF0DC;
-$sod-parchment-2: #F8E7CB;
-$sod-sand: #E9CDA5;
 $sod-bark: #6A4A32;
 $sod-charcoal: #2A1A12;
 $sod-muted: #92735A;
 $sod-line: #EBD5B5;
-$sod-soft-line: rgba(122, 68, 36, .14);
-$sod-soft-shadow: rgba(74, 42, 24, .10);
+
 $sod-sage: #61724C;
 $sod-sage-dark: #415136;
 $sod-sage-light: #EEF4E7;
@@ -30,7 +25,7 @@ $sod-redwood: #9A4A32;
 $sod-amber: #C98228;
 
 // ============================================================
-// Eliminar header nativo del Dialog que muestra "Odoo"
+// Modal nativo
 // ============================================================
 
 .modal-content:has(.o_sale_order_dialog_wood),
@@ -40,8 +35,8 @@ $sod-amber: #C98228;
   overflow: hidden;
   background: $sod-cream !important;
   box-shadow:
-    0 34px 90px rgba(74, 42, 24, .18),
-    0 10px 28px rgba(74, 42, 24, .10);
+    0 34px 90px rgba($sod-walnut, .18),
+    0 10px 28px rgba($sod-walnut, .10);
 
   .modal-header {
     display: none !important;
@@ -78,7 +73,7 @@ $sod-amber: #C98228;
     content: "";
     position: absolute;
     inset: 0;
-    opacity: .12;
+    opacity: .11;
     pointer-events: none;
     background:
       repeating-linear-gradient(
@@ -104,7 +99,7 @@ $sod-amber: #C98228;
 }
 
 // ============================================================
-// Botón flotante de cierre
+// Cierre flotante
 // ============================================================
 
 .sod-floating-close {
@@ -133,10 +128,6 @@ $sod-amber: #C98228;
     color: #ffffff;
     background: linear-gradient(135deg, $sod-cedar, $sod-walnut);
     box-shadow: 0 14px 28px rgba($sod-walnut, .18);
-  }
-
-  &--hero {
-    color: $sod-walnut;
   }
 }
 
@@ -172,7 +163,6 @@ $sod-amber: #C98228;
     i {
       font-size: 48px;
       color: $sod-walnut;
-      filter: drop-shadow(0 8px 14px rgba($sod-copper, .16));
     }
   }
 
@@ -193,7 +183,7 @@ $sod-amber: #C98228;
 }
 
 // ============================================================
-// Hero claro
+// Hero
 // ============================================================
 
 .sod-hero {
@@ -209,7 +199,7 @@ $sod-amber: #C98228;
   &__pattern {
     position: absolute;
     inset: 0;
-    opacity: .20;
+    opacity: .18;
     background:
       linear-gradient(rgba($sod-cedar, .10) 1px, transparent 1px),
       linear-gradient(90deg, rgba($sod-cedar, .08) 1px, transparent 1px);
@@ -284,7 +274,7 @@ $sod-amber: #C98228;
 
     h2 {
       color: $sod-walnut;
-      font-size: 36px;
+      font-size: 34px;
       line-height: 1;
       font-weight: 950;
       letter-spacing: -.055em;
@@ -302,10 +292,10 @@ $sod-amber: #C98228;
 
   &__right {
     display: grid;
-    grid-template-columns: repeat(2, minmax(122px, 1fr));
+    grid-template-columns: minmax(170px, 1fr);
     gap: 10px;
     align-items: stretch;
-    min-width: 310px;
+    min-width: 230px;
   }
 }
 
@@ -353,83 +343,136 @@ $sod-amber: #C98228;
   strong {
     display: block;
     color: $sod-walnut;
-    font-size: 22px;
-    line-height: 1.1;
+    font-size: 18px;
+    line-height: 1.15;
     font-weight: 950;
-    letter-spacing: -.04em;
-    word-break: break-word;
-  }
-
-  &--money strong {
-    color: $sod-sage-dark;
+    letter-spacing: -.03em;
+    overflow-wrap: anywhere;
   }
 }
 
 // ============================================================
-// Summary
+// Section heads
 // ============================================================
 
-.sod-summary-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  padding: 18px 22px 6px;
-  background: transparent;
-}
-
-.sod-summary-card {
+.sod-section-head {
   display: flex;
   align-items: center;
-  gap: 12px;
-  min-width: 0;
-  padding: 16px;
-  border-radius: 20px;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba($sod-cedar, .10);
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, .96), rgba($sod-cream, .92));
-  border: 1px solid rgba($sod-cedar, .12);
-  box-shadow:
-    0 12px 28px rgba(74, 42, 24, .06),
-    inset 0 0 0 1px rgba(255, 255, 255, .75);
-
-  &__icon {
-    width: 46px;
-    height: 46px;
-    flex: 0 0 auto;
-    border-radius: 17px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: $sod-walnut;
-    background:
-      radial-gradient(circle at 30% 20%, rgba(255, 255, 255, .74), transparent 32%),
-      linear-gradient(145deg, rgba($sod-honey, .32), rgba($sod-oak, .36));
-    border: 1px solid rgba($sod-copper, .13);
-  }
+    radial-gradient(circle at 0% 0%, rgba($sod-honey, .12), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, .86), rgba($sod-cream, .84));
 
   span {
     display: block;
     color: $sod-muted;
     font-size: 10px;
     text-transform: uppercase;
-    letter-spacing: .09em;
-    font-weight: 900;
+    letter-spacing: .10em;
+    font-weight: 950;
     margin-bottom: 4px;
   }
 
   strong {
     display: block;
     color: $sod-walnut;
-    font-size: 14px;
-    font-weight: 900;
-    letter-spacing: -.02em;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    font-size: 16px;
+    font-weight: 950;
+    line-height: 1.25;
   }
 }
 
 // ============================================================
-// Order cards
+// Material
+// ============================================================
+
+.sod-material-card {
+  margin: 18px 22px 6px;
+  border-radius: 24px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .98), rgba($sod-cream, .96));
+  border: 1px solid rgba($sod-cedar, .13);
+  box-shadow:
+    0 16px 38px rgba($sod-walnut, .07),
+    0 2px 7px rgba($sod-walnut, .04);
+}
+
+.sod-lot-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  background: rgba($sod-honey, .22);
+  border: 1px solid rgba($sod-amber, .26);
+  color: $sod-cedar;
+  font-size: 12px;
+  font-weight: 950;
+  white-space: nowrap;
+
+  i {
+    color: $sod-amber;
+  }
+}
+
+.sod-material-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  padding: 16px;
+}
+
+.sod-material-item {
+  min-width: 0;
+  padding: 13px 14px;
+  border-radius: 17px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .94), rgba($sod-cream, .88));
+  border: 1px solid rgba($sod-cedar, .10);
+
+  span {
+    display: block;
+    color: $sod-muted;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-weight: 900;
+    margin-bottom: 6px;
+  }
+
+  strong {
+    display: block;
+    color: $sod-walnut;
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  &--eta {
+    background:
+      linear-gradient(145deg, rgba($sod-honey, .20), rgba($sod-cream, .92));
+    border-color: rgba($sod-amber, .22);
+
+    strong {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+
+      i {
+        color: $sod-amber;
+      }
+    }
+  }
+}
+
+// ============================================================
+// Orders
 // ============================================================
 
 .sod-orders {
@@ -447,8 +490,8 @@ $sod-amber: #C98228;
     linear-gradient(180deg, rgba(255, 255, 255, .98), rgba($sod-cream, .96));
   border: 1px solid rgba($sod-cedar, .13);
   box-shadow:
-    0 16px 38px rgba(74, 42, 24, .08),
-    0 2px 7px rgba(74, 42, 24, .04);
+    0 16px 38px rgba($sod-walnut, .08),
+    0 2px 7px rgba($sod-walnut, .04);
   animation: sodFadeUp .22s ease both;
 
   &::before {
@@ -457,22 +500,6 @@ $sod-amber: #C98228;
     inset: 0 auto 0 0;
     width: 6px;
     background: linear-gradient(180deg, $sod-honey, $sod-copper, $sod-cedar);
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    opacity: .07;
-    pointer-events: none;
-    background:
-      repeating-linear-gradient(
-        10deg,
-        rgba($sod-cedar, .10) 0px,
-        rgba($sod-cedar, .10) 1px,
-        transparent 1px,
-        transparent 36px
-      );
   }
 
   > * {
@@ -499,18 +526,10 @@ $sod-amber: #C98228;
     min-width: 0;
   }
 
-  &__actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
-
   &__body {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 270px;
-    gap: 18px;
+    grid-template-columns: minmax(0, .95fr) minmax(360px, 1.05fr);
+    gap: 16px;
     padding: 18px 20px 20px 24px;
   }
 }
@@ -549,74 +568,11 @@ $sod-amber: #C98228;
   }
 }
 
-.sod-order-client {
+.sod-order-subtitle {
   color: $sod-muted;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 750;
   margin-top: 3px;
-  max-width: 440px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-// ============================================================
-// States
-// ============================================================
-
-.sod-state {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 32px;
-  padding: 7px 12px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: -.01em;
-  white-space: nowrap;
-  border: 1px solid transparent;
-
-  i {
-    font-size: 12px;
-  }
-
-  &--draft {
-    color: $sod-bark;
-    background: rgba($sod-sand, .42);
-    border-color: rgba($sod-copper, .16);
-  }
-
-  &--sent {
-    color: $sod-walnut;
-    background: rgba($sod-honey, .24);
-    border-color: rgba($sod-honey, .38);
-  }
-
-  &--sale {
-    color: $sod-sage-dark;
-    background: $sod-sage-light;
-    border-color: rgba($sod-sage, .28);
-    box-shadow: 0 7px 14px rgba($sod-sage, .10);
-  }
-
-  &--done {
-    color: $sod-walnut;
-    background: rgba($sod-oak, .52);
-    border-color: rgba($sod-cedar, .16);
-  }
-
-  &--cancel {
-    color: $sod-redwood;
-    background: rgba($sod-redwood, .10);
-    border-color: rgba($sod-redwood, .24);
-  }
-
-  &--default {
-    color: $sod-muted;
-    background: rgba($sod-parchment, .78);
-    border-color: rgba($sod-cedar, .12);
-  }
 }
 
 // ============================================================
@@ -626,15 +582,17 @@ $sod-amber: #C98228;
 .sod-open-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 7px;
-  min-height: 34px;
-  padding: 8px 13px;
+  min-height: 36px;
+  padding: 9px 15px;
   border-radius: 999px;
   color: #ffffff;
   background: linear-gradient(135deg, $sod-cedar, $sod-walnut);
   border: 0;
-  font-size: 11px;
-  font-weight: 900;
+  font-size: 12px;
+  font-weight: 950;
+  white-space: nowrap;
   box-shadow: 0 10px 22px rgba($sod-walnut, .18);
   transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
 
@@ -659,7 +617,7 @@ $sod-amber: #C98228;
   color: #ffffff !important;
   background: linear-gradient(135deg, $sod-cedar, $sod-dark-walnut) !important;
   border: 0 !important;
-  font-weight: 900;
+  font-weight: 950;
   box-shadow: 0 12px 24px rgba($sod-walnut, .18);
   transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
 
@@ -671,13 +629,20 @@ $sod-amber: #C98228;
 }
 
 // ============================================================
-// Info panels
+// Commercial info
 // ============================================================
 
 .sod-info-panel {
+  min-width: 0;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
+  align-content: start;
+  padding: 16px;
+  border-radius: 22px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .94), rgba($sod-cream, .90));
+  border: 1px solid rgba($sod-cedar, .10);
 }
 
 .sod-info-item {
@@ -688,7 +653,7 @@ $sod-amber: #C98228;
     linear-gradient(145deg, rgba(255, 255, 255, .92), rgba($sod-cream, .88));
   border: 1px solid rgba($sod-cedar, .10);
 
-  &__label {
+  span {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -710,53 +675,120 @@ $sod-amber: #C98228;
     color: $sod-walnut;
     font-size: 13px;
     font-weight: 900;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
   }
 }
 
-.sod-amount-panel {
-  position: relative;
+// ============================================================
+// Payment
+// ============================================================
+
+.sod-payment-panel {
   min-width: 0;
-  padding: 17px;
-  border-radius: 20px;
-  overflow: hidden;
+  border-radius: 22px;
+  padding: 16px;
   background:
-    radial-gradient(circle at 90% 0%, rgba(255, 255, 255, .56), transparent 36%),
-    linear-gradient(135deg, #F5FAEF, $sod-sage-light);
-  border: 1px solid rgba($sod-sage, .24);
+    radial-gradient(circle at 92% 0%, rgba(255, 255, 255, .58), transparent 36%),
+    linear-gradient(135deg, #F7FBF2, $sod-sage-light);
+  border: 1px solid rgba($sod-sage, .22);
   box-shadow:
-    0 14px 28px rgba($sod-sage, .10),
+    0 14px 28px rgba($sod-sage, .08),
     inset 0 0 0 1px rgba(255, 255, 255, .72);
+}
+
+.sod-payment-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.sod-payment-percent {
+  color: $sod-sage-dark;
+  font-size: 24px;
+  font-weight: 950;
+  letter-spacing: -.04em;
+}
+
+.sod-payment-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 950;
+  border: 1px solid transparent;
+  white-space: nowrap;
+
+  &--paid {
+    color: $sod-sage-dark;
+    background: #ffffff;
+    border-color: rgba($sod-sage, .28);
+    box-shadow: 0 8px 16px rgba($sod-sage, .10);
+  }
+
+  &--partial {
+    color: $sod-cedar;
+    background: rgba($sod-honey, .26);
+    border-color: rgba($sod-amber, .30);
+  }
+
+  &--none {
+    color: $sod-redwood;
+    background: rgba($sod-redwood, .10);
+    border-color: rgba($sod-redwood, .22);
+  }
+}
+
+.sod-payment-progress {
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba($sod-sage-dark, .13);
+  border: 1px solid rgba($sod-sage, .14);
+  margin-bottom: 14px;
+
+  &__bar {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, $sod-sage, $sod-sage-dark);
+    transition: width .24s ease;
+  }
+}
+
+.sod-payment-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.sod-payment-cell {
+  min-width: 0;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .62);
+  border: 1px solid rgba($sod-sage, .12);
 
   span {
     display: block;
-    color: $sod-sage-dark;
+    color: rgba($sod-sage-dark, .76);
     font-size: 10px;
     text-transform: uppercase;
-    letter-spacing: .10em;
+    letter-spacing: .08em;
     font-weight: 900;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
 
   strong {
     display: block;
     color: $sod-sage-dark;
-    font-size: 24px;
-    line-height: 1.1;
+    font-size: 14px;
     font-weight: 950;
-    letter-spacing: -.055em;
-    word-break: break-word;
-  }
-
-  small {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    color: rgba($sod-sage-dark, .78);
-    margin-top: 10px;
-    font-size: 11px;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
   }
 }
 
@@ -795,13 +827,21 @@ $sod-amber: #C98228;
     }
   }
 
-  .sod-summary-grid {
-    grid-template-columns: 1fr;
-    padding: 16px 16px 4px;
+  .sod-material-card {
+    margin: 16px 16px 4px;
+  }
+
+  .sod-section-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sod-material-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .sod-orders {
-    padding: 12px 16px 18px;
+    padding: 12px 16px 20px;
   }
 
   .sod-order-card {
@@ -810,17 +850,13 @@ $sod-amber: #C98228;
       flex-direction: column;
     }
 
-    &__actions {
-      justify-content: flex-start;
-      width: 100%;
-    }
-
     &__body {
       grid-template-columns: 1fr;
     }
   }
 
-  .sod-info-panel {
+  .sod-info-panel,
+  .sod-payment-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -839,66 +875,37 @@ $sod-amber: #C98228;
   }
 
   .sod-hero {
-    padding: 18px;
-
     &__left {
       align-items: flex-start;
       gap: 12px;
     }
 
     &__icon {
-      width: 64px;
-      height: 64px;
-      border-radius: 20px;
+      width: 66px;
+      height: 66px;
+      border-radius: 22px;
 
       i {
-        font-size: 32px;
+        font-size: 34px;
       }
     }
 
     &__copy h2 {
       font-size: 26px;
     }
-
-    &__copy p {
-      font-size: 12px;
-    }
-
-    &__right {
-      grid-template-columns: 1fr;
-    }
   }
 
-  .sod-order-card {
-    border-radius: 18px;
-
-    &__top {
-      padding: 16px 16px 12px 20px;
-    }
-
-    &__body {
-      padding: 14px 16px 16px 20px;
-    }
+  .sod-material-grid {
+    grid-template-columns: 1fr;
   }
 
-  .sod-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 15px;
-    font-size: 14px;
-  }
-
-  .sod-order-name {
-    font-size: 16px;
+  .sod-payment-head {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .sod-open-btn,
-  .sod-state {
+  .sod-close-btn {
     width: 100%;
-    justify-content: center;
-  }
-
-  .sod-amount-panel strong {
-    font-size: 21px;
   }
 }

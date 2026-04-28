@@ -9,6 +9,7 @@ export class SaleOrderDialog extends Component {
         this.soInfo = this.props.soInfo || {
             count: 0,
             orders: [],
+            lot_info: {},
         };
 
         this.action = useService("action");
@@ -18,8 +19,16 @@ export class SaleOrderDialog extends Component {
         return this.soInfo.orders || [];
     }
 
+    get lotInfo() {
+        return this.soInfo.lot_info || {};
+    }
+
     get hasOrders() {
         return this.orders.length > 0;
+    }
+
+    get hasLotInfo() {
+        return !!(this.lotInfo && (this.lotInfo.lot_name || this.lotInfo.product_name));
     }
 
     get orderCount() {
@@ -27,131 +36,86 @@ export class SaleOrderDialog extends Component {
     }
 
     get orderCountLabel() {
-        return this.orderCount === 1 ? "1 orden vinculada" : `${this.orderCount} órdenes vinculadas`;
+        return this.orderCount === 1 ? "1 orden de venta" : `${this.orderCount} órdenes de venta`;
     }
 
-    get customerSummary() {
-        const names = [];
+    get isTransitLot() {
+        return !!this.lotInfo.is_transit;
+    }
 
-        for (const order of this.orders) {
-            if (order.partner_name && !names.includes(order.partner_name)) {
-                names.push(order.partner_name);
-            }
+    get lotUnitLabel() {
+        const tipo = (this.lotInfo.tipo || "").toString().toLowerCase();
+        return tipo === "pieza" ? "pza" : "m²";
+    }
+
+    getPaymentBadgeClass(status) {
+        const map = {
+            paid: "sod-payment-badge sod-payment-badge--paid",
+            partial: "sod-payment-badge sod-payment-badge--partial",
+            no_payment: "sod-payment-badge sod-payment-badge--none",
+        };
+
+        return map[status] || map.no_payment;
+    }
+
+    getPaymentIcon(status) {
+        const map = {
+            paid: "fa-check-circle",
+            partial: "fa-adjust",
+            no_payment: "fa-exclamation-circle",
+        };
+
+        return map[status] || map.no_payment;
+    }
+
+    clampPercentage(value) {
+        const number = Number(value || 0);
+
+        if (number < 0) {
+            return 0;
         }
 
-        if (!names.length) {
-            return "Sin cliente";
+        if (number > 100) {
+            return 100;
         }
 
-        if (names.length <= 2) {
-            return names.join(" · ");
-        }
-
-        return `${names.slice(0, 2).join(" · ")} +${names.length - 2}`;
+        return number;
     }
 
-    get currencySymbol() {
-        const symbols = [
-            ...new Set(
-                this.orders
-                    .map((order) => order.currency_symbol)
-                    .filter((symbol) => symbol)
-            ),
-        ];
+    formatCurrency(amount, symbol) {
+        const formatted = new Intl.NumberFormat("es-MX", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        }).format(Number(amount || 0));
 
-        return symbols.length === 1 ? symbols[0] : "";
+        return `${symbol || ""} ${formatted}`.trim();
     }
 
-    get totalAmount() {
-        return this.orders.reduce((sum, order) => {
-            const amount = Number(order.amount_total || 0);
-            return sum + amount;
-        }, 0);
+    formatNumber(num) {
+        return new Intl.NumberFormat("es-MX", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        }).format(Number(num || 0));
     }
 
-    get totalAmountLabel() {
-        if (!this.orders.length) {
+    formatPercent(value) {
+        return `${this.formatNumber(this.clampPercentage(value))}%`;
+    }
+
+    formatDate(value) {
+        if (!value) {
             return "—";
         }
 
-        if (!this.currencySymbol) {
-            return "Importe mixto";
+        const raw = String(value);
+        const datePart = raw.includes(" ") ? raw.split(" ")[0] : raw;
+        const parts = datePart.split("-");
+
+        if (parts.length !== 3) {
+            return raw;
         }
 
-        return this.formatCurrency(this.totalAmount, this.currencySymbol);
-    }
-
-    get primaryStateLabel() {
-        const states = [
-            ...new Set(
-                this.orders
-                    .map((order) => order.state)
-                    .filter((state) => state)
-            ),
-        ];
-
-        if (!states.length) {
-            return "Sin estado";
-        }
-
-        if (states.length === 1) {
-            const firstOrder = this.orders.find((order) => order.state === states[0]);
-            return this.getStateLabel(firstOrder);
-        }
-
-        return "Estados múltiples";
-    }
-
-    getStateMeta(state) {
-        const meta = {
-            draft: {
-                label: "Cotización",
-                icon: "fa-pencil-square-o",
-                className: "sod-state sod-state--draft",
-            },
-            sent: {
-                label: "Enviada",
-                icon: "fa-paper-plane-o",
-                className: "sod-state sod-state--sent",
-            },
-            sale: {
-                label: "Orden confirmada",
-                icon: "fa-check-circle",
-                className: "sod-state sod-state--sale",
-            },
-            done: {
-                label: "Bloqueada",
-                icon: "fa-lock",
-                className: "sod-state sod-state--done",
-            },
-            cancel: {
-                label: "Cancelada",
-                icon: "fa-ban",
-                className: "sod-state sod-state--cancel",
-            },
-        };
-
-        return meta[state] || {
-            label: state || "Sin estado",
-            icon: "fa-circle",
-            className: "sod-state sod-state--default",
-        };
-    }
-
-    getStateBadgeClass(state) {
-        return this.getStateMeta(state).className;
-    }
-
-    getStateIcon(state) {
-        return this.getStateMeta(state).icon;
-    }
-
-    getStateLabel(order) {
-        if (!order) {
-            return "Sin estado";
-        }
-
-        return order.state_display || this.getStateMeta(order.state).label;
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
 
     getInitials(name) {
@@ -173,31 +137,6 @@ export class SaleOrderDialog extends Component {
             .map((part) => part[0])
             .join("")
             .toUpperCase();
-    }
-
-    formatCurrency(amount, symbol) {
-        const formatted = new Intl.NumberFormat("es-MX", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        }).format(Number(amount || 0));
-
-        return `${symbol || ""} ${formatted}`.trim();
-    }
-
-    formatDate(value) {
-        if (!value) {
-            return "—";
-        }
-
-        const raw = String(value);
-        const datePart = raw.includes(" ") ? raw.split(" ")[0] : raw;
-        const parts = datePart.split("-");
-
-        if (parts.length !== 3) {
-            return raw;
-        }
-
-        return `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
 
     async openSaleOrder(orderId, ev) {

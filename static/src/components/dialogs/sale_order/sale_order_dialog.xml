@@ -14,10 +14,10 @@
                         <div class="sod-empty__orb">
                             <i class="fa fa-usd"/>
                         </div>
-                        <h3>No hay órdenes de venta vinculadas</h3>
+
+                        <h3>No hay orden de venta vinculada</h3>
                         <p>
-                            Este lote está marcado como venta, pero no se recibió información
-                            de la orden asociada para mostrar en este popup.
+                            El lote fue marcado como vendido, pero no se recibió información de la orden.
                         </p>
                     </div>
                 </t>
@@ -31,122 +31,156 @@
 
                         <div class="sod-hero__pattern"/>
                         <div class="sod-hero__grain"/>
+
                         <div class="sod-hero__content">
                             <div class="sod-hero__left">
                                 <div class="sod-hero__icon">
                                     <i class="fa fa-usd"/>
                                 </div>
+
                                 <div class="sod-hero__copy">
-                                    <span class="sod-eyebrow">Material comprometido</span>
-                                    <h2>Origen de venta</h2>
+                                    <span class="sod-eyebrow">Venta vinculada</span>
+                                    <h2>Información comercial del lote</h2>
                                     <p>
-                                        El lote está vinculado a una operación comercial.
-                                        Revisa aquí cliente, vendedor, fechas e importe.
+                                        Datos esenciales de la orden de venta, pago y saldo pendiente.
                                     </p>
                                 </div>
                             </div>
 
                             <div class="sod-hero__right">
                                 <div class="sod-hero-metric">
-                                    <span class="sod-hero-metric__label">Órdenes</span>
-                                    <strong t-esc="orderCount"/>
-                                </div>
-                                <div class="sod-hero-metric sod-hero-metric--money">
-                                    <span class="sod-hero-metric__label">Total</span>
-                                    <strong t-esc="totalAmountLabel"/>
+                                    <span class="sod-hero-metric__label">Referencia</span>
+                                    <strong t-if="orderCount === 1" t-esc="orders[0].name"/>
+                                    <strong t-else="" t-esc="orderCountLabel"/>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- SUMMARY -->
-                    <div class="sod-summary-grid">
-                        <div class="sod-summary-card">
-                            <div class="sod-summary-card__icon">
-                                <i class="fa fa-file-text-o"/>
-                            </div>
+                    <!-- MATERIAL: una sola sección, sin repetir en cada orden -->
+                    <div class="sod-material-card" t-if="hasLotInfo">
+                        <div class="sod-section-head">
                             <div>
-                                <span>Documento</span>
-                                <strong t-esc="orderCountLabel"/>
+                                <span>Material</span>
+                                <strong t-esc="lotInfo.product_name || 'Producto sin nombre'"/>
+                            </div>
+
+                            <div class="sod-lot-chip">
+                                <i class="fa fa-barcode"/>
+                                <t t-esc="lotInfo.lot_name || 'Sin lote'"/>
                             </div>
                         </div>
 
-                        <div class="sod-summary-card">
-                            <div class="sod-summary-card__icon">
-                                <i class="fa fa-user"/>
+                        <div class="sod-material-grid">
+                            <div class="sod-material-item">
+                                <span>Cantidad</span>
+                                <strong>
+                                    <t t-esc="formatNumber(lotInfo.quantity)"/>
+                                    <t t-esc="lotUnitLabel"/>
+                                </strong>
                             </div>
-                            <div>
-                                <span>Cliente</span>
-                                <strong t-esc="customerSummary"/>
-                            </div>
-                        </div>
 
-                        <div class="sod-summary-card">
-                            <div class="sod-summary-card__icon">
-                                <i class="fa fa-flag"/>
+                            <div class="sod-material-item" t-if="lotInfo.dimensions">
+                                <span>Dimensiones</span>
+                                <strong t-esc="lotInfo.dimensions"/>
                             </div>
-                            <div>
-                                <span>Estado</span>
-                                <strong t-esc="primaryStateLabel"/>
+
+                            <div class="sod-material-item" t-if="lotInfo.location_name">
+                                <span>Ubicación</span>
+                                <strong t-esc="lotInfo.location_name"/>
+                            </div>
+
+                            <div class="sod-material-item" t-if="lotInfo.bloque">
+                                <span>Bloque</span>
+                                <strong t-esc="lotInfo.bloque"/>
+                            </div>
+
+                            <div class="sod-material-item" t-if="lotInfo.contenedor">
+                                <span>Contenedor</span>
+                                <strong t-esc="lotInfo.contenedor"/>
+                            </div>
+
+                            <div class="sod-material-item" t-if="lotInfo.atado">
+                                <span>Atado</span>
+                                <strong t-esc="lotInfo.atado"/>
+                            </div>
+
+                            <div class="sod-material-item" t-if="lotInfo.numero_placa">
+                                <span>N. placa</span>
+                                <strong t-esc="lotInfo.numero_placa"/>
+                            </div>
+
+                            <div class="sod-material-item sod-material-item--eta" t-if="isTransitLot">
+                                <span>ETA</span>
+                                <strong>
+                                    <i class="fa fa-ship"/>
+                                    <t t-if="lotInfo.eta" t-esc="formatDate(lotInfo.eta)"/>
+                                    <t t-else="">No registrada</t>
+                                </strong>
                             </div>
                         </div>
                     </div>
 
-                    <!-- ORDERS -->
+                    <!-- ÓRDENES -->
                     <div class="sod-orders">
                         <t t-foreach="orders" t-as="order" t-key="order.id">
                             <div class="sod-order-card">
+
                                 <div class="sod-order-card__top">
                                     <div class="sod-order-card__identity">
                                         <div class="sod-avatar" t-esc="getInitials(order.partner_name)"/>
+
                                         <div>
                                             <div class="sod-order-name">
                                                 <i class="fa fa-file-text-o"/>
                                                 <span t-esc="order.name"/>
                                             </div>
-                                            <div class="sod-order-client" t-esc="order.partner_name"/>
+                                            <div class="sod-order-subtitle">
+                                                Orden de venta relacionada
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div class="sod-order-card__actions">
-                                        <span t-att-class="getStateBadgeClass(order.state)">
-                                            <i t-attf-class="fa #{getStateIcon(order.state)}"/>
-                                            <t t-esc="getStateLabel(order)"/>
-                                        </span>
-
-                                        <button
-                                            type="button"
-                                            class="sod-open-btn"
-                                            t-on-click="(ev) => this.openSaleOrder(order.id, ev)"
-                                            title="Abrir orden de venta"
-                                        >
-                                            <i class="fa fa-external-link"/>
-                                            Abrir SO
-                                        </button>
-                                    </div>
+                                    <button
+                                        type="button"
+                                        class="sod-open-btn"
+                                        t-on-click="(ev) => this.openSaleOrder(order.id, ev)"
+                                        title="Abrir orden de venta"
+                                    >
+                                        <i class="fa fa-external-link"/>
+                                        Abrir orden
+                                    </button>
                                 </div>
 
                                 <div class="sod-order-card__body">
+                                    <!-- Datos comerciales mínimos -->
                                     <div class="sod-info-panel">
                                         <div class="sod-info-item">
-                                            <span class="sod-info-item__label">
-                                                <i class="fa fa-user-circle"/>
-                                                Vendedor
+                                            <span>
+                                                <i class="fa fa-user"/>
+                                                Cliente
                                             </span>
-                                            <strong t-if="order.user_name" t-esc="order.user_name"/>
-                                            <strong t-else="">—</strong>
+                                            <strong t-esc="order.partner_name || '—'"/>
                                         </div>
 
                                         <div class="sod-info-item">
-                                            <span class="sod-info-item__label">
+                                            <span>
+                                                <i class="fa fa-id-badge"/>
+                                                Vendedor
+                                            </span>
+                                            <strong t-esc="order.user_name || '—'"/>
+                                        </div>
+
+                                        <div class="sod-info-item">
+                                            <span>
                                                 <i class="fa fa-calendar"/>
-                                                Fecha de orden
+                                                Fecha
                                             </span>
                                             <strong t-esc="formatDate(order.date_order)"/>
                                         </div>
 
-                                        <div class="sod-info-item">
-                                            <span class="sod-info-item__label">
+                                        <div class="sod-info-item" t-if="order.commitment_date">
+                                            <span>
                                                 <i class="fa fa-clock-o"/>
                                                 Compromiso
                                             </span>
@@ -154,15 +188,48 @@
                                         </div>
                                     </div>
 
-                                    <div class="sod-amount-panel">
-                                        <span>Total de la orden</span>
-                                        <strong t-esc="formatCurrency(order.amount_total, order.currency_symbol)"/>
-                                        <small>
-                                            <i class="fa fa-info-circle"/>
-                                            Importe de la SO completa
-                                        </small>
+                                    <!-- Pago -->
+                                    <div class="sod-payment-panel">
+                                        <div class="sod-payment-head">
+                                            <span t-att-class="getPaymentBadgeClass(order.payment_status)">
+                                                <i t-attf-class="fa #{getPaymentIcon(order.payment_status)}"/>
+                                                <t t-esc="order.payment_label"/>
+                                            </span>
+
+                                            <strong class="sod-payment-percent" t-esc="formatPercent(order.payment_percentage)"/>
+                                        </div>
+
+                                        <div class="sod-payment-progress">
+                                            <div
+                                                class="sod-payment-progress__bar"
+                                                t-att-style="'width: ' + clampPercentage(order.payment_percentage) + '%;'"
+                                            />
+                                        </div>
+
+                                        <div class="sod-payment-grid">
+                                            <div class="sod-payment-cell">
+                                                <span>Total</span>
+                                                <strong t-esc="formatCurrency(order.amount_total, order.currency_symbol)"/>
+                                            </div>
+
+                                            <div class="sod-payment-cell">
+                                                <span>Pagado</span>
+                                                <strong t-esc="formatCurrency(order.amount_paid, order.currency_symbol)"/>
+                                            </div>
+
+                                            <div class="sod-payment-cell">
+                                                <span>Pendiente</span>
+                                                <strong t-esc="formatCurrency(order.amount_pending, order.currency_symbol)"/>
+                                            </div>
+
+                                            <div class="sod-payment-cell">
+                                                <span>Facturas</span>
+                                                <strong t-esc="order.invoice_count || 0"/>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+
                             </div>
                         </t>
                     </div>
