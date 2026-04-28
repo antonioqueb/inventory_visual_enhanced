@@ -8,10 +8,6 @@ _logger = logging.getLogger(__name__)
 class StockQuantSaleOrderPopup(models.Model):
     _inherit = "stock.quant"
 
-    # -------------------------------------------------------------------------
-    # Helpers
-    # -------------------------------------------------------------------------
-
     @api.model
     def _iv_format_date_value(self, value):
         if not value:
@@ -64,14 +60,10 @@ class StockQuantSaleOrderPopup(models.Model):
     @api.model
     def _iv_shorten_location_name(self, location):
         """
-        Acorta ubicaciones tipo:
-            S/Existencias/G/Línea G16
-            S / Existencias / G / Línea G16
-
-        Resultado:
-            G/Línea G16
-
-        Si no puede detectar ese patrón, devuelve el nombre completo normalizado.
+        Convierte:
+            SOM/Existencias/G/Linea G-16 -> G/Linea G-16
+            S/Existencias/G/Linea G16    -> G/Linea G16
+            Existencias/G/Linea G16      -> G/Linea G16
         """
         if not location:
             return ""
@@ -80,17 +72,22 @@ class StockQuantSaleOrderPopup(models.Model):
         raw = raw.replace(" / ", "/").replace(" /", "/").replace("/ ", "/")
         parts = [p.strip() for p in raw.split("/") if p.strip()]
 
-        if len(parts) >= 3 and parts[0].lower() == "s" and parts[1].lower() in ("existencias", "stock"):
+        if not parts:
+            return raw
+
+        lowered = [p.lower() for p in parts]
+
+        for marker in ("existencias", "stock"):
+            if marker in lowered:
+                idx = lowered.index(marker)
+                remaining = parts[idx + 1:]
+                if remaining:
+                    return "/".join(remaining)
+
+        if len(parts) >= 3 and parts[0].lower() in ("s", "som"):
             return "/".join(parts[2:])
 
-        if len(parts) >= 2 and parts[0].lower() in ("existencias", "stock"):
-            return "/".join(parts[1:])
-
-        return "/".join(parts) if parts else raw
-
-    # -------------------------------------------------------------------------
-    # Contexto del lote/material
-    # -------------------------------------------------------------------------
+        return "/".join(parts)
 
     @api.model
     def _iv_get_quant_sale_popup_context(self, quant_id=False):
@@ -189,10 +186,6 @@ class StockQuantSaleOrderPopup(models.Model):
             "eta_source": eta_source,
         }
 
-    # -------------------------------------------------------------------------
-    # Pago de la orden
-    # -------------------------------------------------------------------------
-
     @api.model
     def _iv_convert_invoice_amount_to_order_currency(self, invoice, amount, order):
         if not amount:
@@ -287,10 +280,6 @@ class StockQuantSaleOrderPopup(models.Model):
             "invoice_count": invoice_count,
         }
 
-    # -------------------------------------------------------------------------
-    # RPC del popup
-    # -------------------------------------------------------------------------
-
     @api.model
     def get_sale_order_info(self, sale_order_ids, quant_id=False):
         lot_info = self._iv_get_quant_sale_popup_context(quant_id)
@@ -303,7 +292,6 @@ class StockQuantSaleOrderPopup(models.Model):
             }
 
         orders = self.env["sale.order"].sudo().browse(sale_order_ids).exists()
-
         result = []
 
         for order in orders:

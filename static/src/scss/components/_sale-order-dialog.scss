@@ -1,6 +1,6 @@
 // ============================================================
 // Sale Order Dialog — Inventario Visual
-// Branding maderero + layout compacto para ver todo rápido
+// Branding maderero + layout compacto, sin exceso de cards
 // ============================================================
 
 $sod-walnut: #4A2A18;
@@ -24,7 +24,7 @@ $sod-redwood: #9A4A32;
 $sod-amber: #C98228;
 
 // ============================================================
-// Modal nativo
+// Modal
 // ============================================================
 
 .modal-content:has(.o_sale_order_dialog_wood),
@@ -112,13 +112,12 @@ $sod-amber: #C98228;
   box-shadow:
     0 10px 24px rgba($sod-walnut, .10),
     inset 0 0 0 1px rgba(255, 255, 255, .70);
-  transition: transform .16s ease, background .16s ease, box-shadow .16s ease, color .16s ease;
+  transition: all .16s ease;
 
   &:hover {
     transform: translateY(-1px) scale(1.04);
     color: #ffffff;
     background: linear-gradient(135deg, $sod-cedar, $sod-walnut);
-    box-shadow: 0 14px 28px rgba($sod-walnut, .18);
   }
 }
 
@@ -147,9 +146,6 @@ $sod-amber: #C98228;
       radial-gradient(circle at 35% 25%, rgba(255, 255, 255, .90), transparent 34%),
       linear-gradient(135deg, rgba($sod-honey, .42), rgba($sod-oak, .60));
     border: 1px solid rgba($sod-cedar, .18);
-    box-shadow:
-      0 22px 46px rgba($sod-copper, .13),
-      inset 0 0 0 1px rgba(255, 255, 255, .72);
 
     i {
       font-size: 42px;
@@ -242,9 +238,6 @@ $sod-amber: #C98228;
       radial-gradient(circle at 30% 20%, rgba(255, 255, 255, .82), transparent 32%),
       linear-gradient(145deg, rgba($sod-honey, .58), rgba($sod-oak, .55));
     border: 1px solid rgba($sod-copper, .18);
-    box-shadow:
-      0 18px 36px rgba($sod-walnut, .11),
-      inset 0 0 0 1px rgba(255, 255, 255, .48);
 
     i {
       color: $sod-walnut;
@@ -316,7 +309,7 @@ $sod-amber: #C98228;
     0 12px 28px rgba($sod-walnut, .08),
     inset 0 0 0 1px rgba(255, 255, 255, .70);
   cursor: pointer;
-  transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+  transition: all .14s ease;
 
   &:hover {
     transform: translateY(-1px);
@@ -337,21 +330,11 @@ $sod-amber: #C98228;
   strong {
     display: block;
     color: $sod-walnut;
-    font-size: 20px;
+    font-size: 21px;
     line-height: 1.05;
     font-weight: 950;
     letter-spacing: -.04em;
     overflow-wrap: anywhere;
-  }
-
-  small {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    margin-top: 8px;
-    color: $sod-copper;
-    font-size: 11px;
-    font-weight: 850;
   }
 }
 
@@ -386,7 +369,7 @@ $sod-amber: #C98228;
 }
 
 // ============================================================
-// Contenido compacto
+// Contenido
 // ============================================================
 
 .sod-compact-body {
@@ -395,7 +378,7 @@ $sod-amber: #C98228;
 
 .sod-main-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, .65fr);
   gap: 12px;
   margin-bottom: 12px;
 }
@@ -415,7 +398,7 @@ $sod-amber: #C98228;
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    margin-bottom: 10px;
+    margin-bottom: 9px;
     color: $sod-walnut;
     font-size: 11px;
     font-weight: 950;
@@ -444,67 +427,71 @@ $sod-amber: #C98228;
   }
 }
 
-.sod-material-title {
-  margin-bottom: 10px;
-  padding: 10px 12px;
+// ============================================================
+// Material como ficha técnica
+// ============================================================
+
+.sod-material-sheet {
+  display: grid;
+  grid-template-columns: minmax(240px, .85fr) minmax(0, 1.15fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.sod-material-main {
+  padding: 12px 14px;
   border-radius: 16px;
-  background: rgba($sod-parchment, .48);
+  background: rgba($sod-parchment, .45);
   border: 1px solid rgba($sod-cedar, .10);
 
   strong {
     display: block;
     color: $sod-walnut;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 950;
-    line-height: 1.2;
+    line-height: 1.22;
     overflow-wrap: anywhere;
   }
 
-  small {
+  span {
     display: block;
-    margin-top: 4px;
+    margin-top: 6px;
     color: $sod-muted;
     font-size: 11px;
-    font-weight: 800;
+    font-weight: 850;
 
     b {
       color: $sod-cedar;
+      font-weight: 950;
     }
   }
 }
 
-.sod-compact-grid {
+.sod-material-lines {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 18px;
+  row-gap: 0;
 }
 
-.sod-sale-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.sod-mini-field {
+.sod-line-item {
   min-width: 0;
-  padding: 10px 11px;
-  border-radius: 15px;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, .94), rgba($sod-cream, .88));
-  border: 1px solid rgba($sod-cedar, .10);
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba($sod-cedar, .10);
 
   span {
-    display: block;
     color: $sod-muted;
-    font-size: 9px;
+    font-size: 9.5px;
     text-transform: uppercase;
     letter-spacing: .08em;
     font-weight: 950;
-    margin-bottom: 5px;
   }
 
   strong {
-    display: block;
     color: $sod-walnut;
     font-size: 12.5px;
     font-weight: 900;
@@ -512,24 +499,77 @@ $sod-amber: #C98228;
     overflow-wrap: anywhere;
   }
 
-  &--wide {
-    grid-column: 1 / -1;
+  &--eta strong {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    i {
+      color: $sod-amber;
+    }
+  }
+}
+
+// ============================================================
+// Venta
+// ============================================================
+
+.sod-sale-sheet {
+  display: grid;
+  gap: 10px;
+}
+
+.sod-sale-client {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba($sod-parchment, .32);
+  border: 1px solid rgba($sod-cedar, .10);
+
+  span {
+    display: block;
+    color: $sod-muted;
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-weight: 950;
+    margin-bottom: 6px;
   }
 
-  &--eta {
-    background:
-      linear-gradient(145deg, rgba($sod-honey, .20), rgba($sod-cream, .92));
-    border-color: rgba($sod-amber, .22);
+  strong {
+    display: block;
+    color: $sod-walnut;
+    font-size: 14px;
+    font-weight: 950;
+    overflow-wrap: anywhere;
+  }
+}
 
-    strong {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+.sod-sale-lines {
+  display: grid;
+  gap: 0;
 
-      i {
-        color: $sod-amber;
-      }
-    }
+  div {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr);
+    gap: 10px;
+    align-items: baseline;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba($sod-cedar, .10);
+  }
+
+  span {
+    color: $sod-muted;
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-weight: 950;
+  }
+
+  strong {
+    color: $sod-walnut;
+    font-size: 12.5px;
+    font-weight: 900;
+    overflow-wrap: anywhere;
   }
 }
 
@@ -637,12 +677,11 @@ $sod-amber: #C98228;
   border: 0 !important;
   font-weight: 950;
   box-shadow: 0 10px 20px rgba($sod-walnut, .16);
-  transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
+  transition: all .14s ease;
 
   &:hover {
     transform: translateY(-1px);
     background: linear-gradient(135deg, $sod-copper, $sod-cedar) !important;
-    box-shadow: 0 12px 24px rgba($sod-copper, .20);
   }
 }
 
@@ -666,8 +705,8 @@ $sod-amber: #C98228;
     grid-template-columns: 1fr;
   }
 
-  .sod-compact-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .sod-material-sheet {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -715,8 +754,7 @@ $sod-amber: #C98228;
     padding: 12px 14px 16px;
   }
 
-  .sod-compact-grid,
-  .sod-sale-grid,
+  .sod-material-lines,
   .sod-payment-grid {
     grid-template-columns: 1fr;
   }
