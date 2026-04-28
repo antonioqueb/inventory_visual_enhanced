@@ -99,10 +99,7 @@
                                             <strong t-esc="lotInfo.product_name || 'Producto sin nombre'"/>
                                         </div>
 
-                                        <div class="sod-material-heading__lot">
-                                            <span>Lote</span>
-                                            <strong t-esc="lotInfo.lot_name || '—'"/>
-                                        </div>
+                                        
                                     </div>
 
                                     <div class="sod-material-table">
