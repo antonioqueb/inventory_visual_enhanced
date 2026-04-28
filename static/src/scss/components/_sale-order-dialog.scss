@@ -299,10 +299,13 @@ $sod-amber: #C98228;
 }
 
 .sod-hero-lot-title {
-  font-family: "SF Mono", "Roboto Mono", Monaco, Consolas, monospace;
+  font-family: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif !important;
   font-size: 38px !important;
-  letter-spacing: -0.07em !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.05em !important;
   color: $sod-walnut !important;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "ss01", "cv11";
 }
 
 .sod-ref-card {
