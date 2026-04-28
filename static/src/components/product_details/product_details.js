@@ -3,6 +3,32 @@ import { Component } from "@odoo/owl";
 
 export class ProductDetails extends Component {
     /**
+     * Devuelve true si las filas actuales corresponden a tránsito.
+     * Esto permite mostrar ETA solo en T. Available / T. Committed,
+     * sin ensuciar la vista normal de almacén.
+     */
+    get hasTransitDetails() {
+        const details = this.props.details || [];
+        return details.some((detail) => this.isTransitDetail(detail));
+    }
+
+    getDetailColspan() {
+        return this.hasTransitDetails ? 17 : 16;
+    }
+
+    isTransitDetail(detail) {
+        if (!detail) {
+            return false;
+        }
+
+        return (
+            detail.is_transit === true ||
+            detail.location_usage === "transit" ||
+            ["available", "committed"].includes(detail.transit_inventory_state || "")
+        );
+    }
+
+    /**
      * Getter principal que transforma la lista plana de detalles (props.details)
      * en una lista agrupada por Bloque, calculando totales y ordenando
      * de mayor cantidad de placas a menor.
@@ -11,55 +37,50 @@ export class ProductDetails extends Component {
         const details = this.props.details || [];
         const groups = {};
 
-        // 1. Agrupación: Recorremos todos los productos
         for (const detail of details) {
-            // Si el campo bloque viene vacío, lo etiquetamos como "Sin Bloque"
-            const blockName = detail.bloque || 'Sin Bloque';
+            const blockName = detail.bloque || "Sin Bloque";
+
             if (!groups[blockName]) {
                 groups[blockName] = {
                     blockName: blockName,
-                    items: [],      // Aquí guardaremos las filas originales
-                    totalArea: 0,   // Acumulador de m2
-                    count: 0,       // Acumulador de cantidad
-                    productType: null // Guardaremos el tipo aquí
+                    items: [],
+                    totalArea: 0,
+                    count: 0,
+                    productType: null,
                 };
             }
 
-            // Agregamos el item al grupo correspondiente
             groups[blockName].items.push(detail);
-
-            // Incrementamos contadores
             groups[blockName].count += 1;
-            groups[blockName].totalArea += (detail.quantity || 0);
+            groups[blockName].totalArea += detail.quantity || 0;
 
-            // Detectar tipo (Placa/Formato/Pieza) del primer item que tenga dato
             if (!groups[blockName].productType && detail.tipo) {
                 groups[blockName].productType = detail.tipo;
             }
         }
 
-        // 2. Conversión: Pasamos de Objeto a Array para poder iterar en el XML
         const groupArray = Object.values(groups);
 
-        // 3. Ordenamiento: Ponemos primero los bloques con más items (Descendente)
         groupArray.sort((a, b) => b.count - a.count);
 
-        // 4. Ordenar items por contenedor dentro de cada bloque y marcar cambios de contenedor
         for (const group of groupArray) {
             group.items.sort((a, b) => {
-                const cA = (a.contenedor || '').toLowerCase();
-                const cB = (b.contenedor || '').toLowerCase();
+                const cA = (a.contenedor || "").toLowerCase();
+                const cB = (b.contenedor || "").toLowerCase();
                 return cA.localeCompare(cB);
             });
 
             let lastContenedor = null;
+
             for (const item of group.items) {
-                const currentContenedor = item.contenedor || '';
+                const currentContenedor = item.contenedor || "";
+
                 if (lastContenedor !== null && currentContenedor !== lastContenedor) {
                     item._containerBreak = true;
                 } else {
                     item._containerBreak = false;
                 }
+
                 lastContenedor = currentContenedor;
             }
         }
@@ -67,32 +88,54 @@ export class ProductDetails extends Component {
         return groupArray;
     }
 
-    // Mantenemos la lógica original de selección móvil
     onMobileSelectAll(ev) {
         if (this.props.onMobileSelectAll) {
             this.props.onMobileSelectAll(ev);
         }
     }
 
-    /**
-     * Método auxiliar para obtener el texto de la unidad
-     * Se usa en el XML para mostrar 'pza' si es Pieza, o 'm²' para Placa/Formato
-     */
     getUnitLabel(type) {
-        const t = type ? type.toString().toLowerCase() : '';
-        return t === 'pieza' ? 'pza' : 'm²';
+        const t = type ? type.toString().toLowerCase() : "";
+        return t === "pieza" ? "pza" : "m²";
+    }
+
+    formatDate(value) {
+        if (!value) {
+            return "—";
+        }
+
+        const raw = String(value);
+        const datePart = raw.includes(" ") ? raw.split(" ")[0] : raw;
+        const parts = datePart.split("-");
+
+        if (parts.length !== 3) {
+            return raw;
+        }
+
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+
+    getEtaText(detail) {
+        if (!this.isTransitDetail(detail)) {
+            return "—";
+        }
+
+        if (!detail.eta) {
+            return "No registrada";
+        }
+
+        return this.formatDate(detail.eta);
     }
 }
 
 ProductDetails.template = "inventory_visual_enhanced.ProductDetails";
 
-// Definición de props para validación y autocompletado
 ProductDetails.props = {
     details: Array,
-    // Props existentes
+
     areAllCurrentProductSelected: { type: Function, optional: true },
     isInCart: { type: Function, optional: true },
-    // Nuevas props para lógica de cantidad manual
+
     getDisplayQuantity: { type: Function, optional: true },
     toggleCartSelection: { type: Function, optional: true },
     onInputManualQuantity: { type: Function, optional: true },

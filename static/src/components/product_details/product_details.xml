@@ -27,6 +27,7 @@
                         <th class="col-checkbox">☑</th>
                         <th class="col-lot">Lote</th>
                         <th class="col-location">Ubicación</th>
+                        <th t-if="hasTransitDetails" class="col-eta">ETA</th>
                         <th class="col-dimensions">Dimensiones</th>
                         <th class="col-color">Color</th>
                         <th class="col-tipo">Tipo</th>
@@ -42,24 +43,21 @@
                         <th class="col-icon">E</th>
                     </tr>
                 </thead>
+
                 <tbody>
-                    <!-- BUCLE EXTERNO: Itera sobre los GRUPOS (Bloques) -->
                     <t t-foreach="groupedAndSortedDetails" t-as="group" t-key="group.blockName">
                         
-                        <!-- SEPARADOR ENTRE BLOQUES: fila vacía antes de cada bloque excepto el primero -->
                         <tr t-if="!group_first" class="container-separator-row">
-                            <td colspan="16" style="height: 8px; padding: 0; border: none; background: transparent;"></td>
+                            <td t-att-colspan="getDetailColspan()" style="height: 8px; padding: 0; border: none; background: transparent;"></td>
                         </tr>
 
-                        <!-- BUCLE INTERNO: Itera sobre los detalles -->
                         <t t-foreach="group.items" t-as="detail" t-key="detail.id">
                             
-                            <!-- SEPARADOR DE CONTENEDOR: fila vacía cuando cambia el contenedor dentro del mismo bloque -->
                             <tr t-if="detail._containerBreak" class="container-separator-row">
-                                <td colspan="16" style="height: 8px; padding: 0; border: none; background: transparent;"></td>
+                                <td t-att-colspan="getDetailColspan()" style="height: 8px; padding: 0; border: none; background: transparent;"></td>
                             </tr>
 
-                            <tr>
+                            <tr t-att-class="{ 'iv-transit-detail-row': isTransitDetail(detail) }">
                                 <!-- Checkbox -->
                                 <td class="col-checkbox text-center">
                                     <div class="checkbox-wrapper" t-on-click.stop="">
@@ -83,6 +81,23 @@
                                 <td class="col-location">
                                     <i class="fa fa-map-marker"></i>
                                     <span t-esc="detail.location_name"></span>
+                                </td>
+
+                                <!-- ETA SOLO PARA TRÁNSITO -->
+                                <td t-if="hasTransitDetails" class="col-eta">
+                                    <t t-if="isTransitDetail(detail)">
+                                        <span
+                                            class="eta-pill"
+                                            t-att-class="{ 'eta-pill--empty': !detail.eta }"
+                                            t-att-title="detail.eta_source ? ('ETA origen: ' + detail.eta_source) : 'ETA de tránsito'"
+                                        >
+                                            <i class="fa fa-ship"></i>
+                                            <t t-esc="getEtaText(detail)"/>
+                                        </span>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="text-muted">-</span>
+                                    </t>
                                 </td>
                                 
                                 <!-- Dimensiones -->
@@ -111,6 +126,7 @@
                                     <span t-if="detail.color" t-esc="detail.color"></span>
                                     <span t-else="" class="text-muted">-</span>
                                 </td>
+
                                 <!-- Tipo -->
                                 <td class="col-tipo">
                                     <span t-if="detail.tipo" t-esc="detail.tipo"></span>
@@ -136,19 +152,19 @@
                                     <span t-if="detail.contenedor" t-esc="detail.contenedor"></span>
                                     <span t-else="" class="text-muted">-</span>
                                 </td>
-                                
-                                <td class="col-ref-proveedor">
-                                    <span t-if="detail.referencia_proveedor" t-esc="detail.referencia_proveedor"></span>
-                                    <span t-else="" class="text-muted">-</span>
-                                </td>
 
                                 <td class="col-num-placa">
                                     <span t-if="detail.numero_placa" t-esc="detail.numero_placa"></span>
                                     <span t-else="" class="text-muted">-</span>
                                 </td>
                                 
+                                <td class="col-ref-proveedor">
+                                    <span t-if="detail.referencia_proveedor" t-esc="detail.referencia_proveedor"></span>
+                                    <span t-else="" class="text-muted">-</span>
+                                </td>
+                                
                                 <!-- ACCIONES -->
-                                <td class="col-icon action-btn-cell">
+                                <td class="col-icon action-btn-cell col-photo">
                                     <button 
                                         type="button"
                                         class="icon-btn"
@@ -159,7 +175,7 @@
                                     </button>
                                 </td>
                                 
-                                <td class="col-icon action-btn-cell">
+                                <td class="col-icon action-btn-cell col-notes">
                                     <button 
                                         type="button"
                                         class="icon-btn"
@@ -170,7 +186,7 @@
                                     </button>
                                 </td>
                                 
-                                <td class="col-icon action-btn-cell">
+                                <td class="col-icon action-btn-cell col-history">
                                     <button 
                                         t-if="props.hasSalesPermissions"
                                         type="button"
@@ -179,12 +195,13 @@
                                     >
                                         <i class="fa fa-history"></i>
                                     </button>
-                                    <span t-else="" class="icon-btn no-content"><i class="fa fa-history"></i></span>
+                                    <span t-else="" class="icon-btn no-content">
+                                        <i class="fa fa-history"></i>
+                                    </span>
                                 </td>
                                 
-                                <!-- COLUMNA E (Estado): Prioridad -> 1. Hold activo, 2. En orden de venta, 3. Sin estado -->
-                                <td class="col-icon action-btn-cell">
-                                    <!-- 1. Tiene hold activo -->
+                                <!-- COLUMNA E -->
+                                <td class="col-icon action-btn-cell col-status">
                                     <button 
                                         t-if="detail.tiene_hold"
                                         type="button"
@@ -195,7 +212,7 @@
                                     >
                                         <i class="fa fa-hand-paper-o"></i>
                                     </button>
-                                    <!-- 2. En orden de venta confirmada -->
+
                                     <button 
                                         t-elif="detail.en_orden_venta"
                                         type="button"
@@ -205,8 +222,10 @@
                                     >
                                         <i class="fa fa-usd"></i>
                                     </button>
-                                    <!-- 3. Sin estado -->
-                                    <span t-else="" class="status-badge-btn status-no-hold" title="Sin apartado"><i class="fa fa-hand-paper-o"></i></span>
+
+                                    <span t-else="" class="status-badge-btn status-no-hold" title="Sin apartado">
+                                        <i class="fa fa-hand-paper-o"></i>
+                                    </span>
                                 </td>
                             </tr>
                         </t>
@@ -214,13 +233,10 @@
                         <!-- FILA DE RESUMEN DEL BLOQUE -->
                         <tr class="group-summary-row" style="background-color: #f8f9fa; border-top: 2px solid #e9ecef;">
                             <td></td>
-                            
-                            <!-- Columna Lote: Vacía para no romper patrón visual -->
                             <td class="col-lot"></td>
-                            
                             <td></td>
+                            <td t-if="hasTransitDetails"></td>
                             
-                            <!-- Columna Dimensiones: Total piezas + Total área -->
                             <td class="col-dimensions" style="font-weight: bold; color: #212529;">
                                 <t t-set="typeLabel" t-value="'Placas'"/>
                                 <t t-if="group.productType and group.productType.toLowerCase() === 'formato'">
@@ -229,14 +245,18 @@
                                 <t t-elif="group.productType and group.productType.toLowerCase() === 'pieza'">
                                     <t t-set="typeLabel" t-value="'Piezas'"/>
                                 </t>
-                                <span><t t-esc="group.count"/> <t t-esc="typeLabel"/> | <t t-esc="props.formatNumber(group.totalArea)"/> <t t-esc="getUnitLabel(group.productType)"/></span>
+                                <span>
+                                    <t t-esc="group.count"/> <t t-esc="typeLabel"/> |
+                                    <t t-esc="props.formatNumber(group.totalArea)"/> <t t-esc="getUnitLabel(group.productType)"/>
+                                </span>
                             </td>
                             
-                            <td colspan="7"></td>
+                            <td colspan="8"></td>
                             
-                            <!-- Últimas columnas: Fin del Bloque -->
                             <td colspan="4" style="text-align: right; vertical-align: middle; padding-right: 15px; color: #6c757d; font-style: italic;">
-                                <small><span t-esc="group.blockName" style="font-weight: 600;"/></small>
+                                <small>
+                                    <span t-esc="group.blockName" style="font-weight: 600;"/>
+                                </small>
                             </td>
                         </tr>
                         

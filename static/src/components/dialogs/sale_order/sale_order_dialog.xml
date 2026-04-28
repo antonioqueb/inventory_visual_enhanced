@@ -94,14 +94,6 @@
                                 </div>
 
                                 <div class="sod-material-sheet">
-                                    <div class="sod-material-heading">
-                                        <div class="sod-material-heading__name">
-                                            <strong t-esc="lotInfo.product_name || 'Producto sin nombre'"/>
-                                        </div>
-
-                                        
-                                    </div>
-
                                     <div class="sod-material-table">
                                         <div class="sod-material-row">
                                             <div class="sod-material-cell">

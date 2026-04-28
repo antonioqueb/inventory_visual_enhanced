@@ -16,6 +16,45 @@ class StockQuantTransitVisibility(models.Model):
         )
 
     @api.model
+    def _iv_format_date_value(self, value):
+        """
+        Formatea fechas / datetimes para enviarlas al frontend como YYYY-MM-DD.
+
+        Mantiene fallback seguro por si el valor ya viene como string.
+        """
+        if not value:
+            return ""
+
+        try:
+            if hasattr(value, "date"):
+                return value.date().strftime("%Y-%m-%d")
+            if hasattr(value, "strftime"):
+                return value.strftime("%Y-%m-%d")
+        except Exception:
+            pass
+
+        return str(value)
+
+    @api.model
+    def _iv_get_first_existing_field_value(self, record, field_names):
+        """
+        Busca el primer campo existente con valor en un record cualquiera.
+
+        Se usa para ETA porque el campo puede vivir en distintos modelos
+        o llamarse diferente según el módulo de tránsito.
+        """
+        if not record or not record.exists():
+            return False
+
+        for field_name in field_names:
+            if field_name in record._fields:
+                value = record[field_name]
+                if value:
+                    return value
+
+        return False
+
+    @api.model
     def _iv_get_transit_state(self, quant):
         """
         Estado comercial usado exclusivamente para tránsito.
@@ -54,6 +93,51 @@ class StockQuantTransitVisibility(models.Model):
         return self.env["stock.transit.line"].sudo().search([
             ("quant_id", "=", quant.id),
         ], limit=1)
+
+    @api.model
+    def _iv_get_eta_for_transit_quant(self, quant):
+        """
+        Obtiene ETA únicamente para quants en tránsito.
+
+        Prioridad:
+        1. Línea de tránsito vinculada al quant.
+        2. Quant directamente.
+
+        Si tu campo real de ETA tiene otro nombre, agrégalo a eta_fields.
+        """
+        if not quant or not quant.exists() or quant.location_id.usage != "transit":
+            return "", ""
+
+        eta_fields = [
+            "eta",
+            "eta_date",
+            "date_eta",
+            "fecha_eta",
+            "eta_produccion",
+            "eta_production",
+            "production_eta",
+            "production_eta_date",
+            "fecha_eta_produccion",
+            "expected_arrival_date",
+            "estimated_arrival_date",
+            "arrival_date",
+            "scheduled_date",
+            "date_expected",
+            "expected_date",
+        ]
+
+        transit_line = self._iv_get_transit_line(quant)
+        eta_value = self._iv_get_first_existing_field_value(transit_line, eta_fields)
+
+        if eta_value:
+            return self._iv_format_date_value(eta_value), "Tránsito"
+
+        eta_value = self._iv_get_first_existing_field_value(quant, eta_fields)
+
+        if eta_value:
+            return self._iv_format_date_value(eta_value), "Inventario"
+
+        return "", ""
 
     # -------------------------------------------------------------------------
     # DETECCIÓN NORMAL DE SO PARA INVENTARIO INTERNO
@@ -350,7 +434,6 @@ class StockQuantTransitVisibility(models.Model):
                 ))
 
         product_groups = {}
-
         visible_quants = self.env["stock.quant"]
 
         for quant in quants:
@@ -510,6 +593,12 @@ class StockQuantTransitVisibility(models.Model):
 
             transit_line = self._iv_get_transit_line(quant) if is_transit else False
 
+            eta_value = ""
+            eta_source = ""
+
+            if is_transit:
+                eta_value, eta_source = self._iv_get_eta_for_transit_quant(quant)
+
             detail = {
                 "id": quant.id,
                 "lot_id": quant.lot_id.id if quant.lot_id else False,
@@ -545,6 +634,9 @@ class StockQuantTransitVisibility(models.Model):
                     self._iv_has_transit_publication_fields()
                     and getattr(quant, "transit_inventory_published", False)
                 ),
+                "is_transit": is_transit,
+                "eta": eta_value,
+                "eta_source": eta_source,
             }
 
             if quant.lot_id and hasattr(quant.lot_id, "x_fotografia_ids"):
@@ -552,12 +644,17 @@ class StockQuantTransitVisibility(models.Model):
 
             # -----------------------------------------------------------------
             # TRÁNSITO: NO SE TOCA LA LÓGICA ACTUAL.
+            # Solo se agregan campos informativos para frontend:
+            # - is_transit
+            # - eta
+            # - eta_source
             # -----------------------------------------------------------------
             if is_transit:
                 if transit_state == "committed":
                     detail["en_orden_venta"] = True
                     if transit_line and transit_line.order_id:
                         detail["sale_order_ids"] = [transit_line.order_id.id]
+
                 result.append(detail)
                 continue
 

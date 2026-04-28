@@ -612,3 +612,120 @@
         }
     }
 }
+
+
+
+// ============================================================
+// ETA EN FILAS DE TRÁNSITO
+// ============================================================
+
+.o_inventory_details_table {
+  thead {
+    th.col-eta {
+      width: 92px;
+      min-width: 92px;
+      text-align: center;
+    }
+  }
+
+  tbody {
+    td.col-eta {
+      text-align: center;
+      white-space: nowrap;
+    }
+  }
+
+  .eta-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 82px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: #fff8e1;
+    border: 1px solid #e4b66a;
+    color: #7a4424;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1.2;
+
+    i {
+      color: #a76735;
+      font-size: 10px;
+    }
+
+    &--empty {
+      background: #f1f1f1;
+      border-color: #dddddd;
+      color: #777777;
+
+      i {
+        color: #999999;
+      }
+    }
+  }
+}
+
+@media (max-width: 992px) {
+  .o_inventory_details_table {
+    tbody {
+      tr.iv-transit-detail-row {
+        grid-template-rows: repeat(9, auto);
+        grid-template-areas:
+          "check  header  header  header"
+          "check  loc     loc     loc"
+          "check  eta     eta     eta"
+          "check  dims    dims    dims"
+          "check  cnt     cnt     cnt"
+          "check  blq     blq     blq"
+          "check  atd     atd     atd"
+          "check  ped     ped     ped"
+          "act1   act2    act3    act4";
+      }
+
+      td.col-eta {
+        grid-area: eta;
+        display: flex !important;
+        align-items: center;
+        justify-content: flex-start;
+        min-height: 30px;
+        padding: 4px 10px !important;
+        background: #fff;
+        border-bottom: 1px solid #f0f0f0 !important;
+
+        &::before {
+          content: "ETA:";
+          font-size: 10px;
+          color: #999;
+          font-weight: 700;
+          flex-shrink: 0;
+          min-width: 30px;
+          margin-right: 6px;
+        }
+
+        .eta-pill {
+          min-width: auto;
+          font-size: 11px;
+          padding: 4px 8px;
+        }
+      }
+
+      td.action-btn-cell.col-photo {
+        grid-area: act1;
+      }
+
+      td.action-btn-cell.col-notes {
+        grid-area: act2;
+      }
+
+      td.action-btn-cell.col-history {
+        grid-area: act3;
+      }
+
+      td.action-btn-cell.col-status {
+        grid-area: act4;
+      }
+    }
+  }
+}
