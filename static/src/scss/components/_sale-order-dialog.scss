@@ -1,6 +1,6 @@
 // ============================================================
 // Sale Order Dialog — Inventario Visual
-// Branding cálido maderero + diseño simple sin redundancia
+// Branding maderero + layout compacto para ver todo rápido
 // ============================================================
 
 $sod-walnut: #4A2A18;
@@ -16,7 +16,6 @@ $sod-parchment: #FCF0DC;
 $sod-bark: #6A4A32;
 $sod-charcoal: #2A1A12;
 $sod-muted: #92735A;
-$sod-line: #EBD5B5;
 
 $sod-sage: #61724C;
 $sod-sage-dark: #415136;
@@ -54,13 +53,12 @@ $sod-amber: #C98228;
     background:
       linear-gradient(180deg, rgba($sod-cream, .98), rgba($sod-cream-2, .98)) !important;
     border-top: 1px solid rgba($sod-cedar, .14) !important;
-    padding: 16px 22px;
+    padding: 12px 18px !important;
   }
 }
 
 .o_sale_order_dialog_wood,
 .o_sale_order_dialog_premium {
-  min-height: 420px;
   position: relative;
   color: $sod-charcoal;
   background:
@@ -73,7 +71,7 @@ $sod-amber: #C98228;
     content: "";
     position: absolute;
     inset: 0;
-    opacity: .11;
+    opacity: .10;
     pointer-events: none;
     background:
       repeating-linear-gradient(
@@ -82,13 +80,6 @@ $sod-amber: #C98228;
         rgba($sod-cedar, .09) 1px,
         transparent 1px,
         transparent 30px
-      ),
-      repeating-linear-gradient(
-        96deg,
-        rgba($sod-honey, .08) 0px,
-        rgba($sod-honey, .08) 1px,
-        transparent 1px,
-        transparent 48px
       );
   }
 
@@ -99,20 +90,20 @@ $sod-amber: #C98228;
 }
 
 // ============================================================
-// Cierre flotante
+// Cierre
 // ============================================================
 
 .sod-floating-close {
   position: absolute;
-  top: 18px;
-  right: 18px;
+  top: 16px;
+  right: 16px;
   z-index: 5;
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border: 1px solid rgba($sod-cedar, .20);
   border-radius: 999px;
   color: $sod-walnut;
-  background: rgba(255, 253, 247, .82);
+  background: rgba(255, 253, 247, .86);
   backdrop-filter: blur(10px);
   display: inline-flex;
   align-items: center;
@@ -132,12 +123,12 @@ $sod-amber: #C98228;
 }
 
 // ============================================================
-// Empty state
+// Empty
 // ============================================================
 
 .sod-empty {
-  min-height: 420px;
-  padding: 76px 32px;
+  min-height: 360px;
+  padding: 64px 28px;
   text-align: center;
   display: flex;
   align-items: center;
@@ -145,13 +136,13 @@ $sod-amber: #C98228;
   flex-direction: column;
 
   &__orb {
-    width: 104px;
-    height: 104px;
-    border-radius: 34px;
+    width: 92px;
+    height: 92px;
+    border-radius: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 22px;
+    margin-bottom: 18px;
     background:
       radial-gradient(circle at 35% 25%, rgba(255, 255, 255, .90), transparent 34%),
       linear-gradient(135deg, rgba($sod-honey, .42), rgba($sod-oak, .60));
@@ -161,34 +152,34 @@ $sod-amber: #C98228;
       inset 0 0 0 1px rgba(255, 255, 255, .72);
 
     i {
-      font-size: 48px;
+      font-size: 42px;
       color: $sod-walnut;
     }
   }
 
   h3 {
     color: $sod-walnut;
-    font-size: 25px;
+    font-size: 24px;
     font-weight: 950;
     letter-spacing: -.04em;
     margin-bottom: 8px;
   }
 
   p {
-    max-width: 540px;
+    max-width: 500px;
     color: $sod-muted;
-    line-height: 1.65;
+    line-height: 1.55;
     margin: 0;
   }
 }
 
 // ============================================================
-// Hero
+// Header
 // ============================================================
 
 .sod-hero {
   position: relative;
-  padding: 28px 24px;
+  padding: 24px 22px;
   background:
     radial-gradient(circle at 9% 15%, rgba(255, 255, 255, .88), transparent 28%),
     radial-gradient(circle at 92% 0%, rgba($sod-honey, .28), transparent 34%),
@@ -199,7 +190,7 @@ $sod-amber: #C98228;
   &__pattern {
     position: absolute;
     inset: 0;
-    opacity: .18;
+    opacity: .15;
     background:
       linear-gradient(rgba($sod-cedar, .10) 1px, transparent 1px),
       linear-gradient(90deg, rgba($sod-cedar, .08) 1px, transparent 1px);
@@ -210,7 +201,7 @@ $sod-amber: #C98228;
   &__grain {
     position: absolute;
     inset: 0;
-    opacity: .18;
+    opacity: .16;
     pointer-events: none;
     background:
       repeating-linear-gradient(
@@ -218,39 +209,32 @@ $sod-amber: #C98228;
         rgba($sod-cedar, .08) 0px,
         rgba($sod-cedar, .08) 1px,
         transparent 1px,
-        transparent 20px
-      ),
-      repeating-linear-gradient(
-        98deg,
-        rgba($sod-honey, .10) 0px,
-        rgba($sod-honey, .10) 1px,
-        transparent 1px,
-        transparent 50px
+        transparent 22px
       );
   }
 
   &__content {
     position: relative;
     z-index: 1;
-    display: flex;
-    align-items: stretch;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 470px);
     gap: 20px;
-    padding-right: 42px;
+    align-items: stretch;
+    padding-right: 40px;
   }
 
   &__left {
     display: flex;
     align-items: center;
-    gap: 18px;
+    gap: 16px;
     min-width: 0;
   }
 
   &__icon {
-    width: 90px;
-    height: 90px;
+    width: 82px;
+    height: 82px;
     flex: 0 0 auto;
-    border-radius: 30px;
+    border-radius: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -259,12 +243,12 @@ $sod-amber: #C98228;
       linear-gradient(145deg, rgba($sod-honey, .58), rgba($sod-oak, .55));
     border: 1px solid rgba($sod-copper, .18);
     box-shadow:
-      0 22px 44px rgba($sod-walnut, .12),
+      0 18px 36px rgba($sod-walnut, .11),
       inset 0 0 0 1px rgba(255, 255, 255, .48);
 
     i {
       color: $sod-walnut;
-      font-size: 48px;
+      font-size: 42px;
       text-shadow: 0 3px 10px rgba(255, 255, 255, .75);
     }
   }
@@ -274,7 +258,7 @@ $sod-amber: #C98228;
 
     h2 {
       color: $sod-walnut;
-      font-size: 34px;
+      font-size: 32px;
       line-height: 1;
       font-weight: 950;
       letter-spacing: -.055em;
@@ -282,20 +266,20 @@ $sod-amber: #C98228;
     }
 
     p {
-      max-width: 575px;
+      max-width: 560px;
       color: $sod-bark;
       margin: 0;
       font-size: 13px;
-      line-height: 1.55;
+      line-height: 1.45;
     }
   }
 
   &__right {
     display: grid;
-    grid-template-columns: minmax(170px, 1fr);
+    grid-template-columns: .9fr 1.1fr;
     gap: 10px;
     align-items: stretch;
-    min-width: 230px;
+    min-width: 0;
   }
 }
 
@@ -319,52 +303,26 @@ $sod-amber: #C98228;
   }
 }
 
-.sod-hero-metric {
-  border-radius: 21px;
-  padding: 16px;
+.sod-ref-card {
+  width: 100%;
+  min-width: 0;
+  text-align: left;
+  border-radius: 20px;
+  padding: 14px;
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, .78), rgba($sod-cream, .82));
-  border: 1px solid rgba($sod-cedar, .13);
-  backdrop-filter: blur(12px);
+    linear-gradient(145deg, rgba(255, 255, 255, .86), rgba($sod-cream, .88));
+  border: 1px solid rgba($sod-cedar, .16);
   box-shadow:
-    0 14px 32px rgba($sod-walnut, .08),
-    inset 0 0 0 1px rgba(255, 255, 255, .74);
+    0 12px 28px rgba($sod-walnut, .08),
+    inset 0 0 0 1px rgba(255, 255, 255, .70);
+  cursor: pointer;
+  transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
 
-  &__label {
-    display: block;
-    color: $sod-muted;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: .10em;
-    font-weight: 900;
-    margin-bottom: 7px;
+  &:hover {
+    transform: translateY(-1px);
+    border-color: rgba($sod-copper, .34);
+    box-shadow: 0 16px 32px rgba($sod-copper, .13);
   }
-
-  strong {
-    display: block;
-    color: $sod-walnut;
-    font-size: 18px;
-    line-height: 1.15;
-    font-weight: 950;
-    letter-spacing: -.03em;
-    overflow-wrap: anywhere;
-  }
-}
-
-// ============================================================
-// Section heads
-// ============================================================
-
-.sod-section-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 16px 18px;
-  border-bottom: 1px solid rgba($sod-cedar, .10);
-  background:
-    radial-gradient(circle at 0% 0%, rgba($sod-honey, .12), transparent 34%),
-    linear-gradient(180deg, rgba(255, 255, 255, .86), rgba($sod-cream, .84));
 
   span {
     display: block;
@@ -373,64 +331,164 @@ $sod-amber: #C98228;
     text-transform: uppercase;
     letter-spacing: .10em;
     font-weight: 950;
-    margin-bottom: 4px;
+    margin-bottom: 5px;
   }
 
   strong {
     display: block;
     color: $sod-walnut;
-    font-size: 16px;
+    font-size: 20px;
+    line-height: 1.05;
     font-weight: 950;
-    line-height: 1.25;
+    letter-spacing: -.04em;
+    overflow-wrap: anywhere;
+  }
+
+  small {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 8px;
+    color: $sod-copper;
+    font-size: 11px;
+    font-weight: 850;
+  }
+}
+
+.sod-payment-hero {
+  min-width: 0;
+  border-radius: 20px;
+  padding: 14px;
+  background:
+    radial-gradient(circle at 92% 0%, rgba(255, 255, 255, .62), transparent 36%),
+    linear-gradient(135deg, #F7FBF2, $sod-sage-light);
+  border: 1px solid rgba($sod-sage, .22);
+  box-shadow:
+    0 12px 28px rgba($sod-sage, .08),
+    inset 0 0 0 1px rgba(255, 255, 255, .72);
+
+  &__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+
+    > strong {
+      color: $sod-sage-dark;
+      font-size: 22px;
+      line-height: 1;
+      font-weight: 950;
+      letter-spacing: -.04em;
+      white-space: nowrap;
+    }
   }
 }
 
 // ============================================================
-// Material
+// Contenido compacto
 // ============================================================
 
-.sod-material-card {
-  margin: 18px 22px 6px;
-  border-radius: 24px;
-  overflow: hidden;
+.sod-compact-body {
+  padding: 14px 18px 18px;
+}
+
+.sod-main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.sod-card {
+  min-width: 0;
+  border-radius: 22px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, .98), rgba($sod-cream, .96));
   border: 1px solid rgba($sod-cedar, .13);
   box-shadow:
-    0 16px 38px rgba($sod-walnut, .07),
+    0 12px 28px rgba($sod-walnut, .07),
     0 2px 7px rgba($sod-walnut, .04);
-}
+  padding: 14px;
 
-.sod-lot-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 36px;
-  padding: 8px 13px;
-  border-radius: 999px;
-  background: rgba($sod-honey, .22);
-  border: 1px solid rgba($sod-amber, .26);
-  color: $sod-cedar;
-  font-size: 12px;
-  font-weight: 950;
-  white-space: nowrap;
+  &__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 10px;
+    color: $sod-walnut;
+    font-size: 11px;
+    font-weight: 950;
+    text-transform: uppercase;
+    letter-spacing: .10em;
 
-  i {
-    color: $sod-amber;
+    i {
+      color: $sod-copper;
+      font-size: 13px;
+    }
+
+    &--payment {
+      color: $sod-sage-dark;
+
+      i {
+        color: $sod-sage;
+      }
+    }
+  }
+
+  &--payment-detail {
+    background:
+      radial-gradient(circle at 92% 0%, rgba(255, 255, 255, .58), transparent 36%),
+      linear-gradient(135deg, #F7FBF2, $sod-sage-light);
+    border-color: rgba($sod-sage, .22);
   }
 }
 
-.sod-material-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  padding: 16px;
+.sod-material-title {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba($sod-parchment, .48);
+  border: 1px solid rgba($sod-cedar, .10);
+
+  strong {
+    display: block;
+    color: $sod-walnut;
+    font-size: 14px;
+    font-weight: 950;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+
+  small {
+    display: block;
+    margin-top: 4px;
+    color: $sod-muted;
+    font-size: 11px;
+    font-weight: 800;
+
+    b {
+      color: $sod-cedar;
+    }
+  }
 }
 
-.sod-material-item {
+.sod-compact-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sod-sale-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sod-mini-field {
   min-width: 0;
-  padding: 13px 14px;
-  border-radius: 17px;
+  padding: 10px 11px;
+  border-radius: 15px;
   background:
     linear-gradient(145deg, rgba(255, 255, 255, .94), rgba($sod-cream, .88));
   border: 1px solid rgba($sod-cedar, .10);
@@ -438,20 +496,24 @@ $sod-amber: #C98228;
   span {
     display: block;
     color: $sod-muted;
-    font-size: 10px;
+    font-size: 9px;
     text-transform: uppercase;
     letter-spacing: .08em;
-    font-weight: 900;
-    margin-bottom: 6px;
+    font-weight: 950;
+    margin-bottom: 5px;
   }
 
   strong {
     display: block;
     color: $sod-walnut;
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 900;
-    line-height: 1.35;
+    line-height: 1.25;
     overflow-wrap: anywhere;
+  }
+
+  &--wide {
+    grid-column: 1 / -1;
   }
 
   &--eta {
@@ -462,7 +524,7 @@ $sod-amber: #C98228;
     strong {
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 6px;
 
       i {
         color: $sod-amber;
@@ -472,251 +534,15 @@ $sod-amber: #C98228;
 }
 
 // ============================================================
-// Orders
+// Pago
 // ============================================================
-
-.sod-orders {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 14px 22px 24px;
-}
-
-.sod-order-card {
-  position: relative;
-  overflow: hidden;
-  border-radius: 24px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, .98), rgba($sod-cream, .96));
-  border: 1px solid rgba($sod-cedar, .13);
-  box-shadow:
-    0 16px 38px rgba($sod-walnut, .08),
-    0 2px 7px rgba($sod-walnut, .04);
-  animation: sodFadeUp .22s ease both;
-
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 6px;
-    background: linear-gradient(180deg, $sod-honey, $sod-copper, $sod-cedar);
-  }
-
-  > * {
-    position: relative;
-    z-index: 1;
-  }
-
-  &__top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 18px;
-    padding: 18px 20px 14px 24px;
-    border-bottom: 1px solid rgba($sod-cedar, .10);
-    background:
-      radial-gradient(circle at 0% 0%, rgba($sod-honey, .10), transparent 34%),
-      linear-gradient(180deg, rgba(255, 255, 255, .80), rgba($sod-cream, .82));
-  }
-
-  &__identity {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    min-width: 0;
-  }
-
-  &__body {
-    display: grid;
-    grid-template-columns: minmax(0, .95fr) minmax(360px, 1.05fr);
-    gap: 16px;
-    padding: 18px 20px 20px 24px;
-  }
-}
-
-.sod-avatar {
-  width: 54px;
-  height: 54px;
-  flex: 0 0 auto;
-  border-radius: 19px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  font-size: 17px;
-  font-weight: 950;
-  letter-spacing: -.04em;
-  background:
-    radial-gradient(circle at 35% 25%, rgba(255, 255, 255, .24), transparent 34%),
-    linear-gradient(135deg, $sod-walnut, $sod-copper);
-  box-shadow: 0 14px 28px rgba($sod-walnut, .15);
-}
-
-.sod-order-name {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: $sod-walnut;
-  font-size: 18px;
-  font-weight: 950;
-  letter-spacing: -.04em;
-  line-height: 1.15;
-
-  i {
-    color: $sod-copper;
-    font-size: 15px;
-  }
-}
-
-.sod-order-subtitle {
-  color: $sod-muted;
-  font-size: 12px;
-  font-weight: 750;
-  margin-top: 3px;
-}
-
-// ============================================================
-// Buttons
-// ============================================================
-
-.sod-open-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  min-height: 36px;
-  padding: 9px 15px;
-  border-radius: 999px;
-  color: #ffffff;
-  background: linear-gradient(135deg, $sod-cedar, $sod-walnut);
-  border: 0;
-  font-size: 12px;
-  font-weight: 950;
-  white-space: nowrap;
-  box-shadow: 0 10px 22px rgba($sod-walnut, .18);
-  transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
-
-  &:hover {
-    transform: translateY(-1px);
-    background: linear-gradient(135deg, $sod-copper, $sod-cedar);
-    box-shadow: 0 14px 28px rgba($sod-copper, .22);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-}
-
-.sod-close-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 40px;
-  padding: 10px 22px;
-  border-radius: 999px;
-  color: #ffffff !important;
-  background: linear-gradient(135deg, $sod-cedar, $sod-dark-walnut) !important;
-  border: 0 !important;
-  font-weight: 950;
-  box-shadow: 0 12px 24px rgba($sod-walnut, .18);
-  transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
-
-  &:hover {
-    transform: translateY(-1px);
-    background: linear-gradient(135deg, $sod-copper, $sod-cedar) !important;
-    box-shadow: 0 14px 28px rgba($sod-copper, .22);
-  }
-}
-
-// ============================================================
-// Commercial info
-// ============================================================
-
-.sod-info-panel {
-  min-width: 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  align-content: start;
-  padding: 16px;
-  border-radius: 22px;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, .94), rgba($sod-cream, .90));
-  border: 1px solid rgba($sod-cedar, .10);
-}
-
-.sod-info-item {
-  min-width: 0;
-  padding: 14px;
-  border-radius: 17px;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, .92), rgba($sod-cream, .88));
-  border: 1px solid rgba($sod-cedar, .10);
-
-  span {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: $sod-muted;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    font-weight: 900;
-    margin-bottom: 8px;
-
-    i {
-      color: $sod-copper;
-      font-size: 12px;
-    }
-  }
-
-  strong {
-    display: block;
-    color: $sod-walnut;
-    font-size: 13px;
-    font-weight: 900;
-    overflow-wrap: anywhere;
-  }
-}
-
-// ============================================================
-// Payment
-// ============================================================
-
-.sod-payment-panel {
-  min-width: 0;
-  border-radius: 22px;
-  padding: 16px;
-  background:
-    radial-gradient(circle at 92% 0%, rgba(255, 255, 255, .58), transparent 36%),
-    linear-gradient(135deg, #F7FBF2, $sod-sage-light);
-  border: 1px solid rgba($sod-sage, .22);
-  box-shadow:
-    0 14px 28px rgba($sod-sage, .08),
-    inset 0 0 0 1px rgba(255, 255, 255, .72);
-}
-
-.sod-payment-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.sod-payment-percent {
-  color: $sod-sage-dark;
-  font-size: 24px;
-  font-weight: 950;
-  letter-spacing: -.04em;
-}
 
 .sod-payment-badge {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  min-height: 34px;
-  padding: 8px 12px;
+  min-height: 30px;
+  padding: 7px 10px;
   border-radius: 999px;
   font-size: 11px;
   font-weight: 950;
@@ -744,12 +570,11 @@ $sod-amber: #C98228;
 }
 
 .sod-payment-progress {
-  height: 10px;
+  height: 8px;
   border-radius: 999px;
   overflow: hidden;
   background: rgba($sod-sage-dark, .13);
   border: 1px solid rgba($sod-sage, .14);
-  margin-bottom: 14px;
 
   &__bar {
     height: 100%;
@@ -757,35 +582,39 @@ $sod-amber: #C98228;
     background: linear-gradient(90deg, $sod-sage, $sod-sage-dark);
     transition: width .24s ease;
   }
+
+  &--hero {
+    height: 9px;
+  }
 }
 
 .sod-payment-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
 }
 
 .sod-payment-cell {
   min-width: 0;
-  padding: 12px;
-  border-radius: 16px;
+  padding: 10px 11px;
+  border-radius: 15px;
   background: rgba(255, 255, 255, .62);
   border: 1px solid rgba($sod-sage, .12);
 
   span {
     display: block;
     color: rgba($sod-sage-dark, .76);
-    font-size: 10px;
+    font-size: 9px;
     text-transform: uppercase;
     letter-spacing: .08em;
-    font-weight: 900;
-    margin-bottom: 6px;
+    font-weight: 950;
+    margin-bottom: 5px;
   }
 
   strong {
     display: block;
     color: $sod-sage-dark;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 950;
     line-height: 1.2;
     overflow-wrap: anywhere;
@@ -793,18 +622,27 @@ $sod-amber: #C98228;
 }
 
 // ============================================================
-// Animation
+// Footer
 // ============================================================
 
-@keyframes sodFadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
+.sod-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 9px 20px;
+  border-radius: 999px;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, $sod-cedar, $sod-dark-walnut) !important;
+  border: 0 !important;
+  font-weight: 950;
+  box-shadow: 0 10px 20px rgba($sod-walnut, .16);
+  transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  &:hover {
+    transform: translateY(-1px);
+    background: linear-gradient(135deg, $sod-copper, $sod-cedar) !important;
+    box-shadow: 0 12px 24px rgba($sod-copper, .20);
   }
 }
 
@@ -812,56 +650,28 @@ $sod-amber: #C98228;
 // Responsive
 // ============================================================
 
-@media (max-width: 992px) {
+@media (max-width: 1100px) {
   .sod-hero {
-    padding: 22px 18px;
-
     &__content {
-      flex-direction: column;
-      padding-right: 0;
+      grid-template-columns: 1fr;
+      padding-right: 38px;
     }
 
     &__right {
-      min-width: 0;
-      width: 100%;
+      grid-template-columns: 1fr 1fr;
     }
   }
 
-  .sod-material-card {
-    margin: 16px 16px 4px;
-  }
-
-  .sod-section-head {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .sod-material-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .sod-orders {
-    padding: 12px 16px 20px;
-  }
-
-  .sod-order-card {
-    &__top {
-      align-items: flex-start;
-      flex-direction: column;
-    }
-
-    &__body {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .sod-info-panel,
-  .sod-payment-grid {
+  .sod-main-grid {
     grid-template-columns: 1fr;
+  }
+
+  .sod-compact-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 576px) {
+@media (max-width: 768px) {
   .modal-content:has(.o_sale_order_dialog_wood),
   .modal-content:has(.o_sale_order_dialog_premium) {
     border-radius: 18px !important;
@@ -875,36 +685,42 @@ $sod-amber: #C98228;
   }
 
   .sod-hero {
+    padding: 20px 16px;
+
     &__left {
       align-items: flex-start;
       gap: 12px;
     }
 
     &__icon {
-      width: 66px;
-      height: 66px;
+      width: 64px;
+      height: 64px;
       border-radius: 22px;
 
       i {
-        font-size: 34px;
+        font-size: 32px;
       }
     }
 
     &__copy h2 {
-      font-size: 26px;
+      font-size: 25px;
+    }
+
+    &__right {
+      grid-template-columns: 1fr;
     }
   }
 
-  .sod-material-grid {
+  .sod-compact-body {
+    padding: 12px 14px 16px;
+  }
+
+  .sod-compact-grid,
+  .sod-sale-grid,
+  .sod-payment-grid {
     grid-template-columns: 1fr;
   }
 
-  .sod-payment-head {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .sod-open-btn,
   .sod-close-btn {
     width: 100%;
   }

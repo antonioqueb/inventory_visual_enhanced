@@ -19,6 +19,10 @@ export class SaleOrderDialog extends Component {
         return this.soInfo.orders || [];
     }
 
+    get primaryOrder() {
+        return this.orders[0] || {};
+    }
+
     get lotInfo() {
         return this.soInfo.lot_info || {};
     }
@@ -31,14 +35,6 @@ export class SaleOrderDialog extends Component {
         return !!(this.lotInfo && (this.lotInfo.lot_name || this.lotInfo.product_name));
     }
 
-    get orderCount() {
-        return this.orders.length;
-    }
-
-    get orderCountLabel() {
-        return this.orderCount === 1 ? "1 orden de venta" : `${this.orderCount} órdenes de venta`;
-    }
-
     get isTransitLot() {
         return !!this.lotInfo.is_transit;
     }
@@ -46,6 +42,22 @@ export class SaleOrderDialog extends Component {
     get lotUnitLabel() {
         const tipo = (this.lotInfo.tipo || "").toString().toLowerCase();
         return tipo === "pieza" ? "pza" : "m²";
+    }
+
+    get shortLocation() {
+        return this.lotInfo.location_short || this.lotInfo.location_name || "—";
+    }
+
+    get paymentStatusLabel() {
+        return this.primaryOrder.payment_label || "Sin pago";
+    }
+
+    get paymentStatusClass() {
+        return this.getPaymentBadgeClass(this.primaryOrder.payment_status);
+    }
+
+    get paymentStatusIcon() {
+        return this.getPaymentIcon(this.primaryOrder.payment_status);
     }
 
     getPaymentBadgeClass(status) {
@@ -118,27 +130,6 @@ export class SaleOrderDialog extends Component {
         return `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
 
-    getInitials(name) {
-        if (!name) {
-            return "SO";
-        }
-
-        const parts = name
-            .trim()
-            .split(/\s+/)
-            .filter((part) => part);
-
-        if (!parts.length) {
-            return "SO";
-        }
-
-        return parts
-            .slice(0, 2)
-            .map((part) => part[0])
-            .join("")
-            .toUpperCase();
-    }
-
     async openSaleOrder(orderId, ev) {
         if (ev) {
             ev.stopPropagation();
@@ -159,6 +150,10 @@ export class SaleOrderDialog extends Component {
         if (this.props.close) {
             this.props.close();
         }
+    }
+
+    async openPrimarySaleOrder(ev) {
+        await this.openSaleOrder(this.primaryOrder.id, ev);
     }
 }
 

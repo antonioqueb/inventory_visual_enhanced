@@ -9,7 +9,7 @@ class StockQuantSaleOrderPopup(models.Model):
     _inherit = "stock.quant"
 
     # -------------------------------------------------------------------------
-    # Helpers generales
+    # Helpers
     # -------------------------------------------------------------------------
 
     @api.model
@@ -61,6 +61,33 @@ class StockQuantSaleOrderPopup(models.Model):
         except Exception:
             return quant.x_tipo or ""
 
+    @api.model
+    def _iv_shorten_location_name(self, location):
+        """
+        Acorta ubicaciones tipo:
+            S/Existencias/G/Línea G16
+            S / Existencias / G / Línea G16
+
+        Resultado:
+            G/Línea G16
+
+        Si no puede detectar ese patrón, devuelve el nombre completo normalizado.
+        """
+        if not location:
+            return ""
+
+        raw = location.complete_name or location.display_name or location.name or ""
+        raw = raw.replace(" / ", "/").replace(" /", "/").replace("/ ", "/")
+        parts = [p.strip() for p in raw.split("/") if p.strip()]
+
+        if len(parts) >= 3 and parts[0].lower() == "s" and parts[1].lower() in ("existencias", "stock"):
+            return "/".join(parts[2:])
+
+        if len(parts) >= 2 and parts[0].lower() in ("existencias", "stock"):
+            return "/".join(parts[1:])
+
+        return "/".join(parts) if parts else raw
+
     # -------------------------------------------------------------------------
     # Contexto del lote/material
     # -------------------------------------------------------------------------
@@ -109,12 +136,12 @@ class StockQuantSaleOrderPopup(models.Model):
             if transit_line:
                 eta_value = self._iv_get_first_existing_field_value(transit_line, eta_fields)
                 if eta_value:
-                    eta_source = "Línea de tránsito"
+                    eta_source = "Tránsito"
 
             if not eta_value:
                 eta_value = self._iv_get_first_existing_field_value(quant, eta_fields)
                 if eta_value:
-                    eta_source = "Inventario en tránsito"
+                    eta_source = "Inventario"
 
         alto = quant.x_alto if hasattr(quant, "x_alto") else False
         ancho = quant.x_ancho if hasattr(quant, "x_ancho") else False
@@ -128,6 +155,9 @@ class StockQuantSaleOrderPopup(models.Model):
         elif grosor:
             dimensions = f"{grosor} cm"
 
+        location_name = quant.location_id.complete_name or quant.location_id.display_name or quant.location_id.name or ""
+        location_short = self._iv_shorten_location_name(quant.location_id)
+
         return {
             "quant_id": quant.id,
             "lot_id": quant.lot_id.id if quant.lot_id else False,
@@ -135,7 +165,8 @@ class StockQuantSaleOrderPopup(models.Model):
             "product_id": quant.product_id.id if quant.product_id else False,
             "product_name": quant.product_id.display_name if quant.product_id else "",
             "product_code": quant.product_id.default_code or "",
-            "location_name": quant.location_id.complete_name or quant.location_id.display_name or "",
+            "location_name": location_name,
+            "location_short": location_short,
             "location_usage": quant.location_id.usage or "",
             "is_transit": is_transit,
             "quantity": quant.quantity or 0.0,
@@ -159,7 +190,7 @@ class StockQuantSaleOrderPopup(models.Model):
         }
 
     # -------------------------------------------------------------------------
-    # Pagos de la orden
+    # Pago de la orden
     # -------------------------------------------------------------------------
 
     @api.model
@@ -257,7 +288,7 @@ class StockQuantSaleOrderPopup(models.Model):
         }
 
     # -------------------------------------------------------------------------
-    # RPC usado por el popup de SO en Inventario Visual
+    # RPC del popup
     # -------------------------------------------------------------------------
 
     @api.model
