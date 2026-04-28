@@ -99,6 +99,10 @@ export class ProductDetails extends Component {
         return t === "pieza" ? "pza" : "m²";
     }
 
+    /**
+     * Formato para ETA:
+     * 28 / Abril / 2026
+     */
     formatDate(value) {
         if (!value) {
             return "—";
@@ -112,7 +116,24 @@ export class ProductDetails extends Component {
             return raw;
         }
 
-        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        const [year, month, day] = parts;
+
+        const monthNames = {
+            "01": "Enero",
+            "02": "Febrero",
+            "03": "Marzo",
+            "04": "Abril",
+            "05": "Mayo",
+            "06": "Junio",
+            "07": "Julio",
+            "08": "Agosto",
+            "09": "Septiembre",
+            "10": "Octubre",
+            "11": "Noviembre",
+            "12": "Diciembre",
+        };
+
+        return `${parseInt(day, 10)} / ${monthNames[month] || month} / ${year}`;
     }
 
     getEtaText(detail) {
