@@ -38,8 +38,14 @@
 
                                 <div class="sod-hero__copy">
                                     <span class="sod-eyebrow">Venta vinculada</span>
-                                    <h2>Información comercial del lote</h2>
-                                    <p>Referencia, cliente, material y pago en una vista rápida.</p>
+
+                                    <h2 class="sod-hero-lot-title">
+                                        <t t-esc="lotInfo.lot_name || 'Sin lote'"/>
+                                    </h2>
+
+                                    <p>
+                                        <t t-esc="lotInfo.product_name || 'Material asociado a la orden de venta'"/>
+                                    </p>
                                 </div>
                             </div>
 
@@ -80,7 +86,7 @@
 
                         <div class="sod-main-grid">
 
-                            <!-- MATERIAL: ficha técnica organizada -->
+                            <!-- MATERIAL -->
                             <section class="sod-card sod-card--material-sheet" t-if="hasLotInfo">
                                 <div class="sod-card__title">
                                     <i class="fa fa-cube"/>

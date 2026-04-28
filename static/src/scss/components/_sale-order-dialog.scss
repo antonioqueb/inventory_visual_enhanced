@@ -259,11 +259,13 @@ $sod-amber: #C98228;
     }
 
     p {
-      max-width: 560px;
+      max-width: 680px;
       color: $sod-bark;
       margin: 0;
       font-size: 13px;
       line-height: 1.45;
+      font-weight: 700;
+      overflow-wrap: anywhere;
     }
   }
 
@@ -294,6 +296,13 @@ $sod-amber: #C98228;
     background: $sod-honey;
     box-shadow: 0 0 18px rgba($sod-honey, .75);
   }
+}
+
+.sod-hero-lot-title {
+  font-family: "SF Mono", "Roboto Mono", Monaco, Consolas, monospace;
+  font-size: 38px !important;
+  letter-spacing: -0.07em !important;
+  color: $sod-walnut !important;
 }
 
 .sod-ref-card {
@@ -428,7 +437,7 @@ $sod-amber: #C98228;
 }
 
 // ============================================================
-// Material como ficha técnica limpia
+// Material
 // ============================================================
 
 .sod-card--material-sheet {
@@ -776,8 +785,9 @@ $sod-amber: #C98228;
       }
     }
 
-    &__copy h2 {
-      font-size: 25px;
+    &__copy h2,
+    .sod-hero-lot-title {
+      font-size: 28px !important;
     }
 
     &__right {
