@@ -1,6 +1,6 @@
 // ============================================================
 // Sale Order Dialog — Inventario Visual
-// Branding maderero + layout compacto, sin exceso de cards
+// Branding maderero + ficha técnica limpia
 // ============================================================
 
 $sod-walnut: #4A2A18;
@@ -71,7 +71,7 @@ $sod-amber: #C98228;
     content: "";
     position: absolute;
     inset: 0;
-    opacity: .10;
+    opacity: .09;
     pointer-events: none;
     background:
       repeating-linear-gradient(
@@ -378,7 +378,7 @@ $sod-amber: #C98228;
 
 .sod-main-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(320px, .65fr);
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, .75fr);
   gap: 12px;
   margin-bottom: 12px;
 }
@@ -398,7 +398,7 @@ $sod-amber: #C98228;
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    margin-bottom: 9px;
+    margin-bottom: 10px;
     color: $sod-walnut;
     font-size: 11px;
     font-weight: 950;
@@ -428,60 +428,95 @@ $sod-amber: #C98228;
 }
 
 // ============================================================
-// Material como ficha técnica
+// Material como ficha técnica limpia
 // ============================================================
+
+.sod-card--material-sheet {
+  padding-bottom: 12px;
+}
 
 .sod-material-sheet {
   display: grid;
-  grid-template-columns: minmax(240px, .85fr) minmax(0, 1.15fr);
-  gap: 14px;
-  align-items: start;
+  gap: 10px;
 }
 
-.sod-material-main {
+.sod-material-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px;
+  gap: 10px;
+  align-items: stretch;
   padding: 12px 14px;
   border-radius: 16px;
-  background: rgba($sod-parchment, .45);
+  background:
+    linear-gradient(145deg, rgba($sod-parchment, .55), rgba(#ffffff, .62));
   border: 1px solid rgba($sod-cedar, .10);
 
-  strong {
-    display: block;
-    color: $sod-walnut;
-    font-size: 15px;
-    font-weight: 950;
-    line-height: 1.22;
-    overflow-wrap: anywhere;
+  &__name {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+
+    strong {
+      color: $sod-walnut;
+      font-size: 16px;
+      font-weight: 950;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
   }
 
-  span {
-    display: block;
-    margin-top: 6px;
-    color: $sod-muted;
-    font-size: 11px;
-    font-weight: 850;
+  &__lot {
+    min-width: 0;
+    display: grid;
+    align-content: center;
+    justify-items: end;
+    border-left: 1px solid rgba($sod-cedar, .12);
+    padding-left: 12px;
 
-    b {
-      color: $sod-cedar;
+    span {
+      color: $sod-muted;
+      font-size: 9px;
       font-weight: 950;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+
+    strong {
+      color: $sod-cedar;
+      font-size: 13px;
+      font-weight: 950;
+      overflow-wrap: anywhere;
+      text-align: right;
     }
   }
 }
 
-.sod-material-lines {
+.sod-material-table {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 18px;
-  row-gap: 0;
+  gap: 0;
+  padding: 2px 4px 0;
 }
 
-.sod-line-item {
+.sod-material-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  min-height: 35px;
+  border-bottom: 1px solid rgba($sod-cedar, .10);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.sod-material-cell {
   min-width: 0;
   display: grid;
-  grid-template-columns: 92px minmax(0, 1fr);
+  grid-template-columns: 100px minmax(0, 1fr);
   gap: 10px;
   align-items: baseline;
-  padding: 7px 0;
-  border-bottom: 1px solid rgba($sod-cedar, .10);
+  padding: 8px 0;
 
   span {
     color: $sod-muted;
@@ -493,7 +528,7 @@ $sod-amber: #C98228;
 
   strong {
     color: $sod-walnut;
-    font-size: 12.5px;
+    font-size: 12.8px;
     font-weight: 900;
     line-height: 1.25;
     overflow-wrap: anywhere;
@@ -544,17 +579,21 @@ $sod-amber: #C98228;
   }
 }
 
-.sod-sale-lines {
+.sod-sale-table {
   display: grid;
   gap: 0;
+}
 
-  div {
-    display: grid;
-    grid-template-columns: 92px minmax(0, 1fr);
-    gap: 10px;
-    align-items: baseline;
-    padding: 7px 0;
-    border-bottom: 1px solid rgba($sod-cedar, .10);
+.sod-sale-row {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba($sod-cedar, .10);
+
+  &:last-child {
+    border-bottom: 0;
   }
 
   span {
@@ -567,7 +606,7 @@ $sod-amber: #C98228;
 
   strong {
     color: $sod-walnut;
-    font-size: 12.5px;
+    font-size: 12.8px;
     font-weight: 900;
     overflow-wrap: anywhere;
   }
@@ -704,10 +743,6 @@ $sod-amber: #C98228;
   .sod-main-grid {
     grid-template-columns: 1fr;
   }
-
-  .sod-material-sheet {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 768px) {
@@ -754,9 +789,29 @@ $sod-amber: #C98228;
     padding: 12px 14px 16px;
   }
 
-  .sod-material-lines,
+  .sod-material-heading {
+    grid-template-columns: 1fr;
+
+    &__lot {
+      justify-items: start;
+      border-left: 0;
+      border-top: 1px solid rgba($sod-cedar, .12);
+      padding-left: 0;
+      padding-top: 8px;
+
+      strong {
+        text-align: left;
+      }
+    }
+  }
+
+  .sod-material-row,
   .sod-payment-grid {
     grid-template-columns: 1fr;
+  }
+
+  .sod-material-cell {
+    grid-template-columns: 92px minmax(0, 1fr);
   }
 
   .sod-close-btn {

@@ -80,7 +80,7 @@
 
                         <div class="sod-main-grid">
 
-                            <!-- MATERIAL COMO FICHA, NO COMO CARDS -->
+                            <!-- MATERIAL: ficha técnica organizada -->
                             <section class="sod-card sod-card--material-sheet" t-if="hasLotInfo">
                                 <div class="sod-card__title">
                                     <i class="fa fa-cube"/>
@@ -88,65 +88,77 @@
                                 </div>
 
                                 <div class="sod-material-sheet">
-                                    <div class="sod-material-main">
-                                        <strong t-esc="lotInfo.product_name || 'Producto sin nombre'"/>
-                                        <span>
-                                            Lote <b t-esc="lotInfo.lot_name || '—'"/>
-                                        </span>
+                                    <div class="sod-material-heading">
+                                        <div class="sod-material-heading__name">
+                                            <strong t-esc="lotInfo.product_name || 'Producto sin nombre'"/>
+                                        </div>
+
+                                        <div class="sod-material-heading__lot">
+                                            <span>Lote</span>
+                                            <strong t-esc="lotInfo.lot_name || '—'"/>
+                                        </div>
                                     </div>
 
-                                    <div class="sod-material-lines">
-                                        <div class="sod-line-item">
-                                            <span>Cantidad</span>
-                                            <strong>
-                                                <t t-esc="formatNumber(lotInfo.quantity)"/>
-                                                <t t-esc="lotUnitLabel"/>
-                                            </strong>
+                                    <div class="sod-material-table">
+                                        <div class="sod-material-row">
+                                            <div class="sod-material-cell">
+                                                <span>Cantidad</span>
+                                                <strong>
+                                                    <t t-esc="formatNumber(lotInfo.quantity)"/>
+                                                    <t t-esc="lotUnitLabel"/>
+                                                </strong>
+                                            </div>
+
+                                            <div class="sod-material-cell" t-if="lotInfo.dimensions">
+                                                <span>Dimensiones</span>
+                                                <strong t-esc="lotInfo.dimensions"/>
+                                            </div>
                                         </div>
 
-                                        <div class="sod-line-item" t-if="lotInfo.dimensions">
-                                            <span>Dimensiones</span>
-                                            <strong t-esc="lotInfo.dimensions"/>
+                                        <div class="sod-material-row">
+                                            <div class="sod-material-cell">
+                                                <span>Ubicación</span>
+                                                <strong t-esc="shortLocation"/>
+                                            </div>
+
+                                            <div class="sod-material-cell" t-if="lotInfo.bloque">
+                                                <span>Bloque</span>
+                                                <strong t-esc="lotInfo.bloque"/>
+                                            </div>
                                         </div>
 
-                                        <div class="sod-line-item">
-                                            <span>Ubicación</span>
-                                            <strong t-esc="shortLocation"/>
+                                        <div class="sod-material-row">
+                                            <div class="sod-material-cell" t-if="lotInfo.contenedor">
+                                                <span>Contenedor</span>
+                                                <strong t-esc="lotInfo.contenedor"/>
+                                            </div>
+
+                                            <div class="sod-material-cell" t-if="lotInfo.atado">
+                                                <span>Atado</span>
+                                                <strong t-esc="lotInfo.atado"/>
+                                            </div>
                                         </div>
 
-                                        <div class="sod-line-item" t-if="lotInfo.bloque">
-                                            <span>Bloque</span>
-                                            <strong t-esc="lotInfo.bloque"/>
-                                        </div>
+                                        <div class="sod-material-row" t-if="lotInfo.numero_placa or isTransitLot">
+                                            <div class="sod-material-cell" t-if="lotInfo.numero_placa">
+                                                <span>N. placa</span>
+                                                <strong t-esc="lotInfo.numero_placa"/>
+                                            </div>
 
-                                        <div class="sod-line-item" t-if="lotInfo.contenedor">
-                                            <span>Contenedor</span>
-                                            <strong t-esc="lotInfo.contenedor"/>
-                                        </div>
-
-                                        <div class="sod-line-item" t-if="lotInfo.atado">
-                                            <span>Atado</span>
-                                            <strong t-esc="lotInfo.atado"/>
-                                        </div>
-
-                                        <div class="sod-line-item" t-if="lotInfo.numero_placa">
-                                            <span>N. placa</span>
-                                            <strong t-esc="lotInfo.numero_placa"/>
-                                        </div>
-
-                                        <div class="sod-line-item sod-line-item--eta" t-if="isTransitLot">
-                                            <span>ETA</span>
-                                            <strong>
-                                                <i class="fa fa-ship"/>
-                                                <t t-if="lotInfo.eta" t-esc="formatDate(lotInfo.eta)"/>
-                                                <t t-else="">No registrada</t>
-                                            </strong>
+                                            <div class="sod-material-cell sod-material-cell--eta" t-if="isTransitLot">
+                                                <span>ETA</span>
+                                                <strong>
+                                                    <i class="fa fa-ship"/>
+                                                    <t t-if="lotInfo.eta" t-esc="formatDate(lotInfo.eta)"/>
+                                                    <t t-else="">No registrada</t>
+                                                </strong>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </section>
 
-                            <!-- VENTA COMPACTA -->
+                            <!-- VENTA -->
                             <section class="sod-card sod-card--sale-sheet">
                                 <div class="sod-card__title">
                                     <i class="fa fa-briefcase"/>
@@ -159,18 +171,18 @@
                                         <strong t-esc="primaryOrder.partner_name || '—'"/>
                                     </div>
 
-                                    <div class="sod-sale-lines">
-                                        <div>
+                                    <div class="sod-sale-table">
+                                        <div class="sod-sale-row">
                                             <span>Vendedor</span>
                                             <strong t-esc="primaryOrder.user_name || '—'"/>
                                         </div>
 
-                                        <div>
+                                        <div class="sod-sale-row">
                                             <span>Fecha</span>
                                             <strong t-esc="formatDate(primaryOrder.date_order)"/>
                                         </div>
 
-                                        <div t-if="primaryOrder.commitment_date">
+                                        <div class="sod-sale-row" t-if="primaryOrder.commitment_date">
                                             <span>Compromiso</span>
                                             <strong t-esc="formatDate(primaryOrder.commitment_date)"/>
                                         </div>
