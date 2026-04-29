@@ -187,6 +187,14 @@ export class ProductDetails extends Component {
             return detail.packing_shipment_name;
         }
 
+        if (detail.packing_voyage_name) {
+            return detail.packing_voyage_name;
+        }
+
+        if (detail.packing_container_name) {
+            return detail.packing_container_name;
+        }
+
         if (detail.has_packing_list) {
             return "Ver embarque";
         }
@@ -206,14 +214,18 @@ export class ProductDetails extends Component {
         }
 
         if (detail.packing_shipment_name) {
-            parts.push(`Embarque: ${detail.packing_shipment_name}`);
+            parts.push(`Embarque proveedor: ${detail.packing_shipment_name}`);
+        }
+
+        if (detail.packing_voyage_name) {
+            parts.push(`Viaje: ${detail.packing_voyage_name}`);
         }
 
         if (detail.packing_container_name) {
             parts.push(`Contenedor: ${detail.packing_container_name}`);
         }
 
-        return parts.join(" | ") || "Abrir embarque";
+        return parts.join(" | ") || "Abrir Packing List / Embarque";
     }
 
     async openPackingList(detail, ev) {
@@ -222,13 +234,14 @@ export class ProductDetails extends Component {
             ev.stopPropagation();
         }
 
-        // Debug log para identificar problemas
         console.log("[Inventario Visual] openPackingList - detail:", {
             id: detail?.id,
             has_packing_list: detail?.has_packing_list,
             packing_shipment_id: detail?.packing_shipment_id,
             packing_list_id: detail?.packing_list_id,
             packing_row_id: detail?.packing_row_id,
+            packing_voyage_id: detail?.packing_voyage_id,
+            packing_voyage_name: detail?.packing_voyage_name,
         });
 
         if (!detail) {
@@ -238,7 +251,7 @@ export class ProductDetails extends Component {
 
         if (!detail.has_packing_list) {
             this.notification.add(
-                "Este lote no tiene Packing List vinculado.",
+                "Este lote no tiene Packing List, embarque o viaje vinculado.",
                 { type: "warning" }
             );
             return;
@@ -246,9 +259,10 @@ export class ProductDetails extends Component {
 
         const shipmentId = detail.packing_shipment_id;
         const packingListId = detail.packing_list_id;
+        const voyageId = detail.packing_voyage_id;
 
         try {
-            // Prioridad 1: Embarque proveedor
+            // Prioridad 1: Embarque proveedor.
             if (shipmentId) {
                 await this.action.doAction({
                     type: "ir.actions.act_window",
@@ -261,7 +275,7 @@ export class ProductDetails extends Component {
                 return;
             }
 
-            // Prioridad 2: Packing List directo
+            // Prioridad 2: Packing List proveedor.
             if (packingListId) {
                 await this.action.doAction({
                     type: "ir.actions.act_window",
@@ -274,13 +288,27 @@ export class ProductDetails extends Component {
                 return;
             }
 
-            // No hay nada que abrir
+            // Prioridad 3: Viaje / Embarque de Torre de Control.
+            // Este fallback cubre el caso donde no existe supplier.shipment,
+            // pero sí existe stock.transit.voyage.
+            if (voyageId) {
+                await this.action.doAction({
+                    type: "ir.actions.act_window",
+                    name: "Embarque",
+                    res_model: "stock.transit.voyage",
+                    res_id: voyageId,
+                    views: [[false, "form"]],
+                    target: "current",
+                });
+                return;
+            }
+
             this.notification.add(
-                "No se pudo localizar el embarque ni el packing list para este lote.",
+                "No se pudo localizar el embarque, Packing List o viaje para este lote.",
                 { type: "warning" }
             );
         } catch (error) {
-            console.error("[Inventario Visual] Error abriendo packing list:", error);
+            console.error("[Inventario Visual] Error abriendo packing list / embarque:", error);
             this.notification.add(
                 `Error al abrir el embarque: ${error.message || error}`,
                 { type: "danger", sticky: true }
