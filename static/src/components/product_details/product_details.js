@@ -175,31 +175,11 @@ export class ProductDetails extends Component {
     }
 
     getPackingListLabel(detail) {
-        if (!detail) {
+        if (!detail || !detail.has_packing_list) {
             return "—";
         }
 
-        if (detail.packing_list_name) {
-            return detail.packing_list_name;
-        }
-
-        if (detail.packing_shipment_name) {
-            return detail.packing_shipment_name;
-        }
-
-        if (detail.packing_voyage_name) {
-            return detail.packing_voyage_name;
-        }
-
-        if (detail.packing_container_name) {
-            return detail.packing_container_name;
-        }
-
-        if (detail.has_packing_list) {
-            return "Ver embarque";
-        }
-
-        return "—";
+        return "Accesar";
     }
 
     getPackingListTitle(detail) {
@@ -207,7 +187,7 @@ export class ProductDetails extends Component {
             return "Sin Packing List vinculado";
         }
 
-        const parts = [];
+        const parts = ["Accesar Packing List / Embarque"];
 
         if (detail.packing_list_name) {
             parts.push(`Packing List: ${detail.packing_list_name}`);
@@ -225,7 +205,7 @@ export class ProductDetails extends Component {
             parts.push(`Contenedor: ${detail.packing_container_name}`);
         }
 
-        return parts.join(" | ") || "Abrir Packing List / Embarque";
+        return parts.join(" | ");
     }
 
     async openPackingList(detail, ev) {
