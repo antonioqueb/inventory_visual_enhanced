@@ -6,24 +6,14 @@ import { useService } from "@web/core/utils/hooks";
 export class ProductDetails extends Component {
     setup() {
         this.action = useService("action");
+        this.notification = useService("notification");
     }
 
-    /**
-     * Devuelve true si las filas actuales corresponden a tránsito.
-     * Esto permite mostrar ETA solo en T. Available / T. Committed,
-     * sin ensuciar la vista normal de almacén.
-     */
     get hasTransitDetails() {
         const details = this.props.details || [];
         return details.some((detail) => this.isTransitDetail(detail));
     }
 
-    /**
-     * Columnas:
-     * Base original sin ETA: 16
-     * Base original con ETA: 17
-     * + Packing List: +1
-     */
     getDetailColspan() {
         return this.hasTransitDetails ? 18 : 17;
     }
@@ -40,11 +30,6 @@ export class ProductDetails extends Component {
         );
     }
 
-    /**
-     * Getter principal que transforma la lista plana de detalles (props.details)
-     * en una lista agrupada por Bloque, calculando totales y ordenando
-     * de mayor cantidad de placas a menor.
-     */
     get groupedAndSortedDetails() {
         const details = this.props.details || [];
         const groups = {};
@@ -144,10 +129,6 @@ export class ProductDetails extends Component {
         }).format(Number(value || 0));
     }
 
-    /**
-     * Formato para ETA:
-     * 28 / Abril / 2026
-     */
     formatDate(value) {
         if (!value) {
             return "—";
@@ -241,39 +222,69 @@ export class ProductDetails extends Component {
             ev.stopPropagation();
         }
 
-        if (!detail || !detail.has_packing_list) {
+        // Debug log para identificar problemas
+        console.log("[Inventario Visual] openPackingList - detail:", {
+            id: detail?.id,
+            has_packing_list: detail?.has_packing_list,
+            packing_shipment_id: detail?.packing_shipment_id,
+            packing_list_id: detail?.packing_list_id,
+            packing_row_id: detail?.packing_row_id,
+        });
+
+        if (!detail) {
+            console.warn("[Inventario Visual] openPackingList: detail vacío");
             return;
         }
 
-        /*
-         * Regla solicitada:
-         * La columna visible dice Packing List,
-         * pero el clic debe abrir el Embarque proveedor.
-         */
-        if (detail.packing_shipment_id) {
-            await this.action.doAction({
-                type: "ir.actions.act_window",
-                name: "Embarque proveedor",
-                res_model: "supplier.shipment",
-                res_id: detail.packing_shipment_id,
-                views: [[false, "form"]],
-                target: "current",
-            });
+        if (!detail.has_packing_list) {
+            this.notification.add(
+                "Este lote no tiene Packing List vinculado.",
+                { type: "warning" }
+            );
             return;
         }
 
-        /*
-         * Fallback: si solo se resolvió el PL y no el embarque.
-         */
-        if (detail.packing_list_id) {
-            await this.action.doAction({
-                type: "ir.actions.act_window",
-                name: "Packing List",
-                res_model: "supplier.shipment.packing",
-                res_id: detail.packing_list_id,
-                views: [[false, "form"]],
-                target: "current",
-            });
+        const shipmentId = detail.packing_shipment_id;
+        const packingListId = detail.packing_list_id;
+
+        try {
+            // Prioridad 1: Embarque proveedor
+            if (shipmentId) {
+                await this.action.doAction({
+                    type: "ir.actions.act_window",
+                    name: "Embarque proveedor",
+                    res_model: "supplier.shipment",
+                    res_id: shipmentId,
+                    views: [[false, "form"]],
+                    target: "current",
+                });
+                return;
+            }
+
+            // Prioridad 2: Packing List directo
+            if (packingListId) {
+                await this.action.doAction({
+                    type: "ir.actions.act_window",
+                    name: "Packing List",
+                    res_model: "supplier.shipment.packing",
+                    res_id: packingListId,
+                    views: [[false, "form"]],
+                    target: "current",
+                });
+                return;
+            }
+
+            // No hay nada que abrir
+            this.notification.add(
+                "No se pudo localizar el embarque ni el packing list para este lote.",
+                { type: "warning" }
+            );
+        } catch (error) {
+            console.error("[Inventario Visual] Error abriendo packing list:", error);
+            this.notification.add(
+                `Error al abrir el embarque: ${error.message || error}`,
+                { type: "danger", sticky: true }
+            );
         }
     }
 }

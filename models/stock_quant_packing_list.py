@@ -30,6 +30,33 @@ class StockQuantPackingList(models.Model):
         return record[field_name] or default
 
     @api.model
+    def _iv_resolve_shipment_from_row(self, row):
+        """
+        Resuelve el embarque (supplier.shipment) desde un renglón
+        de packing list, intentando todos los caminos posibles.
+        """
+        if not row or not row.exists():
+            return False
+
+        # 1. Campo directo shipment_id en el row
+        if "shipment_id" in row._fields and row.shipment_id:
+            return row.shipment_id
+
+        # 2. A través del packing
+        packing = row.packing_id if "packing_id" in row._fields else False
+        if packing and packing.exists():
+            if "shipment_id" in packing._fields and packing.shipment_id:
+                return packing.shipment_id
+
+        # 3. A través del container
+        if "container_id" in row._fields and row.container_id:
+            container = row.container_id
+            if "shipment_id" in container._fields and container.shipment_id:
+                return container.shipment_id
+
+        return False
+
+    @api.model
     def _iv_make_packing_info_from_row(self, row):
         """
         Devuelve la información navegable del Packing List / Embarque
@@ -43,12 +70,7 @@ class StockQuantPackingList(models.Model):
             return {}
 
         packing = row.packing_id if "packing_id" in row._fields else False
-        shipment = False
-
-        if "shipment_id" in row._fields and row.shipment_id:
-            shipment = row.shipment_id
-        elif packing and "shipment_id" in packing._fields and packing.shipment_id:
-            shipment = packing.shipment_id
+        shipment = self._iv_resolve_shipment_from_row(row)
 
         container_name = ""
 
@@ -59,7 +81,7 @@ class StockQuantPackingList(models.Model):
             else:
                 container_name = container.display_name
 
-        return {
+        info = {
             "packing_row_id": row.id,
             "packing_id": packing.id if packing else False,
             "packing_name": (
@@ -71,6 +93,13 @@ class StockQuantPackingList(models.Model):
             "shipment_name": shipment.name if shipment else "",
             "container_name": container_name,
         }
+
+        _logger.debug(
+            "[Inventario Visual] Packing info desde row %s: shipment_id=%s, packing_id=%s",
+            row.id, info["shipment_id"], info["packing_id"]
+        )
+
+        return info
 
     @api.model
     def _iv_make_packing_info_from_shipment(self, shipment, packing=False):
@@ -104,14 +133,6 @@ class StockQuantPackingList(models.Model):
     def _iv_find_packing_row_for_quant(self, quant):
         """
         Busca un renglón de Packing List asociado al lote/producto del quant.
-
-        No depende de tránsito. Funciona aunque el material ya esté recibido
-        en ubicación interna, siempre que el lote conserve datos que permitan
-        correlacionarlo contra el Packing List:
-        - No. placa
-        - Ref. proveedor
-        - Bloque + Atado
-        - Pedimento + Bloque
         """
         if (
             not quant
@@ -159,7 +180,6 @@ class StockQuantPackingList(models.Model):
                 ("bloque", "=", bloque),
             ])
 
-        # Búsqueda flexible por si el proveedor capturó textos con variaciones.
         if numero_placa and "numero_placa" in Row._fields:
             candidate_domains.append(base_domain + [
                 ("numero_placa", "ilike", numero_placa),
@@ -194,8 +214,6 @@ class StockQuantPackingList(models.Model):
         """
         Fallback: si el lote tuvo línea en Torre de Control, intenta llegar
         al viaje y de ahí al embarque del proveedor.
-
-        Esto permite conservar el vínculo aunque el quant ya esté en almacén.
         """
         if (
             not quant
@@ -298,15 +316,28 @@ class StockQuantPackingList(models.Model):
 
         Prioridad:
         1. Renglón exacto del Packing List.
-        2. Embarque por stock.transit.line/voyage.
-        3. Embarque por picking.supplier_shipment_id.
+        2. Si el row no devolvió shipment, intentar resolverlo por tránsito.
+        3. Embarque por stock.transit.line/voyage.
+        4. Embarque por picking.supplier_shipment_id.
         """
         if not quant or not quant.exists() or not quant.lot_id:
             return {}
 
         row = self._iv_find_packing_row_for_quant(quant)
         if row:
-            return self._iv_make_packing_info_from_row(row)
+            info = self._iv_make_packing_info_from_row(row)
+
+            # Si tenemos row pero NO shipment_id, intentamos completar con fallbacks
+            if info and not info.get("shipment_id"):
+                shipment = (
+                    self._iv_find_shipment_from_transit_for_quant(quant)
+                    or self._iv_find_shipment_from_picking_for_quant(quant)
+                )
+                if shipment:
+                    info["shipment_id"] = shipment.id
+                    info["shipment_name"] = shipment.name or shipment.display_name
+
+            return info
 
         shipment = self._iv_find_shipment_from_transit_for_quant(quant)
         if shipment:
@@ -327,15 +358,6 @@ class StockQuantPackingList(models.Model):
         """
         Extiende la respuesta existente de Inventario Visual sin duplicar
         toda la lógica de stock_quant_transit_visibility.
-
-        Agrega por cada detail:
-        - packing_list_id
-        - packing_list_name
-        - packing_row_id
-        - packing_shipment_id
-        - packing_shipment_name
-        - packing_container_name
-        - has_packing_list
         """
         result = super().get_quant_details(quant_ids=quant_ids)
 
