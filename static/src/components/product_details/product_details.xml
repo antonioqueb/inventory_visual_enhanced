@@ -24,8 +24,11 @@
             <table class="o_inventory_details_table">
                 <thead>
                     <tr>
-                        <!-- NO CAMBIAR class="col-checkbox".
-                             inventory_shopping_cart hereda este th por xpath exacto. -->
+                        <!-- IMPORTANTE:
+                             No cambiar esta clase.
+                             inventory_shopping_cart busca exactamente:
+                             //thead/tr/th[@class='col-checkbox']
+                        -->
                         <th class="col-checkbox">☑</th>
 
                         <th class="col-lot">Lote</th>
@@ -40,10 +43,7 @@
                         <th class="col-atado">Atado</th>
                         <th class="col-pedimento">Pedimento</th>
                         <th class="col-container">Contenedor</th>
-
-                        <!-- NUEVA COLUMNA -->
                         <th class="col-packing-list">Packing List</th>
-
                         <th class="col-provider-ref">Ref. Proveedor</th>
                         <th class="col-photo">Fotos</th>
                         <th class="col-notes">Notas</th>
@@ -101,9 +101,12 @@
                                     'detail-row-has-sale': detail.en_orden_venta
                                 }"
                             >
-                                <!-- NO CAMBIAR class="col-checkbox".
-                                     Otros módulos pueden heredarlo por xpath. -->
-                                <td class="col-checkbox">
+                                <!-- IMPORTANTE:
+                                     No cambiar esta clase.
+                                     inventory_shopping_cart busca exactamente:
+                                     //td[@class='col-checkbox text-center']
+                                -->
+                                <td class="col-checkbox text-center">
                                     <input
                                         type="checkbox"
                                         class="cart-checkbox"
