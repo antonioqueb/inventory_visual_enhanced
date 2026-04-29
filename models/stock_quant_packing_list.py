@@ -34,11 +34,8 @@ class StockQuantPackingList(models.Model):
         """
         Devuelve el primer valor disponible revisando varios records/campos.
 
-        Uso principal:
-        - En Inventario Visual muchos campos vienen desde stock.quant.
-        - En otros flujos viven en stock.lot.
-        - Esta función evita que el PL falle solo porque el dato no vive
-          exactamente en el modelo esperado.
+        En Inventario Visual varios datos vienen desde stock.quant, no desde stock.lot.
+        Por eso no conviene depender únicamente del lote para resolver el PL.
         """
         for record, field_names in records_and_fields:
             if not record or not record.exists():
@@ -58,50 +55,35 @@ class StockQuantPackingList(models.Model):
     def _iv_normalize_text(self, value):
         if not value:
             return ""
-
         return str(value).strip()
 
-    @api.model
-    def _iv_normalize_for_compare(self, value):
-        if not value:
-            return ""
-
-        return (
-            str(value)
-            .strip()
-            .upper()
-            .replace(" ", "")
-            .replace("-", "")
-            .replace("_", "")
-        )
-
     # -------------------------------------------------------------------------
-    # RESOLUCIÓN DE EMBARQUE / PACKING
+    # RESOLUCIÓN DE EMBARQUE / PACKING / VIAJE
     # -------------------------------------------------------------------------
 
     @api.model
     def _iv_resolve_shipment_from_row(self, row):
         """
-        Resuelve el embarque supplier.shipment desde un renglón de PL.
+        Resuelve el embarque supplier.shipment desde un renglón de Packing List.
         """
         if not row or not row.exists():
             return False
 
         # 1. Campo related/directo shipment_id en el row
         if "shipment_id" in row._fields and row.shipment_id:
-            return row.shipment_id
+            return row.shipment_id.sudo()
 
         # 2. A través del packing
         packing = row.packing_id if "packing_id" in row._fields else False
         if packing and packing.exists():
             if "shipment_id" in packing._fields and packing.shipment_id:
-                return packing.shipment_id
+                return packing.shipment_id.sudo()
 
         # 3. A través del contenedor
         if "container_id" in row._fields and row.container_id:
             container = row.container_id
             if "shipment_id" in container._fields and container.shipment_id:
-                return container.shipment_id
+                return container.shipment_id.sudo()
 
         return False
 
@@ -109,11 +91,6 @@ class StockQuantPackingList(models.Model):
     def _iv_make_packing_info_from_row(self, row):
         """
         Devuelve información navegable desde supplier.shipment.packing.row.
-
-        Regla:
-        - La columna se llama Packing List.
-        - Si existe embarque, el frontend abre supplier.shipment.
-        - Si no existe embarque, puede abrir supplier.shipment.packing.
         """
         if not row or not row.exists():
             return {}
@@ -149,6 +126,8 @@ class StockQuantPackingList(models.Model):
             "shipment_id": shipment.id if shipment else False,
             "shipment_name": shipment_name,
             "container_name": container_name,
+            "voyage_id": False,
+            "voyage_name": "",
         }
 
         _logger.info(
@@ -161,9 +140,9 @@ class StockQuantPackingList(models.Model):
         return info
 
     @api.model
-    def _iv_make_packing_info_from_shipment(self, shipment, packing=False, container_name=""):
+    def _iv_make_packing_info_from_shipment(self, shipment, packing=False, container_name="", voyage=False):
         """
-        Fallback cuando se encuentra el embarque, aunque no se encuentre
+        Fallback cuando se encuentra supplier.shipment, aunque no se encuentre
         el renglón exacto del Packing List.
         """
         if not shipment or not shipment.exists():
@@ -180,6 +159,9 @@ class StockQuantPackingList(models.Model):
                 else packing.display_name
             )
 
+        if not voyage and "voyage_id" in shipment._fields and shipment.voyage_id:
+            voyage = shipment.voyage_id
+
         return {
             "packing_row_id": False,
             "packing_id": packing.id if packing else False,
@@ -187,6 +169,29 @@ class StockQuantPackingList(models.Model):
             "shipment_id": shipment.id,
             "shipment_name": shipment.name or shipment.display_name,
             "container_name": container_name or "",
+            "voyage_id": voyage.id if voyage else False,
+            "voyage_name": (voyage.name or voyage.display_name) if voyage else "",
+        }
+
+    @api.model
+    def _iv_make_packing_info_from_voyage(self, voyage, container_name=""):
+        """
+        Fallback crítico para tu caso actual:
+        no existe supplier.shipment vinculado al viaje, pero sí existe
+        stock.transit.voyage. Entonces el PL abre el embarque de Torre de Control.
+        """
+        if not voyage or not voyage.exists():
+            return {}
+
+        return {
+            "packing_row_id": False,
+            "packing_id": False,
+            "packing_name": "",
+            "shipment_id": False,
+            "shipment_name": "",
+            "container_name": container_name or "",
+            "voyage_id": voyage.id,
+            "voyage_name": voyage.name or voyage.display_name,
         }
 
     # -------------------------------------------------------------------------
@@ -252,11 +257,6 @@ class StockQuantPackingList(models.Model):
     def _iv_get_voyage_for_quant(self, quant):
         """
         Resuelve stock.transit.voyage desde el quant.
-
-        Prioridad:
-        1. quant.transit_voyage_id
-        2. quant.transit_line_id.voyage_id
-        3. stock.transit.line encontrada por quant/lote/producto
         """
         if not quant or not quant.exists():
             return False
@@ -303,12 +303,8 @@ class StockQuantPackingList(models.Model):
     @api.model
     def _iv_find_shipment_from_transit_for_quant(self, quant):
         """
-        Fallback principal:
         quant -> transit line / voyage -> supplier.shipment.
         """
-        if not quant or not quant.exists():
-            return False
-
         voyage = self._iv_get_voyage_for_quant(quant)
         if not voyage:
             return False
@@ -367,9 +363,9 @@ class StockQuantPackingList(models.Model):
         """
         Junta valores desde quant y lot.
 
-        Importante:
-        En tu vista, bloque/atado/pedimento/contenedor/ref proveedor suelen venir
-        del quant. Si buscamos solo en lot, has_packing_list puede quedar false.
+        Clave:
+        en tu Inventario Visual los datos de bloque, atado, pedimento,
+        contenedor y referencia pueden venir del quant.
         """
         lot = quant.lot_id if quant and quant.exists() else False
 
@@ -415,10 +411,15 @@ class StockQuantPackingList(models.Model):
     @api.model
     def _iv_add_domain_if_fields_exist(self, domains, Row, base_domain, additions):
         """
-        Agrega un dominio candidato solo si todos los campos existen.
+        Agrega un dominio candidato solo si todos los campos existen y tienen valor.
+
+        Soporta campos relacionados en dominio, por ejemplo:
+        container_id.container_number
         """
         for field_name, operator, value in additions:
-            if "." not in field_name and field_name not in Row._fields:
+            root_field = field_name.split(".")[0]
+
+            if root_field not in Row._fields:
                 return
 
             if not value:
@@ -434,10 +435,10 @@ class StockQuantPackingList(models.Model):
         """
         Busca un renglón de Packing List asociado al lote/producto del quant.
 
-        Mejora clave:
-        - Primero intenta scoped por shipment si ya se resolvió el embarque.
-        - Usa datos del quant y del lot.
-        - Si no encuentra row, el flujo todavía puede devolver el shipment como fallback.
+        Mejora:
+        - Si ya se resolvió shipment, busca primero dentro de ese shipment.
+        - Usa datos de quant + lot.
+        - Si no encuentra row, todavía puede devolver viaje como fallback.
         """
         if (
             not quant
@@ -502,16 +503,15 @@ class StockQuantPackingList(models.Model):
             )
 
             # 5. Contenedor + bloque
-            if "container_id" in Row._fields:
-                self._iv_add_domain_if_fields_exist(
-                    candidate_domains,
-                    Row,
-                    base_domain,
-                    [
-                        ("container_id.container_number", "=", values["contenedor"]),
-                        ("bloque", "=", values["bloque"]),
-                    ],
-                )
+            self._iv_add_domain_if_fields_exist(
+                candidate_domains,
+                Row,
+                base_domain,
+                [
+                    ("container_id.container_number", "=", values["contenedor"]),
+                    ("bloque", "=", values["bloque"]),
+                ],
+            )
 
             # 6. Búsquedas flexibles
             self._iv_add_domain_if_fields_exist(
@@ -565,14 +565,17 @@ class StockQuantPackingList(models.Model):
         Punto único de resolución para frontend.
 
         Prioridad:
-        1. Resolver shipment desde tránsito/voyage.
-        2. Buscar row exacto del PL, scoped por shipment si existe.
-        3. Si hay row, devolver row + packing + shipment.
-        4. Si no hay row pero sí shipment, devolver shipment + primer PL.
-        5. Fallback por picking.supplier_shipment_id.
+        1. Resolver viaje desde tránsito.
+        2. Resolver supplier.shipment desde viaje o picking.
+        3. Buscar row exacto del PL.
+        4. Si hay row, devolver row + packing + shipment.
+        5. Si hay shipment, devolver shipment + primer PL.
+        6. Si no hay shipment, devolver viaje stock.transit.voyage.
         """
         if not quant or not quant.exists():
             return {}
+
+        voyage = self._iv_get_voyage_for_quant(quant)
 
         shipment = (
             self._iv_find_shipment_from_transit_for_quant(quant)
@@ -583,17 +586,30 @@ class StockQuantPackingList(models.Model):
         if row:
             info = self._iv_make_packing_info_from_row(row)
 
-            # Si el row no trae shipment, completamos con fallback.
+            # Completar shipment si el row no lo trajo.
             if info and not info.get("shipment_id") and shipment:
                 info["shipment_id"] = shipment.id
                 info["shipment_name"] = shipment.name or shipment.display_name
 
+            # Completar voyage si existe.
+            if voyage:
+                info["voyage_id"] = voyage.id
+                info["voyage_name"] = voyage.name or voyage.display_name
+
             return info
 
+        values = self._iv_get_quant_matching_values(quant)
+
         if shipment:
-            values = self._iv_get_quant_matching_values(quant)
             return self._iv_make_packing_info_from_shipment(
                 shipment,
+                container_name=values.get("contenedor") or "",
+                voyage=voyage,
+            )
+
+        if voyage:
+            return self._iv_make_packing_info_from_voyage(
+                voyage,
                 container_name=values.get("contenedor") or "",
             )
 
@@ -607,7 +623,7 @@ class StockQuantPackingList(models.Model):
     def get_quant_details(self, quant_ids=None):
         """
         Extiende la respuesta existente de Inventario Visual sin duplicar
-        toda la lógica de stock_quant_transit_visibility.
+        la lógica base de tránsito / ventas.
         """
         result = super().get_quant_details(quant_ids=quant_ids)
 
@@ -636,19 +652,26 @@ class StockQuantPackingList(models.Model):
             item["packing_shipment_id"] = packing_info.get("shipment_id") or False
             item["packing_shipment_name"] = packing_info.get("shipment_name") or ""
             item["packing_container_name"] = packing_info.get("container_name") or ""
+
+            # Nuevo fallback para abrir el viaje de Torre de Control
+            item["packing_voyage_id"] = packing_info.get("voyage_id") or False
+            item["packing_voyage_name"] = packing_info.get("voyage_name") or ""
+
             item["has_packing_list"] = bool(
                 item["packing_list_id"]
                 or item["packing_shipment_id"]
                 or item["packing_row_id"]
+                or item["packing_voyage_id"]
             )
 
             _logger.info(
-                "[Inventario Visual][PL] quant=%s | has=%s | shipment=%s | packing=%s | row=%s",
+                "[Inventario Visual][PL] quant=%s | has=%s | shipment=%s | packing=%s | row=%s | voyage=%s",
                 item.get("id"),
                 item["has_packing_list"],
                 item["packing_shipment_id"],
                 item["packing_list_id"],
                 item["packing_row_id"],
+                item["packing_voyage_id"],
             )
 
         return result
