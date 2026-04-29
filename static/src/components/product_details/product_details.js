@@ -1,19 +1,28 @@
 /** @odoo-module **/
+
 import { Component } from "@odoo/owl";
+import { useService } from "@web/core/utils/hooks";
 
 export class ProductDetails extends Component {
+    setup() {
+        this.action = useService("action");
+    }
+
     /**
-     * Devuelve true si las filas actuales corresponden a tránsito.
-     * Esto permite mostrar ETA solo en T. Available / T. Committed,
-     * sin ensuciar la vista normal de almacén.
+     * Devuelve true si alguna fila corresponde a tránsito.
+     * Esto permite mantener la columna ETA solo cuando sí aplica.
      */
     get hasTransitDetails() {
         const details = this.props.details || [];
         return details.some((detail) => this.isTransitDetail(detail));
     }
 
+    /**
+     * Siempre agregamos la columna Packing List.
+     * Si hay ETA, la tabla tiene una columna más.
+     */
     getDetailColspan() {
-        return this.hasTransitDetails ? 17 : 16;
+        return this.hasTransitDetails ? 18 : 17;
     }
 
     isTransitDetail(detail) {
@@ -29,9 +38,7 @@ export class ProductDetails extends Component {
     }
 
     /**
-     * Getter principal que transforma la lista plana de detalles (props.details)
-     * en una lista agrupada por Bloque, calculando totales y ordenando
-     * de mayor cantidad de placas a menor.
+     * Agrupa por bloque, calcula totales y ordena.
      */
     get groupedAndSortedDetails() {
         const details = this.props.details || [];
@@ -52,7 +59,7 @@ export class ProductDetails extends Component {
 
             groups[blockName].items.push(detail);
             groups[blockName].count += 1;
-            groups[blockName].totalArea += detail.quantity || 0;
+            groups[blockName].totalArea += Number(detail.quantity || 0);
 
             if (!groups[blockName].productType && detail.tipo) {
                 groups[blockName].productType = detail.tipo;
@@ -67,7 +74,15 @@ export class ProductDetails extends Component {
             group.items.sort((a, b) => {
                 const cA = (a.contenedor || "").toLowerCase();
                 const cB = (b.contenedor || "").toLowerCase();
-                return cA.localeCompare(cB);
+
+                const containerCompare = cA.localeCompare(cB);
+                if (containerCompare !== 0) {
+                    return containerCompare;
+                }
+
+                const lotA = (a.lot_name || "").toLowerCase();
+                const lotB = (b.lot_name || "").toLowerCase();
+                return lotA.localeCompare(lotB);
             });
 
             let lastContenedor = null;
@@ -88,19 +103,38 @@ export class ProductDetails extends Component {
         return groupArray;
     }
 
-    onMobileSelectAll(ev) {
-        if (this.props.onMobileSelectAll) {
-            this.props.onMobileSelectAll(ev);
-        }
-    }
-
     getUnitLabel(type) {
         const t = type ? type.toString().toLowerCase() : "";
         return t === "pieza" ? "pza" : "m²";
     }
 
+    getTypeLabel(type) {
+        const t = type ? type.toString().toLowerCase() : "";
+
+        if (t === "formato") {
+            return "Formatos";
+        }
+
+        if (t === "pieza") {
+            return "Piezas";
+        }
+
+        return "Placas";
+    }
+
+    formatNumber(value) {
+        if (this.props.formatNumber) {
+            return this.props.formatNumber(value);
+        }
+
+        return new Intl.NumberFormat("es-MX", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        }).format(Number(value || 0));
+    }
+
     /**
-     * Formato para ETA:
+     * Formato:
      * 28 / Abril / 2026
      */
     formatDate(value) {
@@ -133,42 +167,107 @@ export class ProductDetails extends Component {
             "12": "Diciembre",
         };
 
-        return `${parseInt(day, 10)} / ${monthNames[month] || month} / ${year}`;
+        return `${day} / ${monthNames[month] || month} / ${year}`;
     }
 
-    getEtaText(detail) {
-        if (!this.isTransitDetail(detail)) {
+    getPackingListLabel(detail) {
+        if (!detail) {
             return "—";
         }
 
-        if (!detail.eta) {
-            return "No registrada";
+        if (detail.packing_list_name) {
+            return detail.packing_list_name;
         }
 
-        return this.formatDate(detail.eta);
+        if (detail.packing_shipment_name) {
+            return detail.packing_shipment_name;
+        }
+
+        if (detail.has_packing_list) {
+            return "Ver embarque";
+        }
+
+        return "—";
+    }
+
+    getPackingListTitle(detail) {
+        if (!detail || !detail.has_packing_list) {
+            return "Sin Packing List vinculado";
+        }
+
+        const parts = [];
+
+        if (detail.packing_list_name) {
+            parts.push(`Packing List: ${detail.packing_list_name}`);
+        }
+
+        if (detail.packing_shipment_name) {
+            parts.push(`Embarque: ${detail.packing_shipment_name}`);
+        }
+
+        if (detail.packing_container_name) {
+            parts.push(`Contenedor: ${detail.packing_container_name}`);
+        }
+
+        return parts.join(" | ") || "Abrir embarque";
+    }
+
+    async openPackingList(detail, ev) {
+        if (ev) {
+            ev.preventDefault();
+            ev.stopPropagation();
+        }
+
+        if (!detail || !detail.has_packing_list) {
+            return;
+        }
+
+        if (detail.packing_shipment_id) {
+            await this.action.doAction({
+                type: "ir.actions.act_window",
+                name: "Embarque proveedor",
+                res_model: "supplier.shipment",
+                res_id: detail.packing_shipment_id,
+                views: [[false, "form"]],
+                target: "current",
+            });
+            return;
+        }
+
+        if (detail.packing_list_id) {
+            await this.action.doAction({
+                type: "ir.actions.act_window",
+                name: "Packing List",
+                res_model: "supplier.shipment.packing",
+                res_id: detail.packing_list_id,
+                views: [[false, "form"]],
+                target: "current",
+            });
+        }
+    }
+
+    onMobileSelectAll(ev) {
+        if (this.props.onMobileSelectAll) {
+            this.props.onMobileSelectAll(ev);
+        }
     }
 }
 
 ProductDetails.template = "inventory_visual_enhanced.ProductDetails";
 
 ProductDetails.props = {
-    details: Array,
-
-    areAllCurrentProductSelected: { type: Function, optional: true },
-    isInCart: { type: Function, optional: true },
-
-    getDisplayQuantity: { type: Function, optional: true },
-    toggleCartSelection: { type: Function, optional: true },
-    onInputManualQuantity: { type: Function, optional: true },
+    details: { type: Array, optional: true },
     onPhotoClick: { type: Function, optional: true },
     onNotesClick: { type: Function, optional: true },
     onDetailsClick: { type: Function, optional: true },
+    onSalesPersonClick: { type: Function, optional: true },
     onHoldClick: { type: Function, optional: true },
     onSaleOrderClick: { type: Function, optional: true },
     formatNumber: { type: Function, optional: true },
     hasSalesPermissions: { type: Boolean, optional: true },
-    onSalesPersonClick: { type: Function, optional: true },
-    selectAllCurrentProduct: { type: Function, optional: true },
-    deselectAllCurrentProduct: { type: Function, optional: true },
     hasInventoryPermissions: { type: Boolean, optional: true },
+    isInCart: { type: Function, optional: true },
+    toggleCartSelection: { type: Function, optional: true },
+    onMobileSelectAll: { type: Function, optional: true },
+    "*": true,
 };
