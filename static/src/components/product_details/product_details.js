@@ -9,8 +9,9 @@ export class ProductDetails extends Component {
     }
 
     /**
-     * Devuelve true si alguna fila corresponde a tránsito.
-     * Esto permite mantener la columna ETA solo cuando sí aplica.
+     * Devuelve true si las filas actuales corresponden a tránsito.
+     * Esto permite mostrar ETA solo en T. Available / T. Committed,
+     * sin ensuciar la vista normal de almacén.
      */
     get hasTransitDetails() {
         const details = this.props.details || [];
@@ -18,11 +19,15 @@ export class ProductDetails extends Component {
     }
 
     /**
-     * Siempre agregamos la columna Packing List.
-     * Si hay ETA, la tabla tiene una columna más.
+     * Columnas actuales:
+     * Sin ETA: 16
+     * Con ETA: 17
+     *
+     * Se mantiene col-checkbox para compatibilidad con inventory_shopping_cart
+     * y otros módulos que heredan este template por xpath.
      */
     getDetailColspan() {
-        return this.hasTransitDetails ? 18 : 17;
+        return this.hasTransitDetails ? 17 : 16;
     }
 
     isTransitDetail(detail) {
@@ -38,7 +43,7 @@ export class ProductDetails extends Component {
     }
 
     /**
-     * Agrupa por bloque, calcula totales y ordena.
+     * Agrupa detalles por bloque, calcula totales y ordena.
      */
     get groupedAndSortedDetails() {
         const details = this.props.details || [];
@@ -101,6 +106,12 @@ export class ProductDetails extends Component {
         }
 
         return groupArray;
+    }
+
+    onMobileSelectAll(ev) {
+        if (this.props.onMobileSelectAll) {
+            this.props.onMobileSelectAll(ev);
+        }
     }
 
     getUnitLabel(type) {
@@ -167,7 +178,19 @@ export class ProductDetails extends Component {
             "12": "Diciembre",
         };
 
-        return `${day} / ${monthNames[month] || month} / ${year}`;
+        return `${parseInt(day, 10)} / ${monthNames[month] || month} / ${year}`;
+    }
+
+    getEtaText(detail) {
+        if (!this.isTransitDetail(detail)) {
+            return "—";
+        }
+
+        if (!detail.eta) {
+            return "No registrada";
+        }
+
+        return this.formatDate(detail.eta);
     }
 
     getPackingListLabel(detail) {
@@ -222,6 +245,12 @@ export class ProductDetails extends Component {
             return;
         }
 
+        /*
+         * Regla solicitada:
+         * El hipervínculo visible está en columna Packing List,
+         * pero debe llevar al Embarque proveedor, porque tu Packing List
+         * operativamente representa el embarque.
+         */
         if (detail.packing_shipment_id) {
             await this.action.doAction({
                 type: "ir.actions.act_window",
@@ -234,6 +263,10 @@ export class ProductDetails extends Component {
             return;
         }
 
+        /*
+         * Fallback: si por alguna razón solo se resolvió el PL
+         * pero no el embarque, abre el Packing List.
+         */
         if (detail.packing_list_id) {
             await this.action.doAction({
                 type: "ir.actions.act_window",
@@ -245,29 +278,34 @@ export class ProductDetails extends Component {
             });
         }
     }
-
-    onMobileSelectAll(ev) {
-        if (this.props.onMobileSelectAll) {
-            this.props.onMobileSelectAll(ev);
-        }
-    }
 }
 
 ProductDetails.template = "inventory_visual_enhanced.ProductDetails";
 
 ProductDetails.props = {
-    details: { type: Array, optional: true },
+    details: Array,
+
+    areAllCurrentProductSelected: { type: Function, optional: true },
+    isInCart: { type: Function, optional: true },
+
+    getDisplayQuantity: { type: Function, optional: true },
+    toggleCartSelection: { type: Function, optional: true },
+    onInputManualQuantity: { type: Function, optional: true },
+
     onPhotoClick: { type: Function, optional: true },
     onNotesClick: { type: Function, optional: true },
     onDetailsClick: { type: Function, optional: true },
-    onSalesPersonClick: { type: Function, optional: true },
     onHoldClick: { type: Function, optional: true },
     onSaleOrderClick: { type: Function, optional: true },
+    onSalesPersonClick: { type: Function, optional: true },
+
     formatNumber: { type: Function, optional: true },
     hasSalesPermissions: { type: Boolean, optional: true },
     hasInventoryPermissions: { type: Boolean, optional: true },
-    isInCart: { type: Function, optional: true },
-    toggleCartSelection: { type: Function, optional: true },
+
+    selectAllCurrentProduct: { type: Function, optional: true },
+    deselectAllCurrentProduct: { type: Function, optional: true },
     onMobileSelectAll: { type: Function, optional: true },
+
     "*": true,
 };

@@ -1,67 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
-
     <t t-name="inventory_visual_enhanced.ProductDetails" owl="1">
-        <div class="o_product_details_table_wrapper">
+        <div class="details-wrapper">
 
-            <table class="o_product_details_table">
+            <!-- BARRA DE SELECCIÓN MÓVIL -->
+            <div class="mobile-select-bar" t-on-click="onMobileSelectAll">
+                <div class="mobile-select-content">
+                    <div class="checkbox-wrapper">
+                        <input
+                            type="checkbox"
+                            class="form-check-input"
+                            t-att-checked="props.areAllCurrentProductSelected ? props.areAllCurrentProductSelected() : false"
+                            t-on-change="onMobileSelectAll"
+                        />
+                    </div>
+                    <span class="mobile-select-text">
+                        <t t-if="props.areAllCurrentProductSelected and props.areAllCurrentProductSelected()">Deseleccionar todo</t>
+                        <t t-else="">Seleccionar todo</t>
+                    </span>
+                </div>
+            </div>
+
+            <table class="o_inventory_details_table">
                 <thead>
                     <tr>
-                        <th class="col-select" t-if="props.toggleCartSelection">
-                            <span title="Selección">Sel.</span>
-                        </th>
+                        <!-- NO CAMBIAR class="col-checkbox".
+                             inventory_shopping_cart hereda este th por xpath exacto. -->
+                        <th class="col-checkbox">☑</th>
 
-                        <th class="col-status">E</th>
                         <th class="col-lot">Lote</th>
                         <th class="col-location">Ubicación</th>
 
-                        <th t-if="hasTransitDetails" class="col-eta">
-                            ETA
-                        </th>
+                        <th t-if="hasTransitDetails" class="col-eta">ETA</th>
 
                         <th class="col-dimensions">Dimensiones</th>
-                        <th class="col-quantity text-end">Cantidad</th>
-                        <th class="col-type">Tipo</th>
+                        <th class="col-quantity">Cantidad</th>
                         <th class="col-color">Color</th>
                         <th class="col-block">Bloque</th>
                         <th class="col-atado">Atado</th>
                         <th class="col-pedimento">Pedimento</th>
                         <th class="col-container">Contenedor</th>
+
+                        <!-- NUEVA COLUMNA -->
                         <th class="col-packing-list">Packing List</th>
-                        <th class="col-provider-ref">Ref. proveedor</th>
-                        <th class="col-photos text-center">Fotos</th>
-                        <th class="col-notes text-center">Notas</th>
-                        <th class="col-history text-center">Historial</th>
+
+                        <th class="col-provider-ref">Ref. Proveedor</th>
+                        <th class="col-photo">Fotos</th>
+                        <th class="col-notes">Notas</th>
+                        <th class="col-history">Historial</th>
+                        <th class="col-status">Estatus</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    <t t-if="!props.details or props.details.length === 0">
-                        <tr>
-                            <td t-att-colspan="getDetailColspan()" class="text-center text-muted py-3">
-                                <div class="table-loading">
-                                    <div class="spinner"></div>
-                                    <div class="loading-text">Cargando detalles.</div>
-                                </div>
-                            </td>
-                        </tr>
-                    </t>
-
                     <t t-foreach="groupedAndSortedDetails" t-as="group" t-key="group.blockName">
 
-                        <!-- Separador de bloque -->
+                        <!-- FILA DE SEPARADOR POR BLOQUE -->
                         <tr class="group-header-row">
                             <td t-att-colspan="getDetailColspan()">
                                 <div class="group-header-content">
-                                    <span class="group-header-title">
+                                    <span>
                                         <i class="fa fa-th-large"></i>
                                         Bloque:
-                                        <strong t-esc="group.blockName"/>
+                                        <strong t-esc="group.blockName"></strong>
                                     </span>
 
-                                    <span class="group-header-summary">
-                                        <t t-esc="group.count"/>
-                                        <t t-esc="getTypeLabel(group.productType)"/>
+                                    <span>
+                                        <strong>
+                                            <t t-esc="group.count"/>
+                                            <t t-esc="getTypeLabel(group.productType)"/>
+                                        </strong>
                                         |
                                         <t t-esc="formatNumber(group.totalArea)"/>
                                         <t t-esc="getUnitLabel(group.productType)"/>
@@ -86,92 +94,54 @@
                                 </td>
                             </tr>
 
-                            <tr class="detail-row"
+                            <tr
                                 t-att-class="{
-                                    'detail-row--transit': isTransitDetail(detail),
-                                    'detail-row--hold': detail.tiene_hold,
-                                    'detail-row--sale': detail.en_orden_venta
-                                }">
-
-                                <!-- Selección opcional para carrito -->
-                                <td class="col-select text-center" t-if="props.toggleCartSelection">
+                                    'iv-transit-detail-row': isTransitDetail(detail),
+                                    'detail-row-has-hold': detail.tiene_hold,
+                                    'detail-row-has-sale': detail.en_orden_venta
+                                }"
+                            >
+                                <!-- NO CAMBIAR class="col-checkbox".
+                                     Otros módulos pueden heredarlo por xpath. -->
+                                <td class="col-checkbox">
                                     <input
                                         type="checkbox"
-                                        class="form-check-input"
+                                        class="cart-checkbox"
                                         t-att-checked="props.isInCart ? props.isInCart(detail.id) : false"
                                         t-on-click.stop=""
-                                        t-on-change="(ev) => props.toggleCartSelection(detail, ev)"
+                                        t-on-change="(ev) => props.toggleCartSelection ? props.toggleCartSelection(detail, ev) : null"
+                                        t-att-disabled="detail.tiene_hold"
+                                        title="Seleccionar lote"
                                     />
                                 </td>
 
-                                <!-- Estado comercial -->
-                                <td class="col-status text-center">
-                                    <button
-                                        t-if="detail.tiene_hold"
-                                        type="button"
-                                        class="status-badge-btn status-hold-active"
-                                        t-on-click.stop="() => props.hasSalesPermissions and props.onHoldClick ? props.onHoldClick(detail.id, detail.hold_info) : null"
-                                        t-att-title="props.hasSalesPermissions ? 'Ver información del apartado' : 'Lote con apartado activo'"
-                                        t-att-style="!props.hasSalesPermissions ? 'cursor: default;' : ''"
-                                    >
-                                        <i class="fa fa-hand-paper-o"></i>
-                                    </button>
-
-                                    <button
-                                        t-elif="detail.en_orden_venta"
-                                        type="button"
-                                        class="status-badge-btn status-sale-order"
-                                        t-on-click.stop="() => props.onSaleOrderClick ? props.onSaleOrderClick(detail.id, detail.sale_order_ids) : null"
-                                        title="Ver orden de venta"
-                                    >
-                                        <i class="fa fa-usd"></i>
-                                    </button>
-
-                                    <span
-                                        t-elif="isTransitDetail(detail) and detail.transit_inventory_state === 'committed'"
-                                        class="status-badge-btn status-sale-order"
-                                        title="Committed en tránsito"
-                                    >
-                                        <i class="fa fa-ship"></i>
-                                    </span>
-
-                                    <span
-                                        t-elif="isTransitDetail(detail) and detail.transit_inventory_state === 'available'"
-                                        class="status-badge-btn status-no-hold"
-                                        title="Disponible en tránsito"
-                                    >
-                                        <i class="fa fa-ship"></i>
-                                    </span>
-
-                                    <span t-else="" class="status-badge-btn status-no-hold" title="Sin apartado">
-                                        <i class="fa fa-hand-paper-o"></i>
-                                    </span>
-                                </td>
-
-                                <!-- Lote -->
                                 <td class="col-lot">
-                                    <strong t-esc="detail.lot_name || '—'"/>
-                                    <small t-if="detail.numero_placa" class="d-block text-muted">
-                                        Placa:
-                                        <t t-esc="detail.numero_placa"/>
-                                    </small>
+                                    <div class="lot-info">
+                                        <strong t-esc="detail.lot_name || '-'"></strong>
+
+                                        <small t-if="detail.numero_placa" class="lot-subtitle">
+                                            Placa:
+                                            <t t-esc="detail.numero_placa"/>
+                                        </small>
+                                    </div>
                                 </td>
 
-                                <!-- Ubicación -->
                                 <td class="col-location">
-                                    <span t-esc="detail.location_name || '—'"/>
-                                    <small t-if="detail.location_usage === 'transit'" class="d-block text-muted">
+                                    <span t-esc="detail.location_name || '-'"></span>
+                                    <small t-if="detail.location_usage === 'transit'" class="location-subtitle">
                                         Tránsito
                                     </small>
                                 </td>
 
-                                <!-- ETA solo cuando hay tránsito -->
                                 <td t-if="hasTransitDetails" class="col-eta">
                                     <t t-if="isTransitDetail(detail)">
-                                        <span class="eta-pill">
+                                        <span
+                                            class="eta-pill"
+                                            t-att-class="{ 'eta-pill--empty': !detail.eta }"
+                                            t-att-title="detail.eta_source ? ('Fuente: ' + detail.eta_source) : ''"
+                                        >
                                             <i class="fa fa-calendar"></i>
-                                            <t t-if="detail.eta" t-esc="formatDate(detail.eta)"/>
-                                            <t t-else="">Sin ETA</t>
+                                            <t t-esc="getEtaText(detail)"/>
                                         </span>
                                     </t>
                                     <t t-else="">
@@ -179,7 +149,6 @@
                                     </t>
                                 </td>
 
-                                <!-- Dimensiones -->
                                 <td class="col-dimensions">
                                     <t t-if="detail.grosor or detail.alto or detail.ancho">
                                         <span t-if="detail.grosor">
@@ -207,41 +176,36 @@
                                     </t>
                                 </td>
 
-                                <!-- Cantidad -->
-                                <td class="col-quantity text-end">
+                                <td class="col-quantity">
                                     <strong>
                                         <t t-esc="formatNumber(detail.quantity)"/>
                                         <t t-esc="getUnitLabel(detail.tipo)"/>
                                     </strong>
 
-                                    <small t-if="detail.reserved_quantity" class="d-block text-muted">
-                                        Reservado:
+                                    <small t-if="detail.reserved_quantity" class="quantity-subtitle">
+                                        Res:
                                         <t t-esc="formatNumber(detail.reserved_quantity)"/>
                                     </small>
                                 </td>
 
-                                <td class="col-type">
-                                    <t t-esc="detail.tipo || '—'"/>
-                                </td>
-
                                 <td class="col-color">
-                                    <t t-esc="detail.color || '—'"/>
+                                    <t t-esc="detail.color || '-'"/>
                                 </td>
 
                                 <td class="col-block">
-                                    <t t-esc="detail.bloque || '—'"/>
+                                    <t t-esc="detail.bloque || '-'"/>
                                 </td>
 
                                 <td class="col-atado">
-                                    <t t-esc="detail.atado || '—'"/>
+                                    <t t-esc="detail.atado || '-'"/>
                                 </td>
 
                                 <td class="col-pedimento">
-                                    <t t-esc="detail.pedimento || '—'"/>
+                                    <t t-esc="detail.pedimento || '-'"/>
                                 </td>
 
                                 <td class="col-container">
-                                    <t t-esc="detail.contenedor || '—'"/>
+                                    <t t-esc="detail.contenedor || '-'"/>
                                 </td>
 
                                 <!-- NUEVA COLUMNA: PACKING LIST -->
@@ -257,92 +221,150 @@
                                         <span t-esc="getPackingListLabel(detail)"/>
                                     </button>
 
-                                    <span t-else="" class="text-muted">
-                                        —
-                                    </span>
+                                    <span t-else="" class="text-muted">—</span>
 
-                                    <small t-if="detail.packing_shipment_name and detail.packing_list_name"
-                                           class="d-block text-muted">
+                                    <small
+                                        t-if="detail.packing_shipment_name and detail.packing_list_name"
+                                        class="d-block text-muted"
+                                    >
                                         Embarque:
                                         <t t-esc="detail.packing_shipment_name"/>
                                     </small>
 
-                                    <small t-if="detail.packing_container_name"
-                                           class="d-block text-muted">
+                                    <small
+                                        t-if="detail.packing_container_name"
+                                        class="d-block text-muted"
+                                    >
                                         Cont.:
                                         <t t-esc="detail.packing_container_name"/>
                                     </small>
                                 </td>
 
                                 <td class="col-provider-ref">
-                                    <t t-esc="detail.referencia_proveedor || '—'"/>
+                                    <t t-esc="detail.referencia_proveedor || '-'"/>
                                 </td>
 
-                                <!-- Fotos -->
-                                <td class="col-photos text-center">
+                                <td class="action-btn-cell col-photo">
                                     <button
                                         type="button"
-                                        class="btn btn-sm btn-link detail-action-btn"
-                                        t-on-click.stop="() => props.onPhotoClick ? props.onPhotoClick(detail.id) : null"
+                                        class="detail-action-btn photo-btn"
+                                        t-on-click="() => props.onPhotoClick ? props.onPhotoClick(detail.id) : null"
                                         title="Ver fotografías"
                                     >
                                         <i class="fa fa-camera"></i>
-                                        <span t-if="detail.cantidad_fotos" class="detail-action-count" t-esc="detail.cantidad_fotos"/>
+                                        <span
+                                            t-if="detail.cantidad_fotos"
+                                            class="badge"
+                                            t-esc="detail.cantidad_fotos"
+                                        ></span>
                                     </button>
                                 </td>
 
-                                <!-- Notas -->
-                                <td class="col-notes text-center">
+                                <td class="action-btn-cell col-notes">
                                     <button
                                         type="button"
-                                        class="btn btn-sm btn-link detail-action-btn"
-                                        t-on-click.stop="() => props.onNotesClick ? props.onNotesClick(detail.id) : null"
+                                        class="detail-action-btn notes-btn"
+                                        t-on-click="() => props.onNotesClick ? props.onNotesClick(detail.id) : null"
                                         title="Ver notas"
                                     >
                                         <i class="fa fa-sticky-note-o"></i>
                                     </button>
                                 </td>
 
-                                <!-- Historial -->
-                                <td class="col-history text-center">
+                                <td class="action-btn-cell col-history">
                                     <button
                                         type="button"
-                                        class="btn btn-sm btn-link detail-action-btn"
-                                        t-on-click.stop="() => props.onDetailsClick ? props.onDetailsClick(detail.id) : null"
+                                        class="detail-action-btn history-btn"
+                                        t-on-click="() => props.onDetailsClick ? props.onDetailsClick(detail.id) : null"
                                         t-att-title="props.hasSalesPermissions ? 'Ver historial' : 'Sin permisos para historial'"
                                     >
                                         <i class="fa fa-history"></i>
                                     </button>
                                 </td>
+
+                                <td class="action-btn-cell col-status">
+                                    <button
+                                        t-if="detail.tiene_hold"
+                                        type="button"
+                                        class="status-badge-btn status-hold-active"
+                                        t-on-click="() => props.hasSalesPermissions and props.onHoldClick ? props.onHoldClick(detail.id, detail.hold_info) : null"
+                                        t-att-title="props.hasSalesPermissions ? 'Ver información del apartado' : 'Lote con apartado activo'"
+                                        t-att-style="!props.hasSalesPermissions ? 'cursor: default;' : ''"
+                                    >
+                                        <i class="fa fa-hand-paper-o"></i>
+                                    </button>
+
+                                    <button
+                                        t-elif="detail.en_orden_venta"
+                                        type="button"
+                                        class="status-badge-btn status-sale-order"
+                                        t-on-click="() => props.onSaleOrderClick ? props.onSaleOrderClick(detail.id, detail.sale_order_ids) : null"
+                                        title="Ver orden de venta"
+                                    >
+                                        <i class="fa fa-usd"></i>
+                                    </button>
+
+                                    <span
+                                        t-elif="isTransitDetail(detail) and detail.transit_inventory_state === 'committed'"
+                                        class="status-badge-btn status-sale-order"
+                                        title="Committed en tránsito"
+                                    >
+                                        <i class="fa fa-ship"></i>
+                                    </span>
+
+                                    <span
+                                        t-elif="isTransitDetail(detail) and detail.transit_inventory_state === 'available'"
+                                        class="status-badge-btn status-no-state"
+                                        title="Disponible en tránsito"
+                                    >
+                                        <i class="fa fa-ship"></i>
+                                    </span>
+
+                                    <span
+                                        t-else=""
+                                        class="status-badge-btn status-no-hold"
+                                        title="Sin apartado"
+                                    >
+                                        <i class="fa fa-hand-paper-o"></i>
+                                    </span>
+                                </td>
                             </tr>
                         </t>
 
-                        <!-- Resumen del bloque -->
-                        <tr class="group-summary-row">
-                            <td t-att-colspan="getDetailColspan()">
-                                <div class="group-summary-content">
-                                    <span>
-                                        <strong>
-                                            <t t-esc="group.count"/>
-                                            <t t-esc="getTypeLabel(group.productType)"/>
-                                        </strong>
-                                        |
-                                        <t t-esc="formatNumber(group.totalArea)"/>
-                                        <t t-esc="getUnitLabel(group.productType)"/>
-                                    </span>
+                        <!-- FILA DE RESUMEN DEL BLOQUE -->
+                        <tr class="group-summary-row" style="background-color: #f8f9fa; border-top: 2px solid #e9ecef;">
+                            <td></td>
+                            <td class="col-lot"></td>
+                            <td></td>
+                            <td t-if="hasTransitDetails"></td>
 
-                                    <span class="text-muted">
-                                        Bloque:
-                                        <strong t-esc="group.blockName"/>
-                                    </span>
-                                </div>
+                            <td class="col-dimensions" style="font-weight: bold; color: #212529;">
+                                <span>
+                                    <t t-esc="group.count"/>
+                                    <t t-esc="getTypeLabel(group.productType)"/>
+                                    |
+                                    <t t-esc="formatNumber(group.totalArea)"/>
+                                    <t t-esc="getUnitLabel(group.productType)"/>
+                                </span>
+                            </td>
+
+                            <td colspan="9"></td>
+
+                            <td colspan="4" style="text-align: right; vertical-align: middle; padding-right: 15px; color: #6c757d; font-style: italic;">
+                                <small>
+                                    <span t-esc="group.blockName" style="font-weight: 600;"/>
+                                </small>
                             </td>
                         </tr>
 
                     </t>
                 </tbody>
             </table>
+
+            <div class="table-loading" t-if="props.details.length === 0">
+                <div class="spinner"></div>
+                <div class="loading-text">Cargando detalles.</div>
+            </div>
         </div>
     </t>
-
 </templates>
