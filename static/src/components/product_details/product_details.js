@@ -19,15 +19,13 @@ export class ProductDetails extends Component {
     }
 
     /**
-     * Columnas actuales:
-     * Sin ETA: 16
-     * Con ETA: 17
-     *
-     * Se mantiene col-checkbox para compatibilidad con inventory_shopping_cart
-     * y otros módulos que heredan este template por xpath.
+     * Columnas:
+     * Base original sin ETA: 16
+     * Base original con ETA: 17
+     * + Packing List: +1
      */
     getDetailColspan() {
-        return this.hasTransitDetails ? 17 : 16;
+        return this.hasTransitDetails ? 18 : 17;
     }
 
     isTransitDetail(detail) {
@@ -43,7 +41,9 @@ export class ProductDetails extends Component {
     }
 
     /**
-     * Agrupa detalles por bloque, calcula totales y ordena.
+     * Getter principal que transforma la lista plana de detalles (props.details)
+     * en una lista agrupada por Bloque, calculando totales y ordenando
+     * de mayor cantidad de placas a menor.
      */
     get groupedAndSortedDetails() {
         const details = this.props.details || [];
@@ -64,7 +64,7 @@ export class ProductDetails extends Component {
 
             groups[blockName].items.push(detail);
             groups[blockName].count += 1;
-            groups[blockName].totalArea += Number(detail.quantity || 0);
+            groups[blockName].totalArea += detail.quantity || 0;
 
             if (!groups[blockName].productType && detail.tipo) {
                 groups[blockName].productType = detail.tipo;
@@ -145,7 +145,7 @@ export class ProductDetails extends Component {
     }
 
     /**
-     * Formato:
+     * Formato para ETA:
      * 28 / Abril / 2026
      */
     formatDate(value) {
@@ -247,9 +247,8 @@ export class ProductDetails extends Component {
 
         /*
          * Regla solicitada:
-         * El hipervínculo visible está en columna Packing List,
-         * pero debe llevar al Embarque proveedor, porque tu Packing List
-         * operativamente representa el embarque.
+         * La columna visible dice Packing List,
+         * pero el clic debe abrir el Embarque proveedor.
          */
         if (detail.packing_shipment_id) {
             await this.action.doAction({
@@ -264,8 +263,7 @@ export class ProductDetails extends Component {
         }
 
         /*
-         * Fallback: si por alguna razón solo se resolvió el PL
-         * pero no el embarque, abre el Packing List.
+         * Fallback: si solo se resolvió el PL y no el embarque.
          */
         if (detail.packing_list_id) {
             await this.action.doAction({
