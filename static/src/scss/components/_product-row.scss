@@ -1,223 +1,329 @@
-// ============================================================================
-// Inventario Visual — Product Row
-// ============================================================================
+// ==========================================
+// ESTILOS DE FILA (PRODUCT ROW) - COMPACTO
+// ==========================================
 
-.o_inventory_product_row {
-  cursor: pointer;
-  transition: background $iv-fast, box-shadow $iv-fast, transform $iv-fast;
-
-  > td {
-    padding: 13px;
-    border-bottom: 1px solid rgba(215, 232, 242, 0.82);
-    border-right: 1px solid rgba(215, 232, 242, 0.68);
-    vertical-align: top;
-    background: #fff;
-
-    &:last-child {
-      border-right: 0;
-    }
-  }
-
-  &:hover > td {
-    background: linear-gradient(180deg, #fff, $iv-panel-soft);
-  }
-
-  &.expanded > td {
-    background:
-      linear-gradient(180deg, rgba(248, 252, 255, 0.98), rgba(237, 247, 253, 0.75));
-    border-bottom-color: $iv-border-strong;
-  }
-}
-
-.product-name-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  min-width: 0;
-}
-
-.product-title {
-  color: $iv-text;
-  font-size: $iv-size-md;
-  font-weight: $iv-weight-heavy;
-  line-height: 1.25;
-  letter-spacing: -0.025em;
-}
-
-.product-sku {
-  display: inline-flex;
-  width: fit-content;
-  max-width: 100%;
-  padding: 3px 8px;
-  border-radius: $iv-pill;
-  color: $iv-blue-deep;
-  background: rgba(92, 185, 242, 0.12);
-  border: 1px solid rgba(92, 185, 242, 0.24);
-  font-family: $iv-mono;
-  font-size: $iv-size-sm;
-  font-weight: $iv-weight-bold;
-}
-
-.price-tooltip-wrapper {
-  flex: 0 0 auto;
-}
-
-.price-help-icon {
-  color: $iv-blue-dark !important;
-  border-color: $iv-blue !important;
-  background: rgba(92, 185, 242, 0.10);
-  box-shadow: 0 4px 10px rgba(92, 185, 242, 0.12);
-  transition: all $iv-fast;
-
-  &:hover {
-    color: #fff !important;
-    background: linear-gradient(135deg, $iv-blue, $iv-blue-dark);
-    transform: translateY(-1px);
-  }
-}
-
-.price-tooltip-fixed {
-  border-color: $iv-border !important;
-  border-radius: $iv-radius !important;
-  box-shadow: $iv-shadow-lg !important;
-  color: $iv-text !important;
-  font-family: $iv-font !important;
-}
-
-.inventory-subgrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(130px, 1fr));
-  gap: 7px;
-}
-
-.inventory-row {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(84px, 1fr) auto auto;
-  align-items: center;
-  gap: 8px;
-  min-height: 34px;
-  padding: 7px 9px;
-  border-radius: 12px;
-  border: 1px solid rgba(215, 232, 242, 0.88);
-  background: linear-gradient(145deg, #fff, $iv-panel-soft);
-  box-shadow: $iv-shadow-xs;
-  transition: all $iv-fast;
-
-  &.clickable-stat {
-    cursor: pointer;
+.o_inventory_grid_table tbody {
+  tr.o_inventory_product_row {
+    border-bottom: 1px solid $border-color;
+    background: $background-primary;
+    transition: background-color $transition-fast;
+    font-family: "Roboto", "Arial", sans-serif;
+    cursor: pointer; 
 
     &:hover {
-      border-color: $iv-blue;
-      box-shadow: 0 6px 16px rgba(92, 185, 242, 0.14);
-      transform: translateY(-1px);
+      background: $background-secondary;
+    }
+
+    &.expanded {
+      background: rgba($primary-color, 0.02);
+      border-left: 3px solid $primary-color;
+    }
+
+    td {
+      padding: 4px 6px; 
+      vertical-align: top;
+      color: $text-primary;
+      border-right: 1px solid $border-color;
+      line-height: 1.2;
+      font-size: 10px;
+
+      &:last-child {
+        border-right: none;
+      }
     }
   }
 
-  &.active-filter {
-    border-color: $iv-blue;
-    background: linear-gradient(145deg, rgba(92, 185, 242, 0.16), #fff);
-    box-shadow: 0 0 0 3px rgba(92, 185, 242, 0.10);
-  }
+  tr.o_inventory_details_row {
+    background: $background-secondary;
+    border-bottom: 1px solid $border-color;
 
-  &.transit-row {
-    border-style: dashed;
-    border-color: rgba(75, 164, 242, 0.45);
-    background: linear-gradient(145deg, rgba(220, 234, 242, 0.52), #fff);
-  }
-}
-
-.inventory-label {
-  color: $iv-muted;
-  font-size: $iv-size-sm;
-  font-weight: $iv-weight-bold;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.inventory-value {
-  color: $iv-text;
-  font-weight: $iv-weight-heavy;
-  white-space: nowrap;
-
-  &.inventory-units {
-    font-family: $iv-mono;
-    font-size: $iv-size;
-  }
-
-  &.inventory-measure {
-    color: $iv-text-2;
-    font-size: $iv-size;
-  }
-}
-
-.inventory-separator {
-  grid-column: 1 / -1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: $iv-blue-deep;
-  font-size: $iv-size-sm;
-  font-weight: $iv-weight-heavy;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-
-  &::before,
-  &::after {
-    content: "";
-    height: 1px;
-    flex: 1;
-    background: linear-gradient(90deg, transparent, rgba(92, 185, 242, 0.42));
-  }
-
-  &::after {
-    background: linear-gradient(90deg, rgba(92, 185, 242, 0.42), transparent);
-  }
-}
-
-.col-type,
-.col-category {
-  color: $iv-text-2;
-  font-weight: $iv-weight-semibold;
-}
-
-.o_inventory_details_row > .details-cell {
-  padding: 0 !important;
-  background: $iv-panel-muted;
-  border-bottom: 1px solid $iv-border-strong;
-}
-
-@media (max-width: $breakpoint-md) {
-  .o_inventory_product_row {
-    > td {
-      border-right: 0;
-      border-bottom: 1px solid rgba(215, 232, 242, 0.62);
-      background: transparent;
-    }
-
-    .col-product-name {
-      padding: 14px 14px 8px !important;
-    }
-
-    .col-type,
-    .col-category {
-      display: inline-flex !important;
-      width: auto !important;
-      margin: 0 8px 10px 14px;
-      padding: 4px 9px !important;
-      border-radius: $iv-pill;
-      background: rgba(92, 185, 242, 0.10);
-      border: 1px solid rgba(92, 185, 242, 0.22);
-      color: $iv-blue-deep;
-      font-size: $iv-size-sm;
+    td.details-cell {
+      padding: 0;
+      border-right: none;
     }
   }
+}
 
+// === NOMBRE DEL PRODUCTO ===
+.col-product-name {
+  .product-name-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .product-title {
+    font-weight: 700;
+    color: $text-primary;
+    font-size: 11px;
+    line-height: 1.2;
+  }
+
+  .product-sku {
+    font-size: 9px;
+    color: $text-secondary;
+    font-family: "SF Mono", "Roboto Mono", monospace;
+    line-height: 1.1;
+  }
+}
+
+// === COLUMNA DE INVENTARIO ===
+.col-inventory {
   .inventory-subgrid {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    gap: 1px; 
+  }
+
+  .inventory-separator {
+    text-align: center;
+    border-bottom: 1px dashed #cccccc;
+    margin: 4px 0;
+    line-height: 0.1em;
+    
+    span {
+        background: #fff;
+        padding: 0 5px;
+        color: #888;
+        font-size: 8px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
   }
 
   .inventory-row {
-    grid-template-columns: minmax(120px, 1fr) auto auto;
+    display: grid;
+    grid-template-columns: 70px 1fr 1fr;
+    gap: 4px;
+    align-items: center;
+    line-height: 1.1;
+    min-height: 18px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+
+    &.clickable-stat {
+      cursor: pointer;
+      position: relative;
+      z-index: 2;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+        .inventory-label { color: #2C2C2C; }
+      }
+
+      &.active-filter {
+        background-color: rgba($primary-color, 0.1);
+        
+        .inventory-label {
+          color: $primary-color;
+          font-weight: 700;
+        }
+
+        .inventory-units, 
+        .inventory-measure {
+          color: $primary-color;
+        }
+      }
+    }
+    
+    &.transit-row {
+        .inventory-label {
+            color: #795548;
+        }
+        
+        &.active-filter {
+            background-color: rgba(121, 85, 72, 0.1);
+            
+            .inventory-label, .inventory-units, .inventory-measure {
+                color: #795548;
+            }
+        }
+    }
   }
+
+  .inventory-label {
+    font-size: 11px;
+    color: #666666;
+    font-weight: 400;
+    text-align: left;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+    
+    &.text-success { color: $success-color; font-weight: 600; }
+  }
+
+  .inventory-units {
+    font-size: 11px;
+    color: $text-primary;
+    font-weight: 600;
+    font-family: "Roboto", sans-serif;
+    text-align: right;
+    transition: color 0.2s ease;
+  }
+
+  .inventory-measure {
+    font-size: 11px;
+    color: $text-primary;
+    font-weight: 700;
+    font-family: "Roboto", sans-serif;
+    text-align: right;
+    transition: color 0.2s ease;
+    
+    &.text-success { color: $success-color; }
+  }
+}
+
+// === COLUMNAS SIMPLES (Tipo, Categoría) ===
+.col-type, .col-category {
+    font-size: 11px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+}
+
+// ==========================================
+// ESTILOS MÓVIL
+// ==========================================
+@media (max-width: 992px) {
+    .o_inventory_grid_table tbody tr.o_inventory_product_row {
+        padding: 6px 8px !important;
+        margin-bottom: 6px !important;
+        border-radius: 6px;
+        
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        grid-template-areas: 
+            "name"
+            "inv"
+            "info";
+        gap: 4px !important;
+
+        td {
+            border: none !important;
+            padding: 0 !important;
+        }
+
+        // 1. Nombre y SKU
+        td.col-product-name {
+            grid-area: name;
+            margin-bottom: 2px;
+            
+            .product-title { font-size: 13px; color: #714B67; }
+            .product-sku { font-size: 10px; }
+        }
+
+        // 2. Inventario - TARJETAS GRANDES 2x2
+        td.col-inventory {
+            grid-area: inv;
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 6px !important;
+            
+            .inventory-subgrid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+            
+            .inventory-separator {
+                grid-column: 1 / -1;
+                margin: 4px 0 2px 0;
+                border-bottom-color: #ccc;
+            }
+
+            .inventory-row {
+                // Cada celda es una tarjeta
+                display: grid;
+                grid-template-columns: auto 1fr;
+                grid-template-rows: auto auto;
+                grid-template-areas:
+                    "label units"
+                    "label measure";
+                gap: 0 8px;
+                align-items: center;
+                
+                background: #fff;
+                border: 1px solid #e8e8e8;
+                border-radius: 8px;
+                padding: 10px 12px;
+                min-height: 52px;
+                
+                // Reset del grid desktop
+                border-bottom: none;
+
+                &:active {
+                    background: #f4f0f3;
+                }
+
+                &.clickable-stat {
+                    &:hover {
+                        background: #faf8fa;
+                    }
+
+                    &.active-filter {
+                        background: rgba($primary-color, 0.06);
+                        border-color: rgba($primary-color, 0.25);
+                        box-shadow: 0 0 0 1px rgba($primary-color, 0.1);
+                    }
+                }
+                
+                &.transit-row {
+                    background: #fdfdf8;
+                    border-color: #e8e6d8;
+                    
+                    &.active-filter {
+                        background: rgba(121, 85, 72, 0.06);
+                        border-color: rgba(121, 85, 72, 0.25);
+                    }
+                }
+            }
+
+            .inventory-label {
+                grid-area: label;
+                font-size: 11px;
+                font-weight: 600;
+                color: #777;
+                align-self: center;
+                text-align: left;
+                white-space: nowrap;
+            }
+
+            .inventory-units {
+                grid-area: units;
+                font-size: 20px;
+                font-weight: 800;
+                color: #333;
+                text-align: right;
+                line-height: 1;
+                min-width: auto;
+            }
+
+            .inventory-measure {
+                grid-area: measure;
+                font-size: 11px;
+                font-weight: 500;
+                color: #999;
+                text-align: right;
+                line-height: 1.1;
+                min-width: auto;
+            }
+
+            .text-success {
+                color: $success-color !important;
+            }
+        }
+
+        // 3. Info extra (Tipo/Categoría) en una línea
+        td.col-type, td.col-category {
+            grid-area: info;
+            display: inline-block;
+            font-size: 11px !important;
+            color: #888;
+            margin-right: 2.5rem;
+            
+            &:empty { display: none; }
+        }
+    }
 }
