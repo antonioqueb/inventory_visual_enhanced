@@ -221,7 +221,11 @@
 
 .hold-body {
   padding: 20px 24px 24px;
-  max-height: min(68vh, 720px);
+  max-height: 68vh;
+
+  @media (min-height: 1059px) {
+    max-height: 720px;
+  }
   overflow-y: auto;
 }
 
