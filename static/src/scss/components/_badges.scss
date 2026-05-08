@@ -1,235 +1,163 @@
-.icon-btn {
-  width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid $border-color;
-  border-radius: $border-radius-sm;
-  cursor: pointer;
-  transition: all $transition-fast;
-  font-size: 12px;
+// ============================================================================
+// Inventario Visual — Badges, botones de acciones y estado
+// ============================================================================
 
-  &.no-content {
-    background: #c2c2c2;
-    color: #FFFFFF;
-    border-color: #c2c2c2;
-    cursor: default;
-    opacity: 0.6;
-
-    &:hover {
-      background: #c2c2c2;
-      border-color: #c2c2c2;
-      transform: none;
-    }
-  }
-
-  &.has-photos {
-    background: $odoo-gold;
-    color: #FFFFFF;
-    border-color: $odoo-gold;
-
-    &:hover {
-      background: darken($odoo-gold, 10%);
-      border-color: darken($odoo-gold, 10%);
-      transform: scale(1.1);
-    }
-  }
-
-  &.has-notes {
-    background: $odoo-learning;
-    color: #FFFFFF;
-    border-color: $odoo-learning;
-
-    &:hover {
-      background: darken($odoo-learning, 8%);
-      border-color: darken($odoo-learning, 8%);
-      transform: scale(1.1);
-    }
-  }
-
-  &.has-details {
-    background: $odoo-primary;
-    color: #FFFFFF;
-    border-color: $odoo-primary;
-    cursor: pointer;
-
-    &:hover {
-      background: darken($odoo-primary, 8%);
-      transform: scale(1.1);
-    }
-  }
-
-  &.has-sales-person {
-    background: $odoo-silver;
-    color: #FFFFFF;
-    border-color: $odoo-silver;
-
-    &:hover {
-      background: darken($odoo-silver, 8%);
-      border-color: darken($odoo-silver, 8%);
-      transform: scale(1.1);
-    }
-  }
-
-  &.has-hold-active {
-    background: $odoo-ready;
-    color: #FFFFFF;
-    border-color: $odoo-ready;
-
-    &:hover {
-      background: darken($odoo-ready, 10%);
-      border-color: darken($odoo-ready, 10%);
-      transform: scale(1.1);
-    }
-  }
-
-  &.has-hold-available {
-    background: $odoo-gold;
-    color: #FFFFFF;
-    border-color: $odoo-gold;
-
-    &:hover {
-      background: darken($odoo-gold, 10%);
-      border-color: darken($odoo-gold, 10%);
-      transform: scale(1.1);
-    }
-  }
-}
-
+.icon-btn,
+.status-badge-btn,
 .so-badge-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 3px 8px;
-  background: $success-color;
-  color: #FFFFFF;
-  border: 2px solid $success-color;
-  border-radius: $border-radius-sm;
-  font-size: 10px;
-  font-weight: $font-weight-bold;
-  letter-spacing: 0.5px;
+  width: 29px;
+  height: 29px;
+  padding: 0;
+  border-radius: 10px;
+  border: 1px solid $iv-border;
+  background: #fff;
+  color: $iv-muted;
+  font-size: 13px;
+  line-height: 1;
   cursor: pointer;
-  transition: all $transition-fast;
-  min-width: 32px;
+  transition: transform $iv-fast, box-shadow $iv-fast, background $iv-fast, border-color $iv-fast, color $iv-fast;
 
-  &:hover {
-    background: darken($success-color, 10%);
-    border-color: darken($success-color, 10%);
-    transform: scale(1.1);
-    box-shadow: 0 2px 8px rgba($success-color, 0.3);
+  &:hover:not(.no-content):not(.status-no-hold) {
+    transform: translateY(-1px) scale(1.04);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
   }
 
-  &:active {
-    transform: scale(0.95);
+  &:active:not(.no-content):not(.status-no-hold) {
+    transform: scale(0.96);
   }
+}
 
+.icon-btn {
   &.no-content {
-    background: #c2c2c2;
-    border-color: #c2c2c2;
+    background: $iv-gray-soft;
+    color: $iv-muted-2;
+    border-color: rgba(148, 163, 184, 0.22);
     cursor: default;
-    opacity: 0.6;
-
-    &:hover {
-      background: #c2c2c2;
-      border-color: #c2c2c2;
-      transform: none;
-      box-shadow: none;
-    }
+    opacity: 0.72;
   }
+
+  &.has-photos {
+    background: linear-gradient(135deg, $iv-amber, #ffd45c);
+    color: #1f2937;
+    border-color: rgba(242, 183, 5, 0.62);
+  }
+
+  &.has-notes {
+    background: linear-gradient(135deg, $iv-blue, $iv-blue-dark);
+    color: #fff;
+    border-color: $iv-blue-dark;
+  }
+
+  &.has-details {
+    background: linear-gradient(135deg, $iv-blue-deep, $iv-head);
+    color: #fff;
+    border-color: rgba(15, 23, 42, 0.64);
+  }
+
+  &.has-sales-person {
+    background: linear-gradient(135deg, $iv-blue-2, $iv-blue-dark);
+    color: #fff;
+    border-color: $iv-blue-dark;
+  }
+
+  &.has-hold-active,
+  &.has-hold-available {
+    background: linear-gradient(135deg, $iv-amber, #ffd45c);
+    color: #1f2937;
+    border-color: $iv-amber;
+  }
+}
+
+.so-badge-btn,
+.status-badge-btn.status-sale-order {
+  background: linear-gradient(135deg, $iv-green, $iv-green-dark);
+  color: #fff;
+  border-color: rgba(4, 122, 49, 0.75);
 }
 
 .status-badge-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px 8px;
-  border: 2px solid;
-  border-radius: $border-radius-sm;
-  font-size: 10px;
-  font-weight: $font-weight-bold;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: all $transition-fast;
-  min-width: 40px;
-  height: 28px;
+  min-width: 34px;
 
-  i.fa {
-    font-size: 22px;
+  .fa {
+    font-size: 14px;
   }
 
   &.status-hold-active {
-    background: #FFD700;
-    color: #2C2C2C;
-    border-color: #FFD700;
-
-    &:hover {
-      background: darken(#FFD700, 8%);
-      border-color: darken(#FFD700, 8%);
-      transform: scale(1.1);
-      box-shadow: 0 2px 8px rgba(#FFD700, 0.3);
-    }
-
-    &:active {
-      transform: scale(0.95);
-    }
+    background: linear-gradient(135deg, $iv-amber, #ffd45c);
+    color: #1f2937;
+    border-color: rgba(242, 183, 5, 0.72);
   }
 
-  &.status-sale-order {
-    background: #528F76;
-    color: #FFFFFF;
-    border-color: #528F76;
-
-    &:hover {
-      background: darken(#528F76, 10%);
-      border-color: darken(#528F76, 10%);
-      transform: scale(1.1);
-      box-shadow: 0 2px 8px rgba(#528F76, 0.3);
-    }
-
-    &:active {
-      transform: scale(0.95);
-    }
-  }
-
-  &.status-no-state {
-    background: #FFFFFF;
-    color: #909090;
-    border-color: #FFFFFF;
-    cursor: pointer;
-    opacity: 0.85;
-
-    &:hover {
-      background: darken(#FFFFFF, 8%);
-      border-color: darken(#FFFFFF, 8%);
-      color: #b0b0b0;
-      transform: scale(1.05);
-    }
+  &.status-no-state,
+  &.status-no-hold {
+    background: $iv-gray-soft;
+    color: $iv-muted-2;
+    border-color: rgba(148, 163, 184, 0.22);
+    cursor: default;
+    pointer-events: none;
+    opacity: 0.78;
   }
 
   &.status-available-no-perms {
-    background: #E8F5E9;
-    color: #4CAF50;
-    border-color: #C8E6C9;
+    background: rgba(4, 217, 79, 0.08);
+    color: $iv-green-dark;
+    border-color: rgba(4, 217, 79, 0.20);
     cursor: default;
     pointer-events: none;
-    opacity: 0.7;
-    
-    i {
-      font-size: 14px;
-    }
-  }
-&.status-no-hold {
-  background: #E0E0E0;
-  color: #6a6a6a;
-  border-color: #E0E0E0;
-  cursor: default;
-  pointer-events: none;
-  opacity: 0.6;
-  
-  i {
-    font-size: 14px;
   }
 }
 
+.iv-soft-badge,
+.ivh-soft-badge,
+.sod-payment-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: $iv-pill;
+  font-size: $iv-size-sm;
+  font-weight: $iv-weight-heavy;
+  line-height: 1;
+  border: 1px solid $iv-border;
+  background: #fff;
+  color: $iv-text-2;
+  white-space: nowrap;
+}
+
+.iv-soft-badge--neutral,
+.ivh-soft-badge--neutral {
+  background: $iv-gray-soft;
+  color: $iv-text-2;
+  border-color: rgba(148, 163, 184, 0.28);
+}
+
+.iv-soft-badge--strong,
+.ivh-soft-badge--strong {
+  background: rgba(92, 185, 242, 0.12);
+  color: $iv-blue-deep;
+  border-color: rgba(92, 185, 242, 0.28);
+}
+
+.iv-soft-badge--success,
+.ivh-soft-badge--success {
+  background: $iv-green-soft;
+  color: $iv-green-dark;
+  border-color: rgba(4, 217, 79, 0.24);
+}
+
+.iv-soft-badge--hold,
+.ivh-soft-badge--hold {
+  background: $iv-amber-soft;
+  color: $iv-amber-dark;
+  border-color: rgba(242, 183, 5, 0.28);
+}
+
+.iv-soft-badge--danger,
+.ivh-soft-badge--danger {
+  background: $iv-red-soft;
+  color: $iv-red-dark;
+  border-color: rgba(220, 38, 38, 0.18);
 }

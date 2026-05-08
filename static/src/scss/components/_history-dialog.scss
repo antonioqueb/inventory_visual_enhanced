@@ -1,1141 +1,494 @@
-// ==========================================
-// HISTORY DIALOG - Tema Maderero Cálido Claro
-// inventory_visual_enhanced
-// ==========================================
+// ============================================================================
+// Inventario Visual — Historial del lote
+// ============================================================================
 
-// Paleta principal
-$ivh-nogal: #4A2A18;
-$ivh-nogal-dark: #2F1B10;
-$ivh-cedro: #7A4424;
-$ivh-cobre: #A76735;
-$ivh-caramelo: #C58A4A;
-$ivh-miel: #E4B66A;
-$ivh-roble: #F1D6AA;
-$ivh-roble-light: #F9E8CC;
-$ivh-crema: #FFFDF7;
-$ivh-crema-alt: #FFF8EC;
-$ivh-pergamino: #FCF0DC;
-$ivh-pergamino-strong: #F8E7CB;
-$ivh-arena: #E9CDA5;
-$ivh-corteza: #6A4A32;
-$ivh-carbon: #2A1A12;
-$ivh-muted: #92735A;
-$ivh-line: #EBD5B5;
-$ivh-salvia: #61724C;
-$ivh-salvia-dark: #415136;
-$ivh-salvia-light: #EEF4E7;
-$ivh-redwood: #9A4A32;
-$ivh-ambar: #C98228;
-
-// Sombras
-$ivh-shadow-soft: 0 14px 38px rgba($ivh-nogal-dark, 0.10);
-$ivh-shadow-card: 0 10px 26px rgba($ivh-nogal-dark, 0.08);
-$ivh-shadow-hover: 0 14px 32px rgba($ivh-cobre, 0.14);
-
-// ==========================================
-// CONTENEDOR MODAL NATIVO
-// ==========================================
-
-.modal-content:has(.o_history_dialog) {
-  border: 0 !important;
-  border-radius: 30px !important;
-  overflow: hidden !important;
-  background: $ivh-crema !important;
-  box-shadow:
-    0 28px 80px rgba($ivh-nogal-dark, 0.24),
-    0 10px 28px rgba($ivh-cobre, 0.12) !important;
-
+.ivh-history-dialog-shell {
   .modal-header {
-    display: none !important;
+    display: none;
   }
 
   .modal-body {
-    padding: 0 !important;
-    background:
-      radial-gradient(circle at 12% 0%, rgba($ivh-miel, 0.18), transparent 30%),
-      radial-gradient(circle at 92% 8%, rgba($ivh-roble, 0.32), transparent 28%),
-      linear-gradient(180deg, #FFFFFF 0%, $ivh-crema 42%, $ivh-crema-alt 100%) !important;
+    padding: 0;
+    overflow: hidden;
+    background: $iv-bg;
   }
 
   .modal-footer {
-    background:
-      linear-gradient(180deg, rgba(#FFFFFF, 0.92), rgba($ivh-crema-alt, 0.95)) !important;
-    border-top: 1px solid rgba($ivh-cedro, 0.14) !important;
-    padding: 16px 24px !important;
+    padding: 12px 16px;
+    background: #fff;
+    border-top: 1px solid $iv-border;
   }
 }
-
-.ivh-history-dialog-shell {
-  height: 100%;
-}
-
-// ==========================================
-// DIALOG BASE
-// ==========================================
 
 .o_history_dialog {
   position: relative;
-  min-height: 0;
   background:
-    radial-gradient(circle at 8% 0%, rgba($ivh-miel, 0.12), transparent 34%),
-    radial-gradient(circle at 94% 16%, rgba($ivh-roble, 0.24), transparent 34%),
-    linear-gradient(180deg, #FFFFFF 0%, $ivh-crema 45%, $ivh-crema-alt 100%);
-  color: $ivh-carbon;
-  isolation: isolate;
-
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.12;
-    background-image:
-      repeating-linear-gradient(
-        8deg,
-        rgba($ivh-cedro, 0.09) 0,
-        rgba($ivh-cedro, 0.09) 1px,
-        transparent 1px,
-        transparent 13px
-      );
-    mix-blend-mode: multiply;
-    z-index: -1;
-  }
-
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: rgba($ivh-cedro, 0.55) rgba($ivh-roble-light, 0.65);
-  }
-
-  *::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  *::-webkit-scrollbar-track {
-    background: rgba($ivh-roble-light, 0.65);
-    border-radius: 999px;
-  }
-
-  *::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, $ivh-cobre, $ivh-cedro);
-    border-radius: 999px;
-  }
+    radial-gradient(circle at top left, rgba(92, 185, 242, 0.18), transparent 32%),
+    linear-gradient(180deg, #fbfdff, $iv-bg);
+  color: $iv-text;
+  font-family: $iv-font;
 }
-
-// ==========================================
-// CLOSE BUTTON
-// ==========================================
 
 .ivh-dialog-close {
   position: absolute;
-  top: 18px;
-  right: 20px;
-  z-index: 20;
-  width: 42px;
-  height: 42px;
-  border: 1px solid rgba($ivh-cedro, 0.16);
-  border-radius: 999px;
-  background: rgba($ivh-crema, 0.92);
-  color: $ivh-cedro;
-  box-shadow: 0 8px 20px rgba($ivh-nogal-dark, 0.10);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.18s ease;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  border-radius: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  color: #fff;
+  background: rgba(15, 23, 42, 0.22);
+  backdrop-filter: blur(10px);
+  transition: all $iv-fast;
 
   &:hover {
-    transform: translateY(-1px);
-    background: $ivh-pergamino;
-    color: $ivh-nogal;
-    border-color: rgba($ivh-cobre, 0.30);
-    box-shadow: 0 10px 24px rgba($ivh-cobre, 0.16);
-  }
-
-  i {
-    font-size: 15px;
+    background: rgba(15, 23, 42, 0.38);
   }
 }
 
-// ==========================================
-// HERO
-// ==========================================
-
 .ivh-history-hero {
-  position: relative;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 18px;
+  display: flex;
   align-items: center;
-  padding: 28px 76px 24px 28px;
-  border-bottom: 1px solid rgba($ivh-cedro, 0.14);
+  gap: 16px;
+  padding: 22px 24px;
+  color: #fff;
   background:
-    radial-gradient(circle at 7% 8%, rgba($ivh-miel, 0.28), transparent 28%),
-    radial-gradient(circle at 78% 4%, rgba($ivh-roble, 0.38), transparent 32%),
-    linear-gradient(135deg, #FFFFFF 0%, $ivh-crema 42%, $ivh-roble-light 100%);
+    radial-gradient(circle at 10% 0%, rgba(92, 185, 242, 0.42), transparent 35%),
+    linear-gradient(135deg, $iv-head, $iv-blue-deep 56%, $iv-blue-dark);
 
   &__icon {
-    width: 82px;
-    height: 82px;
-    border-radius: 28px;
-    display: inline-flex;
+    width: 58px;
+    height: 58px;
+    border-radius: 21px;
+    display: flex;
     align-items: center;
     justify-content: center;
-    background:
-      linear-gradient(135deg, rgba($ivh-miel, 0.92), rgba($ivh-roble, 0.78));
-    border: 1px solid rgba($ivh-cobre, 0.22);
-    box-shadow:
-      inset 0 1px 0 rgba(#FFFFFF, 0.75),
-      0 16px 32px rgba($ivh-cobre, 0.14);
-
-    i {
-      font-size: 34px;
-      color: $ivh-nogal;
-    }
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    font-size: 23px;
+    flex: 0 0 auto;
   }
 
   &__content {
+    flex: 1;
     min-width: 0;
   }
 
   &__eyebrow {
-    margin-bottom: 4px;
-    color: $ivh-cobre;
-    font-size: 11px;
-    font-weight: 900;
+    color: rgba(255, 255, 255, 0.66);
+    font-size: $iv-size-sm;
+    font-weight: $iv-weight-heavy;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
   }
 
   &__title {
-    margin: 0;
-    color: $ivh-nogal;
-    font-size: 32px;
+    margin: 3px 0 8px;
+    color: #fff;
+    font-size: 24px;
+    font-weight: $iv-weight-heavy;
     line-height: 1.08;
-    font-weight: 950;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.045em;
   }
 
-  &__meta {
+  &__meta,
+  &__badges {
     display: flex;
+    align-items: center;
+    gap: 8px;
     flex-wrap: wrap;
-    gap: 8px 16px;
-    margin-top: 12px;
-    color: $ivh-muted;
-    font-size: 12.5px;
+  }
 
-    span {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      min-width: 0;
-    }
-
-    i {
-      color: $ivh-cobre;
-    }
+  &__meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 9px;
+    border-radius: $iv-pill;
+    background: rgba(255, 255, 255, 0.10);
+    color: rgba(255, 255, 255, 0.78);
+    font-size: $iv-size-sm;
 
     strong {
-      color: $ivh-corteza;
-      font-weight: 850;
+      color: #fff;
     }
   }
 
   &__badges {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 9px;
+    justify-content: flex-end;
+    flex: 0 0 auto;
+    max-width: 260px;
   }
 }
-
-// ==========================================
-// BADGES / PILLS
-// ==========================================
-
-.ivh-soft-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  width: fit-content;
-  max-width: 100%;
-  padding: 7px 11px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 900;
-  line-height: 1;
-  letter-spacing: 0.025em;
-  white-space: nowrap;
-  border: 1px solid rgba($ivh-cedro, 0.16);
-  background: $ivh-pergamino;
-  color: $ivh-corteza;
-
-  i {
-    font-size: 12px;
-  }
-
-  &--strong {
-    background: linear-gradient(135deg, $ivh-cedro, $ivh-nogal);
-    color: #FFFFFF;
-    border-color: transparent;
-    box-shadow: 0 8px 18px rgba($ivh-nogal, 0.16);
-
-    strong,
-    i {
-      color: #FFFFFF;
-    }
-  }
-
-  &--neutral {
-    background: rgba($ivh-roble-light, 0.72);
-    color: $ivh-corteza;
-    border-color: rgba($ivh-cedro, 0.14);
-
-    i {
-      color: $ivh-cobre;
-    }
-  }
-
-  &--success {
-    background: $ivh-salvia-light;
-    color: $ivh-salvia-dark;
-    border-color: rgba($ivh-salvia, 0.24);
-
-    i {
-      color: $ivh-salvia;
-    }
-  }
-
-  &--hold {
-    background: rgba($ivh-miel, 0.25);
-    color: $ivh-cedro;
-    border-color: rgba($ivh-ambar, 0.26);
-
-    i {
-      color: $ivh-ambar;
-    }
-  }
-
-  &--danger {
-    background: rgba($ivh-redwood, 0.10);
-    color: $ivh-redwood;
-    border-color: rgba($ivh-redwood, 0.24);
-
-    i {
-      color: $ivh-redwood;
-    }
-  }
-}
-
-.ivh-number-pill {
-  display: inline-flex;
-  justify-content: center;
-  min-width: 92px;
-  padding: 7px 12px;
-  border-radius: 999px;
-  background: rgba($ivh-roble-light, 0.76);
-  border: 1px solid rgba($ivh-cedro, 0.14);
-  color: $ivh-corteza;
-  font-weight: 900;
-
-  &--hold {
-    background: rgba($ivh-miel, 0.24);
-    color: $ivh-cedro;
-    border-color: rgba($ivh-ambar, 0.26);
-  }
-
-  &--success {
-    background: $ivh-salvia-light;
-    color: $ivh-salvia-dark;
-    border-color: rgba($ivh-salvia, 0.24);
-  }
-}
-
-// ==========================================
-// TABS
-// ==========================================
 
 .ivh-history-tabs {
-  flex-wrap: nowrap;
-  gap: 8px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 14px 24px 0;
-  border-bottom: 1px solid rgba($ivh-cedro, 0.14) !important;
-  background: rgba($ivh-crema, 0.76);
-
-  .nav-item {
-    margin-bottom: 0;
-  }
+  display: flex;
+  gap: 6px;
+  padding: 12px 16px 0;
+  border-bottom: 1px solid $iv-border;
+  background: rgba(255, 255, 255, 0.90);
 
   .nav-link {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
-    min-height: 40px;
-    padding: 8px 12px;
-    border: 1px solid rgba($ivh-cedro, 0.13) !important;
-    border-bottom: 0 !important;
-    border-radius: 16px 16px 0 0 !important;
-    background: rgba(#FFFFFF, 0.76) !important;
-    color: $ivh-muted !important;
-    font-size: 12.5px;
-    font-weight: 900;
-    white-space: nowrap;
-    transition: all 0.18s ease;
-
-    i {
-      color: $ivh-cobre;
-      font-size: 13px;
-    }
+    gap: 6px;
+    padding: 9px 12px;
+    border: 1px solid transparent;
+    border-bottom: 0;
+    border-radius: 13px 13px 0 0;
+    color: $iv-muted;
+    font-size: $iv-size;
+    font-weight: $iv-weight-heavy;
+    background: transparent;
 
     &:hover {
-      transform: translateY(-1px);
-      background: $ivh-pergamino !important;
-      color: $ivh-nogal !important;
-      border-color: rgba($ivh-cobre, 0.22) !important;
+      color: $iv-blue-dark;
+      background: $iv-panel-soft;
     }
 
     &.active {
-      background: linear-gradient(135deg, $ivh-cedro, $ivh-nogal) !important;
-      color: #FFFFFF !important;
-      border-color: transparent !important;
-      box-shadow: 0 10px 20px rgba($ivh-nogal, 0.14);
-
-      i {
-        color: #FFFFFF;
-      }
-
-      .ivh-tab-count {
-        background: #FFFFFF;
-        color: $ivh-nogal;
-        border-color: transparent;
-      }
+      color: $iv-blue-deep;
+      background: linear-gradient(180deg, #fff, $iv-panel-soft);
+      border-color: $iv-border;
+      box-shadow: 0 -6px 18px rgba(92, 185, 242, 0.08);
     }
   }
 }
 
 .ivh-tab-count {
-  min-width: 20px;
-  height: 20px;
+  min-width: 19px;
+  height: 19px;
   padding: 0 6px;
-  border-radius: 999px;
+  border-radius: $iv-pill;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba($ivh-roble, 0.48);
-  border: 1px solid rgba($ivh-cedro, 0.12);
-  color: $ivh-corteza;
+  color: #fff;
+  background: $iv-blue-dark;
   font-size: 10px;
-  font-weight: 950;
+  font-weight: $iv-weight-heavy;
 }
-
-// ==========================================
-// CONTENT
-// ==========================================
 
 .ivh-history-content {
-  padding: 20px 24px 24px;
-  min-height: 0;
-  background:
-    linear-gradient(180deg, rgba(#FFFFFF, 0.82), rgba($ivh-crema-alt, 0.82));
+  padding: 18px;
+  max-height: calc(82vh - 190px);
 }
 
-// ==========================================
-// CARDS
-// ==========================================
-
-.ivh-card {
-  position: relative;
+.ivh-card,
+.ivh-record-card {
+  border: 1px solid $iv-border;
+  border-radius: $iv-radius;
+  background: linear-gradient(145deg, #fff, $iv-panel-soft);
+  box-shadow: $iv-shadow-sm;
   overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(#FFFFFF, 0.94), rgba($ivh-crema, 0.94));
-  border: 1px solid rgba($ivh-cedro, 0.13);
-  border-radius: 22px;
-  box-shadow: $ivh-shadow-card;
-  transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    border-color 0.18s ease;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: $ivh-shadow-hover;
-    border-color: rgba($ivh-cobre, 0.28);
-  }
 
   &--featured {
-    &::before {
-      content: "";
-      position: absolute;
-      inset: 0 auto 0 0;
-      width: 6px;
-      background: linear-gradient(180deg, $ivh-miel, $ivh-cobre, $ivh-cedro);
-    }
+    box-shadow: $iv-shadow-md;
   }
 
   &__header {
-    min-height: 54px;
-    padding: 15px 18px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 14px;
-    background:
-      linear-gradient(180deg, rgba($ivh-roble-light, 0.72), rgba($ivh-pergamino, 0.62));
-    border-bottom: 1px solid rgba($ivh-cedro, 0.12);
+    gap: 10px;
+    padding: 13px 15px;
+    border-bottom: 1px solid $iv-border;
+    background: rgba(255, 255, 255, 0.74);
 
     h6 {
-      margin: 0;
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      gap: 8px;
-      color: $ivh-nogal;
-      font-size: 14px;
-      font-weight: 950;
-      letter-spacing: -0.01em;
-
-      i {
-        color: $ivh-cobre;
-      }
-
-      small {
-        color: $ivh-muted;
-        font-weight: 800;
-      }
+      gap: 7px;
+      margin: 0;
+      color: $iv-text;
+      font-size: $iv-size-md;
+      font-weight: $iv-weight-heavy;
     }
   }
 
   &__body {
-    padding: 18px;
-    background:
-      linear-gradient(180deg, rgba(#FFFFFF, 0.82), rgba($ivh-crema, 0.88));
+    padding: 15px;
   }
 }
 
-.ivh-record-card {
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 5px;
-    background: linear-gradient(180deg, $ivh-miel, $ivh-cobre);
+.ivh-info-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  td {
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(215, 232, 242, 0.70);
+
+    &:first-child {
+      color: $iv-muted;
+      font-weight: $iv-weight-bold;
+    }
+
+    &:last-child {
+      color: $iv-text;
+      font-weight: $iv-weight-heavy;
+      text-align: right;
+    }
   }
 
-  &--sale::before {
-    background: linear-gradient(180deg, $ivh-salvia, $ivh-salvia-dark);
+  tr:last-child td {
+    border-bottom: 0;
   }
 
-  &--hold::before,
-  &--active::before {
-    background: linear-gradient(180deg, $ivh-miel, $ivh-ambar, $ivh-cobre);
+  &--compact td {
+    padding: 6px 0;
+    font-size: $iv-size;
+  }
+}
+
+.ivh-number-pill,
+.ivh-total-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  border-radius: $iv-pill;
+  color: $iv-blue-deep;
+  background: rgba(92, 185, 242, 0.12);
+  border: 1px solid rgba(92, 185, 242, 0.24);
+  font-family: $iv-mono;
+  font-weight: $iv-weight-heavy;
+
+  &--hold {
+    color: $iv-amber-dark;
+    background: $iv-amber-soft;
+    border-color: rgba(242, 183, 5, 0.28);
   }
 
-  &--cancelled::before {
-    background: linear-gradient(180deg, rgba($ivh-redwood, 0.85), $ivh-redwood);
+  &--success,
+  &--success strong {
+    color: $iv-green-dark;
+    background: $iv-green-soft;
+    border-color: rgba(4, 217, 79, 0.24);
+  }
+}
+
+.ivh-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.ivh-stat-card {
+  padding: 14px 12px;
+  border-radius: $iv-radius;
+  background: #fff;
+  border: 1px solid $iv-border;
+  text-align: center;
+
+  h3 {
+    margin: 0;
+    color: $iv-blue-deep;
+    font-size: 24px;
+    font-weight: $iv-weight-heavy;
+    letter-spacing: -0.04em;
   }
 
-  &--expired::before {
-    background: linear-gradient(180deg, $ivh-arena, $ivh-corteza);
+  span {
+    color: $iv-muted;
+    font-size: $iv-size-sm;
+    font-weight: $iv-weight-bold;
+    text-transform: uppercase;
   }
+}
+
+.ivh-field-block {
+  margin-bottom: 9px;
+
+  span {
+    display: block;
+    color: $iv-muted;
+    font-size: $iv-size-sm;
+    font-weight: $iv-weight-bold;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  strong {
+    color: $iv-text;
+    font-weight: $iv-weight-heavy;
+  }
+}
+
+.ivh-table-wrap {
+  overflow: auto;
+  border-radius: $iv-radius;
+  border: 1px solid $iv-border;
+  background: #fff;
+  box-shadow: $iv-shadow-sm;
+}
+
+.ivh-table {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: collapse;
+
+  thead {
+    background: linear-gradient(180deg, $iv-head, $iv-head-2);
+
+    th {
+      padding: 11px 12px;
+      color: #fff;
+      font-size: $iv-size-sm;
+      font-weight: $iv-weight-heavy;
+      text-transform: uppercase;
+      letter-spacing: 0.045em;
+      white-space: nowrap;
+    }
+  }
+
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid $iv-border;
+    color: $iv-text-2;
+  }
+
+  tbody tr:hover td {
+    background: $iv-panel-soft;
+  }
+
+  &--compact {
+    font-size: $iv-size;
+  }
+}
+
+.ivh-empty-state {
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: $iv-muted;
+  text-align: center;
+
+  .fa {
+    font-size: 42px;
+    color: $iv-muted-2;
+  }
+}
+
+.ivh-section-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 5px;
+  color: $iv-blue-deep;
+  font-size: $iv-size-sm;
+  font-weight: $iv-weight-heavy;
+  text-transform: uppercase;
+  letter-spacing: 0.055em;
+}
+
+.ivh-main-value {
+  margin: 0;
+  color: $iv-text;
+  font-weight: $iv-weight-heavy;
+}
+
+.ivh-muted-value {
+  margin: 2px 0 0;
+  color: $iv-muted;
+  font-size: $iv-size;
 }
 
 .ivh-header-badges {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  gap: 6px;
   justify-content: flex-end;
-  gap: 8px;
 }
 
-// ==========================================
-// INFO TABLES
-// ==========================================
-
-.ivh-info-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-
-  tr {
-    &:not(:last-child) td {
-      border-bottom: 1px solid rgba($ivh-cedro, 0.10);
-    }
-  }
-
-  td {
-    padding: 11px 8px;
-    color: $ivh-carbon;
-    vertical-align: middle;
-    font-size: 13px;
-
-    &:first-child {
-      width: 42%;
-      color: $ivh-muted;
-      font-size: 10.5px;
-      font-weight: 950;
-      text-transform: uppercase;
-      letter-spacing: 0.10em;
-    }
-
-    &:last-child {
-      color: $ivh-carbon;
-      font-weight: 750;
-    }
-
-    strong {
-      color: $ivh-nogal;
-      font-weight: 950;
-    }
-  }
-
-  &--compact {
-    td {
-      padding: 8px 6px;
-
-      &:first-child {
-        width: 38%;
-      }
-    }
-  }
-}
-
-// ==========================================
-// STATS
-// ==========================================
-
-.ivh-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.ivh-stat-card {
-  min-height: 104px;
-  padding: 16px 12px;
-  border-radius: 18px;
-  background:
-    radial-gradient(circle at 50% 0%, rgba($ivh-miel, 0.20), transparent 42%),
-    linear-gradient(180deg, rgba(#FFFFFF, 0.94), rgba($ivh-roble-light, 0.52));
-  border: 1px solid rgba($ivh-cedro, 0.14);
-  box-shadow: inset 0 1px 0 rgba(#FFFFFF, 0.85);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.18s ease;
-
-  &:hover {
-    transform: translateY(-1px);
-    background:
-      radial-gradient(circle at 50% 0%, rgba($ivh-miel, 0.26), transparent 44%),
-      linear-gradient(180deg, rgba($ivh-pergamino, 0.92), rgba($ivh-roble-light, 0.72));
-    border-color: rgba($ivh-cobre, 0.28);
-    box-shadow: 0 10px 22px rgba($ivh-cobre, 0.12);
-  }
-
-  h3 {
-    margin: 0 0 4px;
-    color: $ivh-nogal;
-    font-size: 28px;
-    line-height: 1;
-    font-weight: 950;
-    letter-spacing: -0.04em;
-  }
-
-  span {
-    color: $ivh-muted;
-    font-size: 10.5px;
-    font-weight: 950;
-    text-transform: uppercase;
-    letter-spacing: 0.10em;
-  }
-}
-
-// ==========================================
-// FIELDS / TOTALS
-// ==========================================
-
-.ivh-field-block {
-  margin-bottom: 12px;
-
-  span {
-    display: block;
-    margin-bottom: 3px;
-    color: $ivh-muted;
-    font-size: 10.5px;
-    font-weight: 950;
-    text-transform: uppercase;
-    letter-spacing: 0.10em;
-  }
-
-  strong {
-    color: $ivh-carbon;
-    font-size: 13.5px;
-    font-weight: 850;
-  }
-}
-
-.ivh-total-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 2px;
-  padding: 10px 14px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, $ivh-cedro, $ivh-nogal);
-  color: #FFFFFF;
-  box-shadow: 0 10px 22px rgba($ivh-nogal, 0.16);
-
-  span {
-    color: rgba(#FFFFFF, 0.82);
-    font-size: 10px;
-    font-weight: 950;
-    text-transform: uppercase;
-    letter-spacing: 0.10em;
-  }
-
-  strong {
-    color: #FFFFFF;
-    font-size: 15px;
-    font-weight: 950;
-  }
-
-  &--success {
-    background: linear-gradient(135deg, $ivh-salvia, $ivh-salvia-dark);
-    box-shadow: 0 10px 22px rgba($ivh-salvia-dark, 0.14);
-  }
-}
-
-// ==========================================
-// SECTION VALUES
-// ==========================================
-
-.ivh-section-title {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  margin-bottom: 7px;
-  color: $ivh-cobre;
-  font-size: 10.5px;
-  font-weight: 950;
-  text-transform: uppercase;
-  letter-spacing: 0.10em;
-
-  i {
-    color: $ivh-cobre;
-  }
-}
-
-.ivh-main-value {
-  margin: 0 0 5px;
-  color: $ivh-carbon;
-  font-size: 13.5px;
-  font-weight: 850;
-}
-
-.ivh-muted-value {
-  margin: 0 0 5px;
-  color: $ivh-muted;
-  font-size: 12px;
-
-  i {
-    color: $ivh-cobre;
-    margin-right: 5px;
-  }
-}
-
-// ==========================================
-// ALERT / NOTE BOXES
-// ==========================================
-
-.ivh-alert-box {
-  padding: 15px 16px;
-  border-radius: 18px;
-  border: 1px solid rgba($ivh-cedro, 0.14);
-  background: rgba($ivh-pergamino, 0.72);
+.ivh-alert-box,
+.ivh-note-box {
+  padding: 13px;
+  border-radius: $iv-radius;
+  border: 1px solid $iv-border;
+  background: #fff;
 
   h6 {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    margin: 0 0 12px;
-    color: $ivh-nogal;
-    font-size: 12px;
-    font-weight: 950;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-
-    i {
-      color: $ivh-cobre;
-    }
+    margin: 0 0 8px;
+    color: $iv-text;
+    font-weight: $iv-weight-heavy;
   }
 
   span {
     display: block;
-    margin-bottom: 3px;
-    color: $ivh-muted;
-    font-size: 10.5px;
-    font-weight: 950;
-    text-transform: uppercase;
-    letter-spacing: 0.10em;
+    color: $iv-muted;
+    font-size: $iv-size-sm;
+    font-weight: $iv-weight-bold;
   }
 
   strong {
-    color: $ivh-carbon;
-    font-weight: 850;
+    color: $iv-text;
+  }
+
+  p {
+    margin: 0;
+    color: $iv-text-2;
+    white-space: pre-wrap;
   }
 
   &--danger {
-    background: rgba($ivh-redwood, 0.08);
-    border-color: rgba($ivh-redwood, 0.22);
-
-    h6,
-    h6 i {
-      color: $ivh-redwood;
-    }
+    background: $iv-red-soft;
+    border-color: rgba(220, 38, 38, 0.20);
   }
 
   &--link {
-    background: rgba($ivh-roble-light, 0.68);
-    border-color: rgba($ivh-cobre, 0.20);
-
-    h6,
-    h6 i {
-      color: $ivh-cobre;
-    }
+    background: rgba(92, 185, 242, 0.10);
+    border-color: rgba(92, 185, 242, 0.24);
   }
 }
-
-.ivh-note-box {
-  padding: 15px 16px;
-  border-radius: 18px;
-  background:
-    linear-gradient(180deg, rgba($ivh-pergamino, 0.88), rgba($ivh-crema-alt, 0.92));
-  border: 1px solid rgba($ivh-cedro, 0.16);
-
-  h6 {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    margin: 0 0 8px;
-    color: $ivh-cobre;
-    font-size: 11px;
-    font-weight: 950;
-    text-transform: uppercase;
-    letter-spacing: 0.10em;
-  }
-
-  p {
-    margin: 0;
-    color: $ivh-carbon;
-    font-size: 13px;
-    line-height: 1.55;
-    white-space: pre-line;
-  }
-}
-
-// ==========================================
-// TABLES
-// ==========================================
-
-.ivh-table-wrap {
-  overflow: auto;
-  border-radius: 20px;
-  border: 1px solid rgba($ivh-cedro, 0.14);
-  background: rgba(#FFFFFF, 0.90);
-  box-shadow: $ivh-shadow-card;
-}
-
-.ivh-table {
-  width: 100%;
-  margin: 0;
-  border-collapse: separate;
-  border-spacing: 0;
-  background: transparent;
-  color: $ivh-carbon;
-  font-size: 13px;
-
-  thead {
-    background:
-      linear-gradient(180deg, rgba($ivh-pergamino, 0.96), rgba($ivh-roble-light, 0.84));
-
-    th {
-      padding: 13px 12px;
-      color: $ivh-corteza;
-      font-size: 10.5px;
-      font-weight: 950;
-      text-transform: uppercase;
-      letter-spacing: 0.10em;
-      border-bottom: 1px solid rgba($ivh-cedro, 0.14);
-      white-space: nowrap;
-    }
-  }
-
-  tbody {
-    tr {
-      background: rgba(#FFFFFF, 0.78);
-      transition: background 0.15s ease;
-
-      &:nth-child(even) {
-        background: rgba($ivh-crema-alt, 0.62);
-      }
-
-      &:hover {
-        background: rgba($ivh-miel, 0.14);
-      }
-
-      &:not(:last-child) td {
-        border-bottom: 1px solid rgba($ivh-cedro, 0.09);
-      }
-    }
-
-    td {
-      padding: 12px;
-      color: $ivh-carbon;
-      vertical-align: middle;
-
-      strong {
-        color: $ivh-nogal;
-        font-weight: 900;
-      }
-
-      small {
-        color: $ivh-muted;
-        font-weight: 650;
-      }
-    }
-  }
-
-  &--compact {
-    font-size: 12.5px;
-
-    thead th {
-      padding: 11px 10px;
-    }
-
-    tbody td {
-      padding: 10px;
-    }
-  }
-}
-
-// ==========================================
-// EMPTY STATE
-// ==========================================
-
-.ivh-empty-state {
-  min-height: 280px;
-  padding: 54px 24px;
-  border-radius: 24px;
-  border: 2px dashed rgba($ivh-cedro, 0.20);
-  background:
-    radial-gradient(circle at 50% 0%, rgba($ivh-miel, 0.16), transparent 40%),
-    linear-gradient(180deg, rgba(#FFFFFF, 0.76), rgba($ivh-crema-alt, 0.82));
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-
-  i {
-    margin-bottom: 14px;
-    color: rgba($ivh-cobre, 0.45);
-    font-size: 58px;
-  }
-
-  p {
-    margin: 0;
-    color: $ivh-muted;
-    font-size: 13px;
-    font-weight: 800;
-  }
-}
-
-// ==========================================
-// FOOTER BUTTON
-// ==========================================
 
 .ivh-footer-close-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 42px;
-  padding: 10px 22px !important;
-  border: 0 !important;
-  border-radius: 999px !important;
-  background: linear-gradient(135deg, $ivh-cedro, $ivh-nogal) !important;
-  color: #FFFFFF !important;
-  font-size: 13px;
-  font-weight: 950 !important;
-  box-shadow: 0 10px 22px rgba($ivh-nogal, 0.18);
-  transition: all 0.18s ease;
+  border: 1px solid $iv-border;
+  border-radius: 13px;
+  background: #fff;
+  color: $iv-text-2;
+  font-weight: $iv-weight-heavy;
 
   &:hover {
-    transform: translateY(-1px);
-    background: linear-gradient(135deg, $ivh-cobre, $ivh-cedro) !important;
-    color: #FFFFFF !important;
-    box-shadow: 0 12px 28px rgba($ivh-cobre, 0.22);
-  }
-
-  i {
-    color: #FFFFFF;
+    color: $iv-blue-dark;
+    border-color: $iv-blue;
+    background: $iv-panel-soft;
   }
 }
 
-// ==========================================
-// OVERRIDES BOOTSTRAP HEREDADOS DENTRO DEL DIALOG
-// ==========================================
-
-.o_history_dialog {
-  .text-muted {
-    color: $ivh-muted !important;
-  }
-
-  .text-secondary {
-    color: $ivh-cobre !important;
-  }
-
-  .text-dark {
-    color: $ivh-carbon !important;
-  }
-
-  .bg-light {
-    background-color: $ivh-pergamino !important;
-  }
-
-  .bg-secondary {
-    background-color: $ivh-cedro !important;
-    color: #FFFFFF !important;
-  }
-
-  .bg-warning {
-    background-color: rgba($ivh-miel, 0.28) !important;
-    color: $ivh-cedro !important;
-  }
-
-  .bg-danger {
-    background-color: $ivh-redwood !important;
-    color: #FFFFFF !important;
-  }
-
-  .border,
-  .border-bottom,
-  .border-start {
-    border-color: rgba($ivh-cedro, 0.14) !important;
-  }
-
-  .badge {
-    border-radius: 999px;
-    font-weight: 900;
+@media (max-width: $breakpoint-lg) {
+  .ivh-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
-// ==========================================
-// RESPONSIVE
-// ==========================================
-
-@media (max-width: 992px) {
+@media (max-width: $breakpoint-md) {
   .ivh-history-hero {
-    grid-template-columns: auto minmax(0, 1fr);
-    padding-right: 70px;
+    flex-direction: column;
+    align-items: flex-start;
 
     &__badges {
-      grid-column: 1 / -1;
-      flex-direction: row;
-      flex-wrap: wrap;
-      align-items: center;
       justify-content: flex-start;
-    }
-  }
-
-  .ivh-stats-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 768px) {
-  .modal-content:has(.o_history_dialog) {
-    border-radius: 22px !important;
-  }
-
-  .ivh-dialog-close {
-    top: 14px;
-    right: 14px;
-  }
-
-  .ivh-history-hero {
-    grid-template-columns: 1fr;
-    padding: 24px 62px 20px 20px;
-
-    &__icon {
-      width: 66px;
-      height: 66px;
-      border-radius: 22px;
-
-      i {
-        font-size: 28px;
-      }
-    }
-
-    &__title {
-      font-size: 25px;
-    }
-
-    &__meta {
-      flex-direction: column;
-      gap: 8px;
+      max-width: none;
     }
   }
 
   .ivh-history-tabs {
-    padding: 12px 16px 0;
-
-    .nav-link {
-      min-height: 38px;
-      padding: 8px 11px;
-      font-size: 12px;
-    }
-
-    .ivh-tab-count {
-      display: none;
-    }
+    overflow-x: auto;
+    flex-wrap: nowrap;
   }
 
   .ivh-history-content {
-    padding: 16px;
-  }
-
-  .ivh-card {
-    border-radius: 18px;
-
-    &__header {
-      align-items: flex-start;
-      flex-direction: column;
-      gap: 10px;
-    }
-  }
-
-  .ivh-header-badges {
-    justify-content: flex-start;
+    padding: 12px;
+    max-height: calc(82vh - 220px);
   }
 
   .ivh-stats-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .ivh-table {
-    min-width: 760px;
-  }
-}
-
-@media (max-width: 480px) {
-  .ivh-stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .ivh-total-pill {
-    width: 100%;
-    justify-content: space-between;
+    grid-template-columns: repeat(2, 1fr);
   }
 }

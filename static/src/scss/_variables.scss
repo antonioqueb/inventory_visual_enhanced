@@ -1,108 +1,195 @@
-// Colores Odoo
-$odoo-primary: #714B67;
-$odoo-gray: #8F8F8F;
-$odoo-secondary: #017E84;
-$odoo-learning: #E46E78;
-$odoo-ready: #21B799;
-$odoo-silver: #5B899E;
-$odoo-gold: #E4A900;
+// ============================================================================
+// Inventario Visual Avanzado — Premium Blue Control Theme
+// Paleta alineada con To Be Allocated / To Be Purchased / Stone Selection
+// ============================================================================
 
-// Colores principales
-$primary-color: $odoo-primary;
-$primary-hover: darken($odoo-primary, 10%);
-$primary-light: mix(#fff, $odoo-primary, 90%);
-$primary-dark: darken($odoo-primary, 15%);
+// Dominante
+$iv-blue: #5CB9F2;
+$iv-blue-2: #4BA4F2;
+$iv-blue-dark: #247fbd;
+$iv-blue-deep: #155f94;
+$iv-ice: #DCEAF2;
 
-$secondary-color: $odoo-secondary;
-$accent-color: $odoo-gold;
-$neutral-color: $odoo-gray;
-
-$success-color: $odoo-ready;
-$warning-color: $odoo-gold;
-$danger-color: $odoo-learning;
-$info-color: $odoo-silver;
-
-$stock-color: $odoo-gray;
-$committed-color: $odoo-learning;
-$available-color: $odoo-ready;
+// Acentos operativos
+$iv-green: #04D94F;
+$iv-green-dark: #047a31;
+$iv-amber: #F2B705;
+$iv-amber-dark: #8f6500;
+$iv-red: #dc2626;
+$iv-red-dark: #991b1b;
 
 // Fondos
-$background-primary: #FFFFFF;
-$background-secondary: #FAFAFA;
-$background-tertiary: #F5F5F5;
-$background-hover: mix(#fff, $odoo-gray, 95%);
-$background-elevated: #FFFFFF;
+$iv-bg: #eef8fe;
+$iv-bg-2: #e6f4fc;
+$iv-panel: #ffffff;
+$iv-panel-soft: #f8fcff;
+$iv-panel-muted: #edf7fd;
+$iv-panel-warm: #fbfdff;
+
+// Texto
+$iv-text: #0f172a;
+$iv-text-2: #284256;
+$iv-muted: #60798c;
+$iv-muted-2: #91a9b8;
+$iv-white: #ffffff;
 
 // Bordes
-$border-color: #E0E0E0;
-$border-color-medium: #CCCCCC;
-$border-color-dark: $odoo-gray;
-$divider-color: #F0F0F0;
+$iv-border: #d7e8f2;
+$iv-border-strong: #bdd7e8;
+$iv-border-dark: rgba(15, 23, 42, 0.12);
 
-// Textos
-$text-primary: #2C2C2C;
-$text-secondary: #7a7a7a;
-$text-tertiary: $odoo-gray;
-$text-muted: #808080;
+// Tabla / cabeceras
+$iv-head: #0f172a;
+$iv-head-2: #111827;
+$iv-head-border: rgba(15, 23, 42, 0.96);
 
-// Iconos
-$icon-default: $odoo-gray;
-$icon-active: $odoo-primary;
-$icon-alert: $odoo-learning;
+// Estados suaves
+$iv-blue-soft: rgba(92, 185, 242, 0.14);
+$iv-blue-glass: rgba(92, 185, 242, 0.20);
+$iv-green-soft: rgba(4, 217, 79, 0.12);
+$iv-amber-soft: rgba(242, 183, 5, 0.15);
+$iv-red-soft: #fef2f2;
+$iv-gray-soft: #f1f5f9;
+
+// Sombras
+$iv-shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+$iv-shadow-sm: 0 4px 14px rgba(75, 164, 242, 0.09);
+$iv-shadow-md: 0 12px 34px rgba(75, 164, 242, 0.14);
+$iv-shadow-lg: 0 24px 62px rgba(15, 23, 42, 0.18);
+$iv-shadow-focus: 0 0 0 3px rgba(92, 185, 242, 0.24);
+
+// Radios
+$iv-radius-xs: 8px;
+$iv-radius-sm: 10px;
+$iv-radius: 16px;
+$iv-radius-lg: 22px;
+$iv-radius-xl: 28px;
+$iv-pill: 999px;
 
 // Tipografía
-$font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-$font-family-monospace: "SF Mono", Monaco, Consolas, "Courier New", monospace;
+$iv-font: "Inter", "SF Pro Display", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+$iv-mono: "SF Mono", Monaco, Consolas, "Courier New", monospace;
 
-$font-size-base: 13px;
-$font-size-small: 12px;
-$font-size-xsmall: 11px;
-$font-size-large: 16px;
-$font-size-xlarge: 18px;
+$iv-size-xs: 10px;
+$iv-size-sm: 11px;
+$iv-size: 12px;
+$iv-size-md: 13px;
+$iv-size-lg: 16px;
+$iv-size-xl: 20px;
+
+$iv-weight-medium: 550;
+$iv-weight-semibold: 700;
+$iv-weight-bold: 820;
+$iv-weight-heavy: 900;
+
+// Espaciado
+$iv-space-1: 4px;
+$iv-space-2: 8px;
+$iv-space-3: 12px;
+$iv-space-4: 16px;
+$iv-space-5: 20px;
+$iv-space-6: 24px;
+$iv-space-8: 32px;
+
+// Transiciones
+$iv-ease: cubic-bezier(0.4, 0, 0.2, 1);
+$iv-fast: 150ms $iv-ease;
+$iv-base: 240ms $iv-ease;
+$iv-slow: 340ms $iv-ease;
+
+// Breakpoints
+$breakpoint-sm: 576px;
+$breakpoint-md: 992px;
+$breakpoint-lg: 1200px;
+$breakpoint-xl: 1440px;
+
+// Compatibilidad con SCSS anterior
+$odoo-primary: $iv-blue-dark;
+$odoo-gray: $iv-muted;
+$odoo-secondary: $iv-blue-2;
+$odoo-learning: $iv-red;
+$odoo-ready: $iv-green;
+$odoo-silver: $iv-blue-deep;
+$odoo-gold: $iv-amber;
+
+$primary-color: $iv-blue;
+$primary-hover: $iv-blue-dark;
+$primary-light: $iv-blue-soft;
+$primary-dark: $iv-blue-deep;
+$secondary-color: $iv-blue-2;
+$accent-color: $iv-amber;
+$neutral-color: $iv-muted;
+$success-color: $iv-green;
+$warning-color: $iv-amber;
+$danger-color: $iv-red;
+$info-color: $iv-blue-deep;
+$stock-color: $iv-muted;
+$committed-color: $iv-red;
+$available-color: $iv-green;
+
+$background-primary: $iv-panel;
+$background-secondary: $iv-panel-soft;
+$background-tertiary: $iv-panel-muted;
+$background-hover: $iv-blue-soft;
+$background-elevated: $iv-panel;
+
+$border-color: $iv-border;
+$border-color-medium: $iv-border-strong;
+$border-color-dark: $iv-muted-2;
+$divider-color: rgba(215, 232, 242, 0.7);
+
+$text-primary: $iv-text;
+$text-secondary: $iv-text-2;
+$text-tertiary: $iv-muted;
+$text-muted: $iv-muted-2;
+
+$icon-default: $iv-muted;
+$icon-active: $iv-blue-dark;
+$icon-alert: $iv-red;
+
+$font-family-base: $iv-font;
+$font-family-monospace: $iv-mono;
+$font-size-base: $iv-size-md;
+$font-size-small: $iv-size;
+$font-size-xsmall: $iv-size-sm;
+$font-size-large: $iv-size-lg;
+$font-size-xlarge: $iv-size-xl;
 $font-size-xxlarge: 24px;
 
 $font-weight-normal: 400;
-$font-weight-medium: 500;
-$font-weight-semibold: 600;
-$font-weight-bold: 700;
+$font-weight-medium: $iv-weight-medium;
+$font-weight-semibold: $iv-weight-semibold;
+$font-weight-bold: $iv-weight-bold;
 
 $line-height-base: 1.5;
 $line-height-tight: 1.3;
 $line-height-compact: 1;
 
-// Espaciado
-$spacing-xs: 4px;
-$spacing-sm: 8px;
-$spacing-md: 12px;
-$spacing-lg: 16px;
-$spacing-xl: 24px;
+$spacing-xs: $iv-space-1;
+$spacing-sm: $iv-space-2;
+$spacing-md: $iv-space-3;
+$spacing-lg: $iv-space-4;
+$spacing-xl: $iv-space-6;
 $spacing-xxl: 48px;
 
-// Sombras
-$shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.06);
-$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
-$shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.08);
-$shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);
-$shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.14), 0 6px 12px rgba(0, 0, 0, 0.1);
-$shadow-hover: 0 6px 16px rgba($odoo-primary, 0.2), 0 3px 8px rgba($odoo-primary, 0.12);
-$shadow-focus: 0 0 0 3px rgba($odoo-primary, 0.15);
+$shadow-xs: $iv-shadow-xs;
+$shadow-sm: $iv-shadow-sm;
+$shadow-md: $iv-shadow-md;
+$shadow-lg: $iv-shadow-lg;
+$shadow-xl: $iv-shadow-lg;
+$shadow-hover: 0 12px 28px rgba(92, 185, 242, 0.20);
+$shadow-focus: $iv-shadow-focus;
 
-// Border radius
-$border-radius-sm: 4px;
-$border-radius-md: 8px;
-$border-radius-lg: 12px;
-$border-radius-xl: 16px;
-$border-radius-pill: 50px;
+$border-radius-sm: $iv-radius-xs;
+$border-radius-md: $iv-radius-sm;
+$border-radius-lg: $iv-radius;
+$border-radius-xl: $iv-radius-lg;
+$border-radius-pill: $iv-pill;
 
-// Transiciones
-$transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-$transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-$transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
-$transition-all: all $transition-base;
+$transition-fast: $iv-fast;
+$transition-base: $iv-base;
+$transition-slow: $iv-slow;
+$transition-all: all $iv-base;
 
-// Layout
 $container-max-width: 1600px;
 $z-index-searchbar: 100;
-$breakpoint-sm: 576px;
-$breakpoint-md: 992px;
-$breakpoint-lg: 1200px;

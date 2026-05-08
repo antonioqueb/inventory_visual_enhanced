@@ -1,833 +1,366 @@
-// ============================================================
-// Sale Order Dialog — Inventario Visual
-// Branding maderero + ficha técnica limpia
-// ============================================================
+// ============================================================================
+// Inventario Visual — Popup orden de venta vinculada
+// ============================================================================
 
-$sod-walnut: #4A2A18;
-$sod-dark-walnut: #2F1B10;
-$sod-cedar: #7A4424;
-$sod-copper: #A76735;
-$sod-honey: #E4B66A;
-$sod-oak: #F1D6AA;
-$sod-light-oak: #F9E8CC;
-$sod-cream: #FFFDF7;
-$sod-cream-2: #FFF8EC;
-$sod-parchment: #FCF0DC;
-$sod-bark: #6A4A32;
-$sod-charcoal: #2A1A12;
-$sod-muted: #92735A;
-
-$sod-sage: #61724C;
-$sod-sage-dark: #415136;
-$sod-sage-light: #EEF4E7;
-$sod-redwood: #9A4A32;
-$sod-amber: #C98228;
-
-// ============================================================
-// Modal
-// ============================================================
-
-.modal-content:has(.o_sale_order_dialog_wood),
-.modal-content:has(.o_sale_order_dialog_premium) {
-  border: 0 !important;
-  border-radius: 30px !important;
-  overflow: hidden;
-  background: $sod-cream !important;
-  box-shadow:
-    0 34px 90px rgba($sod-walnut, .18),
-    0 10px 28px rgba($sod-walnut, .10);
-
-  .modal-header {
-    display: none !important;
-  }
-
-  .modal-body {
-    padding: 0 !important;
-    background:
-      radial-gradient(circle at 8% 0%, rgba($sod-honey, .16), transparent 28%),
-      radial-gradient(circle at 96% 4%, rgba($sod-oak, .22), transparent 34%),
-      linear-gradient(180deg, $sod-cream 0%, $sod-cream-2 55%, $sod-parchment 100%) !important;
-  }
-
-  .modal-footer {
-    background:
-      linear-gradient(180deg, rgba($sod-cream, .98), rgba($sod-cream-2, .98)) !important;
-    border-top: 1px solid rgba($sod-cedar, .14) !important;
-    padding: 12px 18px !important;
-  }
+.o_sale_order_dialog_content,
+.o_sale_order_dialog_content_wood {
+  .modal-header { display: none; }
+  .modal-body { padding: 0; overflow: hidden; background: $iv-bg; }
+  .modal-footer { padding: 12px 16px; background: #fff; border-top: 1px solid $iv-border; }
 }
 
-.o_sale_order_dialog_wood,
-.o_sale_order_dialog_premium {
+.o_sale_order_dialog,
+.o_sale_order_dialog_premium,
+.o_sale_order_dialog_wood {
   position: relative;
-  color: $sod-charcoal;
+  color: $iv-text;
+  font-family: $iv-font;
   background:
-    radial-gradient(circle at 10% 3%, rgba($sod-honey, .14), transparent 30%),
-    radial-gradient(circle at 92% 0%, rgba($sod-oak, .24), transparent 34%),
-    linear-gradient(180deg, #ffffff 0%, $sod-cream 38%, $sod-cream-2 100%);
-  overflow: hidden;
-
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    opacity: .09;
-    pointer-events: none;
-    background:
-      repeating-linear-gradient(
-        8deg,
-        rgba($sod-cedar, .09) 0px,
-        rgba($sod-cedar, .09) 1px,
-        transparent 1px,
-        transparent 30px
-      );
-  }
-
-  > * {
-    position: relative;
-    z-index: 1;
-  }
+    radial-gradient(circle at top left, rgba(4, 217, 79, 0.09), transparent 28%),
+    radial-gradient(circle at top right, rgba(92, 185, 242, 0.18), transparent 34%),
+    linear-gradient(180deg, #fbfdff, $iv-bg);
 }
-
-// ============================================================
-// Cierre
-// ============================================================
 
 .sod-floating-close {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 5;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
   width: 36px;
   height: 36px;
-  border: 1px solid rgba($sod-cedar, .20);
-  border-radius: 999px;
-  color: $sod-walnut;
-  background: rgba(255, 253, 247, .86);
+  border-radius: 13px;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  background: rgba(15, 23, 42, 0.24);
   backdrop-filter: blur(10px);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow:
-    0 10px 24px rgba($sod-walnut, .10),
-    inset 0 0 0 1px rgba(255, 255, 255, .70);
-  transition: all .16s ease;
 
   &:hover {
-    transform: translateY(-1px) scale(1.04);
-    color: #ffffff;
-    background: linear-gradient(135deg, $sod-cedar, $sod-walnut);
+    background: rgba(15, 23, 42, 0.40);
   }
 }
 
-// ============================================================
-// Empty
-// ============================================================
-
 .sod-empty {
-  min-height: 360px;
-  padding: 64px 28px;
-  text-align: center;
+  min-height: 420px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  gap: 12px;
+  text-align: center;
+  padding: 44px;
 
   &__orb {
-    width: 92px;
-    height: 92px;
-    border-radius: 30px;
+    width: 74px;
+    height: 74px;
+    border-radius: 26px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 18px;
-    background:
-      radial-gradient(circle at 35% 25%, rgba(255, 255, 255, .90), transparent 34%),
-      linear-gradient(135deg, rgba($sod-honey, .42), rgba($sod-oak, .60));
-    border: 1px solid rgba($sod-cedar, .18);
-
-    i {
-      font-size: 42px;
-      color: $sod-walnut;
-    }
+    color: $iv-blue-dark;
+    background: rgba(92, 185, 242, 0.12);
+    border: 1px solid rgba(92, 185, 242, 0.28);
+    font-size: 30px;
   }
 
   h3 {
-    color: $sod-walnut;
-    font-size: 24px;
-    font-weight: 950;
-    letter-spacing: -.04em;
-    margin-bottom: 8px;
+    margin: 0;
+    color: $iv-text;
+    font-weight: $iv-weight-heavy;
+    letter-spacing: -0.035em;
   }
 
   p {
-    max-width: 500px;
-    color: $sod-muted;
-    line-height: 1.55;
     margin: 0;
+    color: $iv-muted;
   }
 }
 
-// ============================================================
-// Header
-// ============================================================
-
 .sod-hero {
   position: relative;
-  padding: 24px 22px;
-  background:
-    radial-gradient(circle at 9% 15%, rgba(255, 255, 255, .88), transparent 28%),
-    radial-gradient(circle at 92% 0%, rgba($sod-honey, .28), transparent 34%),
-    linear-gradient(135deg, #FFFDF7 0%, $sod-cream-2 34%, $sod-parchment 70%, $sod-light-oak 100%);
-  border-bottom: 1px solid rgba($sod-cedar, .12);
   overflow: hidden;
+  color: #fff;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 15% 8%, rgba(4, 217, 79, 0.20), transparent 32%),
+    radial-gradient(circle at 78% 10%, rgba(92, 185, 242, 0.32), transparent 34%),
+    linear-gradient(135deg, $iv-head, $iv-blue-deep 58%, $iv-blue-dark);
 
-  &__pattern {
-    position: absolute;
-    inset: 0;
-    opacity: .15;
-    background:
-      linear-gradient(rgba($sod-cedar, .10) 1px, transparent 1px),
-      linear-gradient(90deg, rgba($sod-cedar, .08) 1px, transparent 1px);
-    background-size: 38px 38px;
-    pointer-events: none;
-  }
-
+  &__pattern,
   &__grain {
     position: absolute;
     inset: 0;
-    opacity: .16;
     pointer-events: none;
-    background:
-      repeating-linear-gradient(
-        8deg,
-        rgba($sod-cedar, .08) 0px,
-        rgba($sod-cedar, .08) 1px,
-        transparent 1px,
-        transparent 22px
-      );
+  }
+
+  &__pattern {
+    background: linear-gradient(120deg, transparent 0 44%, rgba(255,255,255,0.06) 44% 45%, transparent 45% 100%);
+  }
+
+  &__grain {
+    opacity: 0.18;
+    background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,.22) 1px, transparent 0);
+    background-size: 18px 18px;
   }
 
   &__content {
     position: relative;
-    z-index: 1;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(360px, 470px);
-    gap: 20px;
-    align-items: stretch;
-    padding-right: 40px;
-  }
-
-  &__left {
     display: flex;
     align-items: center;
-    gap: 16px;
-    min-width: 0;
+    justify-content: space-between;
+    gap: 22px;
   }
 
-  &__icon {
-    width: 82px;
-    height: 82px;
-    flex: 0 0 auto;
-    border-radius: 28px;
+  &__left,
+  &__right {
     display: flex;
     align-items: center;
-    justify-content: center;
-    background:
-      radial-gradient(circle at 30% 20%, rgba(255, 255, 255, .82), transparent 32%),
-      linear-gradient(145deg, rgba($sod-honey, .58), rgba($sod-oak, .55));
-    border: 1px solid rgba($sod-copper, .18);
-
-    i {
-      color: $sod-walnut;
-      font-size: 42px;
-      text-shadow: 0 3px 10px rgba(255, 255, 255, .75);
-    }
-  }
-
-  &__copy {
-    min-width: 0;
-
-    h2 {
-      color: $sod-walnut;
-      font-size: 32px;
-      line-height: 1;
-      font-weight: 950;
-      letter-spacing: -.055em;
-      margin: 4px 0 8px;
-    }
-
-    p {
-      max-width: 680px;
-      color: $sod-bark;
-      margin: 0;
-      font-size: 13px;
-      line-height: 1.45;
-      font-weight: 700;
-      overflow-wrap: anywhere;
-    }
+    gap: 14px;
   }
 
   &__right {
-    display: grid;
-    grid-template-columns: .9fr 1.1fr;
-    gap: 10px;
-    align-items: stretch;
-    min-width: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  &__icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 21px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    font-size: 24px;
+  }
+
+  p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.74);
   }
 }
 
 .sod-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  color: $sod-copper;
-  font-size: 10px;
-  font-weight: 950;
-  letter-spacing: .14em;
+  color: rgba(255, 255, 255, 0.66);
+  font-size: $iv-size-sm;
+  font-weight: $iv-weight-heavy;
   text-transform: uppercase;
-
-  &::before {
-    content: "";
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: $sod-honey;
-    box-shadow: 0 0 18px rgba($sod-honey, .75);
-  }
+  letter-spacing: 0.14em;
 }
 
 .sod-hero-lot-title {
-  font-family: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif !important;
-  font-size: 38px !important;
-  font-weight: 950 !important;
-  letter-spacing: -0.05em !important;
-  color: $sod-walnut !important;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "ss01", "cv11";
+  margin: 2px 0 4px;
+  color: #fff;
+  font-size: 26px;
+  font-weight: $iv-weight-heavy;
+  letter-spacing: -0.045em;
+}
+
+.sod-ref-card,
+.sod-payment-hero {
+  min-width: 190px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(10px);
 }
 
 .sod-ref-card {
-  width: 100%;
-  min-width: 0;
   text-align: left;
-  border-radius: 20px;
-  padding: 14px;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, .86), rgba($sod-cream, .88));
-  border: 1px solid rgba($sod-cedar, .16);
-  box-shadow:
-    0 12px 28px rgba($sod-walnut, .08),
-    inset 0 0 0 1px rgba(255, 255, 255, .70);
-  cursor: pointer;
-  transition: all .14s ease;
+  transition: all $iv-fast;
+
+  span {
+    display: block;
+    color: rgba(255, 255, 255, 0.62);
+    font-size: $iv-size-sm;
+    font-weight: $iv-weight-bold;
+    text-transform: uppercase;
+  }
+
+  strong {
+    color: #fff;
+    font-size: $iv-size-lg;
+    font-weight: $iv-weight-heavy;
+  }
 
   &:hover {
+    background: rgba(255, 255, 255, 0.18);
     transform: translateY(-1px);
-    border-color: rgba($sod-copper, .34);
-    box-shadow: 0 16px 32px rgba($sod-copper, .13);
-  }
-
-  span {
-    display: block;
-    color: $sod-muted;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: .10em;
-    font-weight: 950;
-    margin-bottom: 5px;
-  }
-
-  strong {
-    display: block;
-    color: $sod-walnut;
-    font-size: 21px;
-    line-height: 1.05;
-    font-weight: 950;
-    letter-spacing: -.04em;
-    overflow-wrap: anywhere;
   }
 }
 
-.sod-payment-hero {
-  min-width: 0;
-  border-radius: 20px;
-  padding: 14px;
-  background:
-    radial-gradient(circle at 92% 0%, rgba(255, 255, 255, .62), transparent 36%),
-    linear-gradient(135deg, #F7FBF2, $sod-sage-light);
-  border: 1px solid rgba($sod-sage, .22);
-  box-shadow:
-    0 12px 28px rgba($sod-sage, .08),
-    inset 0 0 0 1px rgba(255, 255, 255, .72);
-
-  &__top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 10px;
-
-    > strong {
-      color: $sod-sage-dark;
-      font-size: 22px;
-      line-height: 1;
-      font-weight: 950;
-      letter-spacing: -.04em;
-      white-space: nowrap;
-    }
-  }
-}
-
-// ============================================================
-// Contenido
-// ============================================================
-
-.sod-compact-body {
-  padding: 14px 18px 18px;
-}
-
-.sod-main-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(320px, .75fr);
+.sod-payment-hero__top {
+  display: flex;
+  justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
-}
+  align-items: center;
+  margin-bottom: 8px;
 
-.sod-card {
-  min-width: 0;
-  border-radius: 22px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, .98), rgba($sod-cream, .96));
-  border: 1px solid rgba($sod-cedar, .13);
-  box-shadow:
-    0 12px 28px rgba($sod-walnut, .07),
-    0 2px 7px rgba($sod-walnut, .04);
-  padding: 14px;
-
-  &__title {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    margin-bottom: 10px;
-    color: $sod-walnut;
-    font-size: 11px;
-    font-weight: 950;
-    text-transform: uppercase;
-    letter-spacing: .10em;
-
-    i {
-      color: $sod-copper;
-      font-size: 13px;
-    }
-
-    &--payment {
-      color: $sod-sage-dark;
-
-      i {
-        color: $sod-sage;
-      }
-    }
-  }
-
-  &--payment-detail {
-    background:
-      radial-gradient(circle at 92% 0%, rgba(255, 255, 255, .58), transparent 36%),
-      linear-gradient(135deg, #F7FBF2, $sod-sage-light);
-    border-color: rgba($sod-sage, .22);
+  > strong {
+    color: #fff;
+    font-size: $iv-size-lg;
   }
 }
-
-// ============================================================
-// Material
-// ============================================================
-
-.sod-card--material-sheet {
-  padding-bottom: 12px;
-}
-
-.sod-material-sheet {
-  display: grid;
-  gap: 10px;
-}
-
-.sod-material-heading {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 150px;
-  gap: 10px;
-  align-items: stretch;
-  padding: 12px 14px;
-  border-radius: 16px;
-  background:
-    linear-gradient(145deg, rgba($sod-parchment, .55), rgba(#ffffff, .62));
-  border: 1px solid rgba($sod-cedar, .10);
-
-  &__name {
-    min-width: 0;
-    display: flex;
-    align-items: center;
-
-    strong {
-      color: $sod-walnut;
-      font-size: 16px;
-      font-weight: 950;
-      line-height: 1.2;
-      overflow-wrap: anywhere;
-    }
-  }
-
-  &__lot {
-    min-width: 0;
-    display: grid;
-    align-content: center;
-    justify-items: end;
-    border-left: 1px solid rgba($sod-cedar, .12);
-    padding-left: 12px;
-
-    span {
-      color: $sod-muted;
-      font-size: 9px;
-      font-weight: 950;
-      letter-spacing: .10em;
-      text-transform: uppercase;
-      margin-bottom: 3px;
-    }
-
-    strong {
-      color: $sod-cedar;
-      font-size: 13px;
-      font-weight: 950;
-      overflow-wrap: anywhere;
-      text-align: right;
-    }
-  }
-}
-
-.sod-material-table {
-  display: grid;
-  gap: 0;
-  padding: 2px 4px 0;
-}
-
-.sod-material-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 22px;
-  min-height: 35px;
-  border-bottom: 1px solid rgba($sod-cedar, .10);
-
-  &:last-child {
-    border-bottom: 0;
-  }
-}
-
-.sod-material-cell {
-  min-width: 0;
-  display: grid;
-  grid-template-columns: 100px minmax(0, 1fr);
-  gap: 10px;
-  align-items: baseline;
-  padding: 8px 0;
-
-  span {
-    color: $sod-muted;
-    font-size: 9.5px;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    font-weight: 950;
-  }
-
-  strong {
-    color: $sod-walnut;
-    font-size: 12.8px;
-    font-weight: 900;
-    line-height: 1.25;
-    overflow-wrap: anywhere;
-  }
-
-  &--eta strong {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-
-    i {
-      color: $sod-amber;
-    }
-  }
-}
-
-// ============================================================
-// Venta
-// ============================================================
-
-.sod-sale-sheet {
-  display: grid;
-  gap: 10px;
-}
-
-.sod-sale-client {
-  padding: 12px 14px;
-  border-radius: 16px;
-  background: rgba($sod-parchment, .32);
-  border: 1px solid rgba($sod-cedar, .10);
-
-  span {
-    display: block;
-    color: $sod-muted;
-    font-size: 9.5px;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    font-weight: 950;
-    margin-bottom: 6px;
-  }
-
-  strong {
-    display: block;
-    color: $sod-walnut;
-    font-size: 14px;
-    font-weight: 950;
-    overflow-wrap: anywhere;
-  }
-}
-
-.sod-sale-table {
-  display: grid;
-  gap: 0;
-}
-
-.sod-sale-row {
-  display: grid;
-  grid-template-columns: 92px minmax(0, 1fr);
-  gap: 10px;
-  align-items: baseline;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba($sod-cedar, .10);
-
-  &:last-child {
-    border-bottom: 0;
-  }
-
-  span {
-    color: $sod-muted;
-    font-size: 9.5px;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    font-weight: 950;
-  }
-
-  strong {
-    color: $sod-walnut;
-    font-size: 12.8px;
-    font-weight: 900;
-    overflow-wrap: anywhere;
-  }
-}
-
-// ============================================================
-// Pago
-// ============================================================
 
 .sod-payment-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  min-height: 30px;
-  padding: 7px 10px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 950;
-  border: 1px solid transparent;
-  white-space: nowrap;
+  color: #fff;
+  border: 0;
 
   &--paid {
-    color: $sod-sage-dark;
-    background: #ffffff;
-    border-color: rgba($sod-sage, .28);
-    box-shadow: 0 8px 16px rgba($sod-sage, .10);
+    background: linear-gradient(135deg, $iv-green, $iv-green-dark);
   }
 
   &--partial {
-    color: $sod-cedar;
-    background: rgba($sod-honey, .26);
-    border-color: rgba($sod-amber, .30);
+    background: linear-gradient(135deg, $iv-amber, $iv-amber-dark);
   }
 
   &--none {
-    color: $sod-redwood;
-    background: rgba($sod-redwood, .10);
-    border-color: rgba($sod-redwood, .22);
+    background: linear-gradient(135deg, $iv-red, $iv-red-dark);
   }
 }
 
 .sod-payment-progress {
   height: 8px;
-  border-radius: 999px;
   overflow: hidden;
-  background: rgba($sod-sage-dark, .13);
-  border: 1px solid rgba($sod-sage, .14);
+  border-radius: $iv-pill;
+  background: rgba(255, 255, 255, 0.18);
 
   &__bar {
     height: 100%;
     border-radius: inherit;
-    background: linear-gradient(90deg, $sod-sage, $sod-sage-dark);
-    transition: width .24s ease;
-  }
-
-  &--hero {
-    height: 9px;
+    background: linear-gradient(90deg, $iv-green, #b7ffcf);
+    box-shadow: 0 0 16px rgba(4, 217, 79, 0.28);
   }
 }
 
+.sod-compact-body {
+  padding: 18px;
+}
+
+.sod-main-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.sod-card {
+  border: 1px solid $iv-border;
+  border-radius: $iv-radius;
+  background: linear-gradient(145deg, #fff, $iv-panel-soft);
+  box-shadow: $iv-shadow-sm;
+  overflow: hidden;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    border-bottom: 1px solid $iv-border;
+    color: $iv-text;
+    background: rgba(255, 255, 255, 0.78);
+    font-weight: $iv-weight-heavy;
+
+    &--payment {
+      color: $iv-blue-deep;
+    }
+  }
+}
+
+.sod-material-sheet,
+.sod-sale-sheet {
+  padding: 14px;
+}
+
+.sod-material-table,
+.sod-sale-table {
+  display: grid;
+  gap: 9px;
+}
+
+.sod-material-row,
+.sod-sale-row,
 .sod-payment-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
 }
 
-.sod-payment-cell {
-  min-width: 0;
-  padding: 10px 11px;
-  border-radius: 15px;
-  background: rgba(255, 255, 255, .62);
-  border: 1px solid rgba($sod-sage, .12);
+.sod-material-cell,
+.sod-payment-cell,
+.sod-sale-row {
+  padding: 10px;
+  border-radius: 13px;
+  border: 1px solid $iv-border;
+  background: #fff;
 
   span {
     display: block;
-    color: rgba($sod-sage-dark, .76);
-    font-size: 9px;
+    color: $iv-muted;
+    font-size: $iv-size-sm;
+    font-weight: $iv-weight-bold;
     text-transform: uppercase;
-    letter-spacing: .08em;
-    font-weight: 950;
-    margin-bottom: 5px;
+    letter-spacing: 0.045em;
+  }
+
+  strong {
+    color: $iv-text;
+    font-weight: $iv-weight-heavy;
+  }
+}
+
+.sod-sale-client {
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: $iv-radius;
+  background: rgba(92, 185, 242, 0.10);
+  border: 1px solid rgba(92, 185, 242, 0.24);
+
+  span {
+    color: $iv-muted;
+    font-size: $iv-size-sm;
+    font-weight: $iv-weight-bold;
+    text-transform: uppercase;
   }
 
   strong {
     display: block;
-    color: $sod-sage-dark;
-    font-size: 13px;
-    font-weight: 950;
-    line-height: 1.2;
-    overflow-wrap: anywhere;
+    color: $iv-blue-deep;
+    font-size: $iv-size-lg;
+    font-weight: $iv-weight-heavy;
   }
 }
 
-// ============================================================
-// Footer
-// ============================================================
+.sod-payment-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 14px;
+}
 
 .sod-close-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 38px;
-  padding: 9px 20px;
-  border-radius: 999px;
-  color: #ffffff !important;
-  background: linear-gradient(135deg, $sod-cedar, $sod-dark-walnut) !important;
-  border: 0 !important;
-  font-weight: 950;
-  box-shadow: 0 10px 20px rgba($sod-walnut, .16);
-  transition: all .14s ease;
+  border: 1px solid $iv-border;
+  border-radius: 13px;
+  background: #fff;
+  color: $iv-text-2;
+  font-weight: $iv-weight-heavy;
 
   &:hover {
-    transform: translateY(-1px);
-    background: linear-gradient(135deg, $sod-copper, $sod-cedar) !important;
+    color: $iv-blue-dark;
+    border-color: $iv-blue;
   }
 }
 
-// ============================================================
-// Responsive
-// ============================================================
-
-@media (max-width: 1100px) {
-  .sod-hero {
-    &__content {
-      grid-template-columns: 1fr;
-      padding-right: 38px;
-    }
-
-    &__right {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-
-  .sod-main-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .modal-content:has(.o_sale_order_dialog_wood),
-  .modal-content:has(.o_sale_order_dialog_premium) {
-    border-radius: 18px !important;
-  }
-
-  .sod-floating-close {
-    top: 12px;
-    right: 12px;
-    width: 34px;
-    height: 34px;
-  }
-
-  .sod-hero {
-    padding: 20px 16px;
-
-    &__left {
-      align-items: flex-start;
-      gap: 12px;
-    }
-
-    &__icon {
-      width: 64px;
-      height: 64px;
-      border-radius: 22px;
-
-      i {
-        font-size: 32px;
-      }
-    }
-
-    &__copy h2,
-    .sod-hero-lot-title {
-      font-size: 28px !important;
-    }
-
-    &__right {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .sod-compact-body {
-    padding: 12px 14px 16px;
-  }
-
-  .sod-material-heading {
-    grid-template-columns: 1fr;
-
-    &__lot {
-      justify-items: start;
-      border-left: 0;
-      border-top: 1px solid rgba($sod-cedar, .12);
-      padding-left: 0;
-      padding-top: 8px;
-
-      strong {
-        text-align: left;
-      }
-    }
-  }
-
+@media (max-width: $breakpoint-md) {
+  .sod-hero__content,
+  .sod-hero__left,
+  .sod-hero__right,
+  .sod-main-grid,
+  .sod-payment-grid,
   .sod-material-row,
-  .sod-payment-grid {
+  .sod-sale-row {
+    display: grid;
     grid-template-columns: 1fr;
-  }
-
-  .sod-material-cell {
-    grid-template-columns: 92px minmax(0, 1fr);
-  }
-
-  .sod-close-btn {
-    width: 100%;
+    align-items: stretch;
   }
 }

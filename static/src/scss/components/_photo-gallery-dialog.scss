@@ -1,783 +1,163 @@
-// ==========================================
-// PHOTO GALLERY DIALOG - Tema Maderero Cálido Claro
-// inventory_visual_enhanced
-// ==========================================
-
-$photo-nogal: #4A2A18;
-$photo-nogal-dark: #2F1B10;
-$photo-cedro: #7A4424;
-$photo-cobre: #A76735;
-$photo-caramelo: #C58A4A;
-$photo-miel: #E4B66A;
-$photo-roble: #F1D6AA;
-$photo-roble-light: #F9E8CC;
-$photo-crema: #FFFDF7;
-$photo-crema-alt: #FFF8EC;
-$photo-pergamino: #FCF0DC;
-$photo-pergamino-strong: #F8E7CB;
-$photo-arena: #E9CDA5;
-$photo-corteza: #6A4A32;
-$photo-carbon: #2A1A12;
-$photo-muted: #92735A;
-$photo-line: #EBD5B5;
-$photo-salvia: #61724C;
-$photo-salvia-dark: #415136;
-$photo-salvia-light: #EEF4E7;
-$photo-redwood: #9A4A32;
-$photo-ambar: #C98228;
-
-$photo-shadow-soft: 0 14px 38px rgba($photo-nogal-dark, 0.10);
-$photo-shadow-card: 0 10px 26px rgba($photo-nogal-dark, 0.08);
-$photo-shadow-hover: 0 14px 32px rgba($photo-cobre, 0.14);
-
-// ==========================================
-// MODAL NATIVO
-// ==========================================
-
-.modal-content:has(.o_photo_gallery_dialog) {
-  border: 0 !important;
-  border-radius: 30px !important;
-  overflow: hidden !important;
-  background: $photo-crema !important;
-  box-shadow:
-    0 28px 80px rgba($photo-nogal-dark, 0.24),
-    0 10px 28px rgba($photo-cobre, 0.12) !important;
-
-  .modal-header {
-    display: none !important;
-  }
-
-  .modal-body {
-    padding: 0 !important;
-    background:
-      radial-gradient(circle at 12% 0%, rgba($photo-miel, 0.18), transparent 30%),
-      radial-gradient(circle at 92% 8%, rgba($photo-roble, 0.32), transparent 28%),
-      linear-gradient(180deg, #FFFFFF 0%, $photo-crema 42%, $photo-crema-alt 100%) !important;
-  }
-
-  .modal-footer {
-    background:
-      linear-gradient(180deg, rgba(#FFFFFF, 0.92), rgba($photo-crema-alt, 0.95)) !important;
-    border-top: 1px solid rgba($photo-cedro, 0.14) !important;
-    padding: 16px 24px !important;
-
-    .btn-secondary {
-      min-height: 42px;
-      padding: 10px 22px !important;
-      border: 0 !important;
-      border-radius: 999px !important;
-      background: linear-gradient(135deg, $photo-cedro, $photo-nogal) !important;
-      color: #FFFFFF !important;
-      font-size: 13px;
-      font-weight: 950 !important;
-      box-shadow: 0 10px 22px rgba($photo-nogal, 0.18);
-      transition: all 0.18s ease;
-
-      &:hover {
-        transform: translateY(-1px);
-        background: linear-gradient(135deg, $photo-cobre, $photo-cedro) !important;
-        color: #FFFFFF !important;
-        box-shadow: 0 12px 28px rgba($photo-cobre, 0.22);
-      }
-    }
-  }
-}
-
-// ==========================================
-// BASE
-// ==========================================
+// ============================================================================
+// Inventario Visual — Galería de fotos
+// ============================================================================
 
 .o_photo_gallery_dialog {
   position: relative;
-  padding: 22px 24px 24px;
+  color: $iv-text;
+  font-family: $iv-font;
   background:
-    radial-gradient(circle at 8% 0%, rgba($photo-miel, 0.12), transparent 34%),
-    radial-gradient(circle at 94% 16%, rgba($photo-roble, 0.24), transparent 34%),
-    linear-gradient(180deg, #FFFFFF 0%, $photo-crema 45%, $photo-crema-alt 100%);
-  color: $photo-carbon;
-  isolation: isolate;
+    radial-gradient(circle at top right, rgba(92, 185, 242, 0.16), transparent 34%),
+    linear-gradient(180deg, #fbfdff, $iv-bg);
+  padding: 16px;
 
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.10;
-    background-image:
-      repeating-linear-gradient(
-        8deg,
-        rgba($photo-cedro, 0.09) 0,
-        rgba($photo-cedro, 0.09) 1px,
-        transparent 1px,
-        transparent 13px
-      );
-    mix-blend-mode: multiply;
-    z-index: -1;
+  .bg-dark {
+    background: linear-gradient(135deg, $iv-head, $iv-blue-deep) !important;
   }
 
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: rgba($photo-cedro, 0.55) rgba($photo-roble-light, 0.65);
+  .bg-light {
+    background: $iv-panel-soft !important;
   }
 
-  *::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+  .btn {
+    border-radius: 12px;
+    font-weight: $iv-weight-bold;
   }
 
-  *::-webkit-scrollbar-track {
-    background: rgba($photo-roble-light, 0.65);
-    border-radius: 999px;
-  }
-
-  *::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, $photo-cobre, $photo-cedro);
-    border-radius: 999px;
-  }
-}
-
-// ==========================================
-// VISOR NORMAL
-// ==========================================
-
-.o_photo_gallery_dialog {
-  .photo-viewer-section {
-    overflow: hidden;
-    border-radius: 24px;
-    border: 1px solid rgba($photo-cedro, 0.14);
-    background:
-      linear-gradient(180deg, rgba(#FFFFFF, 0.94), rgba($photo-crema, 0.94));
-    box-shadow: $photo-shadow-card;
-
-    > .position-relative {
-      padding: 14px;
-      background:
-        radial-gradient(circle at 50% 0%, rgba($photo-miel, 0.16), transparent 36%),
-        linear-gradient(180deg, rgba($photo-pergamino, 0.72), rgba($photo-crema-alt, 0.86));
-    }
-
-    .bg-dark {
-      border-radius: 22px !important;
-      background:
-        radial-gradient(circle at 50% 0%, rgba($photo-cobre, 0.16), transparent 40%),
-        linear-gradient(135deg, #1C120C 0%, #080604 100%) !important;
-      border: 1px solid rgba($photo-miel, 0.14);
-      box-shadow:
-        inset 0 1px 0 rgba(#FFFFFF, 0.06),
-        0 12px 28px rgba($photo-nogal-dark, 0.22);
-    }
-
-    img.img-fluid.rounded.shadow-lg {
-      border-radius: 18px !important;
-      box-shadow: 0 18px 40px rgba(#000000, 0.28) !important;
-      transition: transform 0.18s ease, box-shadow 0.18s ease;
-
-      &:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 22px 48px rgba(#000000, 0.34) !important;
-      }
-    }
-
-    .position-absolute.top-0.end-0 {
-      .badge {
-        border-radius: 999px;
-        background: rgba($photo-nogal-dark, 0.78) !important;
-        color: #FFFFFF !important;
-        border: 1px solid rgba($photo-miel, 0.22);
-
-        i,
-        strong {
-          color: #FFFFFF;
-        }
-      }
-    }
-
-    .btn-light.position-absolute {
-      width: 50px !important;
-      height: 50px !important;
-      border: 1px solid rgba($photo-cedro, 0.16) !important;
-      border-radius: 999px !important;
-      background: rgba($photo-crema, 0.94) !important;
-      color: $photo-cedro !important;
-      box-shadow: 0 12px 28px rgba($photo-nogal-dark, 0.16) !important;
-      transition: all 0.18s ease;
-
-      &:hover:not(:disabled) {
-        transform: translateY(-1px);
-        background: $photo-pergamino !important;
-        color: $photo-nogal !important;
-        border-color: rgba($photo-cobre, 0.30) !important;
-      }
-
-      &:disabled {
-        opacity: 0.42 !important;
-      }
-    }
-
-    .mt-2.p-2.bg-light.rounded.border {
-      margin: 12px 14px 14px !important;
-      padding: 14px 16px !important;
-      border-radius: 18px !important;
-      border: 1px solid rgba($photo-cedro, 0.14) !important;
-      background:
-        linear-gradient(180deg, rgba(#FFFFFF, 0.88), rgba($photo-pergamino, 0.72)) !important;
-
-      h6 {
-        margin-bottom: 6px !important;
-        color: $photo-nogal;
-        font-size: 14px;
-        font-weight: 950;
-
-        i {
-          color: $photo-cobre !important;
-        }
-
-        strong {
-          color: $photo-nogal;
-        }
-      }
-
-      small {
-        color: $photo-muted !important;
-        font-weight: 650;
-
-        i {
-          color: $photo-cobre;
-        }
-      }
-    }
-  }
-
-  hr {
-    border-color: rgba($photo-cedro, 0.14) !important;
-    opacity: 1;
-  }
-}
-
-// ==========================================
-// MINIATURAS
-// ==========================================
-
-.o_photo_gallery_dialog {
-  .d-flex.gap-2.mt-2.overflow-auto.pb-2 {
-    padding: 0 14px 14px !important;
-
-    > div {
-      border-radius: 16px !important;
-      border: 1px solid rgba($photo-cedro, 0.16) !important;
-      background: rgba($photo-crema, 0.86);
-      box-shadow: 0 8px 18px rgba($photo-nogal-dark, 0.06);
-      transition: all 0.18s ease;
-
-      &:hover {
-        transform: translateY(-1px);
-        border-color: rgba($photo-cobre, 0.34) !important;
-        box-shadow: 0 12px 24px rgba($photo-cobre, 0.14);
-      }
-
-      &.border-secondary,
-      &.border-3 {
-        border-color: $photo-cobre !important;
-        box-shadow:
-          0 0 0 3px rgba($photo-miel, 0.28),
-          0 12px 24px rgba($photo-cobre, 0.16);
-      }
-
-      img {
-        border-radius: 12px !important;
-      }
-    }
-  }
-}
-
-// ==========================================
-// EMPTY STATE
-// ==========================================
-
-.o_photo_gallery_dialog {
-  .text-center.py-5 {
-    min-height: 280px;
-    padding: 54px 24px !important;
-    border-radius: 24px;
-    border: 2px dashed rgba($photo-cedro, 0.20);
-    background:
-      radial-gradient(circle at 50% 0%, rgba($photo-miel, 0.16), transparent 40%),
-      linear-gradient(180deg, rgba(#FFFFFF, 0.76), rgba($photo-crema-alt, 0.82));
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    i {
-      color: rgba($photo-cobre, 0.45) !important;
-    }
-
-    p {
-      color: $photo-muted !important;
-      font-size: 13px;
-      font-weight: 800;
-    }
-  }
-}
-
-// ==========================================
-// BOTÓN AGREGAR FOTO
-// ==========================================
-
-.o_photo_gallery_dialog {
-  .text-center.mb-2 {
-    margin-top: 18px;
-
-    .btn-secondary {
-      min-height: 46px;
-      padding: 11px 24px !important;
-      border: 0 !important;
-      border-radius: 999px !important;
-      background: linear-gradient(135deg, $photo-cedro, $photo-nogal) !important;
-      color: #FFFFFF !important;
-      font-size: 13px;
-      font-weight: 950 !important;
-      box-shadow: 0 10px 22px rgba($photo-nogal, 0.18);
-      transition: all 0.18s ease;
-
-      &:hover {
-        transform: translateY(-1px);
-        background: linear-gradient(135deg, $photo-cobre, $photo-cedro) !important;
-        color: #FFFFFF !important;
-        box-shadow: 0 12px 28px rgba($photo-cobre, 0.22);
-      }
-
-      i {
-        color: #FFFFFF;
-      }
-    }
-  }
-}
-
-// ==========================================
-// BOTONES DESCARGAR / COMPARTIR
-// ==========================================
-
-.o_photo_gallery_dialog {
-  .btn-outline-primary,
-  .btn-outline-success,
-  .btn-outline-secondary,
-  .btn-outline-warning {
-    border-radius: 999px !important;
-    font-size: 12px;
-    font-weight: 900 !important;
-    transition: all 0.18s ease;
-
-    &:hover {
-      transform: translateY(-1px);
-    }
-  }
-
-  .btn-outline-primary {
-    border-color: rgba($photo-cedro, 0.34) !important;
-    color: $photo-cedro !important;
-    background: rgba($photo-crema, 0.72) !important;
-
-    &:hover {
-      background: $photo-pergamino !important;
-      color: $photo-nogal !important;
-      border-color: rgba($photo-cobre, 0.46) !important;
-    }
-  }
-
-  .btn-outline-success {
-    border-color: rgba($photo-salvia, 0.36) !important;
-    color: $photo-salvia-dark !important;
-    background: $photo-salvia-light !important;
-
-    &:hover {
-      background: linear-gradient(135deg, $photo-salvia, $photo-salvia-dark) !important;
-      color: #FFFFFF !important;
-      border-color: transparent !important;
-    }
-  }
-
+  .btn-secondary,
   .btn-outline-secondary {
-    border-color: rgba($photo-cedro, 0.24) !important;
-    color: $photo-cedro !important;
-    background: rgba($photo-crema, 0.80) !important;
+    border-color: $iv-border;
+    background: #fff;
+    color: $iv-text-2;
 
     &:hover {
-      background: $photo-pergamino !important;
-      color: $photo-nogal !important;
-      border-color: rgba($photo-cobre, 0.36) !important;
-    }
-  }
-
-  .btn-outline-warning {
-    border-color: rgba($photo-ambar, 0.42) !important;
-    color: $photo-ambar !important;
-    background: rgba($photo-miel, 0.14) !important;
-
-    &:hover {
-      background: rgba($photo-miel, 0.26) !important;
-      color: $photo-cedro !important;
-      border-color: rgba($photo-ambar, 0.58) !important;
+      color: $iv-blue-dark;
+      border-color: $iv-blue;
+      background: $iv-panel-soft;
     }
   }
 
   .btn-success {
-    border: 0 !important;
-    border-radius: 999px !important;
-    background: linear-gradient(135deg, $photo-salvia, $photo-salvia-dark) !important;
-    color: #FFFFFF !important;
-    font-weight: 950 !important;
-    box-shadow: 0 10px 22px rgba($photo-salvia-dark, 0.16);
-    transition: all 0.18s ease;
+    border-color: $iv-green-dark;
+    background: linear-gradient(135deg, $iv-green, $iv-green-dark);
+    color: #fff;
+  }
 
-    &:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 12px 28px rgba($photo-salvia-dark, 0.22);
+  .btn-outline-primary {
+    border-color: $iv-blue;
+    color: $iv-blue-dark;
+
+    &:hover {
+      background: $iv-blue-dark;
+      color: #fff;
     }
+  }
 
-    &:disabled {
-      opacity: 0.62;
-      box-shadow: none;
-    }
+  .btn-outline-success {
+    border-color: $iv-green;
+    color: $iv-green-dark;
 
-    i {
-      color: #FFFFFF;
+    &:hover {
+      background: $iv-green-dark;
+      color: #fff;
     }
   }
 }
 
-// ==========================================
-// EDITOR / UPLOAD SECTION
-// ==========================================
-
-.o_photo_gallery_dialog {
-  .upload-section {
-    overflow: hidden;
-    padding: 20px;
-    border-radius: 24px;
-    border: 1px solid rgba($photo-cedro, 0.14);
-    background:
-      linear-gradient(180deg, rgba(#FFFFFF, 0.94), rgba($photo-crema, 0.94));
-    box-shadow: $photo-shadow-card;
-
-    h5 {
-      color: $photo-nogal;
-      font-size: 17px;
-      font-weight: 950;
-      letter-spacing: -0.01em;
-
-      i {
-        color: $photo-cobre !important;
-      }
-    }
-
-    .form-control {
-      min-height: 42px;
-      border: 2px solid rgba($photo-cedro, 0.20) !important;
-      border-radius: 14px !important;
-      background: rgba($photo-crema, 0.94) !important;
-      color: $photo-carbon !important;
-      font-size: 14px;
-      font-weight: 700;
-      box-shadow: inset 0 1px 0 rgba(#FFFFFF, 0.85);
-      transition: all 0.18s ease;
-
-      &:focus {
-        border-color: rgba($photo-cobre, 0.72) !important;
-        background: #FFFFFF !important;
-        box-shadow:
-          0 0 0 4px rgba($photo-cobre, 0.12),
-          0 10px 24px rgba($photo-cobre, 0.08) !important;
-        outline: none !important;
-      }
-
-      &::placeholder {
-        color: rgba($photo-muted, 0.76);
-      }
-    }
-
-    .alert-info {
-      border-radius: 16px !important;
-      border: 1px solid rgba($photo-cobre, 0.20) !important;
-      background:
-        linear-gradient(180deg, rgba($photo-roble-light, 0.72), rgba($photo-pergamino, 0.76)) !important;
-      color: $photo-corteza !important;
-
-      i {
-        color: $photo-cobre;
-      }
-
-      strong {
-        color: $photo-nogal;
-      }
-    }
-
-    .text-center.mb-3.position-relative {
-      padding: 14px;
-      border-radius: 22px;
-      background:
-        linear-gradient(135deg, rgba($photo-pergamino, 0.74), rgba($photo-crema-alt, 0.90));
-      border: 1px solid rgba($photo-cedro, 0.12);
-
-      img {
-        border-radius: 18px !important;
-        box-shadow: 0 14px 34px rgba($photo-nogal-dark, 0.16) !important;
-      }
-
-      .badge.bg-warning {
-        border-radius: 999px;
-        background: rgba($photo-miel, 0.88) !important;
-        color: $photo-cedro !important;
-        border: 1px solid rgba($photo-ambar, 0.32);
-        font-weight: 900;
-      }
-    }
-
-    .d-flex.gap-2.mb-3 {
-      .btn {
-        min-height: 40px;
-      }
-    }
-
-    .btn-success.w-100 {
-      min-height: 52px;
-      border-radius: 999px !important;
-    }
-  }
+.photo-viewer-section,
+.upload-section {
+  border: 1px solid $iv-border;
+  border-radius: $iv-radius-lg;
+  background: linear-gradient(145deg, #fff, $iv-panel-soft);
+  box-shadow: $iv-shadow-md;
+  padding: 14px;
+  overflow: hidden;
 }
 
-// ==========================================
-// FULLSCREEN PHOTO VIEWER
-// ==========================================
+.photo-viewer-section {
+  .position-relative.flex-grow-1 {
+    min-height: 360px;
+  }
 
-.o_photo_gallery_dialog,
-.fullscreen-viewer {
-  .fullscreen-toolbar {
-    background:
-      linear-gradient(180deg, rgba(#000000, 0.70), rgba(#000000, 0.20)) !important;
-    border-bottom: 1px solid rgba($photo-miel, 0.14);
-
-    strong {
-      color: #FFFFFF;
-      font-weight: 900;
-    }
-
-    span {
-      color: rgba(#FFFFFF, 0.72);
-      font-weight: 700;
-    }
-
-    .btn {
-      border-radius: 999px !important;
-      font-weight: 900;
-      transition: all 0.18s ease;
-
-      &:hover {
-        transform: translateY(-1px);
-      }
-    }
+  img {
+    box-shadow: 0 18px 44px rgba(15, 23, 42, 0.20);
   }
 }
 
 .fullscreen-viewer {
   background:
-    radial-gradient(circle at 50% 0%, rgba($photo-cobre, 0.16), transparent 42%),
-    linear-gradient(135deg, #150D09 0%, #020202 100%) !important;
+    radial-gradient(circle at 50% 0%, rgba(92, 185, 242, 0.18), transparent 38%),
+    rgba(2, 6, 23, 0.97) !important;
 
-  img {
-    border-radius: 18px !important;
-    box-shadow: 0 22px 70px rgba(#000000, 0.55);
+  .fullscreen-toolbar {
+    background: rgba(15, 23, 42, 0.72);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
   }
 
-  .btn-dark.rounded-circle {
-    border: 1px solid rgba($photo-miel, 0.18) !important;
-    background: rgba(#000000, 0.58) !important;
-    color: #FFFFFF !important;
-    transition: all 0.18s ease;
-
-    &:hover:not(:disabled) {
-      transform: translateY(-1px);
-      background: rgba($photo-nogal, 0.82) !important;
-    }
-
-    &:disabled {
-      opacity: 0.28 !important;
-    }
-  }
-
-  .border.rounded.flex-shrink-0 {
-    border-radius: 14px !important;
-    background: rgba(#FFFFFF, 0.08);
-    transition: all 0.18s ease;
-
-    &:hover {
-      transform: translateY(-1px);
-      opacity: 1 !important;
-    }
-
-    &.border-light {
-      border-color: $photo-miel !important;
-      box-shadow: 0 0 0 3px rgba($photo-miel, 0.20);
-    }
-
-    img {
-      border-radius: 11px !important;
-      box-shadow: none;
-    }
+  .btn {
+    border-radius: 12px;
   }
 }
-
-// ==========================================
-// DRAWING EDITOR FULLSCREEN
-// ==========================================
 
 .drawing-editor-fullscreen {
   background:
-    radial-gradient(circle at 50% 0%, rgba($photo-cobre, 0.14), transparent 42%),
-    linear-gradient(135deg, #120B07 0%, #000000 100%) !important;
+    radial-gradient(circle at 50% 0%, rgba(92, 185, 242, 0.16), transparent 38%),
+    #020617 !important;
 
   .drawing-toolbar {
-    background:
-      linear-gradient(180deg, rgba($photo-nogal-dark, 0.98), rgba(#000000, 0.94)) !important;
-    border-bottom: 1px solid rgba($photo-miel, 0.16);
+    background: rgba(15, 23, 42, 0.92) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(14px);
+  }
 
-    .btn {
-      border-radius: 999px !important;
-      font-weight: 900;
-      transition: all 0.18s ease;
-
-      &:hover:not(:disabled) {
-        transform: translateY(-1px);
-      }
-    }
-
-    .btn-success {
-      background: linear-gradient(135deg, $photo-salvia, $photo-salvia-dark) !important;
-      border: 0 !important;
-      color: #FFFFFF !important;
-    }
-
-    .btn-outline-warning {
-      border-color: rgba($photo-miel, 0.48) !important;
-      color: $photo-miel !important;
-    }
-
-    .btn-outline-danger {
-      border-color: rgba($photo-redwood, 0.58) !important;
-      color: lighten($photo-redwood, 18%) !important;
-    }
-
-    input[type="range"] {
-      accent-color: $photo-miel;
-    }
+  .btn {
+    border-radius: 11px;
+    font-weight: $iv-weight-bold;
   }
 
   .drawing-area {
     background:
-      radial-gradient(circle at 50% 50%, rgba($photo-miel, 0.06), transparent 42%),
-      #000000;
-
-    img {
-      filter: drop-shadow(0 16px 42px rgba(#000000, 0.52));
-    }
-  }
-
-  .bg-dark.text-white.text-center {
-    background: linear-gradient(180deg, rgba(#000000, 0.60), rgba(#000000, 0.92)) !important;
-    border-top: 1px solid rgba($photo-miel, 0.12);
-    color: rgba(#FFFFFF, 0.78) !important;
-
-    i {
-      color: $photo-miel;
-    }
+      linear-gradient(45deg, rgba(255,255,255,0.04) 25%, transparent 25%),
+      linear-gradient(-45deg, rgba(255,255,255,0.04) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.04) 75%),
+      linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.04) 75%);
+    background-size: 24px 24px;
+    background-position: 0 0, 0 12px, 12px -12px, -12px 0;
   }
 }
 
-// ==========================================
-// BOOTSTRAP OVERRIDES DENTRO DEL POPUP
-// ==========================================
-
-.o_photo_gallery_dialog {
-  .text-muted {
-    color: $photo-muted !important;
+.upload-section {
+  h5 {
+    color: $iv-text;
+    font-weight: $iv-weight-heavy;
   }
 
-  .text-secondary {
-    color: $photo-cobre !important;
+  .form-control {
+    border: 1px solid $iv-border;
+    border-radius: 13px;
+    color: $iv-text;
+
+    &:focus {
+      border-color: $iv-blue;
+      box-shadow: $iv-shadow-focus;
+    }
   }
 
-  .bg-light {
-    background-color: $photo-pergamino !important;
-  }
-
-  .border,
-  .border-bottom,
-  .border-start {
-    border-color: rgba($photo-cedro, 0.14) !important;
-  }
-
-  .badge {
-    border-radius: 999px;
-    font-weight: 900;
+  .alert-info {
+    color: $iv-blue-deep;
+    background: rgba(92, 185, 242, 0.11);
+    border-color: rgba(92, 185, 242, 0.25);
+    border-radius: $iv-radius;
   }
 }
 
-// ==========================================
-// RESPONSIVE
-// ==========================================
-
-@media (max-width: 768px) {
-  .modal-content:has(.o_photo_gallery_dialog) {
-    border-radius: 22px !important;
-  }
-
+@media (max-width: $breakpoint-md) {
   .o_photo_gallery_dialog {
-    padding: 16px;
-
-    .photo-viewer-section {
-      border-radius: 20px;
-
-      > .position-relative {
-        padding: 10px;
-      }
-
-      .bg-dark {
-        border-radius: 18px !important;
-      }
-
-      .btn-light.position-absolute {
-        width: 42px !important;
-        height: 42px !important;
-      }
-
-      .mt-2.p-2.bg-light.rounded.border {
-        .d-flex.justify-content-between {
-          flex-direction: column;
-          gap: 12px;
-        }
-      }
-    }
-
-    .upload-section {
-      padding: 16px;
-      border-radius: 20px;
-    }
-
-    .d-flex.gap-2.mb-3 {
-      flex-direction: column;
-    }
+    padding: 10px;
   }
 
-  .fullscreen-viewer {
-    .fullscreen-toolbar {
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-  }
-
-  .drawing-editor-fullscreen {
-    .drawing-toolbar {
-      gap: 8px !important;
-    }
+  .photo-viewer-section .position-relative.flex-grow-1 {
+    min-height: 260px;
   }
 }

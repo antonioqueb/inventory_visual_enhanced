@@ -1,10 +1,15 @@
+// ============================================================================
+// Inventario Visual — Grid principal
+// ============================================================================
+
 .o_inventory_data_grid {
   width: 100%;
+  min-height: 0;
   overflow-x: auto;
-  
-  // Scrollbar inline
+  border-radius: $iv-radius;
+  box-shadow: $iv-shadow-sm;
   scrollbar-width: thin;
-  scrollbar-color: #8F8F8F #FAFAFA;
+  scrollbar-color: rgba(92, 185, 242, 0.62) rgba(220, 234, 242, 0.62);
 
   &::-webkit-scrollbar {
     width: 10px;
@@ -12,104 +17,106 @@
   }
 
   &::-webkit-scrollbar-track {
-    background: #FAFAFA;
-    border-radius: 50px;
+    background: rgba(220, 234, 242, 0.62);
+    border-radius: $iv-pill;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: linear-gradient(to bottom, #8F8F8F 0%, #714B67 100%);
-    border-radius: 50px;
-    border: 2px solid #FAFAFA;
-
-    &:hover {
-      background: linear-gradient(to bottom, #714B67 0%, #017E84 100%);
-    }
+    background: linear-gradient(180deg, $iv-blue, $iv-blue-dark);
+    border-radius: $iv-pill;
+    border: 2px solid rgba(220, 234, 242, 0.78);
   }
 }
 
 .o_inventory_grid_table {
   width: 100%;
-  border-collapse: collapse;
-  background: #FFFFFF;
-  border: 1px solid #E0E0E0;
-  border-radius: 8px;
+  min-width: 980px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: $iv-panel;
+  border: 1px solid $iv-border;
+  border-radius: $iv-radius;
   overflow: hidden;
-  font-size: 13px;
+  color: $iv-text;
+  font-size: $iv-size-md;
 
   thead {
-    background: #F5F5F5;
-    border-bottom: 1px solid #E0E0E0;
+    background: linear-gradient(180deg, $iv-head, $iv-head-2);
 
     th {
-      padding: 12px;
-      text-align: left;
-      font-weight: 700;
-      color: #2C2C2C;
-      font-size: 12px;
-      border-right: 1px solid #E0E0E0;
-      white-space: nowrap;
-      line-height: 1.4;
+      padding: 12px 13px;
+      color: #fff;
+      font-size: $iv-size;
+      font-weight: $iv-weight-heavy;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.055em;
+      line-height: 1.1;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      border-bottom: 1px solid $iv-head-border;
+      white-space: nowrap;
+      vertical-align: middle;
 
       &:last-child {
         border-right: none;
       }
 
-      // Reajuste de anchos para ocupar el 100% sin la columna de acciones
-      &.col-product-name { width: 30%; min-width: 250px; }
-      &.col-inventory { width: 40%; min-width: 300px; }
-      &.col-type { width: 15%; min-width: 100px; }
-      &.col-category { width: 15%; min-width: 100px; }
+      &.col-product-name { width: 30%; min-width: 270px; }
+      &.col-inventory { width: 43%; min-width: 360px; }
+      &.col-type { width: 12%; min-width: 120px; }
+      &.col-category { width: 15%; min-width: 150px; }
     }
+  }
+
+  tbody {
+    background: #fff;
   }
 }
 
-// === RESPONSIVE TABLE TRANSFORMATION ===
 @media (max-width: $breakpoint-md) {
+  .o_inventory_data_grid {
+    overflow-x: visible;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
   .o_inventory_grid_table {
+    min-width: 0;
     border: none;
     background: transparent;
 
     thead {
-      display: none; // Ocultar cabeceras en móvil
+      display: none;
     }
 
-    tbody {
+    tbody,
+    tr,
+    td {
       display: block;
-      width: 100%;
+      width: 100% !important;
     }
 
-    // Convertir filas en tarjetas
-    tr {
-        &.o_inventory_product_row {
-            display: flex;
-            flex-direction: column;
-            background: #FFFFFF;
-            border: 1px solid $border-color;
-            border-radius: $border-radius-md;
-            margin-bottom: $spacing-md;
-            box-shadow: $shadow-sm;
-            position: relative; 
-        }
+    tr.o_inventory_product_row {
+      margin-bottom: 10px;
+      border: 1px solid $iv-border;
+      border-radius: $iv-radius;
+      background: linear-gradient(145deg, #fff, $iv-panel-soft);
+      box-shadow: $iv-shadow-sm;
+      overflow: hidden;
+    }
 
-        &.o_inventory_details_row {
-            display: block;
-            border: none;
-            background: transparent;
-            margin-bottom: $spacing-md;
-        }
+    tr.o_inventory_details_row {
+      border: none;
+      background: transparent;
+      margin: -4px 0 14px;
     }
 
     td {
-        display: block;
-        width: 100% !important;
-        border-right: none !important;
-        padding: $spacing-sm $spacing-md !important;
-        
-        &.details-cell {
-            padding: 0 !important;
-        }
+      border-right: 0 !important;
+      padding: 9px 12px !important;
+
+      &.details-cell {
+        padding: 0 !important;
+      }
     }
   }
 }

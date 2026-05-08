@@ -1,103 +1,179 @@
-.o_inventory_visual_empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 400px;
-  padding: 48px;
-  text-align: center;
+// ============================================================================
+// Inventario Visual — estados generales, contenedor y scrollbars
+// ============================================================================
 
-  .empty-icon {
-    font-size: 64px;
-    color: #8F8F8F;
-    margin-bottom: 16px;
-    animation: float 3s ease-in-out infinite;
+.o_inventory_visual_container {
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  color: $iv-text;
+  font-family: $iv-font;
+  font-size: $iv-size-md;
+  letter-spacing: -0.01em;
+  background:
+    radial-gradient(circle at top left, rgba(92, 185, 242, 0.22), transparent 31%),
+    radial-gradient(circle at 84% 8%, rgba(75, 164, 242, 0.14), transparent 30%),
+    radial-gradient(circle at 72% 18%, rgba(4, 217, 79, 0.07), transparent 24%),
+    linear-gradient(180deg, #fbfdff 0%, $iv-bg 48%, $iv-bg-2 100%);
+
+  * {
+    box-sizing: border-box;
   }
 
-  .empty-title {
-    font-size: 20px;
-    font-weight: 600;
-    color: #7a7a7a;
-    margin-bottom: 8px;
+  .fa {
+    line-height: 1;
   }
 
-  .empty-subtitle {
-    font-size: 13px;
-    color: #808080;
-    max-width: 400px;
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 3px solid rgba(92, 185, 242, 0.24);
+    outline-offset: 2px;
   }
 }
 
+.o_inventory_visual_content {
+  min-height: 0;
+  padding: 18px 22px 24px;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(92, 185, 242, 0.55) rgba(220, 234, 242, 0.60);
+
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(220, 234, 242, 0.55);
+    border-radius: $iv-pill;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, $iv-blue, $iv-blue-dark);
+    border: 2px solid rgba(220, 234, 242, 0.75);
+    border-radius: $iv-pill;
+  }
+}
+
+.o_inventory_visual_empty,
+.o_inventory_no_results,
+.o_inventory_error,
 .o_inventory_loading {
+  width: min(760px, 92vw);
+  min-height: 320px;
+  margin: 42px auto;
+  padding: 38px 34px;
+  border: 1px solid rgba(215, 232, 242, 0.96);
+  border-radius: $iv-radius-lg;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(248, 252, 255, 0.94)),
+    linear-gradient(90deg, rgba(92, 185, 242, 0.11), rgba(220, 234, 242, 0.42));
+  box-shadow: $iv-shadow-md;
+  text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 300px;
   flex-direction: column;
   gap: 12px;
-
-  .spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid #f0ebef;
-    border-top-color: #714B67;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-
-  .loading-text {
-    color: #7a7a7a;
-    font-size: 13px;
-  }
 }
 
-.o_inventory_error {
-  background: rgba(228, 110, 120, 0.1);
-  border: 1px solid rgba(228, 110, 120, 0.3);
-  border-radius: 12px;
-  padding: 16px;
-  margin: 16px;
-  text-align: center;
-
-  .error-icon {
-    font-size: 40px;
-    color: #E46E78;
-    margin-bottom: 12px;
-  }
-
-  .error-message {
-    color: #c74854;
-    font-weight: 500;
-  }
+.empty-icon,
+.no-results-icon,
+.error-icon {
+  width: 68px;
+  height: 68px;
+  border-radius: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+  background:
+    linear-gradient(145deg, rgba(92, 185, 242, 0.24), rgba(220, 234, 242, 0.58)),
+    #ffffff;
+  color: $iv-blue-dark;
+  border: 1px solid rgba(92, 185, 242, 0.42);
+  box-shadow: 0 16px 34px rgba(92, 185, 242, 0.17);
+  font-size: 27px;
 }
 
-.o_inventory_no_results {
-  text-align: center;
-  padding: 24px;
-
-  .no-results-icon {
-    font-size: 56px;
-    color: #8F8F8F;
-    margin-bottom: 12px;
-  }
-
-  .no-results-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: #7a7a7a;
-    margin-bottom: 8px;
-  }
-
-  .no-results-message {
-    color: #808080;
-  }
+.error-icon {
+  color: $iv-red-dark;
+  background: linear-gradient(145deg, rgba(220, 38, 38, 0.12), #fff);
+  border-color: rgba(220, 38, 38, 0.26);
 }
 
-@keyframes spin {
+.empty-title,
+.no-results-title,
+.o_inventory_error .error-message,
+.loading-text {
+  margin: 0;
+  color: $iv-text;
+  font-weight: $iv-weight-heavy;
+  letter-spacing: -0.035em;
+}
+
+.empty-title,
+.no-results-title {
+  font-size: 22px;
+}
+
+.empty-subtitle,
+.no-results-message {
+  max-width: 520px;
+  margin: 0;
+  color: $iv-muted;
+  font-size: $iv-size-md;
+  line-height: 1.55;
+}
+
+.o_inventory_loading .spinner,
+.table-loading .spinner {
+  width: 34px;
+  height: 34px;
+  border: 3px solid rgba(92, 185, 242, 0.22);
+  border-top-color: $iv-blue-dark;
+  border-radius: 50%;
+  animation: iv-spin 0.85s linear infinite;
+}
+
+.table-loading {
+  padding: 26px;
+  color: $iv-muted;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  font-weight: $iv-weight-semibold;
+}
+
+@keyframes iv-spin {
   to { transform: rotate(360deg); }
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+@media (max-width: $breakpoint-md) {
+  .o_inventory_visual_content {
+    padding: 12px;
+  }
+
+  .o_inventory_visual_empty,
+  .o_inventory_no_results,
+  .o_inventory_error,
+  .o_inventory_loading {
+    min-height: 260px;
+    margin: 18px auto;
+    padding: 28px 18px;
+    border-radius: $iv-radius;
+  }
 }

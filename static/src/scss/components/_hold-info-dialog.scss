@@ -1,651 +1,276 @@
-// ============================================================
-// HOLD INFO DIALOG — Horizontal Wood Warm Light Theme
-// Más espacio para información del lote
-// ============================================================
+// ============================================================================
+// Inventario Visual — Información de apartado activo
+// ============================================================================
 
-$wood-walnut: #4A2A18;
-$wood-dark-walnut: #2F1B10;
-$wood-cedar: #7A4424;
-$wood-copper: #A76735;
-$wood-caramel: #C58A4A;
-$wood-honey: #E4B66A;
-$wood-oak: #F1D6AA;
-$wood-light-oak: #F9E8CC;
-$wood-cream: #FFFDF7;
-$wood-cream-2: #FFF8EC;
-$wood-parchment: #FCF0DC;
-$wood-parchment-2: #F8E7CB;
-$wood-sand: #E9CDA5;
-$wood-bark: #6A4A32;
-$wood-charcoal: #2A1A12;
-$wood-muted: #92735A;
-$wood-line: #EBD5B5;
-
-$wood-sage: #61724C;
-$wood-sage-dark: #415136;
-$wood-sage-light: #EEF4E7;
-$wood-redwood: #9A4A32;
-$wood-amber: #C98228;
-
-.modal-content:has(.o_hold_info_dialog_wood) {
-  border: 0 !important;
-  border-radius: 30px !important;
-  overflow: hidden;
-  background: $wood-cream !important;
-  box-shadow:
-    0 34px 90px rgba($wood-walnut, .18),
-    0 10px 28px rgba($wood-walnut, .10);
-
-  .modal-header {
-    display: none !important;
-  }
-
-  .modal-body {
-    padding: 0 !important;
-    background:
-      radial-gradient(circle at 8% 0%, rgba($wood-honey, .16), transparent 28%),
-      radial-gradient(circle at 96% 4%, rgba($wood-oak, .22), transparent 34%),
-      linear-gradient(180deg, $wood-cream 0%, $wood-cream-2 55%, $wood-parchment 100%) !important;
-  }
-
-  .modal-footer {
-    background:
-      linear-gradient(180deg, rgba($wood-cream, .98), rgba($wood-cream-2, .98)) !important;
-    border-top: 1px solid rgba($wood-cedar, .14) !important;
-    padding: 16px 22px !important;
-  }
+.o_hold_info_dialog_content,
+.o_hold_info_dialog_content_wood {
+  .modal-header { display: none; }
+  .modal-body { padding: 0; background: $iv-bg; overflow: hidden; }
+  .modal-footer { padding: 12px 16px; background: #fff; border-top: 1px solid $iv-border; }
 }
 
+.o_hold_info_dialog,
 .o_hold_info_dialog_wood {
   position: relative;
-  color: $wood-charcoal;
   background:
-    radial-gradient(circle at 10% 3%, rgba($wood-honey, .14), transparent 30%),
-    radial-gradient(circle at 92% 0%, rgba($wood-oak, .24), transparent 34%),
-    linear-gradient(180deg, #ffffff 0%, $wood-cream 38%, $wood-cream-2 100%);
-  overflow: hidden;
-
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    opacity: .10;
-    pointer-events: none;
-    background:
-      repeating-linear-gradient(
-        8deg,
-        rgba($wood-cedar, .08) 0px,
-        rgba($wood-cedar, .08) 1px,
-        transparent 1px,
-        transparent 30px
-      ),
-      repeating-linear-gradient(
-        96deg,
-        rgba($wood-honey, .08) 0px,
-        rgba($wood-honey, .08) 1px,
-        transparent 1px,
-        transparent 48px
-      );
-  }
-
-  > * {
-    position: relative;
-    z-index: 1;
-  }
+    radial-gradient(circle at top left, rgba(242, 183, 5, 0.14), transparent 30%),
+    radial-gradient(circle at top right, rgba(92, 185, 242, 0.18), transparent 34%),
+    linear-gradient(180deg, #fbfdff, $iv-bg);
+  color: $iv-text;
+  font-family: $iv-font;
 }
-
-// ============================================================
-// Floating close
-// ============================================================
 
 .hold-info-floating-close {
   position: absolute;
-  top: 18px;
-  right: 18px;
-  z-index: 8;
-  width: 38px;
-  height: 38px;
-  border: 1px solid rgba($wood-cedar, .20);
-  border-radius: 999px;
-  color: $wood-walnut;
-  background: rgba(255, 253, 247, .82);
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  border-radius: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  color: #fff;
+  background: rgba(15, 23, 42, 0.22);
   backdrop-filter: blur(10px);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow:
-    0 10px 24px rgba($wood-walnut, .10),
-    inset 0 0 0 1px rgba(255, 255, 255, .70);
-  transition: transform .16s ease, background .16s ease, box-shadow .16s ease, color .16s ease;
-
-  &:hover {
-    transform: translateY(-1px) scale(1.04);
-    color: #ffffff;
-    background: linear-gradient(135deg, $wood-cedar, $wood-walnut);
-    box-shadow: 0 14px 28px rgba($wood-walnut, .18);
-  }
 }
-
-// ============================================================
-// Hero
-// ============================================================
 
 .hold-info-hero {
   position: relative;
-  padding: 28px 28px 20px;
-  background:
-    radial-gradient(circle at 9% 15%, rgba(255, 255, 255, .88), transparent 28%),
-    radial-gradient(circle at 92% 0%, rgba($wood-honey, .28), transparent 34%),
-    linear-gradient(135deg, #FFFDF7 0%, $wood-cream-2 34%, $wood-parchment 70%, $wood-light-oak 100%);
-  border-bottom: 1px solid rgba($wood-cedar, .12);
   overflow: hidden;
+  color: #fff;
+  padding: 22px 24px;
+  background:
+    radial-gradient(circle at 14% 4%, rgba(242, 183, 5, 0.34), transparent 35%),
+    linear-gradient(135deg, $iv-head, $iv-blue-deep 58%, $iv-blue-dark);
 
   &__grain {
     position: absolute;
     inset: 0;
-    opacity: .18;
-    pointer-events: none;
-    background:
-      repeating-linear-gradient(
-        8deg,
-        rgba($wood-cedar, .08) 0px,
-        rgba($wood-cedar, .08) 1px,
-        transparent 1px,
-        transparent 20px
-      ),
-      repeating-linear-gradient(
-        98deg,
-        rgba($wood-honey, .10) 0px,
-        rgba($wood-honey, .10) 1px,
-        transparent 1px,
-        transparent 50px
-      );
+    opacity: 0.2;
+    background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,.24) 1px, transparent 0);
+    background-size: 18px 18px;
   }
 
-  &__content {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 18px;
-    padding-right: 46px;
-  }
-
+  &__content,
   &__left {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 18px;
-    min-width: 0;
+    gap: 14px;
   }
 
   &__icon {
-    width: 86px;
-    height: 86px;
-    flex: 0 0 auto;
-    border-radius: 28px;
+    width: 56px;
+    height: 56px;
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background:
-      radial-gradient(circle at 30% 20%, rgba(255, 255, 255, .82), transparent 32%),
-      linear-gradient(145deg, rgba($wood-honey, .58), rgba($wood-oak, .55));
-    border: 1px solid rgba($wood-copper, .18);
-    box-shadow:
-      0 22px 44px rgba($wood-walnut, .12),
-      inset 0 0 0 1px rgba(255, 255, 255, .48);
-
-    i {
-      color: $wood-walnut;
-      font-size: 42px;
-      text-shadow: 0 3px 10px rgba(255, 255, 255, .75);
-    }
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    font-size: 22px;
   }
 
-  &__copy {
-    min-width: 0;
+  h2 {
+    margin: 2px 0 4px;
+    color: #fff;
+    font-size: 24px;
+    font-weight: $iv-weight-heavy;
+    letter-spacing: -0.045em;
+  }
 
-    h2 {
-      color: $wood-walnut;
-      font-size: 34px;
-      line-height: 1;
-      font-weight: 950;
-      letter-spacing: -.055em;
-      margin: 4px 0 8px;
-    }
-
-    p {
-      max-width: 760px;
-      color: $wood-bark;
-      margin: 0;
-      font-size: 13px;
-      line-height: 1.55;
-    }
+  p {
+    margin: 0;
+    max-width: 760px;
+    color: rgba(255, 255, 255, 0.75);
   }
 }
 
 .hold-info-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  color: $wood-copper;
-  font-size: 10px;
-  font-weight: 950;
-  letter-spacing: .14em;
+  color: rgba(255, 255, 255, 0.66);
+  font-size: $iv-size-sm;
+  font-weight: $iv-weight-heavy;
   text-transform: uppercase;
-
-  &::before {
-    content: "";
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: $wood-honey;
-    box-shadow: 0 0 18px rgba($wood-honey, .75);
-  }
+  letter-spacing: 0.14em;
 }
-
-// ============================================================
-// Summary cards
-// ============================================================
 
 .hold-info-summary {
   display: grid;
-  grid-template-columns: minmax(280px, 1.5fr) minmax(130px, .6fr) minmax(130px, .6fr) minmax(130px, .6fr);
-  gap: 12px;
-  padding: 18px 28px 8px;
+  grid-template-columns: minmax(260px, 1.4fr) repeat(3, minmax(120px, 0.7fr));
+  gap: 10px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid $iv-border;
+}
+
+.hold-info-stat,
+.hold-info-card,
+.hold-info-status,
+.hold-info-lot-item,
+.hold-info-data-item,
+.hold-info-side-item {
+  border: 1px solid $iv-border;
+  border-radius: $iv-radius;
+  background: #fff;
+  box-shadow: $iv-shadow-xs;
 }
 
 .hold-info-stat {
-  min-width: 0;
-  padding: 16px 18px;
-  border-radius: 20px;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, .96), rgba($wood-cream, .92));
-  border: 1px solid rgba($wood-cedar, .12);
-  box-shadow:
-    0 12px 28px rgba($wood-walnut, .06),
-    inset 0 0 0 1px rgba(255, 255, 255, .75);
+  padding: 11px 12px;
 
   span {
     display: block;
-    color: $wood-muted;
-    font-size: 10px;
+    color: $iv-muted;
+    font-size: $iv-size-sm;
+    font-weight: $iv-weight-bold;
     text-transform: uppercase;
-    letter-spacing: .09em;
-    font-weight: 950;
-    margin-bottom: 6px;
+    letter-spacing: 0.05em;
   }
 
   strong {
-    display: block;
-    color: $wood-walnut;
-    font-size: 16px;
-    font-weight: 950;
-    line-height: 1.25;
-    letter-spacing: -.02em;
-    word-break: normal;
-    overflow-wrap: anywhere;
-  }
-
-  &--product strong {
-    font-size: 15px;
+    color: $iv-text;
+    font-weight: $iv-weight-heavy;
   }
 
   &--status {
-    background:
-      linear-gradient(145deg, rgba($wood-sage-light, .92), rgba(#f7fbf2, .95));
-    border-color: rgba($wood-sage, .22);
+    background: $iv-amber-soft;
+    border-color: rgba(242, 183, 5, 0.30);
 
     strong {
-      color: $wood-sage-dark;
+      color: $iv-amber-dark;
     }
   }
 }
-
-// ============================================================
-// Alert
-// ============================================================
 
 .hold-info-status {
   display: flex;
   align-items: flex-start;
-  gap: 14px;
-  margin: 12px 28px 0;
-  padding: 16px;
-  border-radius: 22px;
-  background: rgba($wood-honey, .16);
-  border: 1px solid rgba($wood-amber, .18);
+  gap: 12px;
+  margin: 16px;
+  padding: 14px;
+  background: $iv-amber-soft;
+  border-color: rgba(242, 183, 5, 0.30);
 
   &__icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 18px;
-    color: $wood-amber;
-    background: rgba($wood-honey, .22);
+    width: 38px;
+    height: 38px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: #fff;
+    color: $iv-amber-dark;
     flex: 0 0 auto;
-
-    i {
-      font-size: 23px;
-    }
-  }
-
-  &__copy {
-    min-width: 0;
   }
 
   strong {
-    display: block;
-    color: $wood-walnut;
-    font-size: 15px;
-    font-weight: 950;
-    margin-bottom: 4px;
+    color: $iv-text;
   }
 
   p {
-    color: $wood-bark;
-    font-size: 12px;
-    line-height: 1.55;
-    margin: 0;
+    margin: 2px 0 0;
+    color: $iv-muted;
   }
 }
-
-// ============================================================
-// Main horizontal layout
-// ============================================================
 
 .hold-info-main {
   display: grid;
-  grid-template-columns: minmax(330px, .82fr) minmax(0, 1.55fr);
+  grid-template-columns: 0.9fr 1.35fr;
   gap: 16px;
-  padding: 18px 28px 24px;
-
-  &__left,
-  &__right {
-    min-width: 0;
-    display: grid;
-    gap: 16px;
-    align-content: start;
-  }
+  padding: 0 16px 18px;
+  max-height: 62vh;
+  overflow-y: auto;
 }
 
-// ============================================================
-// Cards
-// ============================================================
-
 .hold-info-card {
-  min-width: 0;
-  border-radius: 24px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, .98), rgba($wood-cream, .96));
-  border: 1px solid rgba($wood-cedar, .13);
-  box-shadow:
-    0 16px 38px rgba($wood-walnut, .08),
-    0 2px 7px rgba($wood-walnut, .04);
   overflow: hidden;
+  margin-bottom: 14px;
 
   &__header {
     display: flex;
     align-items: center;
-    gap: 9px;
-    padding: 14px 16px;
-    background:
-      radial-gradient(circle at 0% 0%, rgba($wood-honey, .10), transparent 34%),
-      linear-gradient(180deg, rgba(255, 255, 255, .80), rgba($wood-cream, .82));
-    border-bottom: 1px solid rgba($wood-cedar, .10);
-
-    i {
-      color: $wood-copper;
-      font-size: 15px;
-      flex: 0 0 auto;
-    }
-
-    span {
-      color: $wood-walnut;
-      font-size: 12px;
-      font-weight: 950;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      line-height: 1.3;
-    }
+    gap: 8px;
+    padding: 12px 14px;
+    color: $iv-text;
+    background: rgba(248, 252, 255, 0.96);
+    border-bottom: 1px solid $iv-border;
+    font-weight: $iv-weight-heavy;
   }
 }
 
-// ============================================================
-// Left data grid
-// ============================================================
+.hold-info-data-grid,
+.hold-info-date-grid,
+.hold-info-lot-grid {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
 
 .hold-info-data-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  padding: 16px;
-}
-
-.hold-info-data-item {
-  min-width: 0;
-  padding: 14px;
-  border-radius: 18px;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, .96), rgba($wood-cream, .92));
-  border: 1px solid rgba($wood-cedar, .10);
-
-  > span {
-    display: block;
-    color: $wood-muted;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: .09em;
-    font-weight: 950;
-    margin-bottom: 8px;
-  }
-
-  strong {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    color: $wood-walnut;
-    font-size: 14px;
-    font-weight: 900;
-    line-height: 1.45;
-    word-break: normal;
-    overflow-wrap: anywhere;
-    min-width: 0;
-
-    i {
-      color: $wood-copper;
-      margin-top: 2px;
-      flex: 0 0 auto;
-    }
-  }
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .hold-info-date-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  padding: 16px;
-}
-
-// ============================================================
-// Lot information expanded
-// ============================================================
-
-.hold-info-lot-card {
-  min-height: 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .hold-info-lot-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(160px, 1fr));
-  gap: 12px;
-  padding: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.hold-info-lot-item,
-.hold-info-side-item {
-  min-width: 0;
-  padding: 14px;
-  border-radius: 18px;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, .96), rgba($wood-cream, .92));
-  border: 1px solid rgba($wood-cedar, .10);
+.hold-info-data-item,
+.hold-info-side-item,
+.hold-info-lot-item {
+  padding: 12px;
 
-  > span {
+  span {
     display: block;
-    color: $wood-muted;
-    font-size: 10px;
+    margin-bottom: 4px;
+    color: $iv-muted;
+    font-size: $iv-size-sm;
+    font-weight: $iv-weight-bold;
     text-transform: uppercase;
-    letter-spacing: .08em;
-    font-weight: 950;
-    margin-bottom: 7px;
+    letter-spacing: 0.045em;
   }
 
   strong {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 7px;
-    color: $wood-walnut;
-    font-size: 14px;
-    font-weight: 900;
-    line-height: 1.45;
-    word-break: normal;
-    overflow-wrap: anywhere;
-    min-width: 0;
+    color: $iv-text;
+    font-weight: $iv-weight-heavy;
+    word-break: break-word;
+  }
 
-    i {
-      color: $wood-copper;
-      margin-top: 2px;
-      flex: 0 0 auto;
-      width: 15px;
-      text-align: center;
-    }
+  &--wide {
+    grid-column: 1 / -1;
   }
 }
-
-.hold-info-lot-item--wide {
-  grid-column: span 2;
-}
-
-.hold-info-lot-item--full {
-  grid-column: 1 / -1;
-}
-
-// ============================================================
-// Footer button
-// ============================================================
 
 .hold-info-close-button {
-  min-height: 42px;
-  padding: 10px 22px;
-  border-radius: 999px;
-  color: #ffffff;
-  background: linear-gradient(135deg, $wood-cedar, $wood-walnut);
-  border: 0;
-  font-size: 13px;
-  font-weight: 900;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  box-shadow: 0 10px 22px rgba($wood-walnut, .18);
-  transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
+  border: 1px solid $iv-border;
+  border-radius: 13px;
+  background: #fff;
+  color: $iv-text-2;
+  font-weight: $iv-weight-heavy;
+  padding: 9px 14px;
 
   &:hover {
-    transform: translateY(-1px);
-    background: linear-gradient(135deg, $wood-copper, $wood-cedar);
-    box-shadow: 0 14px 28px rgba($wood-copper, .22);
+    color: $iv-blue-dark;
+    border-color: $iv-blue;
   }
 }
 
-// ============================================================
-// Responsive
-// ============================================================
-
-@media (max-width: 1200px) {
-  .hold-info-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .hold-info-main {
-    grid-template-columns: 1fr;
-  }
-
-  .hold-info-lot-grid {
-    grid-template-columns: repeat(2, minmax(160px, 1fr));
-  }
-}
-
-@media (max-width: 768px) {
-  .hold-info-hero {
-    padding: 22px 18px 18px;
-
-    &__content {
-      padding-right: 0;
-    }
-
-    &__left {
-      align-items: flex-start;
-    }
-
-    &__icon {
-      width: 68px;
-      height: 68px;
-      border-radius: 22px;
-
-      i {
-        font-size: 32px;
-      }
-    }
-
-    &__copy h2 {
-      font-size: 26px;
-    }
-  }
-
-  .hold-info-summary {
-    grid-template-columns: 1fr;
-    padding: 16px 18px 8px;
-  }
-
-  .hold-info-status {
-    margin: 12px 18px 0;
-  }
-
-  .hold-info-main {
-    padding: 16px 18px 20px;
-  }
-
+@media (max-width: $breakpoint-md) {
+  .hold-info-summary,
+  .hold-info-main,
+  .hold-info-data-grid,
+  .hold-info-date-grid,
   .hold-info-lot-grid {
     grid-template-columns: 1fr;
   }
 
-  .hold-info-lot-item--wide,
-  .hold-info-lot-item--full {
-    grid-column: auto;
-  }
-}
-
-@media (max-width: 576px) {
-  .modal-content:has(.o_hold_info_dialog_wood) {
-    border-radius: 18px !important;
-  }
-
-  .hold-info-floating-close {
-    top: 12px;
-    right: 12px;
-    width: 34px;
-    height: 34px;
-  }
-
-  .hold-info-status {
-    flex-direction: column;
-  }
-
-  .hold-info-close-button {
-    width: 100%;
+  .hold-info-main {
+    max-height: 66vh;
   }
 }
