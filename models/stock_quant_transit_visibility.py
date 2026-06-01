@@ -291,6 +291,166 @@ class StockQuantTransitVisibility(models.Model):
         return sorted(sale_order_ids)
 
     @api.model
+    def _iv_batch_get_committed_quant_keys(self, quants):
+        """
+        Versión batch de _iv_get_normal_sale_order_ids_for_quant.
+
+        Devuelve el conjunto de tuplas (lot_id, product_id, location_id)
+        cuyos quants internos están comprometidos con al menos una sale.order
+        (vía move_line pendiente o vía sale.order.line.lot_ids).
+
+        El objetivo es responder al booleano is_committed_by_sale del bucle
+        principal sin ejecutar O(N) búsquedas por quant. Preserva las cuatro
+        vías de detección del helper original (sale_line_id directo,
+        picking.sale_id, procurement group y origin), pero ejecutándolas
+        sobre conjuntos en vez de uno por uno.
+        """
+        committed_keys = set()
+
+        internal_quants = quants.filtered(
+            lambda q: q.location_id.usage == "internal"
+            and q.lot_id
+            and q.product_id
+        )
+        if not internal_quants:
+            return committed_keys
+
+        lot_ids = list(set(internal_quants.mapped("lot_id").ids))
+        product_ids = list(set(internal_quants.mapped("product_id").ids))
+        location_ids = list(set(internal_quants.mapped("location_id").ids))
+
+        valid_keys = {
+            (q.lot_id.id, q.product_id.id, q.location_id.id)
+            for q in internal_quants
+        }
+
+        # ---------------------------------------------------------------------
+        # Vía logística: move_lines pendientes con linkeo a sale.order
+        # ---------------------------------------------------------------------
+        move_lines = self.env["stock.move.line"].sudo().search([
+            ("lot_id", "in", lot_ids),
+            ("product_id", "in", product_ids),
+            ("location_id", "in", location_ids),
+            ("state", "not in", ["done", "cancel"]),
+            ("move_id.state", "not in", ["done", "cancel"]),
+        ])
+
+        # Acumuladores para resolución diferida vía group / origin
+        group_lookup = {}   # group_id -> set de keys que dependen de él
+        origin_lookup = {}  # nombre referencia -> set de keys que dependen de él
+
+        for ml in move_lines:
+            key = (ml.lot_id.id, ml.product_id.id, ml.location_id.id)
+            if key not in valid_keys or key in committed_keys:
+                continue
+
+            move = ml.move_id
+            picking = ml.picking_id
+
+            # 1) sale_line_id directo en el move
+            if move and "sale_line_id" in move._fields and move.sale_line_id:
+                committed_keys.add(key)
+                continue
+
+            # 2) picking.sale_id
+            if picking and "sale_id" in picking._fields and picking.sale_id:
+                committed_keys.add(key)
+                continue
+
+            # 3) Procurement group (se resuelve en batch más abajo)
+            group = False
+            if move and "group_id" in move._fields and move.group_id:
+                group = move.group_id
+            elif picking and "group_id" in picking._fields and picking.group_id:
+                group = picking.group_id
+
+            if group:
+                group_lookup.setdefault(group.id, set()).add(key)
+
+            # 4) Origin fallback (se resuelve en batch más abajo)
+            origin = ""
+            if picking and picking.origin:
+                origin = picking.origin
+            elif move and "origin" in move._fields and move.origin:
+                origin = move.origin
+
+            if origin:
+                for ref in origin.replace(";", ",").split(","):
+                    ref = ref.strip()
+                    if ref:
+                        origin_lookup.setdefault(ref, set()).add(key)
+
+        SaleOrder = self.env["sale.order"].sudo()
+
+        # Resolución batch — procurement group
+        if group_lookup:
+            if "procurement_group_id" in SaleOrder._fields:
+                group_field = "procurement_group_id"
+            elif "group_id" in SaleOrder._fields:
+                group_field = "group_id"
+            else:
+                group_field = None
+
+            if group_field:
+                candidate_group_ids = [
+                    gid for gid, keys in group_lookup.items()
+                    if not keys.issubset(committed_keys)
+                ]
+                if candidate_group_ids:
+                    matched_orders = SaleOrder.search([
+                        (group_field, "in", candidate_group_ids),
+                        ("state", "in", ["sale", "done"]),
+                    ])
+                    matched_group_ids = set(matched_orders.mapped(group_field).ids)
+                    for gid in matched_group_ids:
+                        committed_keys.update(group_lookup.get(gid, set()))
+
+        # Resolución batch — origin
+        if origin_lookup:
+            candidate_refs = [
+                ref for ref, keys in origin_lookup.items()
+                if not keys.issubset(committed_keys)
+            ]
+            if candidate_refs:
+                matched_orders = SaleOrder.search([
+                    ("name", "in", candidate_refs),
+                    ("state", "in", ["sale", "done"]),
+                ])
+                matched_names = set(matched_orders.mapped("name"))
+                for ref in matched_names:
+                    committed_keys.update(origin_lookup.get(ref, set()))
+
+        # ---------------------------------------------------------------------
+        # Vía comercial: sale.order.line con el lote ya seleccionado
+        # ---------------------------------------------------------------------
+        SaleLine = self.env["sale.order.line"].sudo()
+        if "lot_ids" in SaleLine._fields:
+            sale_lines = SaleLine.search([
+                ("order_id.state", "in", ["sale", "done"]),
+                ("display_type", "=", False),
+                ("product_id", "in", product_ids),
+                ("lot_ids", "in", lot_ids),
+            ])
+
+            # Index: (lot_id, product_id) -> lista de location_ids presentes
+            quant_location_index = {}
+            for q in internal_quants:
+                idx_key = (q.lot_id.id, q.product_id.id)
+                quant_location_index.setdefault(idx_key, []).append(q.location_id.id)
+
+            for sl in sale_lines:
+                if "qty_delivered" in sl._fields:
+                    if (sl.product_uom_qty or 0.0) <= (sl.qty_delivered or 0.0):
+                        continue
+                product_key = sl.product_id.id
+                for lot in sl.lot_ids:
+                    locs = quant_location_index.get((lot.id, product_key), [])
+                    for loc_id in locs:
+                        committed_keys.add((lot.id, product_key, loc_id))
+
+        return committed_keys
+
+    @api.model
     def get_inventory_grouped_by_product(self, filters=None):
         if not filters:
             return {"products": [], "missing_lots": []}
@@ -428,6 +588,10 @@ class StockQuantTransitVisibility(models.Model):
                     and (q.product_id.id, q.x_bloque) in valid_keys
                 ))
 
+        # Pre-cómputo en bloque para evitar N+1 dentro del bucle:
+        # qué quants internos están comprometidos por alguna sale.order.
+        committed_quant_keys = self._iv_batch_get_committed_quant_keys(quants)
+
         product_groups = {}
         visible_quants = self.env["stock.quant"]
 
@@ -510,10 +674,14 @@ class StockQuantTransitVisibility(models.Model):
             # -----------------------------------------------------------------
             # Inventario interno normal
             # -----------------------------------------------------------------
-            normal_sale_order_ids = self._iv_get_normal_sale_order_ids_for_quant(quant)
+            quant_key = (
+                quant.lot_id.id if quant.lot_id else False,
+                quant.product_id.id if quant.product_id else False,
+                quant.location_id.id,
+            )
 
             is_committed_by_stock = reserved > 0
-            is_committed_by_sale = bool(normal_sale_order_ids)
+            is_committed_by_sale = quant_key in committed_quant_keys
 
             product_groups[product_id]["stock_qty"] += qty
             product_groups[product_id]["stock_plates"] += 1
