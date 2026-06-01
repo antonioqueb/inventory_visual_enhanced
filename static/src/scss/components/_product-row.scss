@@ -4,11 +4,10 @@
 
 .o_inventory_grid_table tbody {
   tr.o_inventory_product_row {
-    border-bottom: 1px solid $border-color;
     background: $background-primary;
     transition: background-color $transition-fast;
     font-family: "Roboto", "Arial", sans-serif;
-    cursor: pointer; 
+    cursor: pointer;
 
     &:hover {
       background: $background-secondary;
@@ -17,13 +16,19 @@
     &.expanded {
       background: rgba($primary-color, 0.02);
       border-left: 3px solid $primary-color;
+
+      // Cuando está expandido, el separador "entre productos" lo pinta la fila de detalles
+      td {
+        border-bottom: 1px solid rgba($iv-border, 0.5);
+      }
     }
 
     td {
-      padding: 4px 6px; 
+      padding: 4px 6px;
       vertical-align: top;
       color: $text-primary;
       border-right: 1px solid $border-color;
+      border-bottom: 2px solid $iv-border-strong;
       line-height: 1.2;
       font-size: 10px;
 
@@ -35,11 +40,11 @@
 
   tr.o_inventory_details_row {
     background: $background-secondary;
-    border-bottom: 1px solid $border-color;
 
     td.details-cell {
       padding: 0;
       border-right: none;
+      border-bottom: 2px solid $iv-border-strong;
     }
   }
 }
