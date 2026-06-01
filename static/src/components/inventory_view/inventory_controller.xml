@@ -53,7 +53,6 @@
                             <tr>
                                 <th class="col-product-name">Product Name (SKU)</th>
                                 <th class="col-inventory">Inventory</th>
-                                <th class="col-type">Type</th>
                                 <th class="col-category">Category</th>
                                 <!-- Columna Actions eliminada -->
                             </tr>

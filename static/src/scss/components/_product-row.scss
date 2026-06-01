@@ -174,8 +174,8 @@
   }
 }
 
-// === COLUMNAS SIMPLES (Tipo, Categoría) ===
-.col-type, .col-category {
+// === COLUMNA SIMPLE (Categoría) ===
+.col-category {
     font-size: 11px !important;
     white-space: nowrap;
     overflow: hidden;
@@ -315,14 +315,14 @@
             }
         }
 
-        // 3. Info extra (Tipo/Categoría) en una línea
-        td.col-type, td.col-category {
+        // 3. Info extra (Categoría) en una línea
+        td.col-category {
             grid-area: info;
             display: inline-block;
             font-size: 11px !important;
             color: #888;
             margin-right: 2.5rem;
-            
+
             &:empty { display: none; }
         }
     }

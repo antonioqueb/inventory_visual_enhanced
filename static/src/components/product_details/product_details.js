@@ -14,8 +14,23 @@ export class ProductDetails extends Component {
         return details.some((detail) => this.isTransitDetail(detail));
     }
 
+    get hasPackingList() {
+        const details = this.props.details || [];
+        return details.some((detail) => detail && detail.has_packing_list);
+    }
+
     getDetailColspan() {
-        return this.hasTransitDetails ? 18 : 17;
+        // Base 14: checkbox, lot, location, dimensions, color, bloque, atado,
+        // pedimento, contenedor, num-placa, P, N, D, E.
+        // +1 si hay ETA (tránsito), +1 si hay packing list.
+        return 14 + (this.hasTransitDetails ? 1 : 0) + (this.hasPackingList ? 1 : 0);
+    }
+
+    getSummaryMidColspan() {
+        // Columnas centrales fusionadas en la fila de resumen del bloque:
+        // color, bloque, atado, pedimento, contenedor, num-placa = 6.
+        // +1 si la columna Packing List está visible.
+        return 6 + (this.hasPackingList ? 1 : 0);
     }
 
     isTransitDetail(detail) {

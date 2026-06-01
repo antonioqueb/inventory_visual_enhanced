@@ -30,14 +30,12 @@
                         <th t-if="hasTransitDetails" class="col-eta">ETA</th>
                         <th class="col-dimensions">Dimensiones</th>
                         <th class="col-color">Color</th>
-                        <th class="col-tipo">Tipo</th>
                         <th class="col-bloque">Bloque</th>
                         <th class="col-atado">Atado</th>
                         <th class="col-pedimento">Pedimento</th>
                         <th class="col-contenedor">Contenedor</th>
-                        <th class="col-packing-list">Packing List</th>
+                        <th t-if="hasPackingList" class="col-packing-list">Packing List</th>
                         <th class="col-numero-placa">N. Placa</th>
-                        <th class="col-ref-proveedor">Ref. Prov.</th>
                         <th class="col-icon">P</th>
                         <th class="col-icon">N</th>
                         <th class="col-icon">D</th>
@@ -132,12 +130,6 @@
                                     <span t-else="" class="text-muted">-</span>
                                 </td>
 
-                                <!-- Tipo -->
-                                <td class="col-tipo">
-                                    <span t-if="detail.tipo" t-esc="detail.tipo"></span>
-                                    <span t-else="" class="text-muted">-</span>
-                                </td>
-                                
                                 <td class="col-bloque">
                                     <span t-if="detail.bloque" t-esc="detail.bloque"></span>
                                     <span t-else="" class="text-muted">-</span>
@@ -158,8 +150,8 @@
                                     <span t-else="" class="text-muted">-</span>
                                 </td>
 
-                                <!-- COLUMNA: PACKING LIST -->
-                                <td class="col-packing-list">
+                                <!-- COLUMNA: PACKING LIST (solo si algún detalle lo tiene) -->
+                                <td t-if="hasPackingList" class="col-packing-list">
                                     <button
                                         t-if="detail.has_packing_list"
                                         type="button"
@@ -180,12 +172,7 @@
                                     <span t-if="detail.numero_placa" t-esc="detail.numero_placa"></span>
                                     <span t-else="" class="text-muted">-</span>
                                 </td>
-                                
-                                <td class="col-ref-proveedor">
-                                    <span t-if="detail.referencia_proveedor" t-esc="detail.referencia_proveedor"></span>
-                                    <span t-else="" class="text-muted">-</span>
-                                </td>
-                                
+
                                 <!-- ACCIONES -->
                                 <td class="col-icon action-btn-cell">
                                     <button 
@@ -280,8 +267,8 @@
                                 </span>
                             </td>
                             
-                            <td colspan="9"></td>
-                            
+                            <td t-att-colspan="getSummaryMidColspan()"></td>
+
                             <!-- Últimas columnas: Fin del Bloque -->
                             <td colspan="4" style="text-align: right; vertical-align: middle; padding-right: 15px; color: #6c757d; font-style: italic;">
                                 <small>
