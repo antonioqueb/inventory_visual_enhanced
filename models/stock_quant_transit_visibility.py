@@ -353,12 +353,7 @@ class StockQuantTransitVisibility(models.Model):
             domain.append(("x_color", "ilike", filters["color"]))
 
         if filters.get("grosor"):
-            try:
-                grosor_val = float(filters["grosor"])
-                domain.append(("x_grosor", ">=", grosor_val - 0.001))
-                domain.append(("x_grosor", "<=", grosor_val + 0.001))
-            except (ValueError, TypeError):
-                pass
+            domain.append(("x_grosor", "=", filters["grosor"]))
 
         if filters.get("numero_serie"):
             raw_input = filters["numero_serie"]

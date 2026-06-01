@@ -255,9 +255,9 @@
                             t-model="state.filters.grosor" 
                             t-on-change="(ev) => this.onFilterChange('grosor', ev)"
                         >
-                            <option value="">Grosor...</option>
+                            <option value="">Espesor...</option>
                             <t t-foreach="state.grosores" t-as="grosor" t-key="grosor">
-                                <option t-att-value="grosor" t-esc="grosor + ' cm'"></option>
+                                <option t-att-value="grosor" t-esc="grosor"></option>
                             </t>
                         </select>
                     </div>
