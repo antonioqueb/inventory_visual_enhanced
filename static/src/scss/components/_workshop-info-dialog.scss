@@ -1,0 +1,286 @@
+// ============================================================================
+// Inventario Visual — Información de placa en taller
+// ============================================================================
+
+$workshop-purple: #6b21a8;
+$workshop-purple-deep: #4c1d95;
+$workshop-purple-light: #9333ea;
+$workshop-purple-soft: rgba(107, 33, 168, 0.08);
+$workshop-purple-border: rgba(107, 33, 168, 0.28);
+
+.o_workshop_info_dialog_content {
+  .modal-header { display: none; }
+  .modal-body { padding: 0; background: $iv-bg; overflow: hidden; }
+  .modal-footer { padding: 12px 16px; background: #fff; border-top: 1px solid $iv-border; }
+}
+
+.o_workshop_info_dialog {
+  position: relative;
+  background:
+    radial-gradient(circle at top left, rgba(147, 51, 234, 0.14), transparent 30%),
+    radial-gradient(circle at top right, rgba(92, 185, 242, 0.16), transparent 34%),
+    linear-gradient(180deg, #fbfdff, $iv-bg);
+  color: $iv-text;
+  font-family: $iv-font;
+}
+
+.workshop-info-floating-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  border-radius: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  color: #fff;
+  background: rgba(15, 23, 42, 0.22);
+  backdrop-filter: blur(10px);
+}
+
+.workshop-info-hero {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  padding: 22px 24px;
+  background:
+    radial-gradient(circle at 14% 4%, rgba(147, 51, 234, 0.42), transparent 35%),
+    linear-gradient(135deg, $workshop-purple-deep, $workshop-purple 58%, $iv-head);
+
+  &__grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.2;
+    background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,.24) 1px, transparent 0);
+    background-size: 18px 18px;
+  }
+
+  &__content,
+  &__left {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  &__icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    font-size: 22px;
+  }
+
+  h2 {
+    margin: 2px 0 4px;
+    color: #fff;
+    font-size: 24px;
+    font-weight: $iv-weight-heavy;
+    letter-spacing: -0.045em;
+  }
+
+  p {
+    margin: 0;
+    max-width: 760px;
+    color: rgba(255, 255, 255, 0.75);
+  }
+}
+
+.workshop-info-eyebrow {
+  color: rgba(255, 255, 255, 0.66);
+  font-size: $iv-size-sm;
+  font-weight: $iv-weight-heavy;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.workshop-info-summary {
+  display: grid;
+  grid-template-columns: minmax(260px, 1.4fr) repeat(3, minmax(120px, 0.7fr));
+  gap: 10px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid $iv-border;
+}
+
+.workshop-info-stat,
+.workshop-info-card,
+.workshop-info-status,
+.workshop-info-lot-item,
+.workshop-info-data-item,
+.workshop-info-side-item {
+  border: 1px solid $iv-border;
+  border-radius: $iv-radius;
+  background: #fff;
+  box-shadow: $iv-shadow-xs;
+}
+
+.workshop-info-stat {
+  padding: 11px 12px;
+
+  span {
+    display: block;
+    color: $iv-muted;
+    font-size: $iv-size-sm;
+    font-weight: $iv-weight-bold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  strong {
+    color: $iv-text;
+    font-weight: $iv-weight-heavy;
+  }
+
+  &--status {
+    background: $workshop-purple-soft;
+    border-color: $workshop-purple-border;
+
+    strong {
+      color: $workshop-purple-deep;
+    }
+  }
+}
+
+.workshop-info-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 16px;
+  padding: 14px;
+  background: $workshop-purple-soft;
+  border-color: $workshop-purple-border;
+
+  &__icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    color: $workshop-purple;
+    flex: 0 0 auto;
+  }
+
+  strong {
+    color: $iv-text;
+  }
+
+  p {
+    margin: 2px 0 0;
+    color: $iv-muted;
+  }
+}
+
+.workshop-info-main {
+  display: grid;
+  grid-template-columns: 0.9fr 1.35fr;
+  gap: 16px;
+  padding: 0 16px 18px;
+
+  &__full {
+    grid-column: 1 / -1;
+  }
+}
+
+.workshop-info-card {
+  overflow: hidden;
+  margin-bottom: 14px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    color: $iv-text;
+    background: rgba(248, 252, 255, 0.96);
+    border-bottom: 1px solid $iv-border;
+    font-weight: $iv-weight-heavy;
+
+    .fa {
+      color: $workshop-purple;
+    }
+  }
+}
+
+.workshop-info-data-grid,
+.workshop-info-date-grid,
+.workshop-info-lot-grid {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
+
+.workshop-info-data-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.workshop-info-date-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.workshop-info-lot-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.workshop-info-data-item,
+.workshop-info-side-item,
+.workshop-info-lot-item {
+  padding: 12px;
+
+  span {
+    display: block;
+    margin-bottom: 4px;
+    color: $iv-muted;
+    font-size: $iv-size-sm;
+    font-weight: $iv-weight-bold;
+    text-transform: uppercase;
+    letter-spacing: 0.045em;
+  }
+
+  strong {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: $iv-text;
+    font-weight: $iv-weight-heavy;
+    word-break: break-word;
+
+    .fa {
+      color: $workshop-purple;
+    }
+  }
+
+  &--wide {
+    grid-column: 1 / -1;
+  }
+}
+
+.workshop-info-close-button {
+  border: 1px solid $iv-border;
+  border-radius: 13px;
+  background: #fff;
+  color: $iv-text-2;
+  font-weight: $iv-weight-heavy;
+  padding: 9px 14px;
+
+  &:hover {
+    color: $workshop-purple-deep;
+    border-color: $workshop-purple;
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .workshop-info-summary,
+  .workshop-info-main,
+  .workshop-info-data-grid,
+  .workshop-info-date-grid,
+  .workshop-info-lot-grid {
+    grid-template-columns: 1fr;
+  }
+}

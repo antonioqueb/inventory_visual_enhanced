@@ -70,6 +70,7 @@
                                     onSalesPersonClick.bind="onSalesPersonClick"
                                     onHoldClick.bind="onHoldClick"
                                     onSaleOrderClick.bind="onSaleOrderClick"
+                                    onWorkshopClick.bind="onWorkshopClick"
                                     formatNumber.bind="formatNumber"
                                     hasSalesPermissions="state.hasSalesPermissions"
                                     hasInventoryPermissions="state.hasInventoryPermissions"

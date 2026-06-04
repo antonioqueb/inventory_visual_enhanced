@@ -52,6 +52,7 @@
             'inventory_visual_enhanced/static/src/scss/components/_hold-info-dialog.scss',
             'inventory_visual_enhanced/static/src/scss/components/_sale-order-dialog.scss',
             'inventory_visual_enhanced/static/src/scss/components/_photo-gallery-dialog.scss',
+            'inventory_visual_enhanced/static/src/scss/components/_workshop-info-dialog.scss',
             
             # JS
             'inventory_visual_enhanced/static/src/components/search_bar/search_bar.js',
@@ -64,6 +65,7 @@
             'inventory_visual_enhanced/static/src/components/dialogs/hold/hold_dialog.js',
             'inventory_visual_enhanced/static/src/components/dialogs/hold_info/hold_info_dialog.js',
             'inventory_visual_enhanced/static/src/components/dialogs/sale_order/sale_order_dialog.js',
+            'inventory_visual_enhanced/static/src/components/dialogs/workshop_info/workshop_info_dialog.js',
             
             # XML
             'inventory_visual_enhanced/static/src/components/search_bar/search_bar.xml',
@@ -76,6 +78,7 @@
             'inventory_visual_enhanced/static/src/components/dialogs/hold/hold_dialog.xml',
             'inventory_visual_enhanced/static/src/components/dialogs/hold_info/hold_info_dialog.xml',
             'inventory_visual_enhanced/static/src/components/dialogs/sale_order/sale_order_dialog.xml',
+            'inventory_visual_enhanced/static/src/components/dialogs/workshop_info/workshop_info_dialog.xml',
         ],
     },
     'installable': True,

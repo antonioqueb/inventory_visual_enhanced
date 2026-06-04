@@ -127,6 +127,7 @@
                     onSalesPersonClick="props.onSalesPersonClick"
                     onHoldClick="props.onHoldClick"
                     onSaleOrderClick="props.onSaleOrderClick"
+                    onWorkshopClick="props.onWorkshopClick"
                     formatNumber="props.formatNumber"
                     isInCart="props.isInCart"
                     getDisplayQuantity="props.getDisplayQuantity"

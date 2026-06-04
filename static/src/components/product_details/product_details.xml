@@ -208,11 +208,22 @@
                                     <span t-else="" class="icon-btn no-content"><i class="fa fa-history"></i></span>
                                 </td>
                                 
-                                <!-- COLUMNA E (Estado): Prioridad -> 1. Hold activo, 2. En orden de venta, 3. Sin estado -->
+                                <!-- COLUMNA E (Estado): Prioridad -> 1. En taller, 2. Hold activo, 3. En orden de venta, 4. Sin estado -->
                                 <td class="col-icon action-btn-cell">
-                                    <!-- 1. Tiene hold activo -->
-                                    <button 
-                                        t-if="detail.tiene_hold"
+                                    <!-- 1. Placa apartada para taller -->
+                                    <button
+                                        t-if="detail.en_taller"
+                                        type="button"
+                                        class="status-badge-btn status-workshop"
+                                        t-on-click="() => props.onWorkshopClick(detail.id)"
+                                        title="Ver información de la orden de taller"
+                                    >
+                                        <i class="fa fa-industry"></i>
+                                    </button>
+
+                                    <!-- 2. Tiene hold activo -->
+                                    <button
+                                        t-elif="detail.tiene_hold"
                                         type="button"
                                         class="status-badge-btn status-hold-active"
                                         t-on-click="() => props.hasSalesPermissions ? props.onHoldClick(detail.id, detail.hold_info) : null"
@@ -222,8 +233,8 @@
                                         <i class="fa fa-hand-paper-o"></i>
                                     </button>
 
-                                    <!-- 2. En orden de venta confirmada -->
-                                    <button 
+                                    <!-- 3. En orden de venta confirmada -->
+                                    <button
                                         t-elif="detail.en_orden_venta"
                                         type="button"
                                         class="status-badge-btn status-sale-order"
@@ -233,7 +244,7 @@
                                         <i class="fa fa-usd"></i>
                                     </button>
 
-                                    <!-- 3. Sin estado -->
+                                    <!-- 4. Sin estado -->
                                     <span t-else="" class="status-badge-btn status-no-hold" title="Sin apartado">
                                         <i class="fa fa-hand-paper-o"></i>
                                     </span>

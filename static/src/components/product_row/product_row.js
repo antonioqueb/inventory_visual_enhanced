@@ -283,6 +283,7 @@ ProductRow.props = {
     onSalesPersonClick: Function,
     onHoldClick: Function,
     onSaleOrderClick: Function,
+    onWorkshopClick: { type: Function, optional: true },
     formatNumber: Function,
     hasSalesPermissions: { type: Boolean, optional: true },
     hasInventoryPermissions: { type: Boolean, optional: true },

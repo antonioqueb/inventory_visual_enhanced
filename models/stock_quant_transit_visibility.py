@@ -733,6 +733,10 @@ class StockQuantTransitVisibility(models.Model):
             or self.env.user.has_group("sales_team.group_sale_manager")
         )
 
+        workshop_lot_ids = self._iv_get_workshop_lot_ids(
+            [q.lot_id.id for q in quants if q.lot_id]
+        )
+
         for quant in quants:
             usage = quant.location_id.usage
             is_transit = usage == "transit"
@@ -792,6 +796,7 @@ class StockQuantTransitVisibility(models.Model):
                 "hold_info": None,
                 "en_orden_venta": False,
                 "sale_order_ids": [],
+                "en_taller": False,
                 "transit_inventory_state": transit_state or "",
                 "transit_inventory_published": bool(
                     self._iv_has_transit_publication_fields()
@@ -825,6 +830,9 @@ class StockQuantTransitVisibility(models.Model):
             # INVENTARIO INTERNO NORMAL
             # -----------------------------------------------------------------
             detail["tiene_hold"] = quant.x_tiene_hold if hasattr(quant, "x_tiene_hold") else False
+
+            if quant.lot_id and quant.lot_id.id in workshop_lot_ids:
+                detail["en_taller"] = True
 
             if (
                 detail["tiene_hold"]

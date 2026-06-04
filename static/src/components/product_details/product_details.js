@@ -329,6 +329,7 @@ ProductDetails.props = {
     onDetailsClick: { type: Function, optional: true },
     onHoldClick: { type: Function, optional: true },
     onSaleOrderClick: { type: Function, optional: true },
+    onWorkshopClick: { type: Function, optional: true },
     onSalesPersonClick: { type: Function, optional: true },
 
     formatNumber: { type: Function, optional: true },

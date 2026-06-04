@@ -91,6 +91,12 @@
     border-color: rgba(242, 183, 5, 0.72);
   }
 
+  &.status-workshop {
+    background: linear-gradient(135deg, #6b21a8, #9333ea);
+    color: #fff;
+    border-color: rgba(107, 33, 168, 0.72);
+  }
+
   &.status-no-state,
   &.status-no-hold {
     background: $iv-gray-soft;

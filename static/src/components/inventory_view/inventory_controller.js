@@ -11,6 +11,7 @@ import { HistoryDialog } from "../dialogs/history/history_dialog";
 import { CreateHoldDialog } from "../dialogs/hold/hold_dialog";
 import { SaleOrderDialog } from "../dialogs/sale_order/sale_order_dialog";
 import { HoldInfoDialog } from "../dialogs/hold_info/hold_info_dialog";
+import { WorkshopInfoDialog } from "../dialogs/workshop_info/workshop_info_dialog";
 
 class InventoryVisualController extends Component {
     setup() {
@@ -423,6 +424,64 @@ class InventoryVisualController extends Component {
         this.dialog.add(SaleOrderDialog, {
             soInfo,
             title: `Órdenes de Venta (${soInfo.count})`,
+            size: "lg",
+        });
+    }
+
+    async onWorkshopClick(detailId) {
+        let detailData = null;
+
+        for (const [productId, details] of Object.entries(this.state.productDetails)) {
+            const detail = details.find((d) => d.id === detailId);
+
+            if (detail) {
+                const numericProductId = parseInt(productId);
+                const product = this.state.products.find(
+                    (p) => p.product_id === numericProductId
+                );
+
+                detailData = {
+                    ...detail,
+                    product_id: numericProductId,
+                    product_name: product ? product.product_name : (detail.product_name || ""),
+                    product_code: product ? product.product_code : (detail.product_code || ""),
+                    categ_name: product ? product.categ_name : (detail.categ_name || ""),
+                };
+
+                break;
+            }
+        }
+
+        if (!detailData) {
+            this.notification.add("No se encontró información del lote", { type: "danger" });
+            return;
+        }
+
+        try {
+            const workshopInfo = await this.orm.call(
+                "stock.quant",
+                "get_workshop_info",
+                [],
+                { quant_id: detailId }
+            );
+
+            if (workshopInfo.error) {
+                this.notification.add(workshopInfo.error, { type: "warning" });
+                return;
+            }
+
+            this.openWorkshopInfoDialog(workshopInfo, detailData);
+        } catch (error) {
+            console.error("Error al cargar info de taller:", error);
+            this.notification.add("Error al cargar información del taller", { type: "danger" });
+        }
+    }
+
+    openWorkshopInfoDialog(workshopInfo, detailData) {
+        this.dialog.add(WorkshopInfoDialog, {
+            workshopInfo,
+            detailData,
+            title: `Placa en taller - ${detailData.lot_name}`,
             size: "lg",
         });
     }

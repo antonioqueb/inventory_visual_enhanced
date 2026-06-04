@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="inventory_visual_enhanced.WorkshopInfoDialog" owl="1">
+        <Dialog size="'xl'" title="''" contentClass="'o_workshop_info_dialog_content'">
+            <div class="o_workshop_info_dialog">
+
+                <button class="workshop-info-floating-close" type="button" t-on-click="props.close" title="Cerrar">
+                    <i class="fa fa-times"/>
+                </button>
+
+                <!-- HERO -->
+                <div class="workshop-info-hero">
+                    <div class="workshop-info-hero__grain"/>
+                    <div class="workshop-info-hero__content">
+                        <div class="workshop-info-hero__left">
+                            <div class="workshop-info-hero__icon">
+                                <i class="fa fa-industry"/>
+                            </div>
+
+                            <div class="workshop-info-hero__copy">
+                                <span class="workshop-info-eyebrow">En taller</span>
+                                <h2>Material en proceso productivo</h2>
+                                <p>
+                                    Este lote está apartado para una orden de taller activa y no debe asignarse
+                                    a otra operación comercial mientras permanezca en producción.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUICK SUMMARY -->
+                <div class="workshop-info-summary">
+                    <div class="workshop-info-stat workshop-info-stat--product">
+                        <span>Producto</span>
+                        <strong t-esc="workshopInfo.product_name"/>
+                    </div>
+
+                    <div class="workshop-info-stat">
+                        <span>Lote</span>
+                        <strong t-esc="workshopInfo.lot_name"/>
+                    </div>
+
+                    <div class="workshop-info-stat">
+                        <span>Cantidad</span>
+                        <strong><t t-esc="workshopInfo.quantity"/> m²</strong>
+                    </div>
+
+                    <div class="workshop-info-stat workshop-info-stat--status">
+                        <span>Estatus</span>
+                        <strong t-if="primaryOrder" t-esc="primaryOrder.line_state"/>
+                        <strong t-else="">En taller</strong>
+                    </div>
+                </div>
+
+                <!-- ALERT -->
+                <div class="workshop-info-status">
+                    <div class="workshop-info-status__icon">
+                        <i class="fa fa-cogs"/>
+                    </div>
+                    <div class="workshop-info-status__copy">
+                        <strong>
+                            <t t-if="workshopInfo.count === 1">Esta placa está en 1 orden de taller activa</t>
+                            <t t-else=""><t t-esc="workshopInfo.count"/> órdenes de taller activas involucran esta placa</t>
+                        </strong>
+                        <p>
+                            El material se encuentra reservado por el proceso productivo. Cualquier movimiento
+                            comercial debe coordinarse con el responsable del taller.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- ÓRDENES (una por sección) -->
+                <t t-foreach="orders" t-as="order" t-key="order.order_id">
+                    <div class="workshop-info-main">
+
+                        <!-- LEFT: DATOS DE LA ORDEN -->
+                        <div class="workshop-info-main__left">
+
+                            <div class="workshop-info-card">
+                                <div class="workshop-info-card__header">
+                                    <i class="fa fa-briefcase"/>
+                                    <span>
+                                        Orden de taller
+                                        <t t-if="orders.length > 1"> (<t t-esc="order_index + 1"/> de <t t-esc="orders.length"/>)</t>
+                                    </span>
+                                </div>
+
+                                <div class="workshop-info-data-grid">
+                                    <div class="workshop-info-data-item workshop-info-data-item--wide">
+                                        <span>Referencia</span>
+                                        <strong>
+                                            <i class="fa fa-hashtag"/>
+                                            <t t-esc="order.order_name"/>
+                                        </strong>
+                                    </div>
+
+                                    <div class="workshop-info-data-item" t-if="order.process_name">
+                                        <span>Proceso</span>
+                                        <strong>
+                                            <i class="fa fa-cogs"/>
+                                            <t t-esc="order.process_name"/>
+                                        </strong>
+                                    </div>
+
+                                    <div class="workshop-info-data-item" t-if="order.operation_mode">
+                                        <span>Modo operativo</span>
+                                        <strong>
+                                            <i class="fa fa-wrench"/>
+                                            <t t-esc="order.operation_mode"/>
+                                        </strong>
+                                    </div>
+
+                                    <div class="workshop-info-data-item" t-if="order.priority">
+                                        <span>Prioridad</span>
+                                        <strong>
+                                            <i class="fa fa-flag"/>
+                                            <t t-esc="order.priority"/>
+                                        </strong>
+                                    </div>
+
+                                    <div class="workshop-info-data-item" t-if="order.responsible">
+                                        <span>Responsable</span>
+                                        <strong>
+                                            <i class="fa fa-user-circle"/>
+                                            <t t-esc="order.responsible"/>
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ENTRADA EN ESTA ORDEN -->
+                            <div class="workshop-info-card">
+                                <div class="workshop-info-card__header">
+                                    <i class="fa fa-cube"/>
+                                    <span>Entrada al proceso</span>
+                                </div>
+
+                                <div class="workshop-info-data-grid">
+                                    <div class="workshop-info-data-item" t-if="order.material_type">
+                                        <span>Tipo material</span>
+                                        <strong>
+                                            <i class="fa fa-tag"/>
+                                            <t t-esc="order.material_type"/>
+                                        </strong>
+                                    </div>
+
+                                    <div class="workshop-info-data-item" t-if="order.qty_in">
+                                        <span>Cantidad entrada</span>
+                                        <strong>
+                                            <i class="fa fa-balance-scale"/>
+                                            <t t-esc="order.qty_in"/>
+                                        </strong>
+                                    </div>
+
+                                    <div class="workshop-info-data-item" t-if="order.area_sqm">
+                                        <span>Área</span>
+                                        <strong>
+                                            <i class="fa fa-expand"/>
+                                            <t t-esc="order.area_sqm"/> m²
+                                        </strong>
+                                    </div>
+
+                                    <div class="workshop-info-data-item" t-if="order.pieces">
+                                        <span>Piezas</span>
+                                        <strong>
+                                            <i class="fa fa-th"/>
+                                            <t t-esc="order.pieces"/>
+                                        </strong>
+                                    </div>
+
+                                    <div class="workshop-info-data-item" t-if="order.thickness_cm">
+                                        <span>Grosor</span>
+                                        <strong>
+                                            <i class="fa fa-compress"/>
+                                            <t t-esc="order.thickness_cm"/> cm
+                                        </strong>
+                                    </div>
+
+                                    <div class="workshop-info-data-item" t-if="order.height_cm">
+                                        <span>Alto</span>
+                                        <strong>
+                                            <i class="fa fa-arrows-v"/>
+                                            <t t-esc="order.height_cm"/> cm
+                                        </strong>
+                                    </div>
+
+                                    <div class="workshop-info-data-item" t-if="order.width_cm">
+                                        <span>Ancho</span>
+                                        <strong>
+                                            <i class="fa fa-arrows-h"/>
+                                            <t t-esc="order.width_cm"/> cm
+                                        </strong>
+                                    </div>
+
+                                    <div class="workshop-info-data-item" t-if="order.current_finish">
+                                        <span>Acabado actual</span>
+                                        <strong>
+                                            <i class="fa fa-paint-brush"/>
+                                            <t t-esc="order.current_finish"/>
+                                        </strong>
+                                    </div>
+
+                                    <div class="workshop-info-data-item workshop-info-data-item--wide" t-if="order.reserved_origin">
+                                        <span>Compromiso comercial</span>
+                                        <strong>
+                                            <i class="fa fa-link"/>
+                                            <t t-esc="order.reserved_origin"/>
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- RIGHT: VIGENCIA, OBJETIVOS Y UBICACIONES -->
+                        <div class="workshop-info-main__right">
+
+                            <div class="workshop-info-card">
+                                <div class="workshop-info-card__header">
+                                    <i class="fa fa-calendar"/>
+                                    <span>Vigencia</span>
+                                </div>
+
+                                <div class="workshop-info-date-grid">
+                                    <div class="workshop-info-side-item">
+                                        <span>Planeada</span>
+                                        <strong>
+                                            <i class="fa fa-calendar-o"/>
+                                            <t t-esc="order.date_planned or '-'"/>
+                                        </strong>
+                                    </div>
+
+                                    <div class="workshop-info-side-item">
+                                        <span>Inicio</span>
+                                        <strong>
+                                            <i class="fa fa-calendar-check-o"/>
+                                            <t t-esc="order.date_start or '-'"/>
+                                        </strong>
+                                    </div>
+
+                                    <div class="workshop-info-side-item">
+                                        <span>Terminación</span>
+                                        <strong>
+                                            <i class="fa fa-calendar-times-o"/>
+                                            <t t-esc="order.date_done or '-'"/>
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="workshop-info-card" t-if="order.production_target_sqm or order.target_pieces or order.expected_yield_percent">
+                                <div class="workshop-info-card__header">
+                                    <i class="fa fa-bullseye"/>
+                                    <span>Objetivos de producción</span>
+                                </div>
+
+                                <div class="workshop-info-date-grid">
+                                    <div class="workshop-info-side-item" t-if="order.production_target_sqm">
+                                        <span>Demanda objetivo</span>
+                                        <strong>
+                                            <i class="fa fa-expand"/>
+                                            <t t-esc="order.production_target_sqm"/> m²
+                                        </strong>
+                                    </div>
+
+                                    <div class="workshop-info-side-item" t-if="order.target_pieces">
+                                        <span>Piezas objetivo</span>
+                                        <strong>
+                                            <i class="fa fa-th"/>
+                                            <t t-esc="order.target_pieces"/>
+                                        </strong>
+                                    </div>
+
+                                    <div class="workshop-info-side-item" t-if="order.expected_yield_percent">
+                                        <span>Rendimiento esperado</span>
+                                        <strong>
+                                            <i class="fa fa-percent"/>
+                                            <t t-esc="order.expected_yield_percent"/>%
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="workshop-info-card" t-if="order.location_src or order.location_workshop or order.location_dest">
+                                <div class="workshop-info-card__header">
+                                    <i class="fa fa-map-marker"/>
+                                    <span>Ubicaciones</span>
+                                </div>
+
+                                <div class="workshop-info-lot-grid">
+                                    <div class="workshop-info-lot-item workshop-info-lot-item--wide" t-if="order.location_src">
+                                        <span>Origen</span>
+                                        <strong>
+                                            <i class="fa fa-sign-out"/>
+                                            <t t-esc="order.location_src"/>
+                                        </strong>
+                                    </div>
+
+                                    <div class="workshop-info-lot-item workshop-info-lot-item--wide" t-if="order.location_workshop">
+                                        <span>Taller / producción</span>
+                                        <strong>
+                                            <i class="fa fa-industry"/>
+                                            <t t-esc="order.location_workshop"/>
+                                        </strong>
+                                    </div>
+
+                                    <div class="workshop-info-lot-item workshop-info-lot-item--wide" t-if="order.location_dest">
+                                        <span>Destino</span>
+                                        <strong>
+                                            <i class="fa fa-sign-in"/>
+                                            <t t-esc="order.location_dest"/>
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </t>
+
+                <!-- INFORMACIÓN DEL LOTE (UBICACIÓN ACTUAL DEL QUANT) -->
+                <div class="workshop-info-main">
+                    <div class="workshop-info-main__full">
+                        <div class="workshop-info-card workshop-info-lot-card">
+                            <div class="workshop-info-card__header">
+                                <i class="fa fa-cube"/>
+                                <span>Información del lote en almacén</span>
+                            </div>
+
+                            <div class="workshop-info-lot-grid">
+                                <div class="workshop-info-lot-item workshop-info-lot-item--wide">
+                                    <span>Ubicación actual</span>
+                                    <strong>
+                                        <i class="fa fa-map-marker"/>
+                                        <t t-esc="workshopInfo.location_name"/>
+                                    </strong>
+                                </div>
+
+                                <div class="workshop-info-lot-item">
+                                    <span>Cantidad total</span>
+                                    <strong>
+                                        <i class="fa fa-balance-scale"/>
+                                        <t t-esc="workshopInfo.quantity"/> m²
+                                    </strong>
+                                </div>
+
+                                <div class="workshop-info-lot-item" t-if="workshopInfo.reserved_quantity">
+                                    <span>Cantidad reservada</span>
+                                    <strong>
+                                        <i class="fa fa-lock"/>
+                                        <t t-esc="workshopInfo.reserved_quantity"/> m²
+                                    </strong>
+                                </div>
+
+                                <div class="workshop-info-lot-item" t-if="detailData.grosor">
+                                    <span>Grosor</span>
+                                    <strong>
+                                        <i class="fa fa-compress"/>
+                                        <t t-esc="detailData.grosor"/> cm
+                                    </strong>
+                                </div>
+
+                                <div class="workshop-info-lot-item" t-if="detailData.alto">
+                                    <span>Alto</span>
+                                    <strong>
+                                        <i class="fa fa-arrows-v"/>
+                                        <t t-esc="detailData.alto"/> m
+                                    </strong>
+                                </div>
+
+                                <div class="workshop-info-lot-item" t-if="detailData.ancho">
+                                    <span>Ancho</span>
+                                    <strong>
+                                        <i class="fa fa-arrows-h"/>
+                                        <t t-esc="detailData.ancho"/> m
+                                    </strong>
+                                </div>
+
+                                <div class="workshop-info-lot-item" t-if="detailData.tipo">
+                                    <span>Tipo</span>
+                                    <strong>
+                                        <i class="fa fa-tag"/>
+                                        <t t-esc="detailData.tipo"/>
+                                    </strong>
+                                </div>
+
+                                <div class="workshop-info-lot-item" t-if="detailData.color">
+                                    <span>Color</span>
+                                    <strong>
+                                        <i class="fa fa-tint"/>
+                                        <t t-esc="detailData.color"/>
+                                    </strong>
+                                </div>
+
+                                <div class="workshop-info-lot-item" t-if="detailData.bloque">
+                                    <span>Bloque</span>
+                                    <strong>
+                                        <i class="fa fa-th-large"/>
+                                        <t t-esc="detailData.bloque"/>
+                                    </strong>
+                                </div>
+
+                                <div class="workshop-info-lot-item" t-if="detailData.atado">
+                                    <span>Atado</span>
+                                    <strong>
+                                        <i class="fa fa-object-group"/>
+                                        <t t-esc="detailData.atado"/>
+                                    </strong>
+                                </div>
+
+                                <div class="workshop-info-lot-item" t-if="detailData.numero_placa">
+                                    <span>Número de placa</span>
+                                    <strong>
+                                        <i class="fa fa-hashtag"/>
+                                        <t t-esc="detailData.numero_placa"/>
+                                    </strong>
+                                </div>
+
+                                <div class="workshop-info-lot-item workshop-info-lot-item--wide" t-if="detailData.detalles_placa">
+                                    <span>Detalles físicos</span>
+                                    <strong>
+                                        <i class="fa fa-info-circle"/>
+                                        <t t-esc="detailData.detalles_placa"/>
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <t t-set-slot="footer">
+                <button class="workshop-info-close-button" type="button" t-on-click="props.close">
+                    <i class="fa fa-times"/>
+                    Cerrar
+                </button>
+            </t>
+        </Dialog>
+    </t>
+
+</templates>

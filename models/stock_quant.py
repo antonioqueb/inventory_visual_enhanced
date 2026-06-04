@@ -25,6 +25,17 @@ class StockQuant(models.Model):
     @api.model
     def check_inventory_permissions(self):
         return self.env.user.has_group('stock.group_stock_user')
+
+    @api.model
+    def _iv_get_workshop_lot_ids(self, lot_ids):
+        if not lot_ids or 'workshop.input.line' not in self.env:
+            return set()
+        lines = self.env['workshop.input.line'].sudo().search([
+            ('lot_id', 'in', list(lot_ids)),
+            ('state', 'not in', ('done', 'cancelled', 'rejected')),
+            ('order_id.state', '=', 'in_workshop'),
+        ])
+        return set(lines.mapped('lot_id').ids)
     
     @api.model
     def _get_price_field_name(self, currency, level):
@@ -357,11 +368,15 @@ class StockQuant(models.Model):
         
         quants = self.browse(quant_ids)
         result = []
-        
+
         is_sales_user = self.env.user.has_group('sales_team.group_sale_salesman') or \
                         self.env.user.has_group('sales_team.group_sale_salesman_all_leads') or \
                         self.env.user.has_group('sales_team.group_sale_manager')
-        
+
+        workshop_lot_ids = self._iv_get_workshop_lot_ids(
+            [q.lot_id.id for q in quants if q.lot_id]
+        )
+
         for quant in quants:
             tipo_display = ''
             if hasattr(quant, 'x_tipo') and quant.x_tipo:
@@ -402,15 +417,19 @@ class StockQuant(models.Model):
                 'hold_info': None,
                 'en_orden_venta': False,
                 'sale_order_ids': [],
+                'en_taller': False,
             }
-            
+
             if quant.lot_id and hasattr(quant.lot_id, 'x_fotografia_ids'):
                 detail['cantidad_fotos'] = len(quant.lot_id.x_fotografia_ids)
-            
+
             # ================================================================
             # tiene_hold: Se calcula SIEMPRE (necesario para bloqueo de carrito)
             # ================================================================
             detail['tiene_hold'] = quant.x_tiene_hold if hasattr(quant, 'x_tiene_hold') else False
+
+            if quant.lot_id and quant.lot_id.id in workshop_lot_ids:
+                detail['en_taller'] = True
             
             # hold_info: Solo se expone a usuarios de ventas (info sensible del cliente)
             if detail['tiene_hold'] and is_sales_user and hasattr(quant, 'x_hold_activo_id') and quant.x_hold_activo_id:
@@ -457,9 +476,101 @@ class StockQuant(models.Model):
                     detail['sale_order_ids'] = list(sale_order_ids)
             
             result.append(detail)
-        
+
         return result
-    
+
+    @api.model
+    def get_workshop_info(self, quant_id=None):
+        if not quant_id:
+            return {'error': 'Lote no encontrado'}
+
+        quant = self.browse(int(quant_id))
+        if not quant.exists() or not quant.lot_id:
+            return {'error': 'Lote no encontrado'}
+
+        if 'workshop.input.line' not in self.env:
+            return {'error': 'Módulo de taller no instalado'}
+
+        lines = self.env['workshop.input.line'].sudo().search([
+            ('lot_id', '=', quant.lot_id.id),
+            ('state', 'not in', ('done', 'cancelled', 'rejected')),
+            ('order_id.state', '=', 'in_workshop'),
+        ], order='id desc')
+
+        if not lines:
+            return {'error': 'Esta placa ya no está activa en ninguna orden de taller'}
+
+        operation_mode_labels = dict(
+            self.env['workshop.order']._fields['operation_mode'].selection
+        ) if 'workshop.order' in self.env else {}
+        priority_labels = dict(
+            self.env['workshop.order']._fields['priority'].selection
+        ) if 'workshop.order' in self.env else {}
+        line_state_labels = dict(
+            self.env['workshop.input.line']._fields['state'].selection
+        )
+        material_type_labels = dict(
+            self.env['workshop.input.line']._fields['material_type'].selection
+        )
+
+        def _fmt_date(value):
+            if not value:
+                return ''
+            try:
+                return fields.Datetime.context_timestamp(self, value).strftime('%Y-%m-%d %H:%M')
+            except Exception:
+                try:
+                    return value.strftime('%Y-%m-%d')
+                except Exception:
+                    return ''
+
+        orders = []
+        for line in lines:
+            order = line.order_id
+            orders.append({
+                'order_id': order.id,
+                'order_name': order.name or '',
+                'process_name': order.process_id.display_name if order.process_id else '',
+                'process_type': order.process_id.process_type if order.process_id and hasattr(order.process_id, 'process_type') else '',
+                'operation_mode': operation_mode_labels.get(order.operation_mode, order.operation_mode or ''),
+                'priority': priority_labels.get(order.priority, ''),
+                'responsible': order.responsible_id.name if order.responsible_id else '',
+                'date_planned': _fmt_date(order.date_planned),
+                'date_start': _fmt_date(order.date_start),
+                'date_done': _fmt_date(order.date_done),
+                'location_src': order.location_src_id.display_name if order.location_src_id else '',
+                'location_workshop': order.location_workshop_id.display_name if order.location_workshop_id else '',
+                'location_dest': order.location_dest_id.display_name if order.location_dest_id else '',
+                'production_target_sqm': order.production_target_sqm or 0.0,
+                'target_pieces': order.target_pieces or 0,
+                'expected_yield_percent': order.expected_yield_percent or 0.0,
+                'line_id': line.id,
+                'line_state': line_state_labels.get(line.state, line.state or ''),
+                'material_type': material_type_labels.get(line.material_type, line.material_type or ''),
+                'qty_in': line.qty_in or 0.0,
+                'area_sqm': line.area_sqm or 0.0,
+                'width_cm': line.width_cm or 0.0,
+                'height_cm': line.height_cm or 0.0,
+                'thickness_cm': line.thickness_cm or 0.0,
+                'pieces': line.pieces or 0,
+                'block_name': line.block_name or '',
+                'tone': line.tone or '',
+                'current_finish': line.current_finish or '',
+                'reserved_origin': line.reserved_origin or '',
+            })
+
+        return {
+            'product_name': quant.product_id.display_name,
+            'product_code': quant.product_id.default_code or '',
+            'lot_name': quant.lot_id.name or '',
+            'lot_id': quant.lot_id.id,
+            'quantity': quant.quantity or 0.0,
+            'reserved_quantity': quant.reserved_quantity or 0.0,
+            'location_name': quant.location_id.display_name if quant.location_id else '',
+            'orders': orders,
+            'count': len(orders),
+        }
+
     @api.model
     def get_lot_history(self, quant_id):
         if not self.check_sales_permissions():
