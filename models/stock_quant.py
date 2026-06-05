@@ -340,23 +340,25 @@ class StockQuant(models.Model):
                     product_groups[product_id]['transit_available_qty'] += available
                     product_groups[product_id]['transit_available_plates'] += 1
 
-            elif is_workshop:
-                product_groups[product_id]['workshop_qty'] += qty
-                product_groups[product_id]['workshop_plates'] += 1
-
             else:
+                # En taller (production): cuenta como stock + bucket de taller,
+                # pero no como disponible (está en proceso productivo).
+                if is_workshop:
+                    product_groups[product_id]['workshop_qty'] += qty
+                    product_groups[product_id]['workshop_plates'] += 1
+
                 product_groups[product_id]['stock_qty'] += qty
                 product_groups[product_id]['stock_plates'] += 1
-                
+
                 if has_hold:
                     product_groups[product_id]['hold_qty'] += qty
                     product_groups[product_id]['hold_plates'] += 1
-                
+
                 if reserved > 0:
                     product_groups[product_id]['committed_qty'] += reserved
                     product_groups[product_id]['committed_plates'] += 1
-                
-                if not has_hold and available > 0:
+
+                if not has_hold and available > 0 and not is_workshop:
                     product_groups[product_id]['available_qty'] += available
                     product_groups[product_id]['available_plates'] += 1
         

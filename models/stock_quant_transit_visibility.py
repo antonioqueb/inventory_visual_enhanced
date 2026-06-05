@@ -676,16 +676,16 @@ class StockQuantTransitVisibility(models.Model):
 
             # -----------------------------------------------------------------
             # En taller (ubicación de producción)
-            # No cuenta como stock disponible ni comprometido: el material está
-            # físicamente en proceso productivo.
+            # El material en taller SÍ cuenta como stock (la empresa lo posee),
+            # por eso suma al total de In Stock y además al bucket de taller.
+            # NO se considera "disponible" porque está físicamente en proceso.
             # -----------------------------------------------------------------
             if is_workshop:
                 product_groups[product_id]["workshop_qty"] += qty
                 product_groups[product_id]["workshop_plates"] += 1
-                continue
 
             # -----------------------------------------------------------------
-            # Inventario interno normal
+            # Inventario interno normal (incluye taller en el total de stock)
             # -----------------------------------------------------------------
             quant_key = (
                 quant.lot_id.id if quant.lot_id else False,
@@ -708,7 +708,7 @@ class StockQuantTransitVisibility(models.Model):
                 product_groups[product_id]["committed_qty"] += committed_qty
                 product_groups[product_id]["committed_plates"] += 1
 
-            if not has_hold and not is_committed_by_sale and available > 0:
+            if not has_hold and not is_committed_by_sale and available > 0 and not is_workshop:
                 product_groups[product_id]["available_qty"] += available
                 product_groups[product_id]["available_plates"] += 1
 

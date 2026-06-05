@@ -227,15 +227,15 @@ export class ProductRow extends Component {
             const transitState = d.transit_inventory_state || "";
 
             if (filter === "all") {
-                return !isTransit && !isWorkshop;
+                return !isTransit;
             }
 
             if (filter === "hold") {
-                return !isTransit && !isWorkshop && d.tiene_hold;
+                return !isTransit && d.tiene_hold;
             }
 
             if (filter === "committed") {
-                return !isTransit && !isWorkshop && (d.reserved_quantity > 0 || d.en_orden_venta);
+                return !isTransit && (d.reserved_quantity > 0 || d.en_orden_venta);
             }
 
             if (filter === "available") {
