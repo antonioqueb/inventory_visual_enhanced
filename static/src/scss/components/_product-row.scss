@@ -136,12 +136,26 @@
         .inventory-label {
             color: #795548;
         }
-        
+
         &.active-filter {
             background-color: rgba(121, 85, 72, 0.1);
-            
+
             .inventory-label, .inventory-units, .inventory-measure {
                 color: #795548;
+            }
+        }
+    }
+
+    &.workshop-row {
+        .inventory-label {
+            color: #6b21a8;
+        }
+
+        &.active-filter {
+            background-color: rgba(107, 33, 168, 0.1);
+
+            .inventory-label, .inventory-units, .inventory-measure {
+                color: #6b21a8;
             }
         }
     }
@@ -277,10 +291,20 @@
                 &.transit-row {
                     background: #fdfdf8;
                     border-color: #e8e6d8;
-                    
+
                     &.active-filter {
                         background: rgba(121, 85, 72, 0.06);
                         border-color: rgba(121, 85, 72, 0.25);
+                    }
+                }
+
+                &.workshop-row {
+                    background: #faf7fd;
+                    border-color: #e4d8ee;
+
+                    &.active-filter {
+                        background: rgba(107, 33, 168, 0.06);
+                        border-color: rgba(107, 33, 168, 0.25);
                     }
                 }
             }

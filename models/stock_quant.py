@@ -122,13 +122,14 @@ class StockQuant(models.Model):
             return {'products': [], 'missing_lots': []}
         
         # =====================================================================
-        # FIX 1: Solo ubicaciones internas y tránsito.
-        # Excluye customer, supplier, production, inventory (virtuales).
-        # Así los lotes ya entregados al cliente NO aparecen en la vista.
+        # FIX 1: Ubicaciones internas, tránsito y producción (taller).
+        # Excluye customer, supplier, inventory (virtuales).
+        # Así los lotes ya entregados al cliente NO aparecen en la vista,
+        # pero las placas en proceso de taller (production) sí se visualizan.
         # =====================================================================
         domain = [
             ('quantity', '>', 0),
-            ('location_id.usage', 'in', ['internal', 'transit']),
+            ('location_id.usage', 'in', ['internal', 'transit', 'production']),
         ]
         search_lot_names = []
         
@@ -299,6 +300,8 @@ class StockQuant(models.Model):
                     'committed_plates': 0,
                     'available_qty': 0.0,
                     'available_plates': 0,
+                    'workshop_qty': 0.0,
+                    'workshop_plates': 0,
                     'transit_qty': 0.0,
                     'transit_plates': 0,
                     'transit_hold_qty': 0.0,
@@ -319,23 +322,28 @@ class StockQuant(models.Model):
             
             usage = quant.location_id.usage
             is_transit = (usage == 'transit')
-            
+            is_workshop = (usage == 'production')
+
             if is_transit:
                 product_groups[product_id]['transit_qty'] += qty
                 product_groups[product_id]['transit_plates'] += 1
-                
+
                 if has_hold:
                     product_groups[product_id]['transit_hold_qty'] += qty
                     product_groups[product_id]['transit_hold_plates'] += 1
-                
+
                 if reserved > 0:
                     product_groups[product_id]['transit_committed_qty'] += reserved
                     product_groups[product_id]['transit_committed_plates'] += 1
-                
+
                 if not has_hold and available > 0:
                     product_groups[product_id]['transit_available_qty'] += available
                     product_groups[product_id]['transit_available_plates'] += 1
-                
+
+            elif is_workshop:
+                product_groups[product_id]['workshop_qty'] += qty
+                product_groups[product_id]['workshop_plates'] += 1
+
             else:
                 product_groups[product_id]['stock_qty'] += qty
                 product_groups[product_id]['stock_plates'] += 1
@@ -428,7 +436,9 @@ class StockQuant(models.Model):
             # ================================================================
             detail['tiene_hold'] = quant.x_tiene_hold if hasattr(quant, 'x_tiene_hold') else False
 
-            if quant.lot_id and quant.lot_id.id in workshop_lot_ids:
+            if quant.location_id.usage == 'production' or (
+                quant.lot_id and quant.lot_id.id in workshop_lot_ids
+            ):
                 detail['en_taller'] = True
             
             # hold_info: Solo se expone a usuarios de ventas (info sensible del cliente)

@@ -223,22 +223,27 @@ export class ProductRow extends Component {
         return details.filter((d) => {
             const availableQty = d.quantity - d.reserved_quantity;
             const isTransit = d.location_usage === "transit";
+            const isWorkshop = d.location_usage === "production";
             const transitState = d.transit_inventory_state || "";
 
             if (filter === "all") {
-                return !isTransit;
+                return !isTransit && !isWorkshop;
             }
 
             if (filter === "hold") {
-                return !isTransit && d.tiene_hold;
+                return !isTransit && !isWorkshop && d.tiene_hold;
             }
 
             if (filter === "committed") {
-                return !isTransit && (d.reserved_quantity > 0 || d.en_orden_venta);
+                return !isTransit && !isWorkshop && (d.reserved_quantity > 0 || d.en_orden_venta);
             }
 
             if (filter === "available") {
-                return !isTransit && availableQty > 0 && !d.tiene_hold && !d.en_orden_venta;
+                return !isTransit && !isWorkshop && availableQty > 0 && !d.tiene_hold && !d.en_orden_venta;
+            }
+
+            if (filter === "workshop") {
+                return isWorkshop;
             }
 
             if (filter === "transit_available") {

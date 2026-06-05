@@ -80,6 +80,23 @@
                         </span>
                     </div>
 
+                    <t t-if="props.product.workshop_qty > 0">
+                        <div class="inventory-separator">
+                            <span>En Taller</span>
+                        </div>
+
+                        <div class="inventory-row clickable-stat workshop-row"
+                             t-att-class="{ 'active-filter': state.activeFilter === 'workshop' }"
+                             t-on-click.stop="() => this.handleFilterClick('workshop')"
+                             title="Filtrar placas en proceso de taller">
+                            <span class="inventory-label">En Taller</span>
+                            <span class="inventory-value inventory-units" t-esc="props.product.workshop_plates || 0"></span>
+                            <span class="inventory-value inventory-measure">
+                                <t t-esc="props.formatNumber(props.product.workshop_qty)"/> <t t-esc="unitLabel"/>
+                            </span>
+                        </div>
+                    </t>
+
                     <t t-if="props.product.transit_qty > 0">
                         <div class="inventory-separator">
                             <span>En Tránsito</span>

@@ -457,7 +457,7 @@ class StockQuantTransitVisibility(models.Model):
 
         domain = [
             ("quantity", ">", 0),
-            ("location_id.usage", "in", ["internal", "transit"]),
+            ("location_id.usage", "in", ["internal", "transit", "production"]),
         ]
 
         search_lot_names = []
@@ -598,6 +598,7 @@ class StockQuantTransitVisibility(models.Model):
         for quant in quants:
             usage = quant.location_id.usage
             is_transit = usage == "transit"
+            is_workshop = usage == "production"
 
             if is_transit:
                 transit_state = self._iv_get_transit_state(quant)
@@ -637,6 +638,8 @@ class StockQuantTransitVisibility(models.Model):
                     "committed_plates": 0,
                     "available_qty": 0.0,
                     "available_plates": 0,
+                    "workshop_qty": 0.0,
+                    "workshop_plates": 0,
                     "transit_qty": 0.0,
                     "transit_plates": 0,
                     "transit_hold_qty": 0.0,
@@ -669,6 +672,16 @@ class StockQuantTransitVisibility(models.Model):
                     product_groups[product_id]["transit_available_qty"] += qty
                     product_groups[product_id]["transit_available_plates"] += 1
 
+                continue
+
+            # -----------------------------------------------------------------
+            # En taller (ubicación de producción)
+            # No cuenta como stock disponible ni comprometido: el material está
+            # físicamente en proceso productivo.
+            # -----------------------------------------------------------------
+            if is_workshop:
+                product_groups[product_id]["workshop_qty"] += qty
+                product_groups[product_id]["workshop_plates"] += 1
                 continue
 
             # -----------------------------------------------------------------
@@ -831,7 +844,9 @@ class StockQuantTransitVisibility(models.Model):
             # -----------------------------------------------------------------
             detail["tiene_hold"] = quant.x_tiene_hold if hasattr(quant, "x_tiene_hold") else False
 
-            if quant.lot_id and quant.lot_id.id in workshop_lot_ids:
+            if quant.location_id.usage == "production" or (
+                quant.lot_id and quant.lot_id.id in workshop_lot_ids
+            ):
                 detail["en_taller"] = True
 
             if (
