@@ -139,7 +139,15 @@ class StockQuant(models.Model):
         if filters.get('almacen_id'):
             almacen = self.env['stock.warehouse'].browse(int(filters['almacen_id']))
             if almacen.view_location_id:
-                domain.append(('location_id', 'child_of', almacen.view_location_id.id))
+                # Las ubicaciones de producción (taller) normalmente cuelgan de
+                # "Ubicaciones virtuales" y NO son hijas de la vista del almacén.
+                # Se incluyen explícitamente para que el material en taller siga
+                # visible aun cuando se filtra por almacén.
+                domain += [
+                    '|',
+                    ('location_id', 'child_of', almacen.view_location_id.id),
+                    ('location_id.usage', '=', 'production'),
+                ]
         
         if filters.get('ubicacion_id'):
             domain.append(('location_id', 'child_of', int(filters['ubicacion_id'])))
