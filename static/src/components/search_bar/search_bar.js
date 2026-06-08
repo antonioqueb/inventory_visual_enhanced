@@ -98,13 +98,23 @@ export class SearchBar extends Component {
                 { order: "name" }
             );
 
+            // Máximo de niveles a exponer en el filtro (contando la raíz).
+            // Categorías más profundas se colapsan en su ancestro de nivel 3.
+            const MAX_CATEGORY_DEPTH = 3;
+
             const parentIds = new Set(
                 allCategorias.filter(cat => cat.parent_id).map(cat => cat.parent_id[0])
             );
 
             const categoriasMap = new Map();
             allCategorias.forEach(cat => {
-                if (!parentIds.has(cat.id)) {
+                const depth = (cat.complete_name || cat.name).split(" / ").length;
+                const hasChildren = parentIds.has(cat.id);
+                // Es opción del filtro si está exactamente en el nivel tope,
+                // o si es una hoja real más superficial que el tope.
+                const isCappedLeaf = depth === MAX_CATEGORY_DEPTH
+                    || (depth < MAX_CATEGORY_DEPTH && !hasChildren);
+                if (isCappedLeaf) {
                     const shortName = cat.name;
                     if (!categoriasMap.has(shortName)) {
                         categoriasMap.set(shortName, { name: shortName, ids: [cat.id] });

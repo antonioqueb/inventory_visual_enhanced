@@ -162,15 +162,26 @@ class StockQuant(models.Model):
             domain.append(('product_id.product_tmpl_id.x_color', 'ilike', filters['color']))
         
         if filters.get('categoria_name'):
+            # Máximo de niveles expuestos en el filtro (contando la raíz).
+            MAX_CATEGORY_DEPTH = 3
             all_cats = self.env['product.category'].search([
                 ('name', 'ilike', filters['categoria_name'])
             ])
             parent_ids = set(
                 self.env['product.category'].search([('parent_id', '!=', False)]).mapped('parent_id').ids
             )
-            leaf_cat_ids = [cat.id for cat in all_cats if cat.id not in parent_ids]
-            if leaf_cat_ids:
-                domain.append(('product_id.categ_id', 'in', leaf_cat_ids))
+            # Solo categorías que son opción del filtro: exactamente en el nivel
+            # tope, o una hoja real más superficial que el tope.
+            capped_cat_ids = []
+            for cat in all_cats:
+                depth = len((cat.complete_name or cat.name).split(' / '))
+                has_children = cat.id in parent_ids
+                if depth == MAX_CATEGORY_DEPTH or (depth < MAX_CATEGORY_DEPTH and not has_children):
+                    capped_cat_ids.append(cat.id)
+            if capped_cat_ids:
+                # child_of incluye la categoría y todo su subárbol, de modo que
+                # los productos asignados a niveles más profundos también se filtran.
+                domain.append(('product_id.categ_id', 'child_of', capped_cat_ids))
 
         if filters.get('grupo'):
             grupo_search = filters['grupo']

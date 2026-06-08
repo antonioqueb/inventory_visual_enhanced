@@ -269,8 +269,11 @@ export class ProductRow extends Component {
     get shortCategoryName() {
         const fullName = this.props.product.categ_name;
         if (!fullName) return "";
+        // Tope de 3 niveles (contando la raíz) para coincidir con el filtro:
+        // categorías más profundas se muestran con su ancestro de nivel 3.
+        const MAX_CATEGORY_DEPTH = 3;
         const parts = fullName.split(" / ");
-        return parts[parts.length - 1];
+        return parts[Math.min(parts.length, MAX_CATEGORY_DEPTH) - 1];
     }
 }
 
