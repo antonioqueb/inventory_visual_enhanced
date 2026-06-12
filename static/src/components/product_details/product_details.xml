@@ -108,7 +108,7 @@
                                     <span class="dimensions-inline">
                                         <span class="dims-text">
                                             <t t-if="detail.alto and detail.ancho">
-                                                <t t-esc="detail.alto"/>m × <t t-esc="detail.ancho"/>m
+                                                <t t-esc="detail.ancho"/>m × <t t-esc="detail.alto"/>m
                                             </t>
                                             <t t-elif="!detail.alto and !detail.ancho">-</t>
                                             <t t-elif="detail.alto">

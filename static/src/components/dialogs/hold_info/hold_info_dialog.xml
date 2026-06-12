@@ -208,9 +208,9 @@
                                         <i class="fa fa-expand"/>
                                         <t t-if="detailData.grosor"><t t-esc="detailData.grosor"/>cm</t>
                                         <t t-if="detailData.grosor and (detailData.alto or detailData.ancho)"> × </t>
-                                        <t t-if="detailData.alto"><t t-esc="detailData.alto"/>m</t>
-                                        <t t-if="detailData.alto and detailData.ancho"> × </t>
                                         <t t-if="detailData.ancho"><t t-esc="detailData.ancho"/>m</t>
+                                        <t t-if="detailData.alto and detailData.ancho"> × </t>
+                                        <t t-if="detailData.alto"><t t-esc="detailData.alto"/>m</t>
                                     </strong>
                                 </div>
 
