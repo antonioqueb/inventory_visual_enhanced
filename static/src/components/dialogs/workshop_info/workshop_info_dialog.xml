@@ -187,7 +187,7 @@
                                     </div>
 
                                     <div class="workshop-info-data-item" t-if="order.width_cm">
-                                        <span>Ancho</span>
+                                        <span>Largo</span>
                                         <strong>
                                             <i class="fa fa-arrows-h"/>
                                             <t t-esc="order.width_cm"/> cm
@@ -371,7 +371,7 @@
                                 </div>
 
                                 <div class="workshop-info-lot-item" t-if="detailData.ancho">
-                                    <span>Ancho</span>
+                                    <span>Largo</span>
                                     <strong>
                                         <i class="fa fa-arrows-h"/>
                                         <t t-esc="detailData.ancho"/> m

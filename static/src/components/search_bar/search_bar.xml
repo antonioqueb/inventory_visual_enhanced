@@ -277,9 +277,9 @@
                         />
                     </div>
 
-                    <!-- Ancho Mínimo -->
+                    <!-- Largo Mínimo (campo ancho) -->
                     <div class="filter-group">
-                        <label class="filter-label d-none d-md-block">Ancho mín. (m)</label>
+                        <label class="filter-label d-none d-md-block">Largo mín. (m)</label>
                         <input 
                             type="number" 
                             class="form-control filter-input" 

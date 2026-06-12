@@ -195,7 +195,7 @@
                                 </div>
 
                                 <div class="hold-info-lot-item" t-if="detailData.ancho">
-                                    <span>Ancho</span>
+                                    <span>Largo</span>
                                     <strong>
                                         <i class="fa fa-arrows-h"/>
                                         <t t-esc="detailData.ancho"/> m

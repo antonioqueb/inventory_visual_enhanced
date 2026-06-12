@@ -146,9 +146,9 @@ class StockQuantSaleOrderPopup(models.Model):
 
         dimensions = ""
         if grosor and alto and ancho:
-            dimensions = f"{grosor} cm · {alto} m × {ancho} m"
+            dimensions = f"{grosor} cm · {ancho} m × {alto} m"
         elif alto and ancho:
-            dimensions = f"{alto} m × {ancho} m"
+            dimensions = f"{ancho} m × {alto} m"
         elif grosor:
             dimensions = f"{grosor} cm"
 
