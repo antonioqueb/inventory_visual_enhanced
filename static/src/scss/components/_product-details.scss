@@ -302,113 +302,19 @@
   }
 }
 
+// ----------------------------------------------------------------------------
+// Móvil: se conserva la misma tabla que en escritorio (sin layout de cards);
+// el contenido se desplaza con scroll horizontal dentro del wrapper.
+// ----------------------------------------------------------------------------
 @media (max-width: $breakpoint-md) {
   .details-wrapper {
     padding: 10px;
-    overflow-x: visible;
-  }
-
-  .mobile-select-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 12px;
-    margin-bottom: 10px;
-    border-radius: $iv-radius;
-    background: #fff;
-    border: 1px solid $iv-border;
-    box-shadow: $iv-shadow-sm;
-    cursor: pointer;
-  }
-
-  .mobile-select-content {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .mobile-select-text {
-    color: $iv-text;
-    font-weight: $iv-weight-bold;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .o_inventory_details_table {
-    min-width: 0;
-    display: block;
-    border: 0;
-    background: transparent;
-    box-shadow: none;
-
-    thead {
-      display: none;
-    }
-
-    tbody,
-    tr,
-    td {
-      display: block;
-      width: 100% !important;
-    }
-
-    tr:not(.group-summary-row):not(.container-separator-row) {
-      margin-bottom: 10px;
-      border: 1px solid $iv-border;
-      border-radius: $iv-radius;
-      background: #fff;
-      box-shadow: $iv-shadow-sm;
-      overflow: hidden;
-    }
-
-    td {
-      border-right: 0;
-      white-space: normal;
-      display: flex !important;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-
-      &::before {
-        content: attr(class);
-        color: $iv-muted;
-        font-size: $iv-size-sm;
-        font-weight: $iv-weight-heavy;
-        text-transform: uppercase;
-      }
-
-      &.col-icon,
-      &.col-checkbox {
-        justify-content: center;
-
-        &::before {
-          display: none;
-        }
-      }
-    }
-
-    .group-summary-row {
-      border-radius: $iv-radius;
-      overflow: hidden;
-      box-shadow: $iv-shadow-xs;
-    }
-
-    td {
-      padding: 9px 8px;
-    }
-
-    .icon-btn,
-    .status-badge-btn {
-      width: 29px;
-      height: 29px;
-      border-radius: 10px;
-      font-size: 13px;
-    }
-
-    .status-badge-btn {
-      min-width: 34px;
-
-      .fa {
-        font-size: 14px;
-      }
-    }
+    width: max-content;
+    min-width: 100%;
   }
 }
