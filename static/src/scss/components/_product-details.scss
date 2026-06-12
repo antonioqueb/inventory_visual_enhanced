@@ -170,18 +170,26 @@
   margin-right: 4px;
 }
 
+// División interna de la celda: dimensiones a la izquierda y total anclado a
+// la derecha, para que los totales queden alineados verticalmente entre filas.
 .dimensions-inline {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 7px;
-  flex-wrap: wrap;
+  width: 100%;
 
   .dims-text {
+    flex: 1 1 auto;
     color: $iv-muted;
   }
 
   .dimensions-total-inline {
     display: inline-flex;
+    justify-content: center;
+    flex: 0 0 auto;
+    margin-left: auto;
+    min-width: 72px;
     padding: 1px 8px;
     border-radius: $iv-pill;
     color: $iv-blue-deep;
@@ -291,6 +299,7 @@
   }
 
   .dimensions-inline .dimensions-total-inline {
+    min-width: 60px;
     padding: 2px 6px;
     font-size: 0.74rem;
   }
