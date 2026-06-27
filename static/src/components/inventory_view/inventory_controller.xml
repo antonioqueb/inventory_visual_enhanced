@@ -65,6 +65,7 @@
                                     details="getProductDetails(product.product_id)"
                                     onToggle.bind="(quantIds) => this.toggleProduct(product.product_id, quantIds)"
                                     onPhotoClick.bind="onPhotoClick"
+                                    onBlockPhotoClick.bind="onBlockPhotoClick"
                                     onNotesClick.bind="onNotesClick"
                                     onDetailsClick.bind="onDetailsClick"
                                     onSalesPersonClick.bind="onSalesPersonClick"

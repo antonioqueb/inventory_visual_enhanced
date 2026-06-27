@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Inventario Visual Avanzado',
-    'version': '19.0.1.0.1',
+    'version': '19.0.1.1.0',
     'category': 'Inventory/Inventory',
     'summary': 'Vista visual mejorada y agrupada del inventario por producto',
     'description': """
@@ -52,6 +52,7 @@
             'inventory_visual_enhanced/static/src/scss/components/_hold-info-dialog.scss',
             'inventory_visual_enhanced/static/src/scss/components/_sale-order-dialog.scss',
             'inventory_visual_enhanced/static/src/scss/components/_photo-gallery-dialog.scss',
+            'inventory_visual_enhanced/static/src/scss/components/_block-photo-dialog.scss',
             'inventory_visual_enhanced/static/src/scss/components/_workshop-info-dialog.scss',
             
             # JS
@@ -60,6 +61,7 @@
             'inventory_visual_enhanced/static/src/components/product_row/product_row.js',
             'inventory_visual_enhanced/static/src/components/inventory_view/inventory_controller.js',
             'inventory_visual_enhanced/static/src/components/dialogs/photo_gallery/photo_gallery_dialog.js',
+            'inventory_visual_enhanced/static/src/components/dialogs/block_photo/block_photo_dialog.js',
             'inventory_visual_enhanced/static/src/components/dialogs/notes/notes_dialog.js',
             'inventory_visual_enhanced/static/src/components/dialogs/history/history_dialog.js',
             'inventory_visual_enhanced/static/src/components/dialogs/hold/hold_dialog.js',
@@ -73,6 +75,7 @@
             'inventory_visual_enhanced/static/src/components/product_row/product_row.xml',
             'inventory_visual_enhanced/static/src/components/inventory_view/inventory_controller.xml',
             'inventory_visual_enhanced/static/src/components/dialogs/photo_gallery/photo_gallery_dialog.xml',
+            'inventory_visual_enhanced/static/src/components/dialogs/block_photo/block_photo_dialog.xml',
             'inventory_visual_enhanced/static/src/components/dialogs/notes/notes_dialog.xml',
             'inventory_visual_enhanced/static/src/components/dialogs/history/history_dialog.xml',
             'inventory_visual_enhanced/static/src/components/dialogs/hold/hold_dialog.xml',

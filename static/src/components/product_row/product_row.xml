@@ -139,6 +139,7 @@
                 <ProductDetails
                     details="filteredDetails"
                     onPhotoClick="props.onPhotoClick"
+                    onBlockPhotoClick="props.onBlockPhotoClick"
                     onNotesClick="props.onNotesClick"
                     onDetailsClick="props.onDetailsClick"
                     onSalesPersonClick="props.onSalesPersonClick"

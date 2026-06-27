@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="inventory_visual_enhanced.BlockPhotoDialog" owl="1">
+        <Dialog title="title" size="'lg'">
+            <div class="ive-block-photos">
+                <t t-if="props.photos and props.photos.length">
+                    <div class="ive-block-photos-grid">
+                        <t t-foreach="props.photos" t-as="photo" t-key="photo.id">
+                            <div class="ive-block-photo-card" t-on-click="() => this.openZoom(photo_index)">
+                                <div class="ive-block-photo-img">
+                                    <img t-att-src="src(photo)" t-att-alt="photo.block_name"/>
+                                    <span class="ive-block-photo-zoomicon"><i class="fa fa-search-plus"/></span>
+                                </div>
+                                <div class="ive-block-photo-cap">
+                                    <span class="ive-block-photo-product" t-esc="photo.product_name"/>
+                                    <small t-if="photo.notes" t-esc="photo.notes"/>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </t>
+                <t t-else="">
+                    <div class="ive-block-photos-empty">
+                        <i class="fa fa-camera"/>
+                        <p>No hay fotos para el bloque <b t-esc="props.blockName"/>.</p>
+                        <small>Las fotos de bloque se suben desde el Portal Proveedor.</small>
+                    </div>
+                </t>
+            </div>
+
+            <!-- Zoom -->
+            <div class="ive-block-zoom" t-if="state.zoom !== null" t-on-click="() => this.closeZoom()">
+                <img t-att-src="src(props.photos[state.zoom])"/>
+                <span class="ive-block-zoom-close"><i class="fa fa-times"/></span>
+            </div>
+
+            <t t-set-slot="footer">
+                <button class="btn btn-secondary" t-on-click="() => props.close()">Cerrar</button>
+            </t>
+        </Dialog>
+    </t>
+
+</templates>

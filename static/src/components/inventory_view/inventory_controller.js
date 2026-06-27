@@ -6,6 +6,7 @@ import { useService } from "@web/core/utils/hooks";
 import { SearchBar } from "../search_bar/search_bar";
 import { ProductRow } from "../product_row/product_row";
 import { PhotoGalleryDialog } from "../dialogs/photo_gallery/photo_gallery_dialog";
+import { BlockPhotoDialog } from "../dialogs/block_photo/block_photo_dialog";
 import { NotesDialog } from "../dialogs/notes/notes_dialog";
 import { HistoryDialog } from "../dialogs/history/history_dialog";
 import { CreateHoldDialog } from "../dialogs/hold/hold_dialog";
@@ -193,6 +194,24 @@ class InventoryVisualController extends Component {
             title: `Fotografías - ${photosData.lot_name}`,
             size: "xl",
         });
+    }
+
+    async onBlockPhotoClick(blockName) {
+        try {
+            const result = await this.orm.call(
+                "stock.quant",
+                "get_block_photos",
+                [],
+                { block_name: blockName }
+            );
+            this.dialog.add(BlockPhotoDialog, {
+                blockName: (result && result.block_name) || blockName,
+                photos: (result && result.photos) || [],
+            });
+        } catch (error) {
+            console.error("Error al cargar fotos del bloque:", error);
+            this.notification.add("Error al cargar fotos del bloque", { type: "danger" });
+        }
     }
 
     async onNotesClick(detailId) {

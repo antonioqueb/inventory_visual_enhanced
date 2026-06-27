@@ -897,7 +897,36 @@ class StockQuant(models.Model):
             'product_name': lot.product_id.display_name,
             'photos': photos,
         }
-    
+
+    @api.model
+    def get_block_photos(self, block_name):
+        """Fotos de un BLOQUE (subidas desde el Portal Proveedor). El bloque es
+        único, así que se busca por nombre (insensible a mayúsculas). Las fotos
+        viven en 'supplier.shipment.block.image' del módulo stock_lot_packing_import;
+        se accede de forma defensiva por si ese módulo no está instalado."""
+        block_name = (block_name or '').strip()
+        if not block_name or 'supplier.shipment.block.image' not in self.env:
+            return {'block_name': block_name, 'photos': []}
+
+        Model = self.env['supplier.shipment.block.image'].sudo()
+        images = Model.search([('block_name', '=ilike', block_name)], order='id desc')
+        photos = []
+        for img in images:
+            if not img.image:
+                continue
+            data = img.image
+            if isinstance(data, bytes):
+                data = data.decode('utf-8', 'ignore')
+            photos.append({
+                'id': img.id,
+                'block_name': img.block_name,
+                'product_name': img.product_id.display_name if img.product_id else '',
+                'filename': img.image_filename or '',
+                'notes': img.notes or '',
+                'image': data,
+            })
+        return {'block_name': block_name, 'photos': photos}
+
     @api.model
     def get_lot_notes(self, quant_id):
         quant = self.browse(quant_id)

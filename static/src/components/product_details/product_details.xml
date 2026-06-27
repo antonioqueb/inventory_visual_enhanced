@@ -282,6 +282,13 @@
 
                             <!-- Últimas columnas: Fin del Bloque -->
                             <td colspan="4" style="text-align: right; vertical-align: middle; padding-right: 15px; color: #6c757d; font-style: italic;">
+                                <button t-if="group.blockName and group.blockName !== 'Sin Bloque'"
+                                        type="button"
+                                        class="ive-block-photo-btn"
+                                        title="Ver fotos del bloque"
+                                        t-on-click.stop="() => props.onBlockPhotoClick(group.blockName)">
+                                    <i class="fa fa-camera"/>
+                                </button>
                                 <small>
                                     <span t-esc="group.blockName" style="font-weight: 600;"/>
                                 </small>

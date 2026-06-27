@@ -325,6 +325,7 @@ ProductDetails.props = {
     onInputManualQuantity: { type: Function, optional: true },
 
     onPhotoClick: { type: Function, optional: true },
+    onBlockPhotoClick: { type: Function, optional: true },
     onNotesClick: { type: Function, optional: true },
     onDetailsClick: { type: Function, optional: true },
     onHoldClick: { type: Function, optional: true },

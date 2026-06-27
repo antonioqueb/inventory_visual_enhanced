@@ -286,6 +286,7 @@ ProductRow.props = {
     details: Array,
     onToggle: Function,
     onPhotoClick: Function,
+    onBlockPhotoClick: { type: Function, optional: true },
     onNotesClick: Function,
     onDetailsClick: Function,
     onSalesPersonClick: Function,
