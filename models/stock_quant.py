@@ -1010,11 +1010,12 @@ class StockQuant(models.Model):
         po_total = 0.0
         for po in valid_pos:
             for pl in po.order_line:
+                uom = getattr(pl, 'product_uom_id', False) or getattr(pl, 'product_uom', False)
                 purchase_lines.append({
                     'po_name': po.name,
                     'product': pl.product_id.display_name,
                     'qty': pl.product_qty,
-                    'uom': pl.product_uom.name if pl.product_uom else '',
+                    'uom': uom.name if uom else '',
                     'unit_price': pl.price_unit,
                     'subtotal': pl.price_subtotal,
                     'is_block': pl.id in block_po_line_set,
