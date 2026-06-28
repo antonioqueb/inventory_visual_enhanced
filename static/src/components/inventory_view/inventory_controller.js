@@ -86,6 +86,14 @@ class InventoryVisualController extends Component {
                 missingLots = result.missing_lots || [];
             }
 
+            // Resguardo de display: en cada modo solo productos CON existencia.
+            // Hace que "En Tránsito" oculte los productos con tránsito 0 aunque el
+            // backend aún devuelva todo (p. ej. si el módulo Python no se recargó).
+            const mode = this.state.stockMode;
+            products = products.filter((p) =>
+                mode === "transit" ? (p.transit_qty || 0) > 0 : (p.stock_qty || 0) > 0
+            );
+
             this.state.products = products;
             this.state.hasSearched = true;
             this.state.totalProducts = products.length;
