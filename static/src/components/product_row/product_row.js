@@ -246,6 +246,10 @@ export class ProductRow extends Component {
                 return isWorkshop;
             }
 
+            if (filter === "transit_all") {
+                return isTransit;
+            }
+
             if (filter === "transit_available") {
                 return isTransit && transitState === "available";
             }

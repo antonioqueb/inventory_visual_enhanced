@@ -103,6 +103,17 @@
                         </div>
 
                         <div class="inventory-row clickable-stat transit-row"
+                             t-att-class="{ 'active-filter': state.activeFilter === 'transit_all' }"
+                             t-on-click.stop="() => this.handleFilterClick('transit_all')"
+                             title="Todo el material en ubicación de tránsito">
+                            <span class="inventory-label">En Tránsito</span>
+                            <span class="inventory-value inventory-units" t-esc="props.product.transit_plates || 0"></span>
+                            <span class="inventory-value inventory-measure">
+                                <t t-esc="props.formatNumber(props.product.transit_qty)"/> <t t-esc="unitLabel"/>
+                            </span>
+                        </div>
+
+                        <div class="inventory-row clickable-stat transit-row"
                              t-att-class="{ 'active-filter': state.activeFilter === 'transit_available' }"
                              t-on-click.stop="() => this.handleFilterClick('transit_available')"
                              title="Disponible en tránsito publicado">
