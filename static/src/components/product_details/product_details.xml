@@ -281,7 +281,7 @@
                             <td t-att-colspan="getSummaryMidColspan()"></td>
 
                             <!-- Últimas columnas: Fin del Bloque -->
-                            <td colspan="4" style="text-align: right; vertical-align: middle; padding-right: 15px; color: #6c757d; font-style: italic;">
+                            <td colspan="4" style="text-align: right; vertical-align: middle; padding-right: 15px; color: #6c757d; font-style: italic; white-space: nowrap;">
                                 <button t-if="group.blockName and group.blockName !== 'Sin Bloque'"
                                         type="button"
                                         class="ive-block-photo-btn"
