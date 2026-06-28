@@ -922,21 +922,148 @@ class StockQuant(models.Model):
         Model = self.env['supplier.shipment.block.image'].sudo()
         images = Model.search([('block_name', '=ilike', block_name)], order='id desc')
         photos = []
+        product_names = []
         for img in images:
             if not img.image:
                 continue
             data = img.image
             if isinstance(data, bytes):
                 data = data.decode('utf-8', 'ignore')
+            pname = img.product_id.display_name if img.product_id else ''
+            if pname and pname not in product_names:
+                product_names.append(pname)
             photos.append({
                 'id': img.id,
-                'block_name': img.block_name,
-                'product_name': img.product_id.display_name if img.product_id else '',
-                'filename': img.image_filename or '',
-                'notes': img.notes or '',
+                'name': img.image_filename or ('Bloque %s' % block_name),
                 'image': data,
+                'fecha_captura': img.create_date.strftime('%Y-%m-%d %H:%M') if img.create_date else '',
+                'notas': img.notes or '',
             })
-        return {'block_name': block_name, 'photos': photos}
+        # Mismo formato que get_lot_photos para reutilizar el popup de placas.
+        return {
+            'lot_name': 'Bloque %s' % block_name,
+            'product_name': ', '.join(product_names),
+            'photos': photos,
+        }
+
+    @api.model
+    def get_block_purchase_report(self, block_name):
+        """Reporte de compra de un BLOQUE: costo por lote, info general de la
+        compra, todo lo comprado en la(s) misma(s) orden(es) y facturas. Camino:
+        stock.lot(x_bloque) → stock.move.line(incoming) → purchase.order.line → PO."""
+        block_name = (block_name or '').strip()
+        empty = {'block_name': block_name, 'has_data': False}
+        if not block_name:
+            return empty
+
+        Lot = self.env['stock.lot'].sudo()
+        lots = Lot.search([('x_bloque', '=ilike', block_name)])
+        if not lots:
+            return empty
+
+        MoveLine = self.env['stock.move.line'].sudo()
+        lot_info = []          # por lote del bloque: qty + po_line
+        block_po_line_ids = set()
+        for lot in lots:
+            mls = MoveLine.search([
+                ('lot_id', '=', lot.id),
+                ('picking_id.picking_type_id.code', '=', 'incoming'),
+            ])
+            qty = sum(mls.mapped('quantity'))
+            po_line = mls.mapped('move_id.purchase_line_id')[:1]
+            if po_line:
+                block_po_line_ids.add(po_line.id)
+            lot_info.append({'lot': lot, 'qty': qty, 'po_line': po_line})
+
+        pos = self.env['purchase.order.line'].sudo().browse(list(block_po_line_ids)).mapped('order_id')
+        valid_pos = pos.filtered(lambda p: p.state in ('purchase', 'done')) or pos
+        main_po = valid_pos[:1]
+        currency = (main_po.currency_id if main_po else self.env.company.currency_id)
+        cur_symbol = currency.symbol or '$'
+
+        def _g(rec, field):
+            return getattr(rec, field) if hasattr(rec, field) else ''
+
+        # --- Costo por lote (de ESTE bloque) ---
+        block_lots = []
+        block_total_cost = 0.0
+        block_total_qty = 0.0
+        for info in lot_info:
+            lot = info['lot']
+            unit = info['po_line'].price_unit if info['po_line'] else (lot.product_id.standard_price or 0.0)
+            total = unit * (info['qty'] or 0.0)
+            block_total_cost += total
+            block_total_qty += info['qty'] or 0.0
+            block_lots.append({
+                'lot_name': lot.name,
+                'numero_placa': _g(lot, 'x_numero_placa') or '',
+                'product': lot.product_id.display_name,
+                'qty': info['qty'] or 0.0,
+                'unit_cost': unit,
+                'total_cost': total,
+            })
+        block_lots.sort(key=lambda x: x['lot_name'])
+        block_po_line_set = {info['po_line'].id for info in lot_info if info['po_line']}
+
+        # --- Todo lo comprado en la(s) misma(s) orden(es) ---
+        purchase_lines = []
+        po_total = 0.0
+        for po in valid_pos:
+            for pl in po.order_line:
+                purchase_lines.append({
+                    'po_name': po.name,
+                    'product': pl.product_id.display_name,
+                    'qty': pl.product_qty,
+                    'uom': pl.product_uom.name if pl.product_uom else '',
+                    'unit_price': pl.price_unit,
+                    'subtotal': pl.price_subtotal,
+                    'is_block': pl.id in block_po_line_set,
+                })
+            po_total += po.amount_total
+
+        # --- Facturas ---
+        invoices = self.env['account.move'].sudo()
+        for po in valid_pos:
+            invoices |= po.invoice_ids
+        invoice_list = [{
+            'id': inv.id,
+            'name': inv.name or inv.ref or '(borrador)',
+            'date': inv.invoice_date.strftime('%d/%m/%Y') if inv.invoice_date else '',
+            'amount': inv.amount_total,
+            'currency': inv.currency_id.symbol or '$',
+            'state': dict(inv._fields['state'].selection).get(inv.state, inv.state or ''),
+            'payment_state': dict(inv._fields['payment_state'].selection).get(inv.payment_state, '') if inv.payment_state else '',
+        } for inv in invoices]
+
+        # --- Info general (de los lotes del bloque) ---
+        def first_lot_attr(field):
+            for lot in lots:
+                v = _g(lot, field)
+                if v:
+                    return v
+            return ''
+
+        return {
+            'block_name': block_name,
+            'has_data': bool(valid_pos),
+            'supplier': main_po.partner_id.name if main_po else '',
+            'po_names': valid_pos.mapped('name'),
+            'po_ids': valid_pos.ids,
+            'date': main_po.date_order.strftime('%d/%m/%Y') if main_po and main_po.date_order else '',
+            'currency': cur_symbol,
+            'partner_ref': main_po.partner_ref if main_po else '',
+            'incoterm': (main_po.incoterm_id.code if main_po and main_po.incoterm_id else ''),
+            'pedimento': first_lot_attr('x_pedimento'),
+            'contenedor': first_lot_attr('x_contenedor'),
+            'ref_proveedor': first_lot_attr('x_referencia_proveedor'),
+            'lots_count': len(lots),
+            'block_lots': block_lots,
+            'block_total_cost': block_total_cost,
+            'block_total_qty': block_total_qty,
+            'purchase_lines': purchase_lines,
+            'po_total': po_total,
+            'invoices': invoice_list,
+        }
 
     @api.model
     def get_lot_notes(self, quant_id):

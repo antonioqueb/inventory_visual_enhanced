@@ -308,8 +308,9 @@
                     <hr class="my-2"/>
                 </t>
 
-                <!-- BOTÓN AGREGAR (cuando no hay editor abierto) -->
-                <t t-if="!state.showUploadForm">
+                <!-- BOTÓN AGREGAR (cuando no hay editor abierto). Oculto en modo
+                     solo lectura, p. ej. fotos de bloque (se suben desde el Portal). -->
+                <t t-if="!state.showUploadForm and !props.readOnly">
                     <div class="text-center mb-2">
                         <button class="btn btn-secondary btn-lg" t-on-click="toggleUploadForm">
                             <i class="fa fa-plus-circle me-2"></i>

@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="inventory_visual_enhanced.BlockReportDialog" owl="1">
+        <Dialog size="'xl'" title="''" contentClass="'o_block_report_dialog_content'">
+            <div class="o_block_report_dialog">
+
+                <button class="block-report-floating-close" type="button" t-on-click="props.close" title="Cerrar">
+                    <i class="fa fa-times"/>
+                </button>
+
+                <!-- HERO -->
+                <div class="block-report-hero">
+                    <div class="block-report-hero__grain"/>
+                    <div class="block-report-hero__content">
+                        <div class="block-report-hero__icon">
+                            <i class="fa fa-file-text-o"/>
+                        </div>
+                        <div class="block-report-hero__copy">
+                            <span class="block-report-eyebrow">Reporte de compra · costo por lote</span>
+                            <h2>Bloque <t t-esc="report.block_name"/></h2>
+                            <p t-if="report.supplier">
+                                Comprado a <b t-esc="report.supplier"/>
+                                <t t-if="report.po_names and report.po_names.length"> · <t t-esc="report.po_names.join(', ')"/></t>
+                                <t t-if="report.date"> · <t t-esc="report.date"/></t>
+                            </p>
+                            <p t-else="">Trazabilidad de la compra que originó este bloque.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SIN DATOS -->
+                <t t-if="!report.has_data">
+                    <div class="block-report-empty">
+                        <i class="fa fa-info-circle"/>
+                        <p>No se encontró información de compra para este bloque.</p>
+                        <small>El bloque puede no provenir de una orden de compra registrada, o estar en una orden no confirmada.</small>
+                    </div>
+                </t>
+
+                <t t-else="">
+                    <!-- SUMMARY -->
+                    <div class="block-report-summary">
+                        <div class="block-report-stat block-report-stat--wide">
+                            <span>Proveedor</span>
+                            <strong t-esc="report.supplier or '-'"/>
+                        </div>
+                        <div class="block-report-stat">
+                            <span>Orden(es)</span>
+                            <strong class="block-report-link" t-on-click="() => this.openPO()">
+                                <i class="fa fa-external-link"/> <t t-esc="(report.po_names || []).join(', ') or '-'"/>
+                            </strong>
+                        </div>
+                        <div class="block-report-stat">
+                            <span>Costo del bloque</span>
+                            <strong t-esc="money(report.block_total_cost)"/>
+                        </div>
+                        <div class="block-report-stat">
+                            <span>Total de la compra</span>
+                            <strong t-esc="money(report.po_total)"/>
+                        </div>
+                    </div>
+
+                    <div class="block-report-body">
+
+                        <!-- INFO GENERAL -->
+                        <div class="block-report-card">
+                            <div class="block-report-card__header">
+                                <i class="fa fa-truck"/>
+                                <span>Información general de la compra</span>
+                            </div>
+                            <div class="block-report-grid">
+                                <div class="block-report-item">
+                                    <span>Fecha</span>
+                                    <strong><i class="fa fa-calendar"/> <t t-esc="report.date or '-'"/></strong>
+                                </div>
+                                <div class="block-report-item">
+                                    <span>Divisa</span>
+                                    <strong><i class="fa fa-money"/> <t t-esc="report.currency or '-'"/></strong>
+                                </div>
+                                <div class="block-report-item" t-if="report.partner_ref">
+                                    <span>Ref. proveedor</span>
+                                    <strong><i class="fa fa-hashtag"/> <t t-esc="report.partner_ref"/></strong>
+                                </div>
+                                <div class="block-report-item" t-if="report.incoterm">
+                                    <span>Incoterm</span>
+                                    <strong><i class="fa fa-globe"/> <t t-esc="report.incoterm"/></strong>
+                                </div>
+                                <div class="block-report-item" t-if="report.pedimento">
+                                    <span>Pedimento</span>
+                                    <strong><i class="fa fa-file-o"/> <t t-esc="report.pedimento"/></strong>
+                                </div>
+                                <div class="block-report-item" t-if="report.contenedor">
+                                    <span>Contenedor</span>
+                                    <strong><i class="fa fa-archive"/> <t t-esc="report.contenedor"/></strong>
+                                </div>
+                                <div class="block-report-item" t-if="report.ref_proveedor">
+                                    <span>Referencia material</span>
+                                    <strong><i class="fa fa-tag"/> <t t-esc="report.ref_proveedor"/></strong>
+                                </div>
+                                <div class="block-report-item">
+                                    <span>Placas del bloque</span>
+                                    <strong><i class="fa fa-th-large"/> <t t-esc="report.lots_count"/></strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- COSTO POR LOTE -->
+                        <div class="block-report-card">
+                            <div class="block-report-card__header">
+                                <i class="fa fa-usd"/>
+                                <span>Costo por lote · este bloque</span>
+                            </div>
+                            <div class="block-report-tablewrap">
+                                <table class="block-report-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Lote</th>
+                                            <th>Placa</th>
+                                            <th class="tr">Cantidad</th>
+                                            <th class="tr">Costo unit.</th>
+                                            <th class="tr">Costo total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="report.block_lots" t-as="l" t-key="l.lot_name">
+                                            <td><b t-esc="l.lot_name"/></td>
+                                            <td t-esc="l.numero_placa or '-'"/>
+                                            <td class="tr"><t t-esc="num(l.qty)"/></td>
+                                            <td class="tr" t-esc="money(l.unit_cost)"/>
+                                            <td class="tr" t-esc="money(l.total_cost)"/>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="2" class="tr"><b>Total</b></td>
+                                            <td class="tr"><b><t t-esc="num(report.block_total_qty)"/></b></td>
+                                            <td/>
+                                            <td class="tr"><b t-esc="money(report.block_total_cost)"/></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- TODO LO COMPRADO JUNTO -->
+                        <div class="block-report-card">
+                            <div class="block-report-card__header">
+                                <i class="fa fa-shopping-cart"/>
+                                <span>Todo lo comprado en esta orden</span>
+                            </div>
+                            <div class="block-report-tablewrap">
+                                <table class="block-report-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th class="tr">Cantidad</th>
+                                            <th class="tr">Costo unit.</th>
+                                            <th class="tr">Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="report.purchase_lines" t-as="pl" t-key="pl_index"
+                                            t-att-class="{ 'block-report-row--here': pl.is_block }">
+                                            <td>
+                                                <t t-esc="pl.product"/>
+                                                <span t-if="pl.is_block" class="block-report-pill">este bloque</span>
+                                            </td>
+                                            <td class="tr"><t t-esc="num(pl.qty)"/> <t t-esc="pl.uom"/></td>
+                                            <td class="tr" t-esc="money(pl.unit_price)"/>
+                                            <td class="tr" t-esc="money(pl.subtotal)"/>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="3" class="tr"><b>Total de la compra</b></td>
+                                            <td class="tr"><b t-esc="money(report.po_total)"/></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- FACTURAS -->
+                        <div class="block-report-card" t-if="report.invoices and report.invoices.length">
+                            <div class="block-report-card__header">
+                                <i class="fa fa-file-text"/>
+                                <span>Facturas de la compra</span>
+                            </div>
+                            <div class="block-report-invoices">
+                                <div class="block-report-invoice" t-foreach="report.invoices" t-as="inv" t-key="inv.id"
+                                     t-on-click="() => this.openRecord('account.move', inv.id)">
+                                    <div class="block-report-invoice__main">
+                                        <i class="fa fa-external-link"/>
+                                        <b t-esc="inv.name"/>
+                                    </div>
+                                    <div class="block-report-invoice__meta">
+                                        <span t-if="inv.date"><t t-esc="inv.date"/></span>
+                                        <span class="block-report-badge" t-esc="inv.state"/>
+                                        <span t-if="inv.payment_state" class="block-report-badge block-report-badge--pay" t-esc="inv.payment_state"/>
+                                        <b><t t-esc="inv.currency"/><t t-esc="num(inv.amount)"/></b>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </t>
+
+            </div>
+
+            <t t-set-slot="footer">
+                <button class="block-report-cta" type="button" t-if="report.has_data" t-on-click="() => this.openPO()">
+                    <i class="fa fa-external-link me-1"/> Abrir orden de compra
+                </button>
+                <button class="block-report-close-button" type="button" t-on-click="props.close">
+                    <i class="fa fa-times me-1"/> Cerrar
+                </button>
+            </t>
+        </Dialog>
+    </t>
+
+</templates>

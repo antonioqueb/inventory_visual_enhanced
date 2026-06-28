@@ -6,7 +6,7 @@ import { useService } from "@web/core/utils/hooks";
 import { SearchBar } from "../search_bar/search_bar";
 import { ProductRow } from "../product_row/product_row";
 import { PhotoGalleryDialog } from "../dialogs/photo_gallery/photo_gallery_dialog";
-import { BlockPhotoDialog } from "../dialogs/block_photo/block_photo_dialog";
+import { BlockReportDialog } from "../dialogs/block_report/block_report_dialog";
 import { NotesDialog } from "../dialogs/notes/notes_dialog";
 import { HistoryDialog } from "../dialogs/history/history_dialog";
 import { CreateHoldDialog } from "../dialogs/hold/hold_dialog";
@@ -209,19 +209,43 @@ class InventoryVisualController extends Component {
 
     async onBlockPhotoClick(blockName) {
         try {
-            const result = await this.orm.call(
+            const photosData = await this.orm.call(
                 "stock.quant",
                 "get_block_photos",
                 [],
                 { block_name: blockName }
             );
-            this.dialog.add(BlockPhotoDialog, {
-                blockName: (result && result.block_name) || blockName,
-                photos: (result && result.photos) || [],
+            if (photosData && photosData.error) {
+                this.notification.add(photosData.error, { type: "warning" });
+                return;
+            }
+            // Mismo popup que las placas (PhotoGalleryDialog), en modo solo lectura
+            // (las fotos de bloque se suben desde el Portal Proveedor).
+            this.dialog.add(PhotoGalleryDialog, {
+                photosData,
+                detailId: null,
+                readOnly: true,
+                title: `Fotografías - ${photosData.lot_name}`,
+                size: "xl",
             });
         } catch (error) {
             console.error("Error al cargar fotos del bloque:", error);
             this.notification.add("Error al cargar fotos del bloque", { type: "danger" });
+        }
+    }
+
+    async onBlockReportClick(blockName) {
+        try {
+            const report = await this.orm.call(
+                "stock.quant",
+                "get_block_purchase_report",
+                [],
+                { block_name: blockName }
+            );
+            this.dialog.add(BlockReportDialog, { report });
+        } catch (error) {
+            console.error("Error al cargar el reporte del bloque:", error);
+            this.notification.add("Error al cargar el reporte de compra del bloque", { type: "danger" });
         }
     }
 

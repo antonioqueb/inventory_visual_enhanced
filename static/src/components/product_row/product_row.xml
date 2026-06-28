@@ -153,6 +153,7 @@
                     details="filteredDetails"
                     onPhotoClick="props.onPhotoClick"
                     onBlockPhotoClick="props.onBlockPhotoClick"
+                    onBlockReportClick="props.onBlockReportClick"
                     onNotesClick="props.onNotesClick"
                     onDetailsClick="props.onDetailsClick"
                     onSalesPersonClick="props.onSalesPersonClick"

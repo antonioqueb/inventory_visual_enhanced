@@ -1,0 +1,319 @@
+// ============================================================================
+// Inventario Visual — Reporte de compra / costo por lote del bloque
+// Mismo branding que los demás diálogos (workshop / sale order).
+// ============================================================================
+
+.o_block_report_dialog_content {
+    .modal-header { display: none; }
+    .modal-body { padding: 0; background: $iv-bg; overflow: hidden; }
+    .modal-footer {
+        padding: 12px 16px;
+        background: #fff;
+        border-top: 1px solid $iv-border;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+}
+
+.o_block_report_dialog {
+    position: relative;
+    background:
+        radial-gradient(circle at top left, rgba(92, 185, 242, 0.16), transparent 32%),
+        radial-gradient(circle at top right, rgba(75, 164, 242, 0.14), transparent 34%),
+        linear-gradient(180deg, $iv-panel-warm, $iv-bg);
+    color: $iv-text;
+    font-family: $iv-font;
+}
+
+.block-report-floating-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 10;
+    width: 36px;
+    height: 36px;
+    border-radius: 13px;
+    border: 1px solid rgba(255, 255, 255, 0.32);
+    color: #fff;
+    background: rgba(15, 23, 42, 0.22);
+    backdrop-filter: blur(10px);
+}
+
+// ---- HERO ----
+.block-report-hero {
+    position: relative;
+    overflow: hidden;
+    color: #fff;
+    padding: 22px 24px;
+    background:
+        radial-gradient(circle at 14% 4%, rgba(92, 185, 242, 0.42), transparent 35%),
+        linear-gradient(135deg, $iv-blue-deep, $iv-blue-dark 58%, $iv-head);
+
+    &__grain {
+        position: absolute;
+        inset: 0;
+        opacity: 0.18;
+        background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.24) 1px, transparent 0);
+        background-size: 18px 18px;
+    }
+    &__content {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    &__icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        font-size: 22px;
+        flex-shrink: 0;
+    }
+    h2 {
+        margin: 2px 0 4px;
+        color: #fff;
+        font-size: 24px;
+        font-weight: $iv-weight-heavy;
+        letter-spacing: -0.03em;
+    }
+    p {
+        margin: 0;
+        max-width: 760px;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: $iv-size-md;
+    }
+}
+
+.block-report-eyebrow {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: $iv-size-sm;
+    font-weight: $iv-weight-heavy;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+}
+
+// ---- SUMMARY ----
+.block-report-summary {
+    display: grid;
+    grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(140px, 1fr));
+    gap: 10px;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.92);
+    border-bottom: 1px solid $iv-border;
+
+    @media (max-width: 900px) { grid-template-columns: 1fr 1fr; }
+}
+
+.block-report-stat {
+    border: 1px solid $iv-border;
+    border-radius: $iv-radius-sm;
+    background: #fff;
+    box-shadow: $iv-shadow-xs;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+
+    span {
+        font-size: $iv-size-sm;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: $iv-muted;
+        font-weight: $iv-weight-semibold;
+    }
+    strong {
+        font-size: $iv-size-lg;
+        font-weight: $iv-weight-bold;
+        color: $iv-text;
+    }
+    &--wide { grid-column: span 1; }
+}
+
+.block-report-link {
+    color: $iv-blue-dark !important;
+    cursor: pointer;
+    i { font-size: 12px; margin-right: 3px; }
+    &:hover { text-decoration: underline; }
+}
+
+// ---- BODY / CARDS ----
+.block-report-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.block-report-card {
+    border: 1px solid $iv-border;
+    border-radius: $iv-radius;
+    background: #fff;
+    box-shadow: $iv-shadow-xs;
+    overflow: hidden;
+
+    &__header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 14px;
+        font-weight: $iv-weight-bold;
+        color: $iv-text;
+        background: $iv-panel-muted;
+        border-bottom: 1px solid $iv-border;
+        i { color: $iv-blue-dark; }
+    }
+}
+
+.block-report-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    padding: 14px;
+}
+
+.block-report-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    span {
+        font-size: $iv-size-sm;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: $iv-muted;
+        font-weight: $iv-weight-semibold;
+    }
+    strong {
+        font-size: $iv-size-md;
+        color: $iv-text;
+        font-weight: $iv-weight-semibold;
+        i { color: $iv-blue-dark; margin-right: 5px; }
+    }
+}
+
+// ---- TABLAS ----
+.block-report-tablewrap { overflow-x: auto; }
+.block-report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: $iv-size-md;
+
+    th {
+        text-align: left;
+        font-size: $iv-size-sm;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: $iv-muted;
+        font-weight: $iv-weight-semibold;
+        padding: 9px 12px;
+        border-bottom: 2px solid $iv-border;
+        background: $iv-panel-soft;
+    }
+    td {
+        padding: 9px 12px;
+        border-bottom: 1px solid $iv-border;
+        color: $iv-text;
+    }
+    .tr { text-align: right; white-space: nowrap; }
+    tfoot td {
+        border-top: 2px solid $iv-border-strong;
+        background: $iv-panel-soft;
+    }
+    .block-report-row--here td { background: rgba(92, 185, 242, 0.10); }
+}
+
+.block-report-pill {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: $iv-size-xs;
+    font-weight: $iv-weight-bold;
+    color: $iv-blue-deep;
+    background: $iv-blue-soft;
+    border-radius: $iv-pill;
+    padding: 1px 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+// ---- FACTURAS ----
+.block-report-invoices {
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+    gap: 6px;
+}
+.block-report-invoice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid $iv-border;
+    border-radius: $iv-radius-sm;
+    cursor: pointer;
+    transition: $transition-fast;
+
+    &:hover {
+        border-color: $iv-blue-dark;
+        background: $iv-blue-soft;
+        transform: translateY(-1px);
+    }
+    &__main {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        i { color: $iv-blue-dark; }
+        b { color: $iv-text; }
+    }
+    &__meta {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: $iv-size-sm;
+        color: $iv-muted;
+        b { color: $iv-text; font-size: $iv-size-md; }
+    }
+}
+.block-report-badge {
+    text-transform: capitalize;
+    font-weight: $iv-weight-semibold;
+    color: $iv-blue-deep;
+    background: $iv-blue-soft;
+    border-radius: $iv-pill;
+    padding: 1px 8px;
+    &--pay { color: $iv-green-dark; background: $iv-green-soft; }
+}
+
+// ---- EMPTY ----
+.block-report-empty {
+    text-align: center;
+    padding: 48px 24px;
+    color: $iv-muted;
+    i { font-size: 48px; color: $iv-border-strong; }
+    p { margin: 14px 0 4px; font-size: $iv-size-lg; color: $iv-text; }
+    small { font-size: $iv-size-md; }
+}
+
+// ---- FOOTER BUTTONS ----
+.block-report-cta {
+    border: none;
+    border-radius: $iv-radius-sm;
+    padding: 9px 16px;
+    font-weight: $iv-weight-bold;
+    color: #fff;
+    background: linear-gradient(135deg, $iv-blue-dark, $iv-blue-deep);
+    box-shadow: $iv-shadow-sm;
+}
+.block-report-close-button {
+    border: 1px solid $iv-border;
+    border-radius: $iv-radius-sm;
+    padding: 9px 16px;
+    font-weight: $iv-weight-semibold;
+    color: $iv-text-2;
+    background: #fff;
+}

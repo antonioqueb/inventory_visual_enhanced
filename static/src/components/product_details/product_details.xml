@@ -289,6 +289,12 @@
                                         t-on-click.stop="() => props.onBlockPhotoClick(group.blockName)">
                                     <i class="fa fa-camera"/>
                                 </button>
+                                <a t-if="group.blockName and group.blockName !== 'Sin Bloque'"
+                                   class="ive-block-report-link"
+                                   title="Reporte de costo por lote e información de compra"
+                                   t-on-click.stop="() => props.onBlockReportClick(group.blockName)">
+                                    <i class="fa fa-file-text-o"/> Reporte de compra
+                                </a>
                                 <small>
                                     <span t-esc="group.blockName" style="font-weight: 600;"/>
                                 </small>
