@@ -35,3 +35,18 @@
     font-weight: 800;
     font-style: normal;
 }
+
+// Estado del ícono de foto del bloque (mismo lenguaje que la foto por placa):
+//  - ámbar = el bloque SÍ tiene foto
+//  - gris   = el bloque NO tiene foto
+.ive-block-photo-btn.has-photos {
+    background: linear-gradient(135deg, #F2B705, #ffd45c);
+    color: #1f2937;
+    border-color: rgba(242, 183, 5, 0.62);
+}
+.ive-block-photo-btn.no-content {
+    background: #f1f5f9;
+    color: #94a3b8;
+    border-color: rgba(148, 163, 184, 0.30);
+    opacity: 0.85;
+}

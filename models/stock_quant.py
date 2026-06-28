@@ -519,6 +519,23 @@ class StockQuant(models.Model):
             
             result.append(detail)
 
+        # Marca por bloque si tiene foto (para colorear el ícono). Un solo query
+        # por producto: OR de =ilike sobre los bloques presentes.
+        blocks_with_photo = set()
+        block_names = {(d.get('bloque') or '').strip() for d in result}
+        block_names.discard('')
+        if block_names and 'supplier.shipment.block.image' in self.env:
+            BImg = self.env['supplier.shipment.block.image'].sudo()
+            names = list(block_names)
+            domain = [('block_name', '=ilike', n) for n in names]
+            if len(names) > 1:
+                domain = ['|'] * (len(names) - 1) + domain
+            for img in BImg.search(domain):
+                if img.image:
+                    blocks_with_photo.add((img.block_name or '').strip().lower())
+        for d in result:
+            d['block_has_photo'] = (d.get('bloque') or '').strip().lower() in blocks_with_photo
+
         return result
 
     @api.model

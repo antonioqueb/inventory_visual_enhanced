@@ -59,12 +59,16 @@ export class ProductDetails extends Component {
                     totalArea: 0,
                     count: 0,
                     productType: null,
+                    hasPhoto: false,
                 };
             }
 
             groups[blockName].items.push(detail);
             groups[blockName].count += 1;
             groups[blockName].totalArea += detail.quantity || 0;
+            if (detail.block_has_photo) {
+                groups[blockName].hasPhoto = true;
+            }
 
             if (!groups[blockName].productType && detail.tipo) {
                 groups[blockName].productType = detail.tipo;

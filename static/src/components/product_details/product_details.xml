@@ -285,7 +285,8 @@
                                 <button t-if="group.blockName and group.blockName !== 'Sin Bloque'"
                                         type="button"
                                         class="ive-block-photo-btn"
-                                        title="Ver fotos del bloque"
+                                        t-att-class="{ 'has-photos': group.hasPhoto, 'no-content': !group.hasPhoto }"
+                                        t-att-title="group.hasPhoto ? 'Ver fotos del bloque' : 'Sin fotos para este bloque'"
                                         t-on-click.stop="() => props.onBlockPhotoClick(group.blockName)">
                                     <i class="fa fa-camera"/>
                                 </button>
