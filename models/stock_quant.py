@@ -388,7 +388,14 @@ class StockQuant(models.Model):
         # === FILTRO DE PRECIOS POST-AGRUPACIÓN ===
         if filters.get('price_min') or filters.get('price_max'):
             product_groups = self._filter_products_by_price(product_groups, filters)
-        
+
+        # Solo productos CON existencia en el modo seleccionado: si la cantidad es
+        # cero, el producto ni siquiera se muestra.
+        if stock_mode == 'transit':
+            product_groups = {pid: g for pid, g in product_groups.items() if g['transit_qty'] > 0}
+        else:
+            product_groups = {pid: g for pid, g in product_groups.items() if g['stock_qty'] > 0}
+
         return {
             'products': list(product_groups.values()),
             'missing_lots': missing_lots
