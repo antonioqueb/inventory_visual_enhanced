@@ -32,6 +32,8 @@ class InventoryVisualController extends Component {
 
             hasSalesPermissions: false,
             hasInventoryPermissions: false,
+
+            stockMode: "stock",
         });
 
         onWillStart(async () => {
@@ -64,6 +66,7 @@ class InventoryVisualController extends Component {
 
         this.state.isLoading = true;
         this.state.error = null;
+        this.state.stockMode = (filters && filters.stock_mode) || "stock";
 
         try {
             const result = await this.orm.call(

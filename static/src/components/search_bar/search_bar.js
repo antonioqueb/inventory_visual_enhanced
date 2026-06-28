@@ -12,7 +12,7 @@ export class SearchBar extends Component {
             filters: {
                 product_name: '',
                 almacen_id: null,
-                ubicacion_id: null,
+                stock_mode: 'stock',
                 tipo: '',
                 categoria_name: '',
                 grupo: '',
@@ -186,28 +186,9 @@ export class SearchBar extends Component {
         }
     }
 
-    async onAlmacenChange(ev) {
+    onAlmacenChange(ev) {
         const almacenId = ev.target.value ? parseInt(ev.target.value) : null;
         this.state.filters.almacen_id = almacenId;
-        this.state.filters.ubicacion_id = null;
-        this.state.ubicaciones = [];
-
-        if (almacenId) {
-            try {
-                const almacen = await this.orm.read("stock.warehouse", [almacenId], ["view_location_id"]);
-                if (almacen.length > 0 && almacen[0].view_location_id) {
-                    const ubicaciones = await this.orm.searchRead(
-                        "stock.location",
-                        [["location_id", "child_of", almacen[0].view_location_id[0]]],
-                        ["id", "complete_name"],
-                        { order: "complete_name" }
-                    );
-                    this.state.ubicaciones = ubicaciones;
-                }
-            } catch (error) {
-                console.error("Error cargando ubicaciones:", error);
-            }
-        }
         this._triggerSearchImmediate();
     }
 
@@ -309,14 +290,18 @@ export class SearchBar extends Component {
     }
 
     hasActiveFilters() {
-        return Object.entries(this.state.filters).some(([key, v]) => v !== null && v !== '');
+        return Object.entries(this.state.filters).some(([key, v]) => {
+            // 'stock_mode' por defecto en 'stock' no cuenta como filtro activo.
+            if (key === 'stock_mode') return v && v !== 'stock';
+            return v !== null && v !== '';
+        });
     }
 
     clearAllFilters() {
         this.state.filters = {
             product_name: '',
             almacen_id: null,
-            ubicacion_id: null,
+            stock_mode: 'stock',
             tipo: '',
             categoria_name: '',
             grupo: '',

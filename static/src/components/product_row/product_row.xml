@@ -36,6 +36,7 @@
             <td class="col-inventory">
                 <div class="inventory-subgrid">
 
+                    <t t-if="!isTransitMode">
                     <div class="inventory-row clickable-stat"
                          t-att-class="{ 'active-filter': state.activeFilter === 'all' }"
                          t-on-click.stop="() => this.handleFilterClick('all')"
@@ -79,8 +80,9 @@
                             <t t-esc="props.formatNumber(props.product.available_qty)"/> <t t-esc="unitLabel"/>
                         </span>
                     </div>
+                    </t>
 
-                    <t t-if="props.product.workshop_qty > 0">
+                    <t t-if="!isTransitMode and props.product.workshop_qty > 0">
                         <div class="inventory-separator">
                             <span>En Taller</span>
                         </div>
@@ -97,7 +99,7 @@
                         </div>
                     </t>
 
-                    <t t-if="props.product.transit_qty > 0">
+                    <t t-if="isTransitMode">
                         <div class="inventory-separator">
                             <span>En Tránsito</span>
                         </div>

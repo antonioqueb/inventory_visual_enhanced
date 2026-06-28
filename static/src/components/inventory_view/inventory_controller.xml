@@ -63,6 +63,7 @@
                                     product="product"
                                     isExpanded="isProductExpanded(product.product_id)"
                                     details="getProductDetails(product.product_id)"
+                                    stockMode="state.stockMode"
                                     onToggle.bind="(quantIds) => this.toggleProduct(product.product_id, quantIds)"
                                     onPhotoClick.bind="onPhotoClick"
                                     onBlockPhotoClick.bind="onBlockPhotoClick"

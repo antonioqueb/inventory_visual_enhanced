@@ -176,19 +176,17 @@
                         </select>
                     </div>
 
-                    <!-- Ubicación -->
+                    <!-- Inventario: Stock / Tránsito (reemplaza al filtro de Ubicación) -->
                     <div class="filter-group">
-                        <label class="filter-label d-none d-md-block">Ubicación</label>
-                        <select 
-                            class="form-select filter-select" 
-                            t-model="state.filters.ubicacion_id" 
-                            t-on-change="(ev) => this.onFilterChange('ubicacion_id', ev)" 
-                            t-att-disabled="props.isLoading or !state.filters.almacen_id or state.ubicaciones.length === 0"
+                        <label class="filter-label d-none d-md-block">Inventario</label>
+                        <select
+                            class="form-select filter-select"
+                            t-model="state.filters.stock_mode"
+                            t-on-change="(ev) => this.onFilterChange('stock_mode', ev)"
+                            t-att-disabled="props.isLoading"
                         >
-                            <option value="">Todas las ubicaciones</option>
-                            <t t-foreach="state.ubicaciones" t-as="ubicacion" t-key="ubicacion.id">
-                                <option t-att-value="ubicacion.id" t-esc="ubicacion.complete_name"></option>
-                            </t>
+                            <option value="stock">En Stock</option>
+                            <option value="transit">En Tránsito</option>
                         </select>
                     </div>
 

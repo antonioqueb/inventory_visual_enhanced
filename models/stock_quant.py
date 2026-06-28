@@ -127,9 +127,13 @@ class StockQuant(models.Model):
         # Así los lotes ya entregados al cliente NO aparecen en la vista,
         # pero las placas en proceso de taller (production) sí se visualizan.
         # =====================================================================
+        # Modo de inventario: 'stock' (almacén/taller) por defecto, o 'transit'
+        # (material en ubicación de tránsito). Reemplaza al filtro de ubicación.
+        stock_mode = (filters.get('stock_mode') or 'stock')
+        usages = ['transit'] if stock_mode == 'transit' else ['internal', 'production']
         domain = [
             ('quantity', '>', 0),
-            ('location_id.usage', 'in', ['internal', 'transit', 'production']),
+            ('location_id.usage', 'in', usages),
         ]
         search_lot_names = []
         

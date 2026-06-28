@@ -10,7 +10,7 @@ export class ProductRow extends Component {
         this.priceIconRef = useRef("priceIcon");
 
         this.state = useState({
-            activeFilter: "all",
+            activeFilter: this.props.stockMode === "transit" ? "transit_all" : "all",
             showPriceTooltip: false,
             priceData: null,
             priceLoading: false,
@@ -19,8 +19,13 @@ export class ProductRow extends Component {
         this._tooltipEl = null;
 
         onWillUpdateProps((nextProps) => {
+            const baseFilter = nextProps.stockMode === "transit" ? "transit_all" : "all";
             if (this.props.isExpanded && !nextProps.isExpanded) {
-                this.state.activeFilter = "all";
+                this.state.activeFilter = baseFilter;
+            }
+            // Al cambiar de modo (stock/tránsito) se reinicia el filtro base.
+            if (nextProps.stockMode !== this.props.stockMode) {
+                this.state.activeFilter = baseFilter;
             }
         });
 
@@ -34,13 +39,18 @@ export class ProductRow extends Component {
         return type === "pieza" ? "pza" : "m²";
     }
 
+    get isTransitMode() {
+        return this.props.stockMode === "transit";
+    }
+
     handleFilterClick(filterType) {
         if (!this.props.isExpanded) {
             this.props.onToggle(this.props.product.quant_ids);
         }
 
-        if (this.state.activeFilter === filterType && filterType !== "all") {
-            this.state.activeFilter = "all";
+        const baseFilter = this.isTransitMode ? "transit_all" : "all";
+        if (this.state.activeFilter === filterType && filterType !== baseFilter) {
+            this.state.activeFilter = baseFilter;
         } else {
             this.state.activeFilter = filterType;
         }
@@ -288,6 +298,7 @@ ProductRow.props = {
     product: Object,
     isExpanded: Boolean,
     details: Array,
+    stockMode: { type: String, optional: true },
     onToggle: Function,
     onPhotoClick: Function,
     onBlockPhotoClick: { type: Function, optional: true },
