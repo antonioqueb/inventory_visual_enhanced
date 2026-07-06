@@ -105,43 +105,9 @@
                             </div>
                         </div>
 
-                        <!-- COSTO POR LOTE -->
-                        <div class="block-report-card">
-                            <div class="block-report-card__header">
-                                <i class="fa fa-usd"/>
-                                <span>Costo por lote · este bloque</span>
-                            </div>
-                            <div class="block-report-tablewrap">
-                                <table class="block-report-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Lote</th>
-                                            <th>Placa</th>
-                                            <th class="tr">Cantidad</th>
-                                            <th class="tr">Costo unit.</th>
-                                            <th class="tr">Costo total</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr t-foreach="report.block_lots" t-as="l" t-key="l.lot_name">
-                                            <td><b t-esc="l.lot_name"/></td>
-                                            <td t-esc="l.numero_placa or '-'"/>
-                                            <td class="tr"><t t-esc="num(l.qty)"/></td>
-                                            <td class="tr" t-esc="money(l.unit_cost)"/>
-                                            <td class="tr" t-esc="money(l.total_cost)"/>
-                                        </tr>
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <td colspan="2" class="tr"><b>Total</b></td>
-                                            <td class="tr"><b><t t-esc="num(report.block_total_qty)"/></b></td>
-                                            <td/>
-                                            <td class="tr"><b t-esc="money(report.block_total_cost)"/></td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
-                        </div>
+                        <!-- La tabla "Costo por lote · este bloque" se eliminó por
+                             requerimiento (jul 2026): alargaba demasiado el diálogo.
+                             El costo total del bloque sigue visible en el resumen. -->
 
                         <!-- TODO LO COMPRADO JUNTO -->
                         <div class="block-report-card">

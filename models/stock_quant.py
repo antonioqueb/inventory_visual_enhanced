@@ -988,12 +988,49 @@ class StockQuant(models.Model):
             ])
             qty = sum(mls.mapped('quantity'))
             po_line = mls.mapped('move_id.purchase_line_id')[:1]
+
+            # FALLBACK A — Lotes ya en STOCK: la recepción física (Torre de
+            # Control) recrea/renumera lotes en un picking INTERNO, por lo que
+            # no tienen move lines de entrada. Se busca cualquier move line del
+            # lote cuyo move venga de una línea de compra.
+            if not po_line:
+                any_mls = MoveLine.search([
+                    ('lot_id', '=', lot.id),
+                    ('move_id.purchase_line_id', '!=', False),
+                ], limit=1)
+                po_line = any_mls.mapped('move_id.purchase_line_id')[:1]
+
+            if not qty:
+                # Sin recepción de entrada: usa la existencia actual del lote.
+                qty = lot.product_qty or 0.0
+
             if po_line:
                 block_po_line_ids.add(po_line.id)
             lot_info.append({'lot': lot, 'qty': qty, 'po_line': po_line})
 
         pos = self.env['purchase.order.line'].sudo().browse(list(block_po_line_ids)).mapped('order_id')
+
+        # FALLBACK B — Bloques del portal del proveedor: la fila de packing
+        # capturada por el proveedor conserva el nombre del bloque y su packing
+        # está ligado a la PO (related almacenado). Cubre lotes históricos sin
+        # ningún vínculo por move lines. Retroactivo: todo se resuelve al vuelo.
+        if not pos and 'supplier.shipment.packing.row' in self.env:
+            rows = self.env['supplier.shipment.packing.row'].sudo().search([
+                ('bloque', '=ilike', block_name),
+            ])
+            if rows:
+                pos = rows.mapped('packing_id.purchase_id')
+
         valid_pos = pos.filtered(lambda p: p.state in ('purchase', 'done')) or pos
+
+        # Costo por lote sin vínculo directo: empatar por producto dentro de
+        # las órdenes encontradas (mejor aproximación que el costo estándar).
+        if valid_pos:
+            for info in lot_info:
+                if not info['po_line']:
+                    info['po_line'] = valid_pos.mapped('order_line').filtered(
+                        lambda l: l.product_id == info['lot'].product_id
+                    )[:1]
         main_po = valid_pos[:1]
         currency = (main_po.currency_id if main_po else self.env.company.currency_id)
         cur_symbol = currency.symbol or '$'
