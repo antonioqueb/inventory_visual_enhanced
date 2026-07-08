@@ -450,6 +450,95 @@ class StockQuantTransitVisibility(models.Model):
 
         return committed_keys
 
+    def _iv_batch_get_partial_commit_map(self, quants):
+        """Mapa {(lot_id, product_id): qty} con la cantidad REALMENTE
+        comprometida en ventas para lotes segmentables (formato/pieza).
+
+        La cantidad sale del desglose de parcialidades de cada línea de venta
+        confirmada (x_lot_breakdown_json) menos lo ya entregado de ese lote en
+        esa línea. Si alguna línea compromete el lote SIN desglose (lote
+        completo), la clave devuelve True: se trata como compromiso total.
+
+        Las placas nunca entran al mapa: no se segmentan.
+        """
+        partial_map = {}
+
+        internal_quants = quants.filtered(
+            lambda q: q.location_id.usage == "internal"
+            and q.lot_id
+            and q.product_id
+        )
+        if not internal_quants:
+            return partial_map
+
+        def _lot_tipo(lot):
+            if hasattr(lot, "x_tipo") and lot.x_tipo:
+                return str(lot.x_tipo).strip().lower()
+            return "placa"
+
+        seg_lots = internal_quants.mapped("lot_id").filtered(
+            lambda l: _lot_tipo(l) in ("formato", "pieza")
+        )
+        if not seg_lots:
+            return partial_map
+
+        SaleLine = self.env["sale.order.line"].sudo()
+        if "lot_ids" not in SaleLine._fields:
+            return partial_map
+
+        sale_lines = SaleLine.search([
+            ("order_id.state", "in", ["sale", "done"]),
+            ("display_type", "=", False),
+            ("lot_ids", "in", seg_lots.ids),
+        ])
+
+        def _ml_qty(ml):
+            if "quantity" in ml._fields and ml.quantity:
+                return ml.quantity or 0.0
+            return getattr(ml, "reserved_uom_qty", 0.0) or getattr(ml, "qty_done", 0.0) or 0.0
+
+        seg_lot_ids = set(seg_lots.ids)
+
+        for sl in sale_lines:
+            breakdown = {}
+            if hasattr(sl, "_tc_read_lot_breakdown"):
+                breakdown = sl._tc_read_lot_breakdown() or {}
+
+            for lot in sl.lot_ids:
+                if lot.id not in seg_lot_ids:
+                    continue
+
+                key = (lot.id, sl.product_id.id)
+                if partial_map.get(key) is True:
+                    continue
+
+                bd_key = str(lot.id)
+                if bd_key not in breakdown:
+                    # Sin desglose: la línea compromete el lote COMPLETO.
+                    partial_map[key] = True
+                    continue
+
+                try:
+                    qty_bd = float(breakdown.get(bd_key) or 0.0)
+                except Exception:
+                    qty_bd = 0.0
+
+                # Descuenta lo ya entregado de ESTE lote en esa línea.
+                delivered = 0.0
+                for dml in sl.move_ids.mapped("move_line_ids"):
+                    if (
+                        dml.state == "done"
+                        and dml.lot_id == lot
+                        and dml.picking_id.picking_type_code == "outgoing"
+                    ):
+                        delivered += _ml_qty(dml)
+
+                remaining = max(0.0, qty_bd - delivered)
+                if remaining > 0.0001:
+                    partial_map[key] = partial_map.get(key, 0.0) + remaining
+
+        return partial_map
+
     @api.model
     def get_inventory_grouped_by_product(self, filters=None):
         if not filters:
@@ -599,6 +688,7 @@ class StockQuantTransitVisibility(models.Model):
         # Pre-cómputo en bloque para evitar N+1 dentro del bucle:
         # qué quants internos están comprometidos por alguna sale.order.
         committed_quant_keys = self._iv_batch_get_committed_quant_keys(quants)
+        partial_commit_map = self._iv_batch_get_partial_commit_map(quants)
 
         product_groups = {}
         visible_quants = self.env["stock.quant"]
@@ -711,14 +801,33 @@ class StockQuantTransitVisibility(models.Model):
                 product_groups[product_id]["hold_qty"] += qty
                 product_groups[product_id]["hold_plates"] += 1
 
-            if is_committed_by_stock or is_committed_by_sale:
-                committed_qty = reserved if reserved > 0 else qty
-                product_groups[product_id]["committed_qty"] += committed_qty
-                product_groups[product_id]["committed_plates"] += 1
+            # -------------------------------------------------------------
+            # PARCIALIDADES (formato/pieza): el lote puede estar comprometido
+            # solo en parte; el resto sigue LIBRE y cuenta como disponible.
+            # -------------------------------------------------------------
+            partial_commit = partial_commit_map.get(
+                (quant.lot_id.id if quant.lot_id else 0, product_id))
 
-            if not has_hold and not is_committed_by_sale and available > 0 and not is_workshop:
-                product_groups[product_id]["available_qty"] += available
-                product_groups[product_id]["available_plates"] += 1
+            if partial_commit is not None and partial_commit is not True:
+                committed_eff = min(qty, max(reserved, partial_commit))
+                remainder = qty - committed_eff
+
+                if committed_eff > 0.0001:
+                    product_groups[product_id]["committed_qty"] += committed_eff
+                    product_groups[product_id]["committed_plates"] += 1
+
+                if not has_hold and not is_workshop and remainder > 0.0001:
+                    product_groups[product_id]["available_qty"] += remainder
+                    product_groups[product_id]["available_plates"] += 1
+            else:
+                if is_committed_by_stock or is_committed_by_sale:
+                    committed_qty = reserved if reserved > 0 else qty
+                    product_groups[product_id]["committed_qty"] += committed_qty
+                    product_groups[product_id]["committed_plates"] += 1
+
+                if not has_hold and not is_committed_by_sale and available > 0 and not is_workshop:
+                    product_groups[product_id]["available_qty"] += available
+                    product_groups[product_id]["available_plates"] += 1
 
         missing_lots = []
         if search_lot_names:
