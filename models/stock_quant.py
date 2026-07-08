@@ -458,6 +458,9 @@ class StockQuant(models.Model):
                 'en_orden_venta': False,
                 'sale_order_ids': [],
                 'en_taller': False,
+                'qty_comprometida': 0.0,
+                'qty_disponible': quant.quantity,
+                'parcialmente_comprometido': False,
             }
 
             if quant.lot_id and hasattr(quant.lot_id, 'x_fotografia_ids'):
@@ -508,14 +511,80 @@ class StockQuant(models.Model):
                 ])
 
                 sale_order_ids = set()
+                committed_by_line = {}
+
+                def _ml_qty(ml):
+                    if 'quantity' in ml._fields and ml.quantity:
+                        return ml.quantity or 0.0
+                    return getattr(ml, 'reserved_uom_qty', 0.0) or getattr(ml, 'qty_done', 0.0) or 0.0
+
                 for move_line in move_lines_with_lot:
-                    sale_order = move_line.move_id.sale_line_id.order_id
+                    sale_line = move_line.move_id.sale_line_id
+                    sale_order = sale_line.order_id
                     if sale_order.state in ['sale', 'done']:
                         sale_order_ids.add(sale_order.id)
-                
+                        committed_by_line[sale_line.id] = (
+                            committed_by_line.get(sale_line.id, 0.0) + _ml_qty(move_line)
+                        )
+
+                # ============================================================
+                # PARCIALIDADES (formato/pieza): la cantidad comprometida es
+                # la del desglose de la línea de venta, NO el lote completo.
+                # También cubre líneas SIN move lines (el guard anti-FIFO omite
+                # la reserva nativa para líneas con lotes manuales).
+                # ============================================================
+                lot_tipo = ''
+                if hasattr(quant.lot_id, 'x_tipo') and quant.lot_id.x_tipo:
+                    lot_tipo = str(quant.lot_id.x_tipo).strip().lower()
+                is_segmentable = lot_tipo in ('formato', 'pieza')
+
+                SaleLine = self.env['sale.order.line'].sudo()
+                if 'lot_ids' in SaleLine._fields:
+                    sol_lines = SaleLine.search([
+                        ('lot_ids', 'in', quant.lot_id.id),
+                        ('state', '=', 'sale'),
+                    ])
+                    for sol in sol_lines:
+                        qty_bd = quant.quantity
+                        if is_segmentable and hasattr(sol, '_tc_read_lot_breakdown'):
+                            breakdown = sol._tc_read_lot_breakdown() or {}
+                            key = str(quant.lot_id.id)
+                            if key in breakdown:
+                                try:
+                                    qty_bd = float(breakdown.get(key) or 0.0)
+                                except Exception:
+                                    qty_bd = 0.0
+
+                        # Descuenta lo ya entregado de ESTE lote en esa línea.
+                        delivered = 0.0
+                        for dml in sol.move_ids.mapped('move_line_ids'):
+                            if (
+                                dml.state == 'done'
+                                and dml.lot_id == quant.lot_id
+                                and dml.picking_id.picking_type_code == 'outgoing'
+                            ):
+                                delivered += _ml_qty(dml)
+
+                        remaining = max(0.0, qty_bd - delivered)
+                        if remaining > 0.0001:
+                            sale_order_ids.add(sol.order_id.id)
+                            committed_by_line[sol.id] = max(
+                                committed_by_line.get(sol.id, 0.0), remaining)
+
+                committed_qty = min(
+                    quant.quantity, sum(committed_by_line.values()))
+
                 if sale_order_ids:
                     detail['en_orden_venta'] = True
                     detail['sale_order_ids'] = list(sale_order_ids)
+                    detail['qty_comprometida'] = committed_qty
+                    detail['qty_disponible'] = max(
+                        0.0, quant.quantity - committed_qty)
+                    detail['parcialmente_comprometido'] = bool(
+                        is_segmentable
+                        and committed_qty > 0.0001
+                        and detail['qty_disponible'] > 0.0001
+                    )
             
             result.append(detail)
 

@@ -68,9 +68,9 @@
                                             type="checkbox"
                                             class="form-check-input cart-checkbox"
                                             t-att-checked="props.isInCart ? props.isInCart(detail.id) : false"
-                                            t-att-disabled="detail.tiene_hold or detail.en_orden_venta"
+                                            t-att-disabled="detail.tiene_hold or (detail.en_orden_venta and !detail.parcialmente_comprometido)"
                                             t-on-change="() => props.toggleCartSelection ? props.toggleCartSelection(detail) : null"
-                                            t-att-title="detail.tiene_hold ? 'Lote con apartado activo' : (detail.en_orden_venta ? 'Lote en orden de venta confirmada' : '')"
+                                            t-att-title="detail.tiene_hold ? 'Lote con apartado activo' : (detail.en_orden_venta and !detail.parcialmente_comprometido ? 'Lote en orden de venta confirmada' : (detail.parcialmente_comprometido ? 'Parcialmente en orden de venta: puedes elegir la parte disponible' : ''))"
                                         />
                                     </div>
                                 </td>
@@ -119,7 +119,15 @@
                                             </t>
                                         </span>
                                         <strong class="dimensions-total-inline">
-                                            <t t-esc="props.formatNumber(detail.quantity)"/> <t t-esc="getUnitLabel(detail.tipo)"/>
+                                            <t t-if="detail.parcialmente_comprometido">
+                                                <span style="color: #198754;"><t t-esc="props.formatNumber(detail.qty_disponible)"/> disp.</span>
+                                                <span style="color: #adb5bd;"> · </span>
+                                                <span style="color: #b45309;"><t t-esc="props.formatNumber(detail.qty_comprometida)"/> en OV</span>
+                                                <t t-esc="getUnitLabel(detail.tipo)"/>
+                                            </t>
+                                            <t t-else="">
+                                                <t t-esc="props.formatNumber(detail.quantity)"/> <t t-esc="getUnitLabel(detail.tipo)"/>
+                                            </t>
                                         </strong>
                                     </span>
                                 </td>
@@ -239,7 +247,7 @@
                                         type="button"
                                         class="status-badge-btn status-sale-order"
                                         t-on-click="() => props.onSaleOrderClick(detail.id, detail.sale_order_ids)"
-                                        title="Ver orden de venta"
+                                        t-att-title="detail.parcialmente_comprometido ? 'Parcialmente en orden de venta (queda disponible ' + props.formatNumber(detail.qty_disponible) + ')' : 'Ver orden de venta'"
                                     >
                                         <i class="fa fa-usd"></i>
                                     </button>

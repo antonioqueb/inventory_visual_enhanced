@@ -249,7 +249,10 @@ export class ProductRow extends Component {
             }
 
             if (filter === "available") {
-                return !isTransit && !isWorkshop && availableQty > 0 && !d.tiene_hold && !d.en_orden_venta;
+                // Un formato/pieza parcialmente comprometido sigue teniendo
+                // una parte disponible: se muestra también en este filtro.
+                return !isTransit && !isWorkshop && availableQty > 0 && !d.tiene_hold
+                    && (!d.en_orden_venta || d.parcialmente_comprometido);
             }
 
             if (filter === "workshop") {
