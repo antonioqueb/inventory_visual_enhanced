@@ -499,6 +499,27 @@ class StockQuantTransitVisibility(models.Model):
 
         seg_lot_ids = set(seg_lots.ids)
 
+        # Líneas ya entregadas por completo no comprometen nada.
+        sale_lines = sale_lines.filtered(
+            lambda l: "qty_delivered" not in l._fields
+            or (l.product_uom_qty or 0.0) - (l.qty_delivered or 0.0) > 0.0001
+        )
+        if not sale_lines:
+            return partial_map
+
+        # Entregado por (línea, lote) en UNA sola consulta — nunca por línea
+        # (con miles de lotes el N+1 congelaba la vista completa).
+        delivered_map = {}
+        done_mls = self.env["stock.move.line"].sudo().search([
+            ("move_id.sale_line_id", "in", sale_lines.ids),
+            ("lot_id", "in", list(seg_lot_ids)),
+            ("state", "=", "done"),
+            ("picking_id.picking_type_code", "=", "outgoing"),
+        ])
+        for dml in done_mls:
+            k = (dml.move_id.sale_line_id.id, dml.lot_id.id)
+            delivered_map[k] = delivered_map.get(k, 0.0) + _ml_qty(dml)
+
         for sl in sale_lines:
             breakdown = {}
             if hasattr(sl, "_tc_read_lot_breakdown"):
@@ -523,15 +544,7 @@ class StockQuantTransitVisibility(models.Model):
                 except Exception:
                     qty_bd = 0.0
 
-                # Descuenta lo ya entregado de ESTE lote en esa línea.
-                delivered = 0.0
-                for dml in sl.move_ids.mapped("move_line_ids"):
-                    if (
-                        dml.state == "done"
-                        and dml.lot_id == lot
-                        and dml.picking_id.picking_type_code == "outgoing"
-                    ):
-                        delivered += _ml_qty(dml)
+                delivered = delivered_map.get((sl.id, lot.id), 0.0)
 
                 remaining = max(0.0, qty_bd - delivered)
                 if remaining > 0.0001:
