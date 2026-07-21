@@ -247,13 +247,13 @@
        
                     <!-- Espesor -->
                     <div class="filter-group">
-                        <label class="filter-label d-none d-md-block">Espesor</label>
+                        <label class="filter-label d-none d-md-block">Grosor</label>
                         <select 
                             class="form-select filter-select" 
                             t-model="state.filters.grosor" 
                             t-on-change="(ev) => this.onFilterChange('grosor', ev)"
                         >
-                            <option value="">Espesor...</option>
+                            <option value="">Grosor...</option>
                             <t t-foreach="state.grosores" t-as="grosor" t-key="grosor">
                                 <option t-att-value="grosor" t-esc="grosor"></option>
                             </t>
