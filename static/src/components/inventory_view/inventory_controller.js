@@ -36,6 +36,14 @@ class InventoryVisualController extends Component {
             stockMode: "stock",
         });
 
+        // Lote inicial: llega cuando la Búsqueda Global del home abre el
+        // Inventario Visual con un lote seleccionado (params.lot_name).
+        this.initialLotName =
+            (this.props.action &&
+                ((this.props.action.params && this.props.action.params.lot_name) ||
+                 (this.props.action.context && this.props.action.context.lot_name))) ||
+            "";
+
         onWillStart(async () => {
             await this.loadPermissions();
         });

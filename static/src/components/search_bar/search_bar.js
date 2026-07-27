@@ -55,12 +55,21 @@ export class SearchBar extends Component {
         // Tracking para evitar búsquedas duplicadas
         this._lastSearchPayload = null;
 
+        // Lote inicial (viene de la Búsqueda Global del home): precargar
+        // el campo de lote y disparar la búsqueda en cuanto monte.
+        if (this.props.initialLot) {
+            this.state.filters.numero_serie = this.props.initialLot;
+        }
+
         onWillStart(async () => {
             await this.loadFilterOptions();
         });
 
         onMounted(() => {
             this.setupScrollListener();
+            if (this.props.initialLot) {
+                this._executeSearch();
+            }
         });
     }
 
@@ -333,4 +342,5 @@ SearchBar.props = {
     onSearch: Function,
     totalProducts: { type: Number, optional: true },
     hasSearched: { type: Boolean, optional: true },
+    initialLot: { type: String, optional: true },
 };

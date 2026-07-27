@@ -10,6 +10,7 @@
                 onSearch.bind="onSearch"
                 totalProducts="state.totalProducts"
                 hasSearched="state.hasSearched"
+                initialLot="initialLotName"
             />
             
             <!-- Contenido principal -->
