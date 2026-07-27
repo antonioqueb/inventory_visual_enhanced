@@ -725,9 +725,12 @@ class StockQuant(models.Model):
             'cantidad_disponible': quant.quantity - quant.reserved_quantity,
         }
         
+        # Acotado a los 300 movimientos más recientes: el historial del diálogo
+        # no necesita la vida completa de un lote muy movido, y sin límite el
+        # popup podía cargar miles de líneas.
         move_lines = self.env['stock.move.line'].search([
             ('lot_id', '=', lot.id)
-        ])
+        ], order='date desc', limit=300)
         
         from datetime import datetime
         dias_inventario = 0
