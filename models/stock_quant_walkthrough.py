@@ -38,13 +38,42 @@ class StockQuantWalkthrough(models.Model):
 
     @api.model
     def _walkthrough_base_domain(self):
+        # Odoo 19 eliminó el booleano scrap_location: el desecho es una
+        # ubicación usage='inventory' (mismo usage que las pérdidas por
+        # ajuste). El filtrado fino se hace en
+        # _walkthrough_filter_proper_exits vía move.scrap_id.
         return [
             ('quantity', '>', 0),
             ('lot_id', '!=', False),
-            '|',
-            ('location_id.usage', '=', 'customer'),
-            ('location_id.scrap_location', '=', True),
+            ('location_id.usage', 'in', ['customer', 'inventory']),
         ]
+
+    @api.model
+    def _walkthrough_filter_proper_exits(self, quants):
+        """Solo salidas por proceso correcto.
+
+        Los quants en ubicaciones usage='inventory' mezclan dos orígenes que
+        Odoo 19 ya no distingue por ubicación: bajas reales (stock.scrap →
+        move.scrap_id) y ajustes de inventario (move.is_inventory, p. ej. la
+        reclasificación al vaciar el lote origen). Solo las primeras son
+        salidas correctas; las segundas quedan fuera del Walkthrough."""
+        inv_quants = quants.filtered(lambda q: q.location_id.usage == 'inventory')
+        if not inv_quants:
+            return quants
+        scrap_lines = self.env['stock.move.line'].sudo().search_read([
+            ('lot_id', 'in', inv_quants.mapped('lot_id').ids),
+            ('location_dest_id', 'in', inv_quants.mapped('location_id').ids),
+            ('state', '=', 'done'),
+            ('move_id.scrap_id', '!=', False),
+        ], ['lot_id', 'location_dest_id'])
+        scrapped_pairs = {
+            (line['lot_id'][0], line['location_dest_id'][0])
+            for line in scrap_lines
+        }
+        return quants.filtered(
+            lambda q: q.location_id.usage == 'customer'
+            or (q.lot_id.id, q.location_id.id) in scrapped_pairs
+        )
 
     @api.model
     def _walkthrough_apply_filters(self, domain, filters):
@@ -159,6 +188,10 @@ class StockQuantWalkthrough(models.Model):
             set(quants.mapped('lot_id').ids))
         quants = quants.filtered(lambda q: q.lot_id.id not in lots_alive)
 
+        # Solo entregas y bajas reales (stock.scrap); los ajustes de
+        # inventario no son salidas correctas.
+        quants = self._walkthrough_filter_proper_exits(quants)
+
         product_groups = {}
         for quant in quants:
             product = quant.product_id
@@ -267,14 +300,21 @@ class StockQuantWalkthrough(models.Model):
             if not quant:
                 continue
 
-            is_scrap = quant.location_id.scrap_location
+            is_scrap = quant.location_id.usage == 'inventory'
             detail['exit_type'] = 'scrap' if is_scrap else 'delivery'
 
-            last_out = MoveLine.search([
+            out_domain = [
                 ('lot_id', '=', quant.lot_id.id),
                 ('location_dest_id', '=', quant.location_id.id),
                 ('state', '=', 'done'),
-            ], order='date desc, id desc', limit=1)
+            ]
+            if is_scrap:
+                # Odoo 19: la ubicación de desecho comparte usage con las
+                # pérdidas por ajuste; el documento de salida correcto es el
+                # movimiento de stock.scrap.
+                out_domain.append(('move_id.scrap_id', '!=', False))
+            last_out = MoveLine.search(
+                out_domain, order='date desc, id desc', limit=1)
 
             detail['exit_date'] = (
                 last_out.date.strftime('%Y-%m-%d') if last_out and last_out.date else ''
