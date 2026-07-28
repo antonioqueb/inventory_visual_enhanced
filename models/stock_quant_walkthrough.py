@@ -2,21 +2,32 @@
 """Walkthrough: inventario que YA SALIÓ del stock.
 
 Espejo del Inventario Visual pero sobre las salidas correctas:
-- Entregas a cliente (quants en ubicaciones usage='customer').
-- Bajas de material / desecho (quants en ubicaciones scrap_location=True).
 
-La clave del diseño: un lote entregado o dado de baja conserva quants con
-cantidad positiva en la ubicación de cliente/desecho (partida doble de
-Odoo), así que el detail.id sigue siendo un stock.quant real y TODA la
-cadena existente (get_quant_details, get_lot_history, get_lot_photos,
-get_lot_notes, save_lot_notes) funciona sin cambios.
+- ENTREGAS: quants con cantidad positiva en ubicaciones usage='customer'
+  (partida doble de Odoo: lo entregado se acumula en el cliente).
+- BAJAS: movimientos done de stock.scrap (move.scrap_id). NO se puede usar
+  el quant de la ubicación de desecho: en Odoo 19 el desecho comparte
+  ubicación/usage ('inventory') con la contrapartida de los ajustes, así
+  que un material que ENTRÓ por ajuste (−qty) y salió por baja (+qty)
+  deja el quant NETO EN CERO. La cantidad real dada de baja se toma de
+  los movimientos.
+
+Cada fila de detalle sigue siendo un stock.quant real (el de cliente, o
+el de la ubicación de desecho — se garantiza su existencia aunque esté en
+cero), para que la cadena existente (get_quant_details, get_lot_history,
+get_lot_photos, get_lot_notes) funcione sin cambios con detail.id.
 
 Quedan fuera a propósito:
 - Lotes que aún tienen existencias en internal/transit/production (eso es
   el Inventario Visual, no el Walkthrough).
-- Lotes reclasificados: su salida fue un ajuste de inventario (usage
-  'inventory' sin scrap_location), no una salida real; el material sigue
-  existiendo en el lote espejo.
+- Ajustes de inventario y reclasificaciones (move.is_inventory, sin
+  scrap_id): no son salidas correctas; en la reclasificación el material
+  sigue existiendo en el lote espejo.
+
+Ojo con lotes archivados: la baja archiva el lote, y cualquier condición
+de dominio que navegue el m2o (lot_id.name, lot_id.x_bloque...) los
+excluiría por active_test. Por eso los filtros de lote se resuelven
+aparte con active_test=False y los dominios reciben ('lot_id','in',ids).
 """
 import logging
 
@@ -29,7 +40,8 @@ class StockQuantWalkthrough(models.Model):
     _inherit = 'stock.quant'
 
     # ------------------------------------------------------------------
-    # Dominio base y filtros
+    # Filtros comunes (aplican a stock.quant Y a stock.move.line: ambos
+    # tienen product_id y lot_id)
     # ------------------------------------------------------------------
 
     @api.model
@@ -37,52 +49,13 @@ class StockQuantWalkthrough(models.Model):
         return field_name in self.env[model]._fields
 
     @api.model
-    def _walkthrough_base_domain(self):
-        # Odoo 19 eliminó el booleano scrap_location: el desecho es una
-        # ubicación usage='inventory' (mismo usage que las pérdidas por
-        # ajuste). El filtrado fino se hace en
-        # _walkthrough_filter_proper_exits vía move.scrap_id.
-        return [
-            ('quantity', '>', 0),
-            ('lot_id', '!=', False),
-            ('location_id.usage', 'in', ['customer', 'inventory']),
-        ]
-
-    @api.model
-    def _walkthrough_filter_proper_exits(self, quants):
-        """Solo salidas por proceso correcto.
-
-        Los quants en ubicaciones usage='inventory' mezclan dos orígenes que
-        Odoo 19 ya no distingue por ubicación: bajas reales (stock.scrap →
-        move.scrap_id) y ajustes de inventario (move.is_inventory, p. ej. la
-        reclasificación al vaciar el lote origen). Solo las primeras son
-        salidas correctas; las segundas quedan fuera del Walkthrough."""
-        inv_quants = quants.filtered(lambda q: q.location_id.usage == 'inventory')
-        if not inv_quants:
-            return quants
-        scrap_lines = self.env['stock.move.line'].sudo().search_read([
-            ('lot_id', 'in', inv_quants.mapped('lot_id').ids),
-            ('location_dest_id', 'in', inv_quants.mapped('location_id').ids),
-            ('state', '=', 'done'),
-            ('move_id.scrap_id', '!=', False),
-        ], ['lot_id', 'location_dest_id'])
-        scrapped_pairs = {
-            (line['lot_id'][0], line['location_dest_id'][0])
-            for line in scrap_lines
-        }
-        return quants.filtered(
-            lambda q: q.location_id.usage == 'customer'
-            or (q.lot_id.id, q.location_id.id) in scrapped_pairs
-        )
-
-    @api.model
-    def _walkthrough_apply_filters(self, domain, filters):
+    def _walkthrough_common_filters(self, filters):
         """Réplica de los filtros del Inventario Visual que tienen sentido
         sin stock actual. almacen_id / ubicacion_id / stock_mode se ignoran
         (el material ya no está en un almacén)."""
         filters = filters or {}
         Lot = self.env['stock.lot']
-        Tmpl = self.env['product.template']
+        domain = []
         missing_lots = []
 
         if filters.get('product_name'):
@@ -109,13 +82,7 @@ class StockQuantWalkthrough(models.Model):
             domain.append((
                 'product_id.product_tmpl_id.x_acabado', '=', filters['acabado']))
 
-        # ------------------------------------------------------------------
-        # Filtros sobre el LOTE. Ojo: los lotes dados de baja quedan
-        # ARCHIVADOS, y una condición de dominio que navega por el m2o
-        # ('lot_id.x_bloque', ...) los excluiría por active_test. Por eso
-        # los filtros de lote se resuelven aparte con active_test=False y
-        # el dominio de quants recibe solo ('lot_id', 'in', ids).
-        # ------------------------------------------------------------------
+        # --- Filtros sobre el LOTE (resueltos con active_test=False) ---
         lot_domain = []
 
         lot_field_filters = [
@@ -167,7 +134,7 @@ class StockQuantWalkthrough(models.Model):
         return domain, missing_lots
 
     # ------------------------------------------------------------------
-    # Agrupación por producto
+    # Fuentes de salidas
     # ------------------------------------------------------------------
 
     @api.model
@@ -188,47 +155,86 @@ class StockQuantWalkthrough(models.Model):
         return {g['lot_id'][0] for g in groups if g.get('lot_id')}
 
     @api.model
+    def _walkthrough_scrap_aggregates(self, common_domain):
+        """Bajas reales, agregadas desde los movimientos de stock.scrap:
+        {(lot, location_dest): qty_total}."""
+        move_lines = self.env['stock.move.line'].sudo().search([
+            ('state', '=', 'done'),
+            ('move_id.scrap_id', '!=', False),
+            ('lot_id', '!=', False),
+            ('location_dest_id.usage', '=', 'inventory'),
+        ] + list(common_domain))
+        aggregates = {}
+        for line in move_lines:
+            key = (line.lot_id, line.location_dest_id)
+            aggregates[key] = aggregates.get(key, 0.0) + (line.quantity or 0.0)
+        return aggregates
+
+    @api.model
+    def _walkthrough_ensure_quant(self, lot, location):
+        """Garantiza un stock.quant (aunque esté en cero) para usarlo como
+        detail.id: el cron de vacuum borra los quants en cero, y el quant de
+        la ubicación de desecho puede quedar neto en cero (ver docstring del
+        módulo). Un quant en cero no afecta existencias."""
+        Quant = self.sudo().with_context(active_test=False)
+        quant = Quant.search([
+            ('lot_id', '=', lot.id),
+            ('location_id', '=', location.id),
+        ], limit=1)
+        if not quant:
+            quant = Quant.create({
+                'product_id': lot.product_id.id,
+                'lot_id': lot.id,
+                'location_id': location.id,
+                'quantity': 0.0,
+            })
+        return quant
+
+    # ------------------------------------------------------------------
+    # Agrupación por producto
+    # ------------------------------------------------------------------
+
+    @api.model
     def get_walkthrough_grouped_by_product(self, filters=None):
         filters = filters or {}
-        domain = self._walkthrough_base_domain()
-        domain, missing_lots = self._walkthrough_apply_filters(domain, filters)
+        common_domain, missing_lots = self._walkthrough_common_filters(filters)
 
-        quants = self.sudo().search(domain, order='product_id, lot_id, id')
+        # Entregas: quants positivos en ubicación de cliente.
+        delivered_quants = self.sudo().search([
+            ('quantity', '>', 0),
+            ('lot_id', '!=', False),
+            ('location_id.usage', '=', 'customer'),
+        ] + list(common_domain), order='product_id, lot_id, id')
 
-        # Excluir lotes que siguen teniendo stock (devoluciones parciales,
-        # entregas parciales: mientras quede material, viven en el
-        # Inventario Visual).
-        lots_alive = self._walkthrough_lots_with_current_stock(
-            set(quants.mapped('lot_id').ids))
-        quants = quants.filtered(lambda q: q.lot_id.id not in lots_alive)
+        # Bajas: movimientos de stock.scrap.
+        scrap_aggregates = self._walkthrough_scrap_aggregates(common_domain)
 
-        # Solo entregas y bajas reales (stock.scrap); los ajustes de
-        # inventario no son salidas correctas.
-        quants = self._walkthrough_filter_proper_exits(quants)
+        # Excluir lotes que siguen teniendo stock (devoluciones/entregas
+        # parciales: mientras quede material, viven en el Inventario Visual).
+        all_lot_ids = set(delivered_quants.mapped('lot_id').ids)
+        all_lot_ids.update(lot.id for (lot, _loc) in scrap_aggregates)
+        lots_alive = self._walkthrough_lots_with_current_stock(all_lot_ids)
+
+        # Entradas normalizadas: (quant, lot, qty, kind).
+        entries = []
+        for quant in delivered_quants:
+            if quant.lot_id.id in lots_alive:
+                continue
+            entries.append((quant, quant.lot_id, quant.quantity or 0.0, 'delivery'))
+        for (lot, location), qty in scrap_aggregates.items():
+            if lot.id in lots_alive or qty <= 0:
+                continue
+            quant = self._walkthrough_ensure_quant(lot, location)
+            entries.append((quant, lot, qty, 'scrap'))
 
         product_groups = {}
-        for quant in quants:
-            product = quant.product_id
+        for quant, lot, qty, kind in entries:
+            product = lot.product_id
             group = product_groups.setdefault(product.id, {
                 'product': product,
-                'quants': [],
-                'out_qty': 0.0,
-                'out_plates': 0,
-                'delivered_qty': 0.0,
-                'delivered_plates': 0,
-                'scrapped_qty': 0.0,
-                'scrapped_plates': 0,
+                'entries': [],
             })
-            qty = quant.quantity or 0.0
-            group['quants'].append(quant)
-            group['out_qty'] += qty
-            group['out_plates'] += 1
-            if quant.location_id.usage == 'customer':
-                group['delivered_qty'] += qty
-                group['delivered_plates'] += 1
-            else:
-                group['scrapped_qty'] += qty
-                group['scrapped_plates'] += 1
+            group['entries'].append((quant, lot, qty, kind))
 
         # Cant. mínima por bloque (sobre lo que salió, espejo del filtro
         # del Inventario Visual).
@@ -242,19 +248,19 @@ class StockQuantWalkthrough(models.Model):
                 for pid in list(product_groups):
                     group = product_groups[pid]
                     block_sums = {}
-                    for quant in group['quants']:
-                        block = getattr(quant.lot_id, 'x_bloque', '') or 'Sin Bloque'
-                        block_sums[block] = block_sums.get(block, 0.0) + (quant.quantity or 0.0)
+                    for _q, lot, qty, _k in group['entries']:
+                        block = getattr(lot, 'x_bloque', '') or 'Sin Bloque'
+                        block_sums[block] = block_sums.get(block, 0.0) + qty
                     kept = [
-                        q for q in group['quants']
+                        e for e in group['entries']
                         if block_sums.get(
-                            getattr(q.lot_id, 'x_bloque', '') or 'Sin Bloque', 0.0
+                            getattr(e[1], 'x_bloque', '') or 'Sin Bloque', 0.0
                         ) >= min_block_val
                     ]
                     if not kept:
                         del product_groups[pid]
-                        continue
-                    self._walkthrough_regroup(group, kept)
+                    else:
+                        group['entries'] = kept
 
         # Rango de precios: reutiliza el helper del Inventario Visual.
         product_groups = self._filter_products_by_price(product_groups, filters)
@@ -262,7 +268,10 @@ class StockQuantWalkthrough(models.Model):
         products = []
         for pid, group in product_groups.items():
             product = group['product']
-            first_lot = group['quants'][0].lot_id if group['quants'] else None
+            group_entries = group['entries']
+            first_lot = group_entries[0][1] if group_entries else None
+            delivered = [e for e in group_entries if e[3] == 'delivery']
+            scrapped = [e for e in group_entries if e[3] == 'scrap']
             products.append({
                 'product_id': pid,
                 'product_name': product.display_name,
@@ -270,30 +279,18 @@ class StockQuantWalkthrough(models.Model):
                 'categ_name': product.categ_id.complete_name or '',
                 'tipo': (getattr(first_lot, 'x_tipo', '') or '') if first_lot else '',
                 'color': (getattr(first_lot, 'x_color', '') or '') if first_lot else '',
-                'quant_ids': [q.id for q in group['quants']],
-                'out_qty': group['out_qty'],
-                'out_plates': group['out_plates'],
-                'delivered_qty': group['delivered_qty'],
-                'delivered_plates': group['delivered_plates'],
-                'scrapped_qty': group['scrapped_qty'],
-                'scrapped_plates': group['scrapped_plates'],
+                'quant_ids': [e[0].id for e in group_entries],
+                'out_qty': sum(e[2] for e in group_entries),
+                'out_plates': len(group_entries),
+                'delivered_qty': sum(e[2] for e in delivered),
+                'delivered_plates': len(delivered),
+                'scrapped_qty': sum(e[2] for e in scrapped),
+                'scrapped_plates': len(scrapped),
             })
 
         products.sort(key=lambda p: p['product_name'] or '')
 
         return {'products': products, 'missing_lots': missing_lots}
-
-    @api.model
-    def _walkthrough_regroup(self, group, kept_quants):
-        group['quants'] = kept_quants
-        group['out_qty'] = sum(q.quantity or 0.0 for q in kept_quants)
-        group['out_plates'] = len(kept_quants)
-        delivered = [q for q in kept_quants if q.location_id.usage == 'customer']
-        scrapped = [q for q in kept_quants if q.location_id.usage != 'customer']
-        group['delivered_qty'] = sum(q.quantity or 0.0 for q in delivered)
-        group['delivered_plates'] = len(delivered)
-        group['scrapped_qty'] = sum(q.quantity or 0.0 for q in scrapped)
-        group['scrapped_plates'] = len(scrapped)
 
     # ------------------------------------------------------------------
     # Detalles por quant (reutiliza get_quant_details + datos de salida)
@@ -305,7 +302,11 @@ class StockQuantWalkthrough(models.Model):
         if not isinstance(details, list):
             return details
 
-        quants = {q.id: q for q in self.sudo().browse(quant_ids).exists()}
+        quants = {
+            q.id: q
+            for q in self.sudo().with_context(active_test=False)
+            .browse(quant_ids).exists()
+        }
         MoveLine = self.env['stock.move.line'].sudo()
         has_writeoff = 'stock.lot.writeoff.line' in self.env
 
@@ -323,12 +324,19 @@ class StockQuantWalkthrough(models.Model):
                 ('state', '=', 'done'),
             ]
             if is_scrap:
-                # Odoo 19: la ubicación de desecho comparte usage con las
-                # pérdidas por ajuste; el documento de salida correcto es el
-                # movimiento de stock.scrap.
+                # El documento y la CANTIDAD de la baja salen del movimiento
+                # de stock.scrap: el quant de la ubicación de desecho puede
+                # estar neto en cero (comparte ubicación con los ajustes).
                 out_domain.append(('move_id.scrap_id', '!=', False))
-            last_out = MoveLine.search(
-                out_domain, order='date desc, id desc', limit=1)
+                scrap_lines = MoveLine.search(
+                    out_domain, order='date desc, id desc')
+                detail['quantity'] = sum(
+                    line.quantity or 0.0 for line in scrap_lines)
+                detail['reserved_quantity'] = 0.0
+                last_out = scrap_lines[:1]
+            else:
+                last_out = MoveLine.search(
+                    out_domain, order='date desc, id desc', limit=1)
 
             detail['exit_date'] = (
                 last_out.date.strftime('%Y-%m-%d') if last_out and last_out.date else ''
