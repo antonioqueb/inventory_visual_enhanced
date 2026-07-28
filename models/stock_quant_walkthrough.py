@@ -109,6 +109,15 @@ class StockQuantWalkthrough(models.Model):
             domain.append((
                 'product_id.product_tmpl_id.x_acabado', '=', filters['acabado']))
 
+        # ------------------------------------------------------------------
+        # Filtros sobre el LOTE. Ojo: los lotes dados de baja quedan
+        # ARCHIVADOS, y una condición de dominio que navega por el m2o
+        # ('lot_id.x_bloque', ...) los excluiría por active_test. Por eso
+        # los filtros de lote se resuelven aparte con active_test=False y
+        # el dominio de quants recibe solo ('lot_id', 'in', ids).
+        # ------------------------------------------------------------------
+        lot_domain = []
+
         lot_field_filters = [
             ('tipo', 'x_tipo', '='),
             ('color', 'x_color', 'ilike'),
@@ -120,12 +129,12 @@ class StockQuantWalkthrough(models.Model):
         for filter_key, lot_field, op in lot_field_filters:
             value = filters.get(filter_key)
             if value and self._walkthrough_field_exists('stock.lot', lot_field):
-                domain.append(('lot_id.%s' % lot_field, op, value))
+                lot_domain.append((lot_field, op, value))
 
         if filters.get('grosor') and self._walkthrough_field_exists(
                 'stock.lot', 'x_grosor'):
             try:
-                domain.append(('lot_id.x_grosor', '=', float(filters['grosor'])))
+                lot_domain.append(('x_grosor', '=', float(filters['grosor'])))
             except (ValueError, TypeError):
                 pass
 
@@ -133,7 +142,7 @@ class StockQuantWalkthrough(models.Model):
             value = filters.get(filter_key)
             if value and self._walkthrough_field_exists('stock.lot', lot_field):
                 try:
-                    domain.append(('lot_id.%s' % lot_field, '>=', float(value)))
+                    lot_domain.append((lot_field, '>=', float(value)))
                 except (ValueError, TypeError):
                     pass
 
@@ -141,14 +150,19 @@ class StockQuantWalkthrough(models.Model):
             raw = str(filters['numero_serie'])
             names = [n.strip() for n in raw.split(',') if n.strip()]
             if len(names) > 1:
-                domain.append(('lot_id.name', 'in', names))
+                lot_domain.append(('name', 'in', names))
                 found = set(
                     Lot.sudo().with_context(active_test=False)
                     .search([('name', 'in', names)]).mapped('name')
                 )
                 missing_lots = [n for n in names if n not in found]
             elif names:
-                domain.append(('lot_id.name', 'ilike', names[0]))
+                lot_domain.append(('name', 'ilike', names[0]))
+
+        if lot_domain:
+            lot_ids = Lot.sudo().with_context(active_test=False).search(
+                lot_domain).ids
+            domain.append(('lot_id', 'in', lot_ids))
 
         return domain, missing_lots
 
