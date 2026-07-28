@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="inventory_visual_enhanced.WalkthroughRow" owl="1">
+        <tr class="o_inventory_product_row"
+            t-att-class="{ expanded: props.isExpanded }"
+            t-on-click="() => props.onToggle(props.product.quant_ids)"
+            title="Click para ver detalles">
+
+            <td class="col-product-name">
+                <div class="product-name-cell">
+                    <div class="d-flex align-items-center gap-1">
+                        <div class="product-title" t-esc="props.product.product_name"></div>
+
+                        <div class="price-tooltip-wrapper"
+                             t-on-click.stop="() => {}"
+                             t-on-mouseenter="onPriceMouseEnter"
+                             t-on-mouseleave="onPriceMouseLeave"
+                             t-ref="priceIcon"
+                             style="display: inline-flex;">
+
+                            <span class="price-help-icon"
+                                  style="cursor: help; color: #714B67; font-size: 13px; font-weight: 700;
+                                         width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid #714B67;
+                                         display: inline-flex; align-items: center; justify-content: center;
+                                         line-height: 1; flex-shrink: 0;">$</span>
+                        </div>
+                    </div>
+
+                    <div class="product-sku"
+                         t-if="props.product.product_code"
+                         t-esc="props.product.product_code"></div>
+                </div>
+            </td>
+
+            <td class="col-inventory">
+                <div class="inventory-subgrid">
+
+                    <div class="inventory-row clickable-stat"
+                         t-att-class="{ 'active-filter': state.activeFilter === 'all' }"
+                         t-on-click.stop="() => this.handleFilterClick('all')"
+                         title="Ver todas las salidas">
+                        <span class="inventory-label">Salida total</span>
+                        <span class="inventory-value inventory-units" t-esc="props.product.out_plates || 0"></span>
+                        <span class="inventory-value inventory-measure">
+                            <t t-esc="props.formatNumber(props.product.out_qty)"/> <t t-esc="unitLabel"/>
+                        </span>
+                    </div>
+
+                    <div class="inventory-row clickable-stat"
+                         t-att-class="{ 'active-filter': state.activeFilter === 'delivered' }"
+                         t-on-click.stop="() => this.handleFilterClick('delivered')"
+                         title="Solo material entregado a clientes">
+                        <span class="inventory-label text-success">Entregado</span>
+                        <span class="inventory-value inventory-units" t-esc="props.product.delivered_plates || 0"></span>
+                        <span class="inventory-value inventory-measure text-success">
+                            <t t-esc="props.formatNumber(props.product.delivered_qty)"/> <t t-esc="unitLabel"/>
+                        </span>
+                    </div>
+
+                    <div class="inventory-row clickable-stat"
+                         t-att-class="{ 'active-filter': state.activeFilter === 'scrapped' }"
+                         t-on-click.stop="() => this.handleFilterClick('scrapped')"
+                         title="Solo material dado de baja (rotura, merma, desecho)">
+                        <span class="inventory-label text-danger">De baja</span>
+                        <span class="inventory-value inventory-units" t-esc="props.product.scrapped_plates || 0"></span>
+                        <span class="inventory-value inventory-measure text-danger">
+                            <t t-esc="props.formatNumber(props.product.scrapped_qty)"/> <t t-esc="unitLabel"/>
+                        </span>
+                    </div>
+
+                </div>
+            </td>
+
+            <td class="col-category">
+                <span t-if="props.product.categ_name" t-esc="shortCategoryName"/>
+                <span t-else="" class="text-muted">-</span>
+            </td>
+        </tr>
+
+        <tr class="o_inventory_details_row" t-if="props.isExpanded">
+            <td colspan="3" class="details-cell">
+                <WalkthroughDetails
+                    details="filteredDetails"
+                    onPhotoClick="props.onPhotoClick"
+                    onBlockPhotoClick="props.onBlockPhotoClick"
+                    onBlockReportClick="props.onBlockReportClick"
+                    onNotesClick="props.onNotesClick"
+                    onDetailsClick="props.onDetailsClick"
+                    formatNumber="props.formatNumber"
+                    hasSalesPermissions="props.hasSalesPermissions"
+                    hasInventoryPermissions="props.hasInventoryPermissions"
+                />
+            </td>
+        </tr>
+    </t>
+
+</templates>

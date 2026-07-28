@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="inventory_visual_enhanced.WalkthroughView" owl="1">
+        <div class="o_inventory_visual_container o_walkthrough_container d-flex flex-column vh-100">
+
+            <!-- Barra de filtros superior (reutilizada del Inventario Visual;
+                 almacén e "Inventario" stock/tránsito se ocultan por CSS) -->
+            <SearchBar
+                isLoading="state.isLoading"
+                onSearch.bind="onSearch"
+                totalProducts="state.totalProducts"
+                hasSearched="state.hasSearched"
+                initialLot="initialLotName"
+            />
+
+            <!-- Contenido principal -->
+            <div class="o_inventory_visual_content flex-grow-1 overflow-auto">
+
+                <!-- Estado inicial -->
+                <div class="o_inventory_visual_empty" t-if="!state.hasSearched and !state.isLoading">
+                    <i class="fa fa-history empty-icon"></i>
+                    <h2 class="empty-title">Walkthrough: inventario que ya salió</h2>
+                    <p class="empty-subtitle">
+                        Aplica filtros en la barra superior para consultar material
+                        entregado o dado de baja, con todo su historial.
+                    </p>
+                </div>
+
+                <!-- Loading -->
+                <div class="o_inventory_loading" t-if="state.isLoading">
+                    <div class="spinner"></div>
+                    <div class="loading-text">Cargando historial...</div>
+                </div>
+
+                <!-- Error -->
+                <div class="o_inventory_error" t-if="state.error">
+                    <i class="fa fa-exclamation-triangle error-icon"></i>
+                    <div class="error-message" t-esc="state.error"></div>
+                </div>
+
+                <!-- Sin resultados -->
+                <div class="o_inventory_no_results" t-if="state.hasSearched and state.products.length === 0 and !state.isLoading">
+                    <i class="fa fa-inbox no-results-icon"></i>
+                    <h3 class="no-results-title">No se encontraron salidas</h3>
+                    <p class="no-results-message">
+                        Intenta con otros filtros. Aquí solo aparece material que ya
+                        salió del inventario (entregas y bajas).
+                    </p>
+                </div>
+
+                <!-- DATA GRID -->
+                <div class="o_inventory_data_grid" t-if="state.products.length > 0 and !state.isLoading">
+                    <table class="o_inventory_grid_table">
+                        <thead>
+                            <tr>
+                                <th class="col-product-name">Product Name (SKU)</th>
+                                <th class="col-inventory">Salidas</th>
+                                <th class="col-category">Category</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="state.products" t-as="product" t-key="product.product_id">
+                                <WalkthroughRow
+                                    product="product"
+                                    isExpanded="isProductExpanded(product.product_id)"
+                                    details="getProductDetails(product.product_id)"
+                                    onToggle.bind="(quantIds) => this.toggleProduct(product.product_id, quantIds)"
+                                    onPhotoClick.bind="onPhotoClick"
+                                    onBlockPhotoClick.bind="onBlockPhotoClick"
+                                    onBlockReportClick.bind="onBlockReportClick"
+                                    onNotesClick.bind="onNotesClick"
+                                    onDetailsClick.bind="onDetailsClick"
+                                    formatNumber.bind="formatNumber"
+                                    hasSalesPermissions="state.hasSalesPermissions"
+                                    hasInventoryPermissions="state.hasInventoryPermissions"
+                                />
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>

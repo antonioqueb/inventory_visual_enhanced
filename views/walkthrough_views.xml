@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_inventory_walkthrough" model="ir.actions.client">
+        <field name="name">Walkthrough</field>
+        <field name="tag">inventory_walkthrough</field>
+        <field name="target">current</field>
+    </record>
+
+    <menuitem id="menu_inventory_walkthrough"
+        name="Walkthrough"
+        parent="stock.menu_stock_root"
+        action="action_inventory_walkthrough"
+        sequence="-9"/>
+
+</odoo>

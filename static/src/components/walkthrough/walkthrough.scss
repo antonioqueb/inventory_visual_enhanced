@@ -1,0 +1,58 @@
+// Walkthrough: estilos propios (hereda todo lo demás de los SCSS del
+// Inventario Visual, mismas clases o_inventory_*).
+
+.o_walkthrough_container {
+
+    // Filtros sin sentido para material que ya salió:
+    // - "Inventario" (En Stock / En Tránsito): se identifica por su option.
+    // - "Almacén": primer filter-group de los filtros avanzados.
+    .advanced-filters .filter-group:has(option[value="transit"]),
+    .advanced-filters .filter-group:first-child {
+        display: none !important;
+    }
+
+    .wt-exit-cell {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        line-height: 1.2;
+    }
+
+    .wt-exit-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-weight: 700;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 10px;
+        width: fit-content;
+
+        &.wt-exit-delivery {
+            color: #146c43;
+            background: rgba(25, 135, 84, 0.12);
+        }
+
+        &.wt-exit-scrap {
+            color: #b02a37;
+            background: rgba(220, 53, 69, 0.12);
+        }
+    }
+
+    .wt-exit-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 8px;
+        font-size: 10.5px;
+        color: #6c757d;
+
+        .wt-exit-doc {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .wt-exit-partner {
+            font-style: italic;
+        }
+    }
+}

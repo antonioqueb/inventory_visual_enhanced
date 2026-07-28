@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Inventario Visual Avanzado',
-    'version': '19.0.1.11.0',
+    'version': '19.0.2.0.0',
     'category': 'Inventory/Inventory',
     'summary': 'Vista visual mejorada y agrupada del inventario por producto',
     'description': """
@@ -33,6 +33,7 @@
     'data': [
         'views/inventory_visual_views.xml',
         'views/menu_items.xml',
+        'views/walkthrough_views.xml',
     ],
     'assets': {
         'web.assets_backend': [
@@ -55,12 +56,16 @@
             'inventory_visual_enhanced/static/src/scss/components/_block-photo-dialog.scss',
             'inventory_visual_enhanced/static/src/scss/components/_block-report-dialog.scss',
             'inventory_visual_enhanced/static/src/scss/components/_workshop-info-dialog.scss',
-            
+            'inventory_visual_enhanced/static/src/components/walkthrough/walkthrough.scss',
+
             # JS
             'inventory_visual_enhanced/static/src/components/search_bar/search_bar.js',
             'inventory_visual_enhanced/static/src/components/product_details/product_details.js',
             'inventory_visual_enhanced/static/src/components/product_row/product_row.js',
             'inventory_visual_enhanced/static/src/components/inventory_view/inventory_controller.js',
+            'inventory_visual_enhanced/static/src/components/walkthrough/walkthrough_details.js',
+            'inventory_visual_enhanced/static/src/components/walkthrough/walkthrough_row.js',
+            'inventory_visual_enhanced/static/src/components/walkthrough/walkthrough_controller.js',
             'inventory_visual_enhanced/static/src/components/dialogs/photo_gallery/photo_gallery_dialog.js',
             'inventory_visual_enhanced/static/src/components/dialogs/block_report/block_report_dialog.js',
             'inventory_visual_enhanced/static/src/components/dialogs/notes/notes_dialog.js',
@@ -75,6 +80,9 @@
             'inventory_visual_enhanced/static/src/components/product_details/product_details.xml',
             'inventory_visual_enhanced/static/src/components/product_row/product_row.xml',
             'inventory_visual_enhanced/static/src/components/inventory_view/inventory_controller.xml',
+            'inventory_visual_enhanced/static/src/components/walkthrough/walkthrough_details.xml',
+            'inventory_visual_enhanced/static/src/components/walkthrough/walkthrough_row.xml',
+            'inventory_visual_enhanced/static/src/components/walkthrough/walkthrough_controller.xml',
             'inventory_visual_enhanced/static/src/components/dialogs/photo_gallery/photo_gallery_dialog.xml',
             'inventory_visual_enhanced/static/src/components/dialogs/block_report/block_report_dialog.xml',
             'inventory_visual_enhanced/static/src/components/dialogs/notes/notes_dialog.xml',

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="inventory_visual_enhanced.WalkthroughDetails" owl="1">
+        <div class="details-wrapper">
+
+            <table class="o_inventory_details_table">
+                <thead>
+                    <tr>
+                        <th class="col-lot">Lote</th>
+                        <th class="col-location">Salida</th>
+                        <th class="col-dimensions">Dimensiones</th>
+                        <th class="col-color">Color</th>
+                        <th class="col-bloque">Bloque</th>
+                        <th class="col-atado">Atado</th>
+                        <th class="col-pedimento">Pedimento</th>
+                        <th class="col-contenedor">Contenedor</th>
+                        <th class="col-numero-placa">N. Placa</th>
+                        <th class="col-icon">P</th>
+                        <th class="col-icon">N</th>
+                        <th class="col-icon">D</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <t t-foreach="groupedAndSortedDetails" t-as="group" t-key="group.blockName">
+
+                        <tr t-if="!group_first" class="container-separator-row">
+                            <td t-att-colspan="getDetailColspan()" style="height: 8px; padding: 0; border: none; background: transparent;"></td>
+                        </tr>
+
+                        <t t-foreach="group.items" t-as="detail" t-key="detail.id">
+
+                            <tr t-if="detail._containerBreak" class="container-separator-row">
+                                <td t-att-colspan="getDetailColspan()" style="height: 8px; padding: 0; border: none; background: transparent;"></td>
+                            </tr>
+
+                            <tr>
+                                <!-- Lote -->
+                                <td class="col-lot">
+                                    <span t-esc="detail.lot_name"></span>
+                                </td>
+
+                                <!-- Salida: tipo + fecha + documento + cliente/motivo -->
+                                <td class="col-location">
+                                    <div class="wt-exit-cell" t-att-title="getExitTitle(detail)">
+                                        <span class="wt-exit-badge"
+                                              t-att-class="isDelivery(detail) ? 'wt-exit-delivery' : 'wt-exit-scrap'">
+                                            <i t-att-class="isDelivery(detail) ? 'fa fa-truck' : 'fa fa-trash'"></i>
+                                            <t t-esc="getExitLabel(detail)"/>
+                                        </span>
+                                        <div class="wt-exit-meta">
+                                            <span t-if="detail.exit_date" t-esc="formatDate(detail.exit_date)"></span>
+                                            <span t-if="detail.exit_doc" class="wt-exit-doc" t-esc="detail.exit_doc"></span>
+                                            <span t-if="detail.exit_partner" class="wt-exit-partner" t-esc="detail.exit_partner"></span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Dimensiones -->
+                                <td class="col-dimensions">
+                                    <span class="dimensions-inline">
+                                        <span class="dims-text">
+                                            <t t-if="detail.alto and detail.ancho">
+                                                <t t-esc="detail.ancho"/>m × <t t-esc="detail.alto"/>m
+                                            </t>
+                                            <t t-elif="!detail.alto and !detail.ancho">-</t>
+                                            <t t-elif="detail.alto">
+                                                <t t-esc="detail.alto"/>m
+                                            </t>
+                                            <t t-else="">
+                                                <t t-esc="detail.ancho"/>m
+                                            </t>
+                                        </span>
+                                        <strong class="dimensions-total-inline">
+                                            <t t-esc="formatNumber(detail.quantity)"/> <t t-esc="getUnitLabel(detail.tipo)"/>
+                                        </strong>
+                                    </span>
+                                </td>
+
+                                <!-- Color -->
+                                <td class="col-color">
+                                    <span t-if="detail.color" t-esc="detail.color"></span>
+                                    <span t-else="" class="text-muted">-</span>
+                                </td>
+
+                                <td class="col-bloque">
+                                    <span t-if="detail.bloque" t-esc="detail.bloque"></span>
+                                    <span t-else="" class="text-muted">-</span>
+                                </td>
+
+                                <td class="col-atado">
+                                    <span t-if="detail.atado" t-esc="detail.atado"></span>
+                                    <span t-else="" class="text-muted">-</span>
+                                </td>
+
+                                <td class="col-pedimento">
+                                    <span t-if="detail.pedimento" t-esc="detail.pedimento"></span>
+                                    <span t-else="" class="text-muted">-</span>
+                                </td>
+
+                                <td class="col-contenedor">
+                                    <span t-if="detail.contenedor" t-esc="detail.contenedor"></span>
+                                    <span t-else="" class="text-muted">-</span>
+                                </td>
+
+                                <td class="col-num-placa">
+                                    <span t-if="detail.numero_placa" t-esc="detail.numero_placa"></span>
+                                    <span t-else="" class="text-muted">-</span>
+                                </td>
+
+                                <!-- ACCIONES -->
+                                <td class="col-icon action-btn-cell">
+                                    <button
+                                        type="button"
+                                        class="icon-btn"
+                                        t-att-class="{ 'has-photos': detail.cantidad_fotos > 0, 'no-content': detail.cantidad_fotos === 0 }"
+                                        t-on-click="() => props.onPhotoClick(detail.id)"
+                                    >
+                                        <i class="fa fa-camera"></i>
+                                    </button>
+                                </td>
+
+                                <td class="col-icon action-btn-cell">
+                                    <button
+                                        type="button"
+                                        class="icon-btn"
+                                        t-att-class="{ 'has-notes': detail.detalles_placa, 'no-content': !detail.detalles_placa }"
+                                        t-on-click="() => props.onNotesClick(detail.id)"
+                                    >
+                                        <i class="fa fa-info-circle"></i>
+                                    </button>
+                                </td>
+
+                                <td class="col-icon action-btn-cell">
+                                    <button
+                                        t-if="props.hasSalesPermissions"
+                                        type="button"
+                                        class="icon-btn has-details"
+                                        t-on-click="() => props.onDetailsClick(detail.id)"
+                                    >
+                                        <i class="fa fa-history"></i>
+                                    </button>
+                                    <span t-else="" class="icon-btn no-content"><i class="fa fa-history"></i></span>
+                                </td>
+                            </tr>
+                        </t>
+
+                        <!-- FILA DE RESUMEN DEL BLOQUE -->
+                        <tr class="group-summary-row" style="background-color: #f8f9fa; border-top: 2px solid #e9ecef;">
+                            <td class="col-lot"></td>
+                            <td></td>
+
+                            <td class="col-dimensions" style="font-weight: bold; color: #212529;">
+                                <span>
+                                    <t t-esc="group.count"/> <t t-esc="getTypeLabel(group.productType)"/> |
+                                    <t t-esc="formatNumber(group.totalArea)"/> <t t-esc="getUnitLabel(group.productType)"/>
+                                </span>
+                            </td>
+
+                            <td t-att-colspan="getSummaryMidColspan()"></td>
+
+                            <td colspan="3" style="text-align: right; vertical-align: middle; padding-right: 15px; color: #6c757d; font-style: italic; white-space: nowrap;">
+                                <button t-if="group.blockName and group.blockName !== 'Sin Bloque'"
+                                        type="button"
+                                        class="ive-block-photo-btn"
+                                        t-att-class="{ 'has-photos': group.hasPhoto, 'no-content': !group.hasPhoto }"
+                                        t-att-title="group.hasPhoto ? 'Ver fotos del bloque' : 'Sin fotos para este bloque'"
+                                        t-on-click.stop="() => props.onBlockPhotoClick(group.blockName)">
+                                    <i class="fa fa-camera"/>
+                                </button>
+                                <button t-if="group.blockName and group.blockName !== 'Sin Bloque'"
+                                        type="button"
+                                        class="ive-block-report-btn"
+                                        title="Reporte de compra: costo por lote, información general y facturas"
+                                        t-on-click.stop="() => props.onBlockReportClick(group.blockName)">P</button>
+                                <small>
+                                    <span t-esc="group.blockName" style="font-weight: 600;"/>
+                                </small>
+                            </td>
+                        </tr>
+
+                    </t>
+                </tbody>
+            </table>
+
+            <div class="table-loading" t-if="props.details.length === 0">
+                <div class="spinner"></div>
+                <div class="loading-text">Cargando detalles...</div>
+            </div>
+        </div>
+    </t>
+</templates>
