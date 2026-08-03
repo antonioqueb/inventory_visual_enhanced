@@ -1315,18 +1315,24 @@ class StockQuant(models.Model):
             return {'error': f'Error al crear cliente: {str(e)}'}
     
     @api.model
-    def get_projects(self, search_term=''):
+    def get_projects(self, search_term='', partner_id=None):
         if not self.check_sales_permissions():
             raise UserError("No tiene permisos para consultar proyectos. Contacte al administrador.")
-        
+
         domain = []
-        
+
         if hasattr(self.env['project.project'], 'x_es_proyecto_marmol'):
             domain.append(('x_es_proyecto_marmol', '=', True))
-        
+
+        # Regla cliente→proyectos: con un cliente seleccionado solo se ofrecen
+        # SUS proyectos (o proyectos aún sin cliente); nunca los de otro cliente.
+        if partner_id:
+            domain += ['|', ('partner_id', '=', False),
+                       ('partner_id', 'child_of', int(partner_id))]
+
         if search_term:
             domain.append(('name', 'ilike', search_term))
-        
+
         projects = self.env['project.project'].search(domain, limit=20, order='name')
         
         result = []
@@ -1339,18 +1345,23 @@ class StockQuant(models.Model):
         return result
     
     @api.model
-    def create_project(self, name):
+    def create_project(self, name, partner_id=None):
         if not self.check_sales_permissions():
             raise UserError("No tiene permisos para crear proyectos. Contacte al administrador.")
-        
+
         if not name or not name.strip():
             return {'error': 'El nombre del proyecto es requerido'}
-        
+
         try:
             vals = {
                 'name': name.strip(),
             }
-            
+
+            # Un proyecto creado desde el flujo comercial nace a nombre del
+            # cliente seleccionado (regla cliente→proyectos).
+            if partner_id:
+                vals['partner_id'] = int(partner_id)
+
             if hasattr(self.env['project.project'], 'x_es_proyecto_marmol'):
                 vals['x_es_proyecto_marmol'] = True
             
@@ -1440,9 +1451,20 @@ class StockQuant(models.Model):
         quant = self.browse(quant_id)
         if not quant.exists() or not quant.lot_id:
             return {'error': 'Lote no encontrado'}
-        
+
         if hasattr(quant, 'x_tiene_hold') and quant.x_tiene_hold:
             return {'error': 'Este lote ya tiene un apartado activo'}
+
+        # Regla cliente→proyectos: el proyecto debe ser del cliente elegido
+        # (o no tener cliente aún). Validación en servidor.
+        if partner_id and project_id:
+            project = self.env['project.project'].browse(int(project_id)).exists()
+            partner = self.env['res.partner'].browse(int(partner_id)).exists()
+            if project and partner and project.partner_id and \
+                    project.partner_id.commercial_partner_id != partner.commercial_partner_id:
+                return {'error': 'El proyecto "%s" pertenece al cliente %s. '
+                                 'Selecciona un proyecto del cliente elegido.' % (
+                                     project.name, project.partner_id.display_name)}
         
         if product_prices and isinstance(product_prices, dict):
             auth_check = self.env['product.template'].check_price_authorization_needed(
