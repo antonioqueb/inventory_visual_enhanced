@@ -170,6 +170,7 @@
                     deselectAllCurrentProduct="props.deselectAllCurrentProduct"
                     hasSalesPermissions="props.hasSalesPermissions"
                     hasInventoryPermissions="props.hasInventoryPermissions"
+                    cart="props.cart"
                 />
             </td>
         </tr>

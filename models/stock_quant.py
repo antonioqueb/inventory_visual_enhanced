@@ -701,7 +701,9 @@ class StockQuant(models.Model):
 
     @api.model
     def get_lot_history(self, quant_id):
-        if not self.check_sales_permissions():
+        # Historial disponible para ventas E inventario (el rol de almacén lo
+        # necesita para etiquetas/traslados aunque no pueda vender ni apartar).
+        if not (self.check_sales_permissions() or self.check_inventory_permissions()):
             raise UserError("No tiene permisos para ver el historial detallado. Contacte al administrador.")
         
         quant = self.browse(quant_id)

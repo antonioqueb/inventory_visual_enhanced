@@ -309,7 +309,7 @@ class InventoryVisualController extends Component {
     }
 
     async onDetailsClick(detailId) {
-        if (!this.state.hasSalesPermissions) {
+        if (!this.state.hasSalesPermissions && !this.state.hasInventoryPermissions) {
             this.notification.add(
                 "No tiene permisos para ver el historial detallado. Contacte al administrador.",
                 { type: "warning" }

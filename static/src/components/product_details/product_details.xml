@@ -205,8 +205,8 @@
                                 </td>
                                 
                                 <td class="col-icon action-btn-cell">
-                                    <button 
-                                        t-if="props.hasSalesPermissions"
+                                    <button
+                                        t-if="props.hasSalesPermissions or props.hasInventoryPermissions"
                                         type="button"
                                         class="icon-btn has-details"
                                         t-on-click="() => props.onDetailsClick(detail.id)"
