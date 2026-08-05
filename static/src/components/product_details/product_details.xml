@@ -294,7 +294,7 @@
 
                             <!-- Últimas columnas: Fin del Bloque -->
                             <td colspan="4" style="text-align: right; vertical-align: middle; padding-right: 15px; color: #6c757d; font-style: italic; white-space: nowrap;">
-                                <button t-if="group.blockName and group.blockName !== 'Sin Bloque'"
+                                <button t-if="group.isBlock and group.blockName and group.blockName !== 'Sin Bloque'"
                                         type="button"
                                         class="ive-block-photo-btn"
                                         t-att-class="{ 'has-photos': group.hasPhoto, 'no-content': !group.hasPhoto }"
@@ -302,7 +302,7 @@
                                         t-on-click.stop="() => props.onBlockPhotoClick(group.blockName)">
                                     <i class="fa fa-camera"/>
                                 </button>
-                                <button t-if="group.blockName and group.blockName !== 'Sin Bloque'"
+                                <button t-if="group.isBlock and group.blockName and group.blockName !== 'Sin Bloque'"
                                         type="button"
                                         class="ive-block-report-btn"
                                         title="Reporte de compra: costo por lote, información general y facturas"

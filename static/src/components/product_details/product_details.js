@@ -17,6 +17,18 @@ export class ProductDetails extends Component {
         this.state.lotSortDir = this.state.lotSortDir === "desc" ? "asc" : "desc";
     }
 
+    // El modo de agrupación viene de la barra de filtros (props):
+    // 'block' = por bloque (default); 'prefix' = por el segmento inicial
+    // del folio del lote (141231-2 → 141231), que corresponde al contenedor.
+    get groupMode() {
+        return this.props.groupMode === "prefix" ? "prefix" : "block";
+    }
+
+    lotPrefix(lotName) {
+        const m = String(lotName || "").trim().match(/^([A-Za-z]*\d+)/);
+        return m ? m[1].toUpperCase() : "";
+    }
+
     // Clave de antigüedad del lote. El folio es "<segmento>-<consecutivo>":
     // - Segmento numérico (Stone Profit): más pequeño = más antiguo.
     // - Segmento "S<n>" (procesos propios, desde ago/2026): SIEMPRE más
@@ -82,13 +94,17 @@ export class ProductDetails extends Component {
     get groupedAndSortedDetails() {
         const details = this.props.details || [];
         const groups = {};
+        const byPrefix = this.groupMode === "prefix";
 
         for (const detail of details) {
-            const blockName = detail.bloque || "Sin Bloque";
+            const blockName = byPrefix
+                ? (this.lotPrefix(detail.lot_name) || "Sin prefijo")
+                : (detail.bloque || "Sin Bloque");
 
             if (!groups[blockName]) {
                 groups[blockName] = {
                     blockName: blockName,
+                    isBlock: !byPrefix,
                     items: [],
                     totalArea: 0,
                     count: 0,

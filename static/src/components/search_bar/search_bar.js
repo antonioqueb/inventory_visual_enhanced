@@ -343,4 +343,6 @@ SearchBar.props = {
     totalProducts: { type: Number, optional: true },
     hasSearched: { type: Boolean, optional: true },
     initialLot: { type: String, optional: true },
+    groupMode: { type: String, optional: true },
+    onGroupModeChange: { type: Function, optional: true },
 };

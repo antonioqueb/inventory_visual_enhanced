@@ -34,6 +34,9 @@ class InventoryVisualController extends Component {
             hasInventoryPermissions: false,
 
             stockMode: "stock",
+
+            // Agrupador del detalle de lotes: "block" | "prefix" (contenedor)
+            groupMode: "block",
         });
 
         // Lote inicial: llega cuando la Búsqueda Global del home abre el
@@ -61,6 +64,10 @@ class InventoryVisualController extends Component {
             this.state.hasSalesPermissions = false;
             this.state.hasInventoryPermissions = false;
         }
+    }
+
+    onGroupModeChange(mode) {
+        this.state.groupMode = mode === "prefix" ? "prefix" : "block";
     }
 
     async onSearch(filters) {

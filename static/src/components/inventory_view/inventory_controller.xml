@@ -11,6 +11,8 @@
                 totalProducts="state.totalProducts"
                 hasSearched="state.hasSearched"
                 initialLot="initialLotName"
+                groupMode="state.groupMode"
+                onGroupModeChange.bind="onGroupModeChange"
             />
             
             <!-- Contenido principal -->
@@ -83,6 +85,7 @@
                                     areAllCurrentProductSelected.bind="() => this.areAllCurrentProductSelected()"
                                     selectAllCurrentProduct.bind="() => this.selectAllCurrentProduct()"
                                     deselectAllCurrentProduct.bind="() => this.deselectAllCurrentProduct()"
+                                    groupMode="state.groupMode"
                                 />
                             </t>
                         </tbody>

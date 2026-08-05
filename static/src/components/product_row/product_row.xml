@@ -171,6 +171,7 @@
                     hasSalesPermissions="props.hasSalesPermissions"
                     hasInventoryPermissions="props.hasInventoryPermissions"
                     cart="props.cart"
+                    groupMode="props.groupMode"
                 />
             </td>
         </tr>

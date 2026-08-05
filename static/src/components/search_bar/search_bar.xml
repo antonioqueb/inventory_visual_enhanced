@@ -135,6 +135,18 @@
                         </datalist>
                     </div>
 
+                    <!-- Agrupador del detalle: bloque o contenedor (prefijo del lote) -->
+                    <div class="filter-group">
+                        <label class="filter-label d-none d-md-block">Agrupar por</label>
+                        <select
+                            class="form-select filter-select"
+                            t-on-change="(ev) => props.onGroupModeChange ? props.onGroupModeChange(ev.target.value) : null"
+                        >
+                            <option value="block" t-att-selected="(props.groupMode || 'block') === 'block'">Bloque</option>
+                            <option value="prefix" t-att-selected="props.groupMode === 'prefix'">Contenedor (prefijo)</option>
+                        </select>
+                    </div>
+
                     <!-- Botones -->
                     <div class="filter-actions d-flex justify-content-between gap-2">
                         <button 
