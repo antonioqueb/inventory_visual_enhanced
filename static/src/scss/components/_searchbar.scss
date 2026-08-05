@@ -25,11 +25,13 @@
 
 .filters-row {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   align-items: end;
 
+  // 8 hijos en UNA fila: Nombre, Lote, Bloque, Tipo, Categoría, Marca,
+  // switch Agrupar y acciones — minmax compactos para que no haya saltos.
   &.main-filters {
-    grid-template-columns: minmax(220px, 1.45fr) minmax(190px, 1fr) minmax(130px, 0.75fr) minmax(140px, 0.76fr) minmax(170px, 0.86fr) minmax(150px, 0.8fr) auto;
+    grid-template-columns: minmax(150px, 1.35fr) minmax(120px, 0.95fr) minmax(95px, 0.65fr) minmax(105px, 0.7fr) minmax(115px, 0.8fr) minmax(105px, 0.75fr) auto auto;
   }
 
   &.advanced-filters {
@@ -308,7 +310,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  min-height: 31px;
+  min-height: 36px;
   padding-left: 0;
   margin: 0;
 
