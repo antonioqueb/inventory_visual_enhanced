@@ -138,7 +138,10 @@ export class ProductDetails extends Component {
                     return containerCompare;
                 }
 
-                const lotCompare = dir * this.compareLotKeys(
+                // Dentro del bloque el consecutivo SIEMPRE va del más chico
+                // al más grande — la flecha solo invierte el orden de los
+                // bloques (por prefijo), no el de las placas.
+                const lotCompare = this.compareLotKeys(
                     this.lotSeriesKey(a.lot_name),
                     this.lotSeriesKey(b.lot_name)
                 );
@@ -148,7 +151,7 @@ export class ProductDetails extends Component {
 
                 const lotA = (a.lot_name || "").toLowerCase();
                 const lotB = (b.lot_name || "").toLowerCase();
-                return dir * lotA.localeCompare(lotB, undefined, { numeric: true });
+                return lotA.localeCompare(lotB, undefined, { numeric: true });
             });
 
             let lastContenedor = null;
