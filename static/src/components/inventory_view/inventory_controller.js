@@ -233,7 +233,8 @@ class InventoryVisualController extends Component {
                 photosData,
                 detailId: null,
                 readOnly: true,
-                title: `Fotografías - ${photosData.lot_name}`,
+                isBlock: true,
+                title: `Imagen de referencia — ${photosData.lot_name}`,
                 size: "xl",
             });
         } catch (error) {

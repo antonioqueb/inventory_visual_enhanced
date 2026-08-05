@@ -195,8 +195,71 @@
                     </div>
                 </div>
 
+                <!-- ========== VISOR DE BLOQUE (sin marco: todo foto + barra inferior) ========== -->
+                <t t-if="hasPhotos and props.isBlock">
+                    <div class="d-flex flex-column" style="margin: -16px; height: calc(100% + 32px); min-height: 70vh;">
+                        <div class="position-relative flex-grow-1" style="min-height: 0; background: #000;">
+                            <img
+                                t-att-src="`data:image/png;base64,${currentPhoto.image}`"
+                                style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; cursor: zoom-in;"
+                                t-on-click="openFullscreenViewer"
+                                t-att-alt="blockShareTitle"
+                                t-att-title="blockShareTitle"
+                            />
+                            <t t-if="photosData.photos.length > 1">
+                                <button
+                                    class="btn btn-dark position-absolute top-50 start-0 translate-middle-y ms-2 rounded-circle"
+                                    style="width: 42px; height: 42px; opacity: 0.65; z-index: 5;"
+                                    t-on-click="prevPhoto"
+                                    t-att-disabled="state.currentImageIndex === 0"
+                                >
+                                    <i class="fa fa-chevron-left" title="Anterior"></i>
+                                </button>
+                                <button
+                                    class="btn btn-dark position-absolute top-50 end-0 translate-middle-y me-2 rounded-circle"
+                                    style="width: 42px; height: 42px; opacity: 0.65; z-index: 5;"
+                                    t-on-click="nextPhoto"
+                                    t-att-disabled="state.currentImageIndex === photosData.photos.length - 1"
+                                >
+                                    <i class="fa fa-chevron-right" title="Siguiente"></i>
+                                </button>
+                            </t>
+                        </div>
+                        <!-- ÚNICA sección: barra inferior de acciones -->
+                        <div class="d-flex align-items-center justify-content-between gap-3 px-3 py-2 bg-white border-top">
+                            <div class="text-muted small text-truncate">
+                                Imagen de <strong>referencia</strong> del bloque
+                                <strong t-esc="blockName"/>
+                                <span t-if="photosData.photos.length > 1" class="ms-2">
+                                    <t t-esc="state.currentImageIndex + 1"/>/<t t-esc="photosData.photos.length"/>
+                                </span>
+                            </div>
+                            <div class="d-flex gap-2 flex-shrink-0">
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-primary btn-sm"
+                                    t-on-click="downloadCurrentImage"
+                                    title="Descargar imagen de referencia"
+                                >
+                                    <i class="fa fa-download me-1"></i>
+                                    <span class="d-none d-md-inline">Descargar</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-success btn-sm"
+                                    t-on-click="shareCurrentImage"
+                                    title="Compartir imagen de referencia"
+                                >
+                                    <i class="fa fa-share-alt me-1"></i>
+                                    <span class="d-none d-md-inline">Compartir</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+
                 <!-- ========== VISOR DE FOTOS (Normal) ========== -->
-                <t t-if="hasPhotos and !state.showUploadForm">
+                <t t-if="hasPhotos and !state.showUploadForm and !props.isBlock">
                     <div class="photo-viewer-section flex-grow-1 d-flex flex-column mb-3" style="min-height: 0;">
                         <div class="position-relative flex-grow-1 d-flex flex-column" style="min-height: 0;">
                             <div class="text-center bg-dark rounded p-2 flex-grow-1 d-flex align-items-center justify-content-center" style="min-height: 0; overflow: hidden;">

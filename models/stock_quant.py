@@ -1033,6 +1033,7 @@ class StockQuant(models.Model):
         # Mismo formato que get_lot_photos para reutilizar el popup de placas.
         return {
             'lot_name': 'Bloque %s' % block_name,
+            'block_name': block_name,
             'product_name': ', '.join(product_names),
             'photos': photos,
         }

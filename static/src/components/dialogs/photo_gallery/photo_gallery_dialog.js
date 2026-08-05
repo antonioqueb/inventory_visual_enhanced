@@ -200,7 +200,9 @@ export class PhotoGalleryDialog extends Component {
             }
             const byteArray = new Uint8Array(byteNumbers);
             const blob = new Blob([byteArray], { type: 'image/png' });
-            const fileName = this.currentPhoto.name || `foto_${this.photosData.lot_name}.png`;
+            const fileName = this.isBlockMode
+                ? `Referencia_bloque_${this.blockName || 'SOM'}.png`
+                : (this.currentPhoto.name || `foto_${this.photosData.lot_name}.png`);
             
             // En móvil usar Web Share API (permite guardar a Fotos)
             if (this.isMobile && navigator.share) {
@@ -241,6 +243,22 @@ export class PhotoGalleryDialog extends Component {
         this.notification.add("Imagen descargada", { type: "success" });
     }
 
+    get isBlockMode() {
+        return !!this.props.isBlock;
+    }
+
+    get blockName() {
+        return (
+            this.photosData.block_name
+            || (this.photosData.lot_name || '').replace(/^Bloque\s+/i, '')
+            || ''
+        );
+    }
+
+    get blockShareTitle() {
+        return `Imagen de referencia del bloque ${this.blockName}`;
+    }
+
     async shareCurrentImage() {
         if (!this.currentPhoto) return;
         
@@ -252,14 +270,17 @@ export class PhotoGalleryDialog extends Component {
         }
         const byteArray = new Uint8Array(byteNumbers);
         const blob = new Blob([byteArray], { type: 'image/png' });
-        const file = new File([blob], this.currentPhoto.name || 'imagen.png', { type: 'image/png' });
+        const shareName = this.isBlockMode
+            ? `Referencia_bloque_${this.blockName || 'SOM'}.png`
+            : (this.currentPhoto.name || 'imagen.png');
+        const file = new File([blob], shareName, { type: 'image/png' });
 
         // Web Share API (móvil)
         if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
             try {
                 await navigator.share({
-                    title: `Foto - ${this.photosData.lot_name}`,
-                    text: `Imagen del lote ${this.photosData.lot_name}`,
+                    title: this.isBlockMode ? this.blockShareTitle : `Foto - ${this.photosData.lot_name}`,
+                    text: this.isBlockMode ? this.blockShareTitle : `Imagen del lote ${this.photosData.lot_name}`,
                     files: [file]
                 });
                 this.notification.add("Imagen compartida", { type: "success" });
