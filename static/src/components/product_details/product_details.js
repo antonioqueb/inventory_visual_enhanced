@@ -7,10 +7,10 @@ export class ProductDetails extends Component {
     setup() {
         this.action = useService("action");
         this.notification = useService("notification");
-        // Orden por antigüedad del lote (Stone Profit): 'desc' = más nuevos
-        // arriba (default), 'asc' = más viejos arriba. Se alterna clickeando
+        // Orden por antigüedad del lote (Stone Profit): 'asc' = más viejos
+        // arriba (default), 'desc' = más nuevos arriba. Se alterna clickeando
         // el encabezado de la columna Lote.
-        this.state = useState({ lotSortDir: "desc" });
+        this.state = useState({ lotSortDir: "asc" });
     }
 
     toggleLotSort() {
@@ -21,7 +21,7 @@ export class ProductDetails extends Component {
     // 'block' = por bloque (default); 'prefix' = por el segmento inicial
     // del folio del lote (141231-2 → 141231), que corresponde al contenedor.
     get groupMode() {
-        return this.props.groupMode === "prefix" ? "prefix" : "block";
+        return this.props.groupMode === "block" ? "block" : "prefix";
     }
 
     lotPrefix(lotName) {

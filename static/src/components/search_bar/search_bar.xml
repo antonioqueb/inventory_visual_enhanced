@@ -135,16 +135,21 @@
                         </datalist>
                     </div>
 
-                    <!-- Agrupador del detalle: bloque o contenedor (prefijo del lote) -->
+                    <!-- Agrupador del detalle: switch Contenedor (default) / Bloque -->
                     <div class="filter-group">
-                        <label class="filter-label d-none d-md-block">Agrupar por</label>
-                        <select
-                            class="form-select filter-select"
-                            t-on-change="(ev) => props.onGroupModeChange ? props.onGroupModeChange(ev.target.value) : null"
-                        >
-                            <option value="block" t-att-selected="(props.groupMode || 'block') === 'block'">Bloque</option>
-                            <option value="prefix" t-att-selected="props.groupMode === 'prefix'">Contenedor (prefijo)</option>
-                        </select>
+                        <label class="filter-label d-none d-md-block">Agrupar</label>
+                        <div class="form-check form-switch ive-group-switch">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                id="ive-group-switch-input"
+                                t-att-checked="(props.groupMode || 'prefix') === 'prefix'"
+                                t-on-change="(ev) => props.onGroupModeChange ? props.onGroupModeChange(ev.target.checked ? 'prefix' : 'block') : null"
+                            />
+                            <label class="form-check-label" for="ive-group-switch-input">
+                                <t t-esc="(props.groupMode || 'prefix') === 'prefix' ? 'Contenedor' : 'Bloque'"/>
+                            </label>
+                        </div>
                     </div>
 
                     <!-- Botones -->

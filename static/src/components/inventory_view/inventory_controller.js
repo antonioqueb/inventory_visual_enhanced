@@ -35,8 +35,8 @@ class InventoryVisualController extends Component {
 
             stockMode: "stock",
 
-            // Agrupador del detalle de lotes: "block" | "prefix" (contenedor)
-            groupMode: "block",
+            // Agrupador del detalle de lotes: "prefix" (contenedor, default) | "block"
+            groupMode: "prefix",
         });
 
         // Lote inicial: llega cuando la Búsqueda Global del home abre el
