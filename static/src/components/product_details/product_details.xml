@@ -25,7 +25,11 @@
                 <thead>
                     <tr>
                         <th class="col-checkbox">☑</th>
-                        <th class="col-lot">Lote</th>
+                        <th class="col-lot col-lot-sortable"
+                            t-on-click="toggleLotSort"
+                            t-att-title="state.lotSortDir === 'desc' ? 'Más nuevos arriba — click para ver los más viejos arriba' : 'Más viejos arriba — click para ver los más nuevos arriba'">
+                            Lote <span class="lot-sort-arrow" t-esc="state.lotSortDir === 'desc' ? '↓' : '↑'"/>
+                        </th>
                         <th class="col-location">Ubicación</th>
                         <th t-if="hasTransitDetails" class="col-eta">ETA</th>
                         <th class="col-dimensions">Dimensiones</th>

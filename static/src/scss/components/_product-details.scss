@@ -124,6 +124,19 @@
 
 .col-checkbox { width: 42px; text-align: center; }
 .col-lot { min-width: 110px; color: $iv-text; font-family: $iv-mono; font-weight: $iv-weight-bold !important; }
+th.col-lot-sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+
+  &:hover { text-decoration: underline; }
+
+  .lot-sort-arrow {
+    display: inline-block;
+    font-weight: 700;
+    opacity: 0.75;
+  }
+}
 .col-location { min-width: 120px; max-width: 220px; }
 .col-eta { min-width: 130px; }
 .col-dimensions { min-width: 150px; }

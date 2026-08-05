@@ -1,12 +1,46 @@
 /** @odoo-module **/
 
-import { Component } from "@odoo/owl";
+import { Component, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
 export class ProductDetails extends Component {
     setup() {
         this.action = useService("action");
         this.notification = useService("notification");
+        // Orden por antigüedad del lote (Stone Profit): 'desc' = más nuevos
+        // arriba (default), 'asc' = más viejos arriba. Se alterna clickeando
+        // el encabezado de la columna Lote.
+        this.state = useState({ lotSortDir: "desc" });
+    }
+
+    toggleLotSort() {
+        this.state.lotSortDir = this.state.lotSortDir === "desc" ? "asc" : "desc";
+    }
+
+    // Clave de antigüedad del lote. El folio es "<segmento>-<consecutivo>":
+    // - Segmento numérico (Stone Profit): más pequeño = más antiguo.
+    // - Segmento "S<n>" (procesos propios, desde ago/2026): SIEMPRE más
+    //   nuevo que cualquier numérico; entre S, más pequeño = más antiguo.
+    lotSeriesKey(lotName) {
+        const name = String(lotName || "").trim();
+        const m = name.match(/^([A-Za-z]*)(\d+)/);
+        if (!m) {
+            return [-1, -1, -1];
+        }
+        const isS = m[1].toUpperCase() === "S" ? 1 : 0;
+        const num = parseInt(m[2], 10) || 0;
+        const consMatch = name.slice(m[0].length).match(/(\d+)/);
+        const cons = consMatch ? parseInt(consMatch[1], 10) : 0;
+        return [isS, num, cons];
+    }
+
+    compareLotKeys(a, b) {
+        for (let i = 0; i < 3; i++) {
+            if (a[i] !== b[i]) {
+                return a[i] - b[i];
+            }
+        }
+        return 0;
     }
 
     get hasTransitDetails() {
@@ -73,11 +107,26 @@ export class ProductDetails extends Component {
             if (!groups[blockName].productType && detail.tipo) {
                 groups[blockName].productType = detail.tipo;
             }
+
+            // Clave de antigüedad del bloque = su lote más NUEVO.
+            const key = this.lotSeriesKey(detail.lot_name);
+            if (!groups[blockName].sortKey ||
+                this.compareLotKeys(key, groups[blockName].sortKey) > 0) {
+                groups[blockName].sortKey = key;
+            }
         }
 
         const groupArray = Object.values(groups);
 
-        groupArray.sort((a, b) => b.count - a.count);
+        // Bloques ordenados por antigüedad del segmento del lote:
+        // desc (default) = más nuevos arriba, asc = más viejos arriba.
+        const dir = this.state.lotSortDir === "asc" ? 1 : -1;
+        groupArray.sort(
+            (a, b) =>
+                dir * this.compareLotKeys(a.sortKey, b.sortKey) ||
+                b.count - a.count ||
+                a.blockName.localeCompare(b.blockName)
+        );
 
         for (const group of groupArray) {
             group.items.sort((a, b) => {
@@ -89,9 +138,17 @@ export class ProductDetails extends Component {
                     return containerCompare;
                 }
 
+                const lotCompare = dir * this.compareLotKeys(
+                    this.lotSeriesKey(a.lot_name),
+                    this.lotSeriesKey(b.lot_name)
+                );
+                if (lotCompare !== 0) {
+                    return lotCompare;
+                }
+
                 const lotA = (a.lot_name || "").toLowerCase();
                 const lotB = (b.lot_name || "").toLowerCase();
-                return lotA.localeCompare(lotB);
+                return dir * lotA.localeCompare(lotB, undefined, { numeric: true });
             });
 
             let lastContenedor = null;
