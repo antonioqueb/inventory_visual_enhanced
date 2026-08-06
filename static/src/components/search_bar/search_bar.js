@@ -12,7 +12,7 @@ export class SearchBar extends Component {
             filters: {
                 product_name: '',
                 almacen_id: null,
-                stock_mode: 'stock',
+                stock_mode: 'all',
                 tipo: '',
                 categoria_name: '',
                 grupo: '',
@@ -300,8 +300,8 @@ export class SearchBar extends Component {
 
     hasActiveFilters() {
         return Object.entries(this.state.filters).some(([key, v]) => {
-            // 'stock_mode' por defecto en 'stock' no cuenta como filtro activo.
-            if (key === 'stock_mode') return v && v !== 'stock';
+            // 'stock_mode' por defecto en 'all' (mixto) no cuenta como filtro activo.
+            if (key === 'stock_mode') return v && v !== 'all';
             return v !== null && v !== '';
         });
     }
@@ -310,7 +310,7 @@ export class SearchBar extends Component {
         this.state.filters = {
             product_name: '',
             almacen_id: null,
-            stock_mode: 'stock',
+            stock_mode: 'all',
             tipo: '',
             categoria_name: '',
             grupo: '',

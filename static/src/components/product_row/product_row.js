@@ -43,6 +43,17 @@ export class ProductRow extends Component {
         return this.props.stockMode === "transit";
     }
 
+    get isMixedMode() {
+        return this.props.stockMode === "all";
+    }
+
+    get showTransitRows() {
+        // En modo tránsito siempre; en mixto solo si el producto trae algo
+        // en el agua (no ensuciar productos que están 100% en patio).
+        return this.isTransitMode || (
+            this.isMixedMode && (this.props.product.transit_qty || 0) > 0);
+    }
+
     handleFilterClick(filterType) {
         if (!this.props.isExpanded) {
             this.props.onToggle(this.props.product.quant_ids);

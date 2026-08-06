@@ -202,8 +202,9 @@
                             t-on-change="(ev) => this.onFilterChange('stock_mode', ev)"
                             t-att-disabled="props.isLoading"
                         >
-                            <option value="stock">En Stock</option>
-                            <option value="transit">En Tránsito</option>
+                            <option value="all">Stock + Tránsito</option>
+                            <option value="stock">Solo Stock</option>
+                            <option value="transit">Solo Tránsito</option>
                         </select>
                     </div>
 

@@ -99,7 +99,7 @@
                         </div>
                     </t>
 
-                    <t t-if="isTransitMode">
+                    <t t-if="showTransitRows">
                         <div class="inventory-separator">
                             <span>En Tránsito</span>
                         </div>

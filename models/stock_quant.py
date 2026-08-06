@@ -127,10 +127,15 @@ class StockQuant(models.Model):
         # Así los lotes ya entregados al cliente NO aparecen en la vista,
         # pero las placas en proceso de taller (production) sí se visualizan.
         # =====================================================================
-        # Modo de inventario: 'stock' (almacén/taller) por defecto, o 'transit'
-        # (material en ubicación de tránsito). Reemplaza al filtro de ubicación.
-        stock_mode = (filters.get('stock_mode') or 'stock')
-        usages = ['transit'] if stock_mode == 'transit' else ['internal', 'production']
+        # Modo de inventario: 'all' (MIXTO stock + tránsito, el default),
+        # 'stock' (solo almacén/taller) o 'transit' (solo tránsito).
+        stock_mode = (filters.get('stock_mode') or 'all')
+        if stock_mode == 'transit':
+            usages = ['transit']
+        elif stock_mode == 'stock':
+            usages = ['internal', 'production']
+        else:
+            usages = ['internal', 'production', 'transit']
         domain = [
             ('quantity', '>', 0),
             ('location_id.usage', 'in', usages),
@@ -393,8 +398,12 @@ class StockQuant(models.Model):
         # cero, el producto ni siquiera se muestra.
         if stock_mode == 'transit':
             product_groups = {pid: g for pid, g in product_groups.items() if g['transit_qty'] > 0}
-        else:
+        elif stock_mode == 'stock':
             product_groups = {pid: g for pid, g in product_groups.items() if g['stock_qty'] > 0}
+        else:
+            product_groups = {
+                pid: g for pid, g in product_groups.items()
+                if g['stock_qty'] > 0 or g['transit_qty'] > 0}
 
         return {
             'products': list(product_groups.values()),

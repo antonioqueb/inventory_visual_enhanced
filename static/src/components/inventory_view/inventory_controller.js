@@ -81,7 +81,7 @@ class InventoryVisualController extends Component {
 
         this.state.isLoading = true;
         this.state.error = null;
-        this.state.stockMode = (filters && filters.stock_mode) || "stock";
+        this.state.stockMode = (filters && filters.stock_mode) || "all";
 
         try {
             const result = await this.orm.call(
