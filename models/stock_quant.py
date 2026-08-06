@@ -588,22 +588,26 @@ class StockQuant(models.Model):
             
             result.append(detail)
 
-        # Marca por bloque si tiene foto (para colorear el ícono). Un solo query
-        # por producto: OR de =ilike sobre los bloques presentes.
+        # Marca por bloque si tiene foto (para colorear el ícono amarillo).
+        # Matching NORMALIZADO en Python (strip + lower): el =ilike anterior
+        # fallaba con espacios al final o comodines (_ %) en el nombre y
+        # además leía los binarios. Un solo query ligero de todos los
+        # nombres de bloque con foto (la tabla es chica).
         blocks_with_photo = set()
-        block_names = {(d.get('bloque') or '').strip() for d in result}
+        block_names = {(d.get('bloque') or '').strip().lower()
+                       for d in result}
         block_names.discard('')
         if block_names and 'supplier.shipment.block.image' in self.env:
-            BImg = self.env['supplier.shipment.block.image'].sudo()
-            names = list(block_names)
-            domain = [('block_name', '=ilike', n) for n in names]
-            if len(names) > 1:
-                domain = ['|'] * (len(names) - 1) + domain
-            for img in BImg.search(domain):
-                if img.image:
-                    blocks_with_photo.add((img.block_name or '').strip().lower())
+            self.env.cr.execute("""
+                SELECT DISTINCT LOWER(TRIM(block_name))
+                FROM supplier_shipment_block_image
+                WHERE COALESCE(block_name, '') != ''
+            """)
+            photo_names = {r[0] for r in self.env.cr.fetchall()}
+            blocks_with_photo = block_names & photo_names
         for d in result:
-            d['block_has_photo'] = (d.get('bloque') or '').strip().lower() in blocks_with_photo
+            d['block_has_photo'] = (
+                (d.get('bloque') or '').strip().lower() in blocks_with_photo)
 
         return result
 
