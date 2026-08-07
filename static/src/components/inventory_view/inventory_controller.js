@@ -97,16 +97,33 @@ class InventoryVisualController extends Component {
             if (Array.isArray(result)) {
                 products = result;
             } else if (result && typeof result === "object") {
+                if (result.requires_query) {
+                    // Resguardo del backend: búsqueda sin producto/lote/bloque
+                    // fuera del modo tránsito no se ejecuta.
+                    this.state.products = [];
+                    this.state.hasSearched = false;
+                    this.state.totalProducts = 0;
+                    this.notification.add(
+                        "Escribe un producto, lote o bloque para buscar. Solo el modo En Tránsito lista todo.",
+                        { type: "info" }
+                    );
+                    return;
+                }
                 products = result.products || [];
                 missingLots = result.missing_lots || [];
             }
 
             // Resguardo de display: en cada modo solo productos CON existencia.
-            // Hace que "En Tránsito" oculte los productos con tránsito 0 aunque el
-            // backend aún devuelva todo (p. ej. si el módulo Python no se recargó).
+            // En MIXTO ('all') un producto que solo viene en tránsito también
+            // cuenta (antes se filtraba por stock_qty y desaparecía de la
+            // búsqueda por nombre aunque sí existiera en tránsito).
             const mode = this.state.stockMode;
             products = products.filter((p) =>
-                mode === "transit" ? (p.transit_qty || 0) > 0 : (p.stock_qty || 0) > 0
+                mode === "transit"
+                    ? (p.transit_qty || 0) > 0
+                    : mode === "stock"
+                        ? (p.stock_qty || 0) > 0
+                        : ((p.stock_qty || 0) > 0 || (p.transit_qty || 0) > 0)
             );
 
             this.state.products = products;

@@ -6,6 +6,7 @@ import { useService } from "@web/core/utils/hooks";
 export class SearchBar extends Component {
     setup() {
         this.orm = useService("orm");
+        this.notification = useService("notification");
         this.root = useRef("root");
 
         this.state = useState({
@@ -274,9 +275,32 @@ export class SearchBar extends Component {
     /**
      * Ejecuta la búsqueda real.
      * Evita búsquedas duplicadas comparando el payload.
+     *
+     * GATE: sin producto, lote o bloque NO se manda la búsqueda (traería el
+     * inventario completo). La única excepción es el modo "En Tránsito", que
+     * sí puede listarse entero.
      */
     _executeSearch() {
         if (!this.props.onSearch) return;
+
+        const f = this.state.filters;
+        const hasQuery = [f.product_name, f.numero_serie, f.bloque]
+            .some((v) => ((v || "").trim().length > 0));
+
+        if (!hasQuery && f.stock_mode !== "transit") {
+            // Se limpia la vista (como una búsqueda vacía) y se avisa UNA vez.
+            this._lastSearchPayload = null;
+            this.props.onSearch(null);
+            if (!this._blockedNoticeShown) {
+                this._blockedNoticeShown = true;
+                this.notification.add(
+                    "Escribe un producto, lote o bloque para buscar. Solo el modo En Tránsito lista todo.",
+                    { type: "info" }
+                );
+            }
+            return;
+        }
+        this._blockedNoticeShown = false;
 
         const payload = JSON.stringify(this.state.filters);
         if (payload === this._lastSearchPayload) return;

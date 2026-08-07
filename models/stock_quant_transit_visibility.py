@@ -557,9 +557,33 @@ class StockQuantTransitVisibility(models.Model):
         if not filters:
             return {"products": [], "missing_lots": []}
 
+        # Modo de inventario: 'all' (MIXTO stock + tránsito, el default),
+        # 'stock' (almacén/taller) o 'transit' (solo tránsito). Esta versión
+        # (la que gana sobre la de stock_quant.py) lo IGNORABA: una búsqueda
+        # en modo tránsito recorría todo el inventario interno + taller y el
+        # frontend tiraba casi todo después — de ahí la eternidad.
+        stock_mode = filters.get("stock_mode") or "all"
+        if stock_mode == "transit":
+            usages = ["transit"]
+        elif stock_mode == "stock":
+            usages = ["internal", "production"]
+        else:
+            usages = ["internal", "production", "transit"]
+
+        # GATE DE BÚSQUEDA: sin un identificador (producto, lote o bloque) el
+        # resultado sería el inventario completo. La única excepción es el
+        # modo tránsito, que sí puede listarse entero (universo acotado).
+        has_query = bool(
+            (filters.get("product_name") or "").strip()
+            or (filters.get("numero_serie") or "").strip()
+            or (filters.get("bloque") or "").strip()
+        )
+        if not has_query and stock_mode != "transit":
+            return {"products": [], "missing_lots": [], "requires_query": True}
+
         domain = [
             ("quantity", ">", 0),
-            ("location_id.usage", "in", ["internal", "transit", "production"]),
+            ("location_id.usage", "in", usages),
         ]
 
         search_lot_names = []
@@ -700,8 +724,14 @@ class StockQuantTransitVisibility(models.Model):
 
         # Pre-cómputo en bloque para evitar N+1 dentro del bucle:
         # qué quants internos están comprometidos por alguna sale.order.
-        committed_quant_keys = self._iv_batch_get_committed_quant_keys(quants)
-        partial_commit_map = self._iv_batch_get_partial_commit_map(quants)
+        # En modo tránsito no hay quants internos: se omite el barrido de
+        # move.lines / sale.order.lines completo.
+        if stock_mode == "transit":
+            committed_quant_keys = set()
+            partial_commit_map = {}
+        else:
+            committed_quant_keys = self._iv_batch_get_committed_quant_keys(quants)
+            partial_commit_map = self._iv_batch_get_partial_commit_map(quants)
 
         product_groups = {}
         visible_quants = self.env["stock.quant"]
@@ -770,8 +800,8 @@ class StockQuantTransitVisibility(models.Model):
             has_hold = hasattr(quant, "x_tiene_hold") and quant.x_tiene_hold
 
             if is_transit:
-                transit_state = self._iv_get_transit_state(quant)
-
+                # transit_state ya se calculó arriba en el filtro de 'hidden'
+                # de esta misma iteración: no se recalcula.
                 product_groups[product_id]["transit_qty"] += qty
                 product_groups[product_id]["transit_plates"] += 1
 
