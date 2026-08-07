@@ -743,7 +743,12 @@ class StockQuantTransitVisibility(models.Model):
 
             if is_transit:
                 transit_state = self._iv_get_transit_state(quant)
-                if transit_state == "hidden":
+                # Con búsqueda explícita (producto/lote/bloque) el material en
+                # tránsito SE MUESTRA aunque no esté publicado en el tablero:
+                # quien busca por nombre quiere encontrarlo esté como esté.
+                # Solo el listado completo de tránsito (sin búsqueda) respeta
+                # la curaduría de publicación.
+                if transit_state == "hidden" and not has_query:
                     continue
 
             visible_quants |= quant
@@ -915,8 +920,11 @@ class StockQuantTransitVisibility(models.Model):
             is_transit = usage == "transit"
             transit_state = self._iv_get_transit_state(quant) if is_transit else False
 
-            if is_transit and transit_state == "hidden":
-                continue
+            # Los ids que llegan aquí ya pasaron el filtro de visibilidad de
+            # la búsqueda (get_inventory_grouped_by_product). NO se re-filtra
+            # por publicación: si la búsqueda mostró un tránsito sin publicar
+            # (búsqueda explícita), su detalle también debe mostrarse — antes
+            # el renglón aparecía pero al expandirlo el lote "no existía".
 
             tipo_display = ""
             if hasattr(quant, "x_tipo") and quant.x_tipo:
