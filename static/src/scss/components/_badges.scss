@@ -45,10 +45,11 @@
     border-color: rgba(242, 183, 5, 0.62);
   }
 
+  // Botón de INFORMACIÓN (fa-info-circle): en ROJO para que destaque.
   &.has-notes {
-    background: linear-gradient(135deg, $iv-blue, $iv-blue-dark);
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
     color: #fff;
-    border-color: $iv-blue-dark;
+    border-color: #991b1b;
   }
 
   &.has-details {
