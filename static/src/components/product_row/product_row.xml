@@ -162,6 +162,7 @@
                     onWorkshopClick="props.onWorkshopClick"
                     formatNumber="props.formatNumber"
                     isInCart="props.isInCart"
+                    onCartStatusClick="props.onCartStatusClick"
                     getDisplayQuantity="props.getDisplayQuantity"
                     toggleCartSelection="props.toggleCartSelection"
                     onInputManualQuantity="props.onInputManualQuantity"

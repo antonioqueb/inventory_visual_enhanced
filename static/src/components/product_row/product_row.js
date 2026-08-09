@@ -334,5 +334,6 @@ ProductRow.props = {
     selectAllCurrentProduct: { type: Function, optional: true },
     deselectAllCurrentProduct: { type: Function, optional: true },
     cart: { type: Object, optional: true },
+    onCartStatusClick: { type: Function, optional: true },
     groupMode: { type: String, optional: true },
 };

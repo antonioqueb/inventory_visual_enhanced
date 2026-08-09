@@ -98,6 +98,13 @@
     border-color: rgba(107, 33, 168, 0.72);
   }
 
+  // EN CARRITO: material retenido por el carrito de un vendedor (24h)
+  &.status-cart {
+    background: linear-gradient(135deg, #1d7ec2, #155f94);
+    color: #fff;
+    border-color: rgba(21, 95, 148, 0.72);
+  }
+
   &.status-no-state,
   &.status-no-hold {
     background: $iv-gray-soft;
