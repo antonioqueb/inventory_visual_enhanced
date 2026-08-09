@@ -533,22 +533,38 @@ class StockQuantTransitVisibility(models.Model):
                 if partial_map.get(key) is True:
                     continue
 
-                bd_key = str(lot.id)
-                if bd_key not in breakdown:
+                # Resolución DUAL: la llave puede ser de LOTE o de QUANT
+                # (flujo de carrito). Antes solo se reconocía la de lote y
+                # un desglose quant-keyed colapsaba a "comprometido TOTAL".
+                qty_bd = None
+                raw = breakdown.get(str(lot.id))
+                if raw is not None:
+                    try:
+                        qty_bd = float(raw or 0.0)
+                    except Exception:
+                        qty_bd = 0.0
+                elif hasattr(sl, '_som_breakdown_qty_for_lot'):
+                    try:
+                        resolved = sl._som_breakdown_qty_for_lot(
+                            breakdown, lot)
+                        if resolved is not None:
+                            qty_bd = float(resolved or 0.0)
+                    except Exception:
+                        qty_bd = None
+
+                if qty_bd is None:
                     # Sin desglose: la línea compromete el lote COMPLETO.
                     partial_map[key] = True
                     continue
 
-                try:
-                    qty_bd = float(breakdown.get(bd_key) or 0.0)
-                except Exception:
-                    qty_bd = 0.0
-
                 delivered = delivered_map.get((sl.id, lot.id), 0.0)
 
                 remaining = max(0.0, qty_bd - delivered)
-                if remaining > 0.0001:
-                    partial_map[key] = partial_map.get(key, 0.0) + remaining
+                # remaining == 0 se registra EXPLÍCITO: el lote entregó toda
+                # su asignación y su remanente físico es LIBRE. Si se omitía
+                # la llave, el bucle principal lo re-pintaba comprometido
+                # completo vía lot_ids.
+                partial_map[key] = partial_map.get(key, 0.0) + remaining
 
         return partial_map
 
@@ -853,12 +869,18 @@ class StockQuantTransitVisibility(models.Model):
             # PARCIALIDADES (formato/pieza): el lote puede estar comprometido
             # solo en parte; el resto sigue LIBRE y cuenta como disponible.
             # -------------------------------------------------------------
-            partial_commit = partial_commit_map.get(
-                (quant.lot_id.id if quant.lot_id else 0, product_id))
+            pc_key = (quant.lot_id.id if quant.lot_id else 0, product_id)
+            partial_commit = partial_commit_map.get(pc_key)
 
             if partial_commit is not None and partial_commit is not True:
                 committed_eff = min(qty, max(reserved, partial_commit))
                 remainder = qty - committed_eff
+                # CONSUMIR el compromiso a medida que se recorre cada quant
+                # del lote: con el lote repartido en varias ubicaciones, el
+                # mismo compromiso se aplicaba ÍNTEGRO a cada quant y el
+                # tablero duplicaba comprometido / escondía disponible.
+                partial_commit_map[pc_key] = max(
+                    partial_commit - committed_eff, 0.0)
 
                 if committed_eff > 0.0001:
                     product_groups[product_id]["committed_qty"] += committed_eff

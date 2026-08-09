@@ -563,6 +563,16 @@ class StockQuant(models.Model):
                                     qty_bd = float(breakdown.get(key) or 0.0)
                                 except Exception:
                                     qty_bd = 0.0
+                            elif breakdown and hasattr(
+                                    sol, '_som_breakdown_qty_for_lot'):
+                                # Llave de QUANT (carrito): resolución dual
+                                try:
+                                    rs = sol._som_breakdown_qty_for_lot(
+                                        breakdown, quant.lot_id)
+                                    if rs is not None:
+                                        qty_bd = float(rs or 0.0)
+                                except Exception:
+                                    pass
 
                         # Descuenta lo ya entregado de ESTE lote en esa línea.
                         delivered = 0.0
