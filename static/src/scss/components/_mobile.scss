@@ -185,17 +185,21 @@
             }
         }
 
-        // ── LA TARJETA DE LOTE ──
+        // ── LA TARJETA DE LOTE: LISTA OPERATIVA COMPACTA ──
+        // 3 líneas fijas, ~90px de alto (5-8 tarjetas por pantalla):
+        //   L1  [✓] LOTE ······ BLOQUE · PLACA      ← jerarquía crítica
+        //   L2  ubicación ················ dims/m²  ← secundaria, diminuta
+        //   L3  [foto][nota][hist][estado]          ← barra de acciones mini
         tbody tr:not(.container-separator-row) {
             display: flex !important;
             flex-wrap: wrap;
             align-items: center;
-            gap: 2px 8px;
-            margin: 0 0 8px;
-            padding: 9px 10px;
+            gap: 1px 6px;
+            margin: 0 0 5px;
+            padding: 5px 8px 4px;
             background: #fff;
             border: 1px solid #e2e8f0;
-            border-radius: 12px;
+            border-radius: 9px;
             box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
 
             > td {
@@ -208,29 +212,30 @@
             }
         }
 
-        // Orden y protagonismo dentro de la tarjeta
+        // ── LÍNEA 1: selección + LOTE + BLOQUE + PLACA ──
         .col-checkbox {
             order: 1;
             flex: 0 0 auto;
 
             .form-check-input {
-                width: 21px;
-                height: 21px;
+                width: 20px;
+                height: 20px;
                 margin: 0;
             }
 
             // Input de parcialidad (formato/pieza): compacto pero tecleable
             input[type="number"] {
-                width: 64px !important;
-                height: 30px !important;
-                font-size: 12px !important;
+                width: 58px !important;
+                height: 26px !important;
+                font-size: 11.5px !important;
+                padding: 1px 4px !important;
             }
         }
 
         .col-lot {
             order: 2;
-            flex: 1 1 auto;
-            font-size: 13px !important;
+            flex: 1 1 auto;          // absorbe el sobrante → fuerza el salto
+            font-size: 12.5px !important;
             font-weight: 800;
             color: #0f172a;
             white-space: nowrap;
@@ -238,68 +243,107 @@
             text-overflow: ellipsis;
         }
 
-        .col-dimensions {
+        .col-bloque {
             order: 3;
-            flex: 0 0 auto;
-            margin-left: auto;
+            flex: 0 1 auto;
+            max-width: 34vw;
+            font-size: 11px !important;
+            font-weight: 800;
+            color: #1e293b;
+            background: #eef2f7;
+            border: 1px solid #dbe3ec;
+            border-radius: 6px;
+            padding: 0 6px !important;
+            line-height: 18px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
 
-            .dims-text { font-size: 10.5px !important; color: #64748b; }
+            &::before {
+                content: 'BLQ ';
+                font-size: 8px;
+                font-weight: 800;
+                letter-spacing: .05em;
+                color: #94a3b8;
+                margin-right: 2px;
+            }
+        }
+
+        .col-num-placa {
+            order: 4;
+            flex: 0 0 auto;
+            font-size: 11px !important;
+            font-weight: 800;
+            color: #155f94;
+            white-space: nowrap;
+
+            &::before {
+                content: 'P·';
+                font-size: 9px;
+                font-weight: 800;
+                color: #94a3b8;
+                margin-right: 1px;
+            }
+        }
+
+        // ── LÍNEA 2: ubicación + dimensiones + m² (diminuta) ──
+        .col-location {
+            order: 5;
+            flex: 1 1 auto;          // crece → empuja acciones a la línea 3
+            font-size: 10.5px !important;
+            color: #64748b;
+            white-space: nowrap !important;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            .fa { margin-right: 3px; opacity: .65; font-size: 9px; }
+        }
+
+        .col-dimensions {
+            order: 6;
+            flex: 0 0 auto;
+
+            .dims-text { font-size: 10px !important; color: #94a3b8; }
 
             .dimensions-total-inline {
-                font-size: 13px !important;
+                font-size: 11.5px !important;
+                font-weight: 800;
                 color: #155f94;
             }
         }
 
-        // Segunda línea: ubicación + bloque
-        .col-location {
-            order: 4;
-            flex: 1 1 100%;
-            font-size: 11px !important;
-            color: #64748b;
-            white-space: normal !important;
-
-            .fa { margin-right: 4px; opacity: .7; }
-        }
-
-        .col-bloque {
-            order: 5;
-            flex: 0 0 auto;
-            font-size: 10.5px !important;
-            font-weight: 700;
-            color: #475569;
-            background: #f1f5f9;
-            border-radius: 6px;
-            padding: 1px 8px !important;
-            margin-right: auto;   // empuja las acciones a la derecha
-        }
-
-        // Columnas secundarias: FUERA en móvil (viven en los diálogos)
+        // Fuera en móvil (viven en los diálogos)
         .col-color,
         .col-atado,
         .col-pedimento,
         .col-contenedor,
-        .col-num-placa,
         .col-eta,
         .col-packing-list { display: none !important; }
 
-        // Acciones: fila táctil al pie, alineada a la derecha
+        // ── LÍNEA 3: barra de acciones mini, horizontal ──
         .col-icon.action-btn-cell {
-            order: 6;
+            order: 7;
             flex: 0 0 auto;
-            margin-top: 4px;
+            margin-top: 1px;
 
             .icon-btn,
             .status-badge-btn {
-                width: 34px !important;
-                height: 34px !important;
-                min-width: 34px !important;
-                border-radius: 10px !important;
+                width: 27px !important;
+                height: 24px !important;
+                min-width: 27px !important;
+                border-radius: 6px !important;
+                // Área táctil efectiva ampliada sin engordar el botón
+                position: relative;
 
-                .fa { font-size: 14px !important; }
+                &::after {
+                    content: '';
+                    position: absolute;
+                    inset: -5px;
+                }
+
+                .fa { font-size: 11.5px !important; }
             }
         }
-
     }
 
     // ════════════════════════════════════════════════════════════════════
