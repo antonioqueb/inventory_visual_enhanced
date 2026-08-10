@@ -4,9 +4,8 @@
 // TODO vive dentro de @media (max-width: 767.98px): el escritorio NO se toca.
 // Rediseño móvil:
 //   · Productos → tarjetas con chips de métricas (2 columnas, tap ≥ 40px).
-//   · Lotes → tarjetas compactas: lote + m² protagonistas, ubicación debajo,
-//     acciones en fila táctil. Columnas secundarias (color, atado, pedimento,
-//     contenedor, nº placa, ETA, packing) se ocultan: viven en los diálogos.
+//   · Lotes → la MISMA tabla de escritorio con scroll lateral (pedido
+//     explícito): todas las columnas visibles, desplazándose a los lados.
 // Este archivo carga AL FINAL del bundle para poder ganar especificidad.
 // ============================================================================
 
@@ -137,213 +136,23 @@
     }
 
     // ════════════════════════════════════════════════════════════════════
-    // 2. TABLA DE LOTES → TARJETAS COMPACTAS
-    // ════════════════════════════════════════════════════════════════════
+    // 2. DETALLE DE LOTES: LA MISMA TABLA DE ESCRITORIO, CON SCROLL LATERAL
+    // ────────────────────────────────────────────────────────────────────
+    // Pedido explícito (2026-08-10): el desglose de lotes se ve EXACTAMENTE
+    // igual que en escritorio — misma tabla, mismas columnas — y el usuario
+    // se desplaza a la derecha/izquierda para ver el resto. Cero
+    // transformación de la tabla; solo el contenedor scrollea.
     .details-wrapper {
-        overflow: visible !important;
-        min-width: 0 !important;
-        padding: 8px !important;
-        background: #f4f7fb;
-        border: 1px solid #e2e8f0;
-        border-radius: 0 0 14px 14px;
-    }
-
-    // Barra "seleccionar todo" existente: píldora pegajosa compacta
-    .mobile-select-bar {
-        position: sticky;
-        top: 0;
-        z-index: 2;
-        margin: 0 0 8px !important;
-        padding: 8px 12px !important;
-        border-radius: 10px !important;
-        font-size: 12px !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        max-width: 100%;
     }
 
     .o_inventory_details_table {
-        display: block !important;
-        min-width: 0 !important;
-        width: 100% !important;
-
-        thead { display: none !important; }
-        tbody { display: block !important; }
-
-        // Separador de contenedor → chip delgado
-        tr.container-separator-row {
-            display: block !important;
-            margin: 10px 2px 6px;
-
-            td {
-                display: block !important;
-                padding: 3px 10px !important;
-                border: none !important;
-                background: #e8eef5 !important;
-                border-radius: 999px;
-                font-size: 10.5px !important;
-                font-weight: 800;
-                letter-spacing: .04em;
-                color: #334155;
-            }
-        }
-
-        // ── LA TARJETA DE LOTE: LISTA OPERATIVA COMPACTA ──
-        // 3 líneas fijas, ~90px de alto (5-8 tarjetas por pantalla):
-        //   L1  [✓] LOTE ······ BLOQUE · PLACA      ← jerarquía crítica
-        //   L2  ubicación ················ dims/m²  ← secundaria, diminuta
-        //   L3  [foto][nota][hist][estado]          ← barra de acciones mini
-        tbody tr:not(.container-separator-row) {
-            display: flex !important;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 1px 6px;
-            margin: 0 0 5px;
-            padding: 5px 8px 4px;
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 9px;
-            box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
-
-            > td {
-                display: flex !important;
-                align-items: center;
-                border: none !important;
-                padding: 0 !important;
-                background: transparent !important;
-                min-width: 0;
-            }
-        }
-
-        // ── LÍNEA 1: selección + LOTE + BLOQUE + PLACA ──
-        .col-checkbox {
-            order: 1;
-            flex: 0 0 auto;
-
-            .form-check-input {
-                width: 20px;
-                height: 20px;
-                margin: 0;
-            }
-
-            // Input de parcialidad (formato/pieza): compacto pero tecleable
-            input[type="number"] {
-                width: 58px !important;
-                height: 26px !important;
-                font-size: 11.5px !important;
-                padding: 1px 4px !important;
-            }
-        }
-
-        .col-lot {
-            order: 2;
-            flex: 1 1 auto;          // absorbe el sobrante → fuerza el salto
-            font-size: 12.5px !important;
-            font-weight: 800;
-            color: #0f172a;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .col-bloque {
-            order: 3;
-            flex: 0 1 auto;
-            max-width: 34vw;
-            font-size: 11px !important;
-            font-weight: 800;
-            color: #1e293b;
-            background: #eef2f7;
-            border: 1px solid #dbe3ec;
-            border-radius: 6px;
-            padding: 0 6px !important;
-            line-height: 18px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-
-            &::before {
-                content: 'BLQ ';
-                font-size: 8px;
-                font-weight: 800;
-                letter-spacing: .05em;
-                color: #94a3b8;
-                margin-right: 2px;
-            }
-        }
-
-        .col-num-placa {
-            order: 4;
-            flex: 0 0 auto;
-            font-size: 11px !important;
-            font-weight: 800;
-            color: #155f94;
-            white-space: nowrap;
-
-            &::before {
-                content: 'P·';
-                font-size: 9px;
-                font-weight: 800;
-                color: #94a3b8;
-                margin-right: 1px;
-            }
-        }
-
-        // ── LÍNEA 2: ubicación + dimensiones + m² (diminuta) ──
-        .col-location {
-            order: 5;
-            flex: 1 1 auto;          // crece → empuja acciones a la línea 3
-            font-size: 10.5px !important;
-            color: #64748b;
-            white-space: nowrap !important;
-            overflow: hidden;
-            text-overflow: ellipsis;
-
-            .fa { margin-right: 3px; opacity: .65; font-size: 9px; }
-        }
-
-        .col-dimensions {
-            order: 6;
-            flex: 0 0 auto;
-
-            .dims-text { font-size: 10px !important; color: #94a3b8; }
-
-            .dimensions-total-inline {
-                font-size: 11.5px !important;
-                font-weight: 800;
-                color: #155f94;
-            }
-        }
-
-        // Fuera en móvil (viven en los diálogos)
-        .col-color,
-        .col-atado,
-        .col-pedimento,
-        .col-contenedor,
-        .col-eta,
-        .col-packing-list { display: none !important; }
-
-        // ── LÍNEA 3: barra de acciones mini, horizontal ──
-        .col-icon.action-btn-cell {
-            order: 7;
-            flex: 0 0 auto;
-            margin-top: 1px;
-
-            .icon-btn,
-            .status-badge-btn {
-                width: 27px !important;
-                height: 24px !important;
-                min-width: 27px !important;
-                border-radius: 6px !important;
-                // Área táctil efectiva ampliada sin engordar el botón
-                position: relative;
-
-                &::after {
-                    content: '';
-                    position: absolute;
-                    inset: -5px;
-                }
-
-                .fa { font-size: 11.5px !important; }
-            }
-        }
+        // La tabla conserva su ancho natural de escritorio: nada de
+        // encogerla — el scroll lateral hace el trabajo.
+        width: max-content !important;
+        min-width: 100% !important;
     }
 
     // ════════════════════════════════════════════════════════════════════
