@@ -1404,7 +1404,7 @@ class StockQuant(models.Model):
     @api.model
     def get_architects(self, search_term=''):
         if not self.check_sales_permissions():
-            raise UserError("No tiene permisos para consultar arquitectos. Contacte al administrador.")
+            raise UserError("No tiene permisos para consultar embajadores. Contacte al administrador.")
         
         domain = []
         
@@ -1435,10 +1435,10 @@ class StockQuant(models.Model):
     @api.model
     def create_architect(self, name, vat='', ref=''):
         if not self.check_sales_permissions():
-            raise UserError("No tiene permisos para crear arquitectos. Contacte al administrador.")
+            raise UserError("No tiene permisos para crear embajadores. Contacte al administrador.")
         
         if not name or not name.strip():
-            return {'error': 'El nombre del arquitecto es requerido'}
+            return {'error': 'El nombre del embajador es requerido'}
         
         try:
             vals = {
@@ -1464,7 +1464,7 @@ class StockQuant(models.Model):
                 }
             }
         except Exception as e:
-            return {'error': f'Error al crear arquitecto: {str(e)}'}
+            return {'error': f'Error al crear embajador: {str(e)}'}
     
     @api.model
     def create_lot_hold_enhanced(self, quant_id, partner_id, project_id, architect_id,

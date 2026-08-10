@@ -21,7 +21,7 @@
                                 <span class="hold-eyebrow">Nuevo apartado</span>
                                 <h2>Reservar material</h2>
                                 <p>
-                                    Configura cliente, proyecto, arquitecto y precio para apartar este lote
+                                    Configura cliente, proyecto, embajador y precio para apartar este lote
                                     durante 5 días hábiles.
                                 </p>
                             </div>
@@ -75,7 +75,7 @@
                             <t t-if="state.currentStep > 3"><i class="fa fa-check"/></t>
                             <t t-else="">3</t>
                         </div>
-                        <div class="hold-step-label">Arquitecto</div>
+                        <div class="hold-step-label">Embajador</div>
                     </div>
 
                     <div class="hold-step-line" t-att-class="{ active: state.currentStep > 3 }"/>
@@ -334,7 +334,7 @@
                         </t>
                     </div>
 
-                    <!-- PASO 3: ARQUITECTO -->
+                    <!-- PASO 3: EMBAJADOR -->
                     <div class="hold-step-panel" t-if="state.currentStep === 3">
                         <div class="hold-step-panel__header">
                             <div class="hold-section-icon">
@@ -342,8 +342,8 @@
                             </div>
                             <div>
                                 <span class="hold-section-eyebrow">Paso 3</span>
-                                <h3>Seleccionar arquitecto</h3>
-                                <p>Registra el arquitecto o contacto técnico vinculado al proyecto.</p>
+                                <h3>Seleccionar embajador</h3>
+                                <p>Registra el embajador o contacto técnico vinculado al proyecto.</p>
                             </div>
                         </div>
 
@@ -388,7 +388,7 @@
                                     <i class="fa fa-check"/>
                                 </div>
                                 <div>
-                                    <span>Arquitecto seleccionado</span>
+                                    <span>Embajador seleccionado</span>
                                     <strong t-esc="state.selectedArchitectName"/>
                                 </div>
                             </div>
@@ -420,7 +420,7 @@
                             <div class="hold-form-card">
                                 <div class="hold-form-grid hold-form-grid--one">
                                     <div class="hold-field">
-                                        <label>Nombre del arquitecto <span>*</span></label>
+                                        <label>Nombre del embajador <span>*</span></label>
                                         <input
                                             type="text"
                                             class="hold-input"
@@ -454,7 +454,7 @@
 
                                 <button type="button" class="hold-primary-button hold-full-button" t-on-click="createArchitect">
                                     <i class="fa fa-plus-circle"/>
-                                    Crear arquitecto
+                                    Crear embajador
                                 </button>
                             </div>
                         </t>
@@ -564,7 +564,7 @@
                             </div>
 
                             <div class="hold-confirm-card">
-                                <span>Arquitecto</span>
+                                <span>Embajador</span>
                                 <strong t-esc="state.selectedArchitectName"/>
                             </div>
 

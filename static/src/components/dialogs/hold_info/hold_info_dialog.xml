@@ -97,7 +97,7 @@
                                 </div>
 
                                 <div class="hold-info-data-item" t-if="holdInfo.arquitecto_nombre">
-                                    <span>Arquitecto</span>
+                                    <span>Embajador</span>
                                     <strong>
                                         <i class="fa fa-user-circle-o"/>
                                         <t t-esc="holdInfo.arquitecto_nombre"/>

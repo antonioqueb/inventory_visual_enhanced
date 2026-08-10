@@ -515,7 +515,7 @@
                                                 <div t-if="reservation.arquitecto">
                                                     <div class="ivh-section-title mt-3">
                                                         <i class="fa fa-pencil-square-o"></i>
-                                                        Arquitecto
+                                                        Embajador
                                                     </div>
                                                     <p class="ivh-main-value" t-esc="reservation.arquitecto"></p>
                                                 </div>

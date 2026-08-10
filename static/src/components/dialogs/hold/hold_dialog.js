@@ -30,7 +30,7 @@ export class CreateHoldDialog extends Component {
             showCreateProject: false,
             newProjectName: '',
             
-            // Arquitecto
+            // Embajador
             searchArchitectTerm: '',
             architects: [],
             selectedArchitectId: null,
@@ -321,7 +321,7 @@ export class CreateHoldDialog extends Component {
         }
     }
     
-    // ========== ARQUITECTO ==========
+    // ========== EMBAJADOR ==========
     
     onSearchArchitect(ev) {
         const value = ev.target.value;
@@ -349,8 +349,8 @@ export class CreateHoldDialog extends Component {
             
             this.state.architects = architects;
         } catch (error) {
-            console.error("Error buscando arquitectos:", error);
-            this.notification.add("Error al buscar arquitectos", { type: "danger" });
+            console.error("Error buscando embajadores:", error);
+            this.notification.add("Error al buscar embajadores", { type: "danger" });
         }
     }
     
@@ -370,7 +370,7 @@ export class CreateHoldDialog extends Component {
     
     async createArchitect() {
         if (!this.state.newArchitectName.trim()) {
-            this.notification.add("El nombre del arquitecto es requerido", { type: "warning" });
+            this.notification.add("El nombre del embajador es requerido", { type: "warning" });
             return;
         }
         
@@ -390,14 +390,14 @@ export class CreateHoldDialog extends Component {
                 this.notification.add(result.error, { type: "danger" });
             } else if (result.success) {
                 this.selectArchitect(result.architect);
-                this.notification.add(`Arquitecto "${result.architect.name}" creado exitosamente`, { type: "success" });
+                this.notification.add(`Embajador "${result.architect.name}" creado exitosamente`, { type: "success" });
                 this.state.newArchitectName = '';
                 this.state.newArchitectVat = '';
                 this.state.newArchitectRef = '';
             }
         } catch (error) {
-            console.error("Error creando arquitecto:", error);
-            this.notification.add("Error al crear arquitecto", { type: "danger" });
+            console.error("Error creando embajador:", error);
+            this.notification.add("Error al crear embajador", { type: "danger" });
         }
     }
     
@@ -419,7 +419,7 @@ export class CreateHoldDialog extends Component {
             return;
         }
         if (this.state.currentStep === 3 && !this.state.selectedArchitectId) {
-            this.notification.add("Debe seleccionar o crear un arquitecto", { type: "warning" });
+            this.notification.add("Debe seleccionar o crear un embajador", { type: "warning" });
             return;
         }
         if (this.state.currentStep === 4) {
