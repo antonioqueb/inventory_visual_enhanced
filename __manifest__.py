@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Inventario Visual Avanzado',
-    'version': '19.0.3.5.0',
+    'version': '19.0.4.0.0',
     'category': 'Inventory/Inventory',
     'summary': 'Vista visual mejorada y agrupada del inventario por producto',
     'description': """
@@ -57,6 +57,8 @@
             'inventory_visual_enhanced/static/src/scss/components/_block-report-dialog.scss',
             'inventory_visual_enhanced/static/src/scss/components/_workshop-info-dialog.scss',
             'inventory_visual_enhanced/static/src/components/walkthrough/walkthrough.scss',
+            # Capa MÓVIL: SOLO media queries — carga al final para ganar cascada.
+            'inventory_visual_enhanced/static/src/scss/components/_mobile.scss',
 
             # JS
             'inventory_visual_enhanced/static/src/components/search_bar/search_bar.js',

@@ -1,0 +1,328 @@
+// ============================================================================
+// INVENTARIO VISUAL — CAPA MÓVIL
+// ----------------------------------------------------------------------------
+// TODO vive dentro de @media (max-width: 767.98px): el escritorio NO se toca.
+// Rediseño móvil:
+//   · Productos → tarjetas con chips de métricas (2 columnas, tap ≥ 40px).
+//   · Lotes → tarjetas compactas: lote + m² protagonistas, ubicación debajo,
+//     acciones en fila táctil. Columnas secundarias (color, atado, pedimento,
+//     contenedor, nº placa, ETA, packing) se ocultan: viven en los diálogos.
+// Este archivo carga AL FINAL del bundle para poder ganar especificidad.
+// ============================================================================
+
+@media (max-width: 767.98px) {
+
+    // ── Lienzo ───────────────────────────────────────────────────────────
+    .o_inventory_visual_content {
+        padding: 8px !important;
+        background: #eef2f7;
+    }
+
+    // ════════════════════════════════════════════════════════════════════
+    // 1. REJILLA DE PRODUCTOS → TARJETAS
+    // ════════════════════════════════════════════════════════════════════
+    .o_inventory_data_grid {
+        overflow: visible !important;
+        min-width: 0 !important;
+    }
+
+    .o_inventory_grid_table {
+        display: block !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        border-collapse: separate;
+
+        thead { display: none !important; }
+        tbody { display: block !important; }
+    }
+
+    .o_inventory_product_row {
+        display: block !important;
+        margin: 0 0 10px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, .05), 0 6px 16px -10px rgba(15, 23, 42, .15);
+        overflow: hidden;
+
+        > td {
+            display: block !important;
+            width: 100% !important;
+            max-width: none !important;
+            border: none !important;
+            padding: 0 !important;
+        }
+
+        // Nombre del producto = cabecera de la tarjeta
+        .col-product-name {
+            padding: 12px 14px 8px !important;
+
+            .product-title {
+                font-size: 15px !important;
+                line-height: 1.25 !important;
+                white-space: normal !important;
+                overflow: visible !important;
+                text-overflow: clip !important;
+            }
+
+            .product-sku {
+                font-size: 11px !important;
+                margin-top: 2px;
+            }
+        }
+
+        // Categoría: fuera en móvil (secundaria)
+        .col-category { display: none !important; }
+
+        // Métricas → chips en 2 columnas
+        .col-inventory { padding: 0 10px 12px !important; }
+
+        .inventory-subgrid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            min-width: 0 !important;
+            width: 100% !important;
+        }
+
+        .inventory-separator { display: none !important; }
+
+        .inventory-row {
+            display: flex !important;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            min-height: 40px;              // objetivo táctil real
+            margin: 0 !important;
+            padding: 6px 10px !important;
+            background: #f8fafc;
+            border: 1px solid #eef2f7;
+            border-radius: 10px;
+            min-width: 0;
+
+            .inventory-label {
+                font-size: 10px !important;
+                text-transform: uppercase;
+                letter-spacing: .04em;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .inventory-value {
+                font-size: 12.5px !important;
+                white-space: nowrap;
+            }
+
+            .inventory-units { font-weight: 800; }
+
+            &.active-filter {
+                background: #e8f1f8;
+                border-color: rgba(21, 95, 148, .35);
+            }
+        }
+    }
+
+    // Fila expandida del detalle: ocupa todo el ancho como bloque
+    .o_inventory_details_row {
+        display: block !important;
+        margin: -6px 0 12px;
+
+        > td.details-cell {
+            display: block !important;
+            width: 100% !important;
+            padding: 0 !important;
+            border: none !important;
+        }
+    }
+
+    // ════════════════════════════════════════════════════════════════════
+    // 2. TABLA DE LOTES → TARJETAS COMPACTAS
+    // ════════════════════════════════════════════════════════════════════
+    .details-wrapper {
+        overflow: visible !important;
+        min-width: 0 !important;
+        padding: 8px !important;
+        background: #f4f7fb;
+        border: 1px solid #e2e8f0;
+        border-radius: 0 0 14px 14px;
+    }
+
+    // Barra "seleccionar todo" existente: píldora pegajosa compacta
+    .mobile-select-bar {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        margin: 0 0 8px !important;
+        padding: 8px 12px !important;
+        border-radius: 10px !important;
+        font-size: 12px !important;
+    }
+
+    .o_inventory_details_table {
+        display: block !important;
+        min-width: 0 !important;
+        width: 100% !important;
+
+        thead { display: none !important; }
+        tbody { display: block !important; }
+
+        // Separador de contenedor → chip delgado
+        tr.container-separator-row {
+            display: block !important;
+            margin: 10px 2px 6px;
+
+            td {
+                display: block !important;
+                padding: 3px 10px !important;
+                border: none !important;
+                background: #e8eef5 !important;
+                border-radius: 999px;
+                font-size: 10.5px !important;
+                font-weight: 800;
+                letter-spacing: .04em;
+                color: #334155;
+            }
+        }
+
+        // ── LA TARJETA DE LOTE ──
+        tbody tr:not(.container-separator-row) {
+            display: flex !important;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 2px 8px;
+            margin: 0 0 8px;
+            padding: 9px 10px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+
+            > td {
+                display: flex !important;
+                align-items: center;
+                border: none !important;
+                padding: 0 !important;
+                background: transparent !important;
+                min-width: 0;
+            }
+        }
+
+        // Orden y protagonismo dentro de la tarjeta
+        .col-checkbox {
+            order: 1;
+            flex: 0 0 auto;
+
+            .form-check-input {
+                width: 21px;
+                height: 21px;
+                margin: 0;
+            }
+
+            // Input de parcialidad (formato/pieza): compacto pero tecleable
+            input[type="number"] {
+                width: 64px !important;
+                height: 30px !important;
+                font-size: 12px !important;
+            }
+        }
+
+        .col-lot {
+            order: 2;
+            flex: 1 1 auto;
+            font-size: 13px !important;
+            font-weight: 800;
+            color: #0f172a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .col-dimensions {
+            order: 3;
+            flex: 0 0 auto;
+            margin-left: auto;
+
+            .dims-text { font-size: 10.5px !important; color: #64748b; }
+
+            .dimensions-total-inline {
+                font-size: 13px !important;
+                color: #155f94;
+            }
+        }
+
+        // Segunda línea: ubicación + bloque
+        .col-location {
+            order: 4;
+            flex: 1 1 100%;
+            font-size: 11px !important;
+            color: #64748b;
+            white-space: normal !important;
+
+            .fa { margin-right: 4px; opacity: .7; }
+        }
+
+        .col-bloque {
+            order: 5;
+            flex: 0 0 auto;
+            font-size: 10.5px !important;
+            font-weight: 700;
+            color: #475569;
+            background: #f1f5f9;
+            border-radius: 6px;
+            padding: 1px 8px !important;
+            margin-right: auto;   // empuja las acciones a la derecha
+        }
+
+        // Columnas secundarias: FUERA en móvil (viven en los diálogos)
+        .col-color,
+        .col-atado,
+        .col-pedimento,
+        .col-contenedor,
+        .col-num-placa,
+        .col-eta,
+        .col-packing-list { display: none !important; }
+
+        // Acciones: fila táctil al pie, alineada a la derecha
+        .col-icon.action-btn-cell {
+            order: 6;
+            flex: 0 0 auto;
+            margin-top: 4px;
+
+            .icon-btn,
+            .status-badge-btn {
+                width: 34px !important;
+                height: 34px !important;
+                min-width: 34px !important;
+                border-radius: 10px !important;
+
+                .fa { font-size: 14px !important; }
+            }
+        }
+
+    }
+
+    // ════════════════════════════════════════════════════════════════════
+    // 3. ESTADOS VACÍO / CARGA
+    // ════════════════════════════════════════════════════════════════════
+    .o_inventory_visual_empty,
+    .o_inventory_no_results {
+        padding: 40px 16px !important;
+
+        .empty-icon,
+        .no-results-icon { font-size: 34px !important; }
+
+        .empty-title,
+        .no-results-title { font-size: 16px !important; }
+
+        .empty-subtitle,
+        .no-results-message { font-size: 12.5px !important; }
+    }
+}
+
+// ── Teléfonos angostos: chips de métricas a 1 columna ───────────────────────
+@media (max-width: 379.98px) {
+    .o_inventory_product_row .inventory-subgrid {
+        grid-template-columns: 1fr !important;
+    }
+}
