@@ -148,11 +148,45 @@
         max-width: 100%;
     }
 
+    // NEUTRALIZAR el bloque móvil viejo de _data-grid.scss: sus reglas
+    // `.o_inventory_grid_table tbody/tr/td { display:block }` alcanzan
+    // también a esta tabla ANIDADA y apilaban las celdas (el look de
+    // "tarjetas"). Se re-declara la semántica de TABLA con mayor
+    // especificidad — idéntica al escritorio.
+    .o_inventory_grid_table .o_inventory_details_table,
     .o_inventory_details_table {
-        // La tabla conserva su ancho natural de escritorio: nada de
-        // encogerla — el scroll lateral hace el trabajo.
+        display: table !important;
         width: max-content !important;
         min-width: 100% !important;
+        table-layout: auto !important;
+
+        thead { display: table-header-group !important; }
+        tbody { display: table-row-group !important; }
+
+        tr {
+            display: table-row !important;
+            width: auto !important;
+            margin: 0 !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            background: transparent;
+        }
+
+        th {
+            display: table-cell !important;
+            width: auto !important;
+        }
+
+        td {
+            display: table-cell !important;
+            width: auto !important;
+            // Clon EXACTO de la celda de escritorio (_product-details.scss)
+            padding: 3px 8px !important;
+            border-bottom: 1px solid rgba(215, 232, 242, 0.78) !important;
+            border-right: 1px solid rgba(215, 232, 242, 0.52) !important;
+            vertical-align: middle;
+        }
     }
 
     // ════════════════════════════════════════════════════════════════════
