@@ -604,7 +604,55 @@ class StockQuant(models.Model):
                         and committed_qty > 0.0001
                         and detail['qty_disponible'] > 0.0001
                     )
-            
+
+            # APARTADO PARCIAL: el hold de un formato/pieza solo retiene su
+            # parcialidad — se suma a lo comprometido y el remanente queda
+            # disponible (y seleccionable).
+            if detail['tiene_hold'] and hasattr(quant, 'som_hold_held_qty'):
+                tipo_h = str(getattr(quant.lot_id, 'x_tipo', '') or '').lower()
+                if tipo_h in ('formato', 'pieza'):
+                    held = quant.som_hold_held_qty()
+                    if held > 0.0001 and (quant.quantity - held) > 0.0001:
+                        prev = detail.get('qty_comprometida') or 0.0
+                        total_ret = min(quant.quantity, prev + held)
+                        detail['qty_apartada'] = held
+                        detail['qty_comprometida'] = total_ret
+                        detail['qty_disponible'] = max(
+                            0.0, quant.quantity - total_ret)
+                        detail['parcialmente_comprometido'] = (
+                            detail['qty_disponible'] > 0.0001)
+                        detail['tiene_hold_parcial'] = True
+
+            # DOS LÍNEAS por lote parcialmente retenido (venta y/o hold):
+            # una NO seleccionable con lo comprometido/apartado y otra
+            # seleccionable con el remanente disponible.
+            if detail.get('parcialmente_comprometido') \
+                    and (detail.get('qty_comprometida') or 0.0) > 0.0001:
+                fila_comp = dict(detail)
+                fila_comp.update({
+                    'id': '%s-comprometido' % quant.id,
+                    'lot_name': '%s · COMPROMETIDO' % detail['lot_name'],
+                    'quantity': detail['qty_comprometida'],
+                    'is_committed_row': True,
+                    # No seleccionable: en venta confirmada sin parcialidad
+                    'en_orden_venta': True,
+                    'parcialmente_comprometido': False,
+                    'qty_disponible': 0.0,
+                })
+                result.append(fila_comp)
+
+                detail = dict(detail)
+                detail.update({
+                    'lot_name': '%s · DISPONIBLE' % detail['lot_name'],
+                    'quantity': detail['qty_disponible'],
+                    'is_available_row': True,
+                    # Seleccionable: el remanente es libre
+                    'tiene_hold': False,
+                    'hold_info': None,
+                    'en_orden_venta': False,
+                    'parcialmente_comprometido': False,
+                })
+
             result.append(detail)
 
         # Marca por bloque si tiene foto (para colorear el ícono amarillo).
