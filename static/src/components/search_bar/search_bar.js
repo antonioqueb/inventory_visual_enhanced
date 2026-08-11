@@ -284,7 +284,9 @@ export class SearchBar extends Component {
         if (!this.props.onSearch) return;
 
         const f = this.state.filters;
-        const hasQuery = [f.product_name, f.numero_serie, f.bloque]
+        // Llaves válidas de búsqueda: producto/lote/bloque (texto) y también
+        // categoría o tipo de material — acotan lo suficiente por sí solos.
+        const hasQuery = [f.product_name, f.numero_serie, f.bloque, f.categoria_name, f.tipo]
             .some((v) => ((v || "").trim().length > 0));
 
         if (!hasQuery && f.stock_mode !== "transit") {
@@ -294,7 +296,7 @@ export class SearchBar extends Component {
             if (!this._blockedNoticeShown) {
                 this._blockedNoticeShown = true;
                 this.notification.add(
-                    "Escribe un producto, lote o bloque para buscar. Solo el modo En Tránsito lista todo.",
+                    "Escribe un producto, lote o bloque — o elige una categoría o tipo de material. Solo el modo En Tránsito lista todo.",
                     { type: "info" }
                 );
             }
