@@ -98,13 +98,16 @@ class InventoryVisualController extends Component {
                 products = result;
             } else if (result && typeof result === "object") {
                 if (result.requires_query) {
-                    // Resguardo del backend: búsqueda sin producto/lote/bloque
-                    // fuera del modo tránsito no se ejecuta.
+                    // Resguardo del backend: sin ningún criterio que acote
+                    // (identificador o filtro de catálogo/embarque) fuera del
+                    // modo tránsito no se ejecuta.
                     this.state.products = [];
                     this.state.hasSearched = false;
                     this.state.totalProducts = 0;
                     this.notification.add(
-                        "Escribe un producto, lote o bloque para buscar. Solo el modo En Tránsito lista todo.",
+                        "Escribe un producto, lote o bloque, o aplica un filtro " +
+                        "(categoría, tipo, grupo, contenedor, ubicación...). " +
+                        "Solo el modo En Tránsito lista todo.",
                         { type: "info" }
                     );
                     return;

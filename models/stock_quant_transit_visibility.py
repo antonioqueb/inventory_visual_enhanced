@@ -586,13 +586,22 @@ class StockQuantTransitVisibility(models.Model):
         else:
             usages = ["internal", "production", "transit"]
 
-        # GATE DE BÚSQUEDA: sin un identificador (producto, lote o bloque) el
-        # resultado sería el inventario completo. La única excepción es el
-        # modo tránsito, que sí puede listarse entero (universo acotado).
-        has_query = bool(
-            (filters.get("product_name") or "").strip()
-            or (filters.get("numero_serie") or "").strip()
-            or (filters.get("bloque") or "").strip()
+        # GATE DE BÚSQUEDA: sin NINGÚN criterio que acote, el resultado sería
+        # el inventario completo. Destraban la búsqueda:
+        # - identificadores (producto, lote, bloque), y
+        # - filtros ACOTADOS de catálogo/embarque (categoría, tipo, grupo,
+        #   marca, color, acabado, contenedor, atado, pedimento, ubicación):
+        #   el vendedor puede pedir "todo lo de mármol" sin escribir un
+        #   producto. El almacén solo NO destraba (es casi todo el universo).
+        # La única excepción es el modo tránsito, que sí puede listarse
+        # entero (universo acotado).
+        _gate_keys = (
+            "product_name", "numero_serie", "bloque",
+            "categoria_name", "tipo", "grupo", "marca", "color",
+            "acabado", "contenedor", "atado", "pedimento", "ubicacion_id",
+        )
+        has_query = any(
+            str(filters.get(k) or "").strip() for k in _gate_keys
         )
         if not has_query and stock_mode != "transit":
             return {"products": [], "missing_lots": [], "requires_query": True}
