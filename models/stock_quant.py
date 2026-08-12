@@ -1363,9 +1363,13 @@ class StockQuant(models.Model):
         
         if not name or not name.strip():
             return {'error': 'El nombre es requerido'}
-        
+
         try:
-            partner = self.env['res.partner'].create({
+            # SUDO deliberado: dar de alta clientes es tarea del VENDEDOR (ya
+            # validado arriba) y no debe requerir el grupo de administración
+            # de contactos ni permisos de contabilidad. Alta acotada a campos
+            # comerciales fijos.
+            partner = self.env['res.partner'].sudo().create({
                 'name': name.strip(),
                 'vat': vat.strip() if vat else False,
                 'ref': ref.strip() if ref else False,
