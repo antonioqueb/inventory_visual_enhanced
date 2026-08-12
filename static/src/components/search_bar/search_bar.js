@@ -284,10 +284,20 @@ export class SearchBar extends Component {
         if (!this.props.onSearch) return;
 
         const f = this.state.filters;
-        // Llaves válidas de búsqueda: producto/lote/bloque (texto) y también
-        // categoría o tipo de material — acotan lo suficiente por sí solos.
-        const hasQuery = [f.product_name, f.numero_serie, f.bloque, f.categoria_name, f.tipo]
-            .some((v) => ((v || "").trim().length > 0));
+        // MISMAS llaves que el gate del backend (_gate_keys): cualquier
+        // criterio que ACOTE destraba — identificadores (producto/lote/
+        // bloque) o filtros de catálogo/embarque (categoría, tipo, grupo,
+        // marca, color, acabado, CONTENEDOR, atado, pedimento, ubicación).
+        // Tenerlas desalineadas dejaba búsquedas válidas (p. ej. solo por
+        // contenedor + Enter) muertas en el cliente sin llegar al servidor.
+        const gateValues = [
+            f.product_name, f.numero_serie, f.bloque,
+            f.categoria_name, f.tipo, f.grupo, f.marca, f.color,
+            f.acabado, f.contenedor, f.atado, f.pedimento, f.ubicacion_id,
+        ];
+        const hasQuery = gateValues.some(
+            (v) => (String(v == null ? "" : v)).trim().length > 0
+        );
 
         if (!hasQuery && f.stock_mode !== "transit") {
             // Se limpia la vista (como una búsqueda vacía) y se avisa UNA vez.
@@ -296,7 +306,7 @@ export class SearchBar extends Component {
             if (!this._blockedNoticeShown) {
                 this._blockedNoticeShown = true;
                 this.notification.add(
-                    "Escribe un producto, lote o bloque — o elige una categoría o tipo de material. Solo el modo En Tránsito lista todo.",
+                    "Escribe un producto, lote o bloque, o aplica un filtro (categoría, tipo, grupo, contenedor, ubicación...). Solo el modo En Tránsito lista todo.",
                     { type: "info" }
                 );
             }
