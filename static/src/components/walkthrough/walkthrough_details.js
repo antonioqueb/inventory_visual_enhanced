@@ -56,7 +56,7 @@ export class WalkthroughDetails extends ProductDetails {
             if (detail.exit_partner) parts.push(`Motivo: ${detail.exit_partner}`);
         }
         if (detail.exit_doc) parts.push(`Documento: ${detail.exit_doc}`);
-        if (detail.exit_date) parts.push(`Fecha: ${detail.exit_date}`);
+        if (detail.exit_date) parts.push(`Fecha: ${this.formatDate(detail.exit_date)}`);
         return parts.join(" | ");
     }
 }

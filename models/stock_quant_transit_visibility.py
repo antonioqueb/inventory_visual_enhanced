@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models, api
+from odoo.addons.inventory_visual_enhanced.models.som_date_format import som_format_date
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -1061,8 +1062,8 @@ class StockQuantTransitVisibility(models.Model):
                     "proyecto_nombre": hold.project_id.name if hasattr(hold, "project_id") and hold.project_id else "",
                     "arquitecto_nombre": hold.arquitecto_id.name if hasattr(hold, "arquitecto_id") and hold.arquitecto_id else "",
                     "vendedor_nombre": hold.user_id.name if hold.user_id else "",
-                    "fecha_inicio": hold.fecha_inicio.strftime("%Y-%m-%d") if hasattr(hold, "fecha_inicio") and hold.fecha_inicio else "",
-                    "fecha_expiracion": hold.fecha_expiracion.strftime("%Y-%m-%d") if hasattr(hold, "fecha_expiracion") and hold.fecha_expiracion else "",
+                    "fecha_inicio": som_format_date(hold.fecha_inicio, empty="") if hasattr(hold, "fecha_inicio") else "",
+                    "fecha_expiracion": som_format_date(hold.fecha_expiracion, empty="") if hasattr(hold, "fecha_expiracion") else "",
                     "notas": hold.notas if hasattr(hold, "notas") else "",
                 }
 

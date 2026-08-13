@@ -3,6 +3,7 @@
 import { Component } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { Dialog } from "@web/core/dialog/dialog";
+import { somFormatDate } from "@inventory_visual_enhanced/utils/som_date";
 
 export class SaleOrderDialog extends Component {
     setup() {
@@ -115,19 +116,7 @@ export class SaleOrderDialog extends Component {
     }
 
     formatDate(value) {
-        if (!value) {
-            return "—";
-        }
-
-        const raw = String(value);
-        const datePart = raw.includes(" ") ? raw.split(" ")[0] : raw;
-        const parts = datePart.split("-");
-
-        if (parts.length !== 3) {
-            return raw;
-        }
-
-        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        return somFormatDate(value);
     }
 
     async openSaleOrder(orderId, ev) {

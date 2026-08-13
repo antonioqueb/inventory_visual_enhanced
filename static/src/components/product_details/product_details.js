@@ -2,6 +2,7 @@
 
 import { Component, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
+import { somFormatDate } from "@inventory_visual_enhanced/utils/som_date";
 
 export class ProductDetails extends Component {
     setup() {
@@ -225,36 +226,7 @@ export class ProductDetails extends Component {
     }
 
     formatDate(value) {
-        if (!value) {
-            return "—";
-        }
-
-        const raw = String(value);
-        const datePart = raw.includes(" ") ? raw.split(" ")[0] : raw;
-        const parts = datePart.split("-");
-
-        if (parts.length !== 3) {
-            return raw;
-        }
-
-        const [year, month, day] = parts;
-
-        const monthNames = {
-            "01": "Enero",
-            "02": "Febrero",
-            "03": "Marzo",
-            "04": "Abril",
-            "05": "Mayo",
-            "06": "Junio",
-            "07": "Julio",
-            "08": "Agosto",
-            "09": "Septiembre",
-            "10": "Octubre",
-            "11": "Noviembre",
-            "12": "Diciembre",
-        };
-
-        return `${parseInt(day, 10)} / ${monthNames[month] || month} / ${year}`;
+        return somFormatDate(value);
     }
 
     getEtaText(detail) {

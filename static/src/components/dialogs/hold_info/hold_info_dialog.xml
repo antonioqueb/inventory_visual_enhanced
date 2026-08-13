@@ -131,7 +131,7 @@
                                     <span>Inicio</span>
                                     <strong>
                                         <i class="fa fa-calendar-check-o"/>
-                                        <t t-esc="holdInfo.fecha_inicio"/>
+                                        <t t-esc="formatDate(holdInfo.fecha_inicio)"/>
                                     </strong>
                                 </div>
 
@@ -139,7 +139,7 @@
                                     <span>Expiración</span>
                                     <strong>
                                         <i class="fa fa-calendar-times-o"/>
-                                        <t t-esc="holdInfo.fecha_expiracion"/>
+                                        <t t-esc="formatDate(holdInfo.fecha_expiracion)"/>
                                     </strong>
                                 </div>
                             </div>

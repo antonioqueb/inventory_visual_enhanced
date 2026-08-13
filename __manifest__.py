@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Inventario Visual Avanzado',
-    'version': '19.0.6.2.0',
+    'version': '19.0.6.3.0',
     'category': 'Inventory/Inventory',
     'summary': 'Vista visual mejorada y agrupada del inventario por producto',
     'description': """
@@ -60,7 +60,9 @@
             # Capa MÓVIL: SOLO media queries — carga al final para ganar cascada.
             'inventory_visual_enhanced/static/src/scss/components/_mobile.scss',
 
-            # JS
+            # JS — utilidades primero (las importan los componentes)
+            'inventory_visual_enhanced/static/src/utils/som_date.js',
+
             'inventory_visual_enhanced/static/src/components/search_bar/search_bar.js',
             'inventory_visual_enhanced/static/src/components/product_details/product_details.js',
             'inventory_visual_enhanced/static/src/components/product_row/product_row.js',

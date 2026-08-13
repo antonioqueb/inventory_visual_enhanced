@@ -3,6 +3,7 @@
 import { Component } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { Dialog } from "@web/core/dialog/dialog";
+import { somFormatDate } from "@inventory_visual_enhanced/utils/som_date";
 
 export class HoldInfoDialog extends Component {
     setup() {
@@ -13,8 +14,7 @@ export class HoldInfoDialog extends Component {
     }
     
     formatDate(dateStr) {
-        if (!dateStr) return '-';
-        return dateStr;
+        return somFormatDate(dateStr, { empty: '-' });
     }
     
     async releaseHold() {
