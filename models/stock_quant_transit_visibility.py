@@ -570,6 +570,14 @@ class StockQuantTransitVisibility(models.Model):
         return partial_map
 
     @api.model
+    @staticmethod
+    def _iv_alpha_key(name):
+        """Llave de orden alfabético estricto: mayúsculas plegadas y
+        acentos normalizados (Á==A, Ñ tras N como en es_MX práctico)."""
+        import unicodedata
+        s = unicodedata.normalize("NFD", name or "")
+        return "".join(c for c in s if unicodedata.category(c) != "Mn").casefold()
+
     def get_inventory_grouped_by_product(self, filters=None):
         if not filters:
             return {"products": [], "missing_lots": []}
@@ -925,7 +933,14 @@ class StockQuantTransitVisibility(models.Model):
             product_groups = self._filter_products_by_price(product_groups, filters)
 
         return {
-            "products": list(product_groups.values()),
+            # Orden alfabético ESTRICTO por nombre de producto (pedido
+            # explícito): sin él, el orden era el de iteración de quants —
+            # aleatorio a ojos del usuario. Insensible a mayúsculas y con
+            # acentos plegados para que Ónix no caiga después de Zebra.
+            "products": sorted(
+                product_groups.values(),
+                key=lambda g: self._iv_alpha_key(g.get("product_name") or ""),
+            ),
             "missing_lots": missing_lots,
         }
 
