@@ -1074,8 +1074,15 @@ class StockQuantTransitVisibility(models.Model):
                 and quant.x_hold_activo_id
             ):
                 hold = quant.x_hold_activo_id
+                # Folio de la ORDEN de reserva dueña del hold (hipervínculo
+                # en el diálogo del apartado).
+                order_line = self.env['stock.lot.hold.order.line'].sudo().search(
+                    [('hold_ids', 'in', hold.id)], limit=1)
+                hold_order = order_line.order_id
                 detail["hold_info"] = {
                     "id": hold.id,
+                    "order_id": hold_order.id or False,
+                    "order_name": hold_order.name or "",
                     "partner_name": hold.partner_id.name if hold.partner_id else "",
                     "proyecto_nombre": hold.project_id.name if hasattr(hold, "project_id") and hold.project_id else "",
                     "arquitecto_nombre": hold.arquitecto_id.name if hasattr(hold, "arquitecto_id") and hold.arquitecto_id else "",

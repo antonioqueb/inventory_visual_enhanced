@@ -80,6 +80,17 @@
                             </div>
 
                             <div class="hold-info-data-grid">
+                                <div class="hold-info-data-item hold-info-data-item--wide" t-if="holdInfo.order_name">
+                                    <span>Orden de reserva</span>
+                                    <strong>
+                                        <a href="#" t-on-click.prevent="openHoldOrder"
+                                           style="cursor: pointer; text-decoration: underline;"
+                                           t-att-title="'Abrir ' + holdInfo.order_name">
+                                            <i class="fa fa-external-link me-1"/>
+                                            <t t-esc="holdInfo.order_name"/>
+                                        </a>
+                                    </strong>
+                                </div>
                                 <div class="hold-info-data-item hold-info-data-item--wide">
                                     <span>Cliente</span>
                                     <strong>
