@@ -569,7 +569,6 @@ class StockQuantTransitVisibility(models.Model):
 
         return partial_map
 
-    @api.model
     @staticmethod
     def _iv_alpha_key(name):
         """Llave de orden alfabético estricto: mayúsculas plegadas y
@@ -578,6 +577,7 @@ class StockQuantTransitVisibility(models.Model):
         s = unicodedata.normalize("NFD", name or "")
         return "".join(c for c in s if unicodedata.category(c) != "Mn").casefold()
 
+    @api.model
     def get_inventory_grouped_by_product(self, filters=None):
         if not filters:
             return {"products": [], "missing_lots": []}
