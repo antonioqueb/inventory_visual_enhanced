@@ -178,6 +178,26 @@ export class ProductRow extends Component {
             return;
         }
 
+        // Niveles por ROL (los decide el backend): vendedor regular ve
+        // 1-3; mayorista y autorizador ven 1-5. Fallback a las llaves
+        // planas viejas si el servidor aún no manda 'levels'.
+        const levels = (d.levels && d.levels.length) ? d.levels : [
+            { label: "Alto", dot: "#28a745", usd: d.usd_high, mxn: d.mxn_high },
+            { label: "Medio", dot: "#ffc107", usd: d.usd_medium, mxn: d.mxn_medium },
+        ];
+        const rowsHtml = levels.map((lv) => `
+                    <tr style="border-bottom: 1px solid #f5f5f5;">
+                        <td style="padding: 4px 6px; font-weight: 600;">
+                            <span style="color: ${lv.dot || "#666"};">●</span> ${lv.label}
+                        </td>
+                        <td style="padding: 4px 6px; text-align: right; font-family: monospace;">
+                            $${this.formatPrice(lv.usd)}
+                        </td>
+                        <td style="padding: 4px 6px; text-align: right; font-family: monospace;">
+                            $${this.formatPrice(lv.mxn)}
+                        </td>
+                    </tr>`).join("");
+
         this._renderTooltipContent(`
             <div style="font-weight: 700; font-size: 13px; color: #714B67;
                         margin-bottom: 8px; border-bottom: 2px solid #714B67;
@@ -192,29 +212,7 @@ export class ProductRow extends Component {
                         <th style="padding: 3px 6px; text-align: right; color: #714B67; font-weight: 700;">MXN</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr style="border-bottom: 1px solid #f5f5f5;">
-                        <td style="padding: 4px 6px; font-weight: 600;">
-                            <span style="color: #28a745;">●</span> Alto
-                        </td>
-                        <td style="padding: 4px 6px; text-align: right; font-family: monospace;">
-                            $${this.formatPrice(d.usd_high)}
-                        </td>
-                        <td style="padding: 4px 6px; text-align: right; font-family: monospace;">
-                            $${this.formatPrice(d.mxn_high)}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 4px 6px; font-weight: 600;">
-                            <span style="color: #ffc107;">●</span> Medio
-                        </td>
-                        <td style="padding: 4px 6px; text-align: right; font-family: monospace;">
-                            $${this.formatPrice(d.usd_medium)}
-                        </td>
-                        <td style="padding: 4px 6px; text-align: right; font-family: monospace;">
-                            $${this.formatPrice(d.mxn_medium)}
-                        </td>
-                    </tr>
+                <tbody>${rowsHtml}
                 </tbody>
             </table>
             <div style="margin-top: 6px; font-size: 10px; color: #999; text-align: right;">
