@@ -1016,6 +1016,38 @@ class StockQuant(models.Model):
             for reservation in reservations:
                 reservation.pop('fecha_creacion_obj', None)
         
+        # 4.b BITÁCORA DE ASIGNACIÓN (stock.lot.assignment.log)
+        # Responde "¿a qué pedido se asignó esta placa y quién se la quitó?".
+        # Es la ÚNICA fuente: sale.order.line.lot_ids es un many2many sin
+        # tracking, así que antes de esta bitácora una desasignación no
+        # dejaba rastro en la base.
+        assignments = []
+        for entry in self.env['stock.lot.assignment.log'].som_get_lot_trail(lot.id):
+            fecha_obj = entry.pop('date_obj', None)
+            entry['fecha'] = som_format_date(fecha_obj, empty='', with_time=True)
+            assignments.append(entry)
+
+            descripcion = '%s %s' % (
+                'Asignada a' if entry['action'] == 'assign' else 'Desasignada de',
+                entry['documento'] or 'documento sin nombre')
+            if entry['cliente']:
+                descripcion += ' (cliente %s)' % entry['cliente']
+            if entry['motivo']:
+                descripcion += ' — %s' % entry['motivo']
+
+            general_logs.append({
+                'fecha_obj': fecha_obj,
+                'fecha': entry['fecha'],
+                'usuario': entry['usuario'],
+                'origen': 'Asignación' if entry['action'] == 'assign' else 'Desasignación',
+                'descripcion': descripcion,
+            })
+
+        statistics['total_asignaciones'] = sum(
+            1 for a in assignments if a['action'] == 'assign')
+        statistics['total_desasignaciones'] = sum(
+            1 for a in assignments if a['action'] == 'unassign')
+
         # 5. ENTREGAS
         deliveries = []
         delivery_moves = self.env['stock.move.line'].search([
@@ -1049,6 +1081,7 @@ class StockQuant(models.Model):
             'movements': movements,
             'sales_orders': sales_orders,
             'reservations': reservations,
+            'assignments': assignments,
             'deliveries': deliveries,
             'general_logs': general_logs,
         }

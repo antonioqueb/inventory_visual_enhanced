@@ -130,6 +130,19 @@
                     <li class="nav-item" role="presentation">
                         <button
                             class="nav-link"
+                            t-att-class="{ active: isActiveTab('assignments') }"
+                            t-on-click="() => this.switchTab('assignments')"
+                            type="button"
+                        >
+                            <i class="fa fa-random"></i>
+                            Asignaciones
+                            <span t-if="history.assignments" class="ivh-tab-count" t-esc="history.assignments.length"></span>
+                        </button>
+                    </li>
+
+                    <li class="nav-item" role="presentation">
+                        <button
+                            class="nav-link"
                             t-att-class="{ active: isActiveTab('deliveries') }"
                             t-on-click="() => this.switchTab('deliveries')"
                             type="button"
@@ -662,6 +675,62 @@
                                                 <td><small t-esc="delivery.origen"></small></td>
                                                 <td>
                                                     <span class="ivh-soft-badge ivh-soft-badge--neutral" t-esc="delivery.estado"></span>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+                    </div>
+
+                    <!-- PESTAÑA ASIGNACIONES: a qué documento entró la placa,
+                         quién la sacó y por qué. Es el rastro que antes no
+                         existía (lot_ids no lleva tracking). -->
+                    <div t-if="isActiveTab('assignments')" class="tab-pane fade show active">
+                        <t t-if="!history.assignments or history.assignments.length === 0">
+                            <div class="ivh-empty-state">
+                                <i class="fa fa-random"></i>
+                                <p>Esta placa no tiene movimientos de asignación registrados.</p>
+                                <p class="text-muted" style="font-size: 12px;">
+                                    La bitácora se empezó a registrar a partir de la
+                                    actualización del 15 ago 2026: los cambios anteriores
+                                    a esa fecha no aparecen aquí.
+                                </p>
+                            </div>
+                        </t>
+
+                        <t t-else="">
+                            <div class="ivh-table-wrap">
+                                <table class="ivh-table ivh-table--compact">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 14%">Fecha</th>
+                                            <th style="width: 12%">Acción</th>
+                                            <th style="width: 14%">Documento</th>
+                                            <th style="width: 16%">Cliente</th>
+                                            <th style="width: 14%">Usuario</th>
+                                            <th>Motivo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="history.assignments" t-as="asg" t-key="asg.id">
+                                            <tr>
+                                                <td class="text-nowrap"><small t-esc="asg.fecha"></small></td>
+                                                <td>
+                                                    <span t-if="asg.action === 'assign'"
+                                                          class="ivh-soft-badge ivh-soft-badge--success"
+                                                          t-esc="asg.action_label"></span>
+                                                    <span t-else=""
+                                                          class="ivh-soft-badge ivh-soft-badge--danger"
+                                                          t-esc="asg.action_label"></span>
+                                                </td>
+                                                <td><strong t-esc="asg.documento"></strong></td>
+                                                <td t-esc="asg.cliente"></td>
+                                                <td><strong t-esc="asg.usuario"></strong></td>
+                                                <td>
+                                                    <span t-esc="asg.motivo"></span>
+                                                    <small t-if="asg.detalle" class="d-block text-muted" t-esc="asg.detalle"></small>
                                                 </td>
                                             </tr>
                                         </t>
