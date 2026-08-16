@@ -179,11 +179,13 @@ export class ProductRow extends Component {
         }
 
         // Niveles por ROL (los decide el backend): vendedor regular ve
-        // 1-3; mayorista y autorizador ven 1-5. Fallback a las llaves
-        // planas viejas si el servidor aún no manda 'levels'.
+        // 1-2; mayorista 1-4; autorizador 1-5. Fallback a las llaves
+        // planas viejas si el servidor aún no manda 'levels' — con las
+        // MISMAS etiquetas numeradas, para que un servidor viejo no
+        // resucite el "Alto/Medio" que nadie usa al hablar de precios.
         const levels = (d.levels && d.levels.length) ? d.levels : [
-            { label: "Alto", dot: "#28a745", usd: d.usd_high, mxn: d.mxn_high },
-            { label: "Medio", dot: "#ffc107", usd: d.usd_medium, mxn: d.mxn_medium },
+            { label: "Precio 1", dot: "#28a745", usd: d.usd_high, mxn: d.mxn_high },
+            { label: "Precio 2", dot: "#ffc107", usd: d.usd_medium, mxn: d.mxn_medium },
         ];
         const rowsHtml = levels.map((lv) => `
                     <tr style="border-bottom: 1px solid #f5f5f5;">
