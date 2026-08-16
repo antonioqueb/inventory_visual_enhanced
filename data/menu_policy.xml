@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Cierra los menús nativos de Inventario que el usuario raso no debe
+         ver (Información general, Operaciones y Productos › Lotes).
+
+         Va como <function> y NO como <record>: son menús de CORE y sus
+         XML ID cambian entre builds, así que se resuelven por nombre en
+         tiempo de carga. Corre en cada actualización del módulo, de modo
+         que si un -u stock repone los grupos de core, la siguiente pasada
+         lo vuelve a cerrar. Ver ir_ui_menu_policy.py. -->
+    <function model="ir.ui.menu"
+              name="_som_apply_inventory_menu_policy"/>
+</odoo>
