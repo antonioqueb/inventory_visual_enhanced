@@ -34,12 +34,30 @@ from odoo import api, models
 
 _logger = logging.getLogger(__name__)
 
-# Menús colgados DIRECTAMENTE de Inventario que el usuario raso no debe ver.
-_HIDE_TOP = ('informacion general', 'operaciones')
-
-# Dentro de 'Productos': el submenú de lotes/números de serie.
-_PRODUCTS_MENU = 'productos'
-_HIDE_UNDER_PRODUCTS = ('lotes', 'numeros de serie', 'lotes/numeros de serie')
+# Secciones de la app Inventario que el usuario raso NO debe ver. Se busca
+# en TODO el árbol de Inventario, no solo en los hijos directos: la primera
+# versión miraba únicamente el primer nivel y por eso no encontraba nada.
+#
+# Cada entrada es una tupla de alias del MISMO menú: el nombre depende del
+# idioma y del build, y con un solo nombre se falla en silencio.
+_HIDE = {
+    'Información general': (
+        'informacion general', 'informacion gral', 'general',
+        'vista general', 'resumen', 'panorama general', 'overview',
+    ),
+    'Operaciones': (
+        'operaciones', 'operacion', 'operations',
+    ),
+    'Productos': (
+        'productos', 'producto', 'products',
+    ),
+    # Se deja aunque 'Productos' ya lo tape: si en este build el menú de
+    # lotes cuelga de otro lado, igual queda cerrado.
+    'Lotes': (
+        'lotes', 'numeros de serie', 'lotes/numeros de serie',
+        'lotes / numeros de serie', 'lots', 'lots/serial numbers',
+    ),
+}
 
 
 def _norm(text):
@@ -84,38 +102,53 @@ class IrUiMenu(models.Model):
         # sudo(): los menús son datos de configuración y esto corre en la
         # instalación/actualización del módulo.
         Menu = self.sudo()
-        hijos = Menu.search([('parent_id', '=', root.id)])
+        # TODO el árbol de Inventario, a cualquier profundidad. Mirar solo
+        # los hijos directos fue el error de la primera versión: si el menú
+        # cuelga un nivel más abajo, no se encontraba y fallaba callado.
+        arbol = Menu.search([('id', 'child_of', root.id), ('id', '!=', root.id)])
 
         objetivos = Menu.browse()
-        faltantes = list(_HIDE_TOP)
-
-        for menu in hijos:
+        encontrados = set()
+        for menu in arbol:
             nombre = _norm(menu.name)
-            if nombre in _HIDE_TOP:
-                objetivos |= menu
-                if nombre in faltantes:
-                    faltantes.remove(nombre)
-            elif nombre == _PRODUCTS_MENU:
-                lotes = Menu.search([('parent_id', '=', menu.id)]).filtered(
-                    lambda m: _norm(m.name) in _HIDE_UNDER_PRODUCTS)
-                if lotes:
-                    objetivos |= lotes
-                else:
-                    faltantes.append('%s > lotes' % _PRODUCTS_MENU)
+            for etiqueta, alias in _HIDE.items():
+                if nombre in alias:
+                    objetivos |= menu
+                    encontrados.add(etiqueta)
+                    break
 
         for menu in objetivos:
             antes = ', '.join(menu[gfield].mapped('name')) or '(sin grupos)'
             if menu[gfield].ids == manager.ids:
+                _logger.info(
+                    '[inventory_visual_enhanced] Menú "%s" ya estaba '
+                    'restringido.', menu.name)
                 continue
             menu.write({gfield: [(6, 0, manager.ids)]})
             _logger.info(
                 '[inventory_visual_enhanced] Menú "%s" restringido a '
                 'Administrador de inventario (antes: %s).', menu.name, antes)
 
+        faltantes = [e for e in _HIDE if e not in encontrados]
+
+        # El árbol COMPLETO va al log siempre, no solo cuando falla. Sin
+        # esto, un menú renombrado (o traducido distinto) deja la política
+        # sin efecto y no hay forma de saber por qué: el log da los nombres
+        # reales para corregir la lista de alias en un minuto.
+        _logger.info(
+            '[inventory_visual_enhanced] ─── Árbol de Inventario tal como '
+            'está en ESTA base (%s menús) ───', len(arbol))
+        for menu in arbol.sorted(key=lambda m: m.complete_name or ''):
+            grupos = ', '.join(menu[gfield].mapped('name')) or '(sin grupos)'
+            marca = '  <<< RESTRINGIDO' if menu in objetivos else ''
+            _logger.info('[inventory_visual_enhanced]   %-58s [%s]%s',
+                         menu.complete_name or menu.name, grupos, marca)
+
         if faltantes:
             _logger.warning(
-                '[inventory_visual_enhanced] No se encontraron estos menús '
-                'bajo Inventario (¿los renombraron?): %s. Revisar a mano.',
+                '[inventory_visual_enhanced] NO se encontró: %s. Se llaman '
+                'distinto en esta base — busca el nombre real en el árbol de '
+                'arriba y agrégalo a _HIDE en ir_ui_menu_policy.py.',
                 ', '.join(faltantes))
 
         # El árbol de menús va en caché: sin esto el usuario los sigue

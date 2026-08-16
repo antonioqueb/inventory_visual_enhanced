@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Inventario Visual Avanzado',
-    'version': '19.0.7.4.0',
+    'version': '19.0.7.5.0',
     'category': 'Inventory/Inventory',
     'summary': 'Vista visual mejorada y agrupada del inventario por producto',
     'description': """
