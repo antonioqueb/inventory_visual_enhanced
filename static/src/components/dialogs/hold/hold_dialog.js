@@ -1,11 +1,18 @@
 /** @odoo-module **/
 
-import { Component, useState, onWillStart } from "@odoo/owl";
+import { Component, useState, onWillStart, onMounted, onWillUnmount } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { Dialog } from "@web/core/dialog/dialog";
 
 export class CreateHoldDialog extends Component {
     setup() {
+        // Medición SOM: mientras este diálogo esté abierto el tiempo
+        // se atribuye a esta pantalla y no a la de atrás. Si el
+        // módulo de medición no está instalado, nadie escucha y ya.
+        onMounted(() => this.env.bus.trigger("SOM_ACTIVITY:SCREEN",
+            { key: "apartado_captura", label: "Captura de apartado" }));
+        onWillUnmount(() => this.env.bus.trigger("SOM_ACTIVITY:SCREEN", {}));
+
         this.detailData = this.props.detailData;
         this.detailId = this.props.detailId;
         this.orm = useService("orm");
