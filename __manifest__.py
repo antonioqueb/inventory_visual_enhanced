@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Inventario Visual Avanzado',
-    'version': '19.0.7.6.0',
+    'version': '19.0.7.7.0',
     'category': 'Inventory/Inventory',
     'summary': 'Vista visual mejorada y agrupada del inventario por producto',
     'description': """
@@ -31,9 +31,13 @@
         'stock_lot_dimensions',
     ],
     'data': [
+        'security/ir.model.access.csv',
         'views/inventory_visual_views.xml',
         'views/menu_items.xml',
         'views/walkthrough_views.xml',
+        # La acción del wizard debe cargar ANTES de la lista de ajustes,
+        # que la referencia con %(...)d en su botón de header.
+        'views/formato_lot_create_wizard_views.xml',
         'views/stock_quant_formato_adjust_views.xml',
         'data/menu_policy.xml',
     ],

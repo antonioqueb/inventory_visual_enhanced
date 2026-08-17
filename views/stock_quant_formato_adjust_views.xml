@@ -12,6 +12,11 @@
         <field name="arch" type="xml">
             <list string="Ajustes de Formatos" editable="bottom" create="1" delete="0"
                   default_order="product_id, lot_id">
+                <header>
+                    <button name="%(inventory_visual_enhanced.action_formato_lot_create)d"
+                            type="action" string="Crear lotes" display="always"
+                            class="btn btn-primary"/>
+                </header>
                 <field name="product_id" readonly="id"
                        domain="[('product_tmpl_id.x_unidad_del_producto', '=ilike', 'formato')]"
                        options="{'no_create': True}"/>

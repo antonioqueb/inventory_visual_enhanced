@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_som_formato_lot_create_form" model="ir.ui.view">
+        <field name="name">som.formato.lot.create.form</field>
+        <field name="model">som.formato.lot.create</field>
+        <field name="arch" type="xml">
+            <form string="Crear lotes de formato">
+                <group>
+                    <group string="Material">
+                        <field name="product_id" options="{'no_create': True}"/>
+                        <field name="location_id" options="{'no_create': True}"/>
+                        <field name="qty_per_lot"/>
+                    </group>
+                    <group string="Serie / secuencia">
+                        <field name="prefix"/>
+                        <field name="next_number"/>
+                        <field name="padding"/>
+                        <field name="lot_count"/>
+                        <field name="name_preview" readonly="1"/>
+                    </group>
+                </group>
+                <group string="Datos del lote">
+                    <group>
+                        <field name="x_bloque"/>
+                        <field name="x_grosor"/>
+                        <field name="x_fecha_lote"/>
+                    </group>
+                    <group>
+                        <field name="x_contenedor"/>
+                        <field name="x_pedimento"/>
+                        <field name="x_referencia_proveedor"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_create_lots" string="Crear lotes"
+                            type="object" class="btn-primary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_formato_lot_create" model="ir.actions.act_window">
+        <field name="name">Crear lotes de formato</field>
+        <field name="res_model">som.formato.lot.create</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

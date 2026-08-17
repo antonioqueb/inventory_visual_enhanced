@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_som_formato_lot_create_stock_user,som.formato.lot.create stock user,model_som_formato_lot_create,stock.group_stock_user,1,1,1,1
