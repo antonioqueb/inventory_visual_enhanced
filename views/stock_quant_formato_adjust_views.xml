@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ══════════ AJUSTES DE FORMATOS ══════════
+         Ajuste de inventario directo (cantidad a la mano) SOLO para
+         productos tipo Formato: lista editable de quants en modo
+         inventario con cantidad contada + botón Aplicar, igual que el
+         ajuste nativo pero acotado a formatos. -->
+
+    <record id="view_stock_quant_formato_adjust_list" model="ir.ui.view">
+        <field name="name">stock.quant.formato.adjust.list</field>
+        <field name="model">stock.quant</field>
+        <field name="arch" type="xml">
+            <list string="Ajustes de Formatos" editable="bottom" create="1" delete="0"
+                  default_order="product_id, lot_id">
+                <field name="product_id" readonly="id"
+                       domain="[('product_tmpl_id.x_unidad_del_producto', '=ilike', 'formato')]"
+                       options="{'no_create': True}"/>
+                <field name="lot_id" readonly="id"
+                       domain="[('product_id', '=', product_id)]"
+                       context="{'default_product_id': product_id}"
+                       options="{'no_create': True}"/>
+                <field name="location_id" readonly="id"
+                       domain="[('usage', '=', 'internal')]"
+                       options="{'no_create': True}"/>
+                <field name="quantity" string="A la mano" readonly="1"/>
+                <field name="inventory_quantity" string="Cantidad contada"/>
+                <field name="inventory_diff_quantity" string="Diferencia" readonly="1"/>
+                <field name="product_uom_id" string="UdM" readonly="1"/>
+                <button name="action_apply_inventory" string="Aplicar"
+                        type="object" class="btn btn-primary"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_stock_quant_formato_adjust_search" model="ir.ui.view">
+        <field name="name">stock.quant.formato.adjust.search</field>
+        <field name="model">stock.quant</field>
+        <field name="arch" type="xml">
+            <search string="Ajustes de Formatos">
+                <field name="product_id"/>
+                <field name="lot_id"/>
+                <field name="location_id"/>
+                <filter name="group_product" string="Producto"
+                        context="{'group_by': 'product_id'}"/>
+                <filter name="group_location" string="Ubicación"
+                        context="{'group_by': 'location_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_formato_adjustments" model="ir.actions.act_window">
+        <field name="name">Ajustes de Formatos</field>
+        <field name="res_model">stock.quant</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_stock_quant_formato_adjust_list"/>
+        <field name="search_view_id" ref="view_stock_quant_formato_adjust_search"/>
+        <field name="domain">[('location_id.usage', '=', 'internal'), ('product_id.product_tmpl_id.x_unidad_del_producto', '=ilike', 'formato')]</field>
+        <field name="context">{'inventory_mode': True, 'search_default_group_product': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Sin existencias de formatos que ajustar</p>
+            <p>Captura la <b>cantidad contada</b> y presiona <b>Aplicar</b> para ajustar la cantidad a la mano del formato. También puedes agregar una línea nueva (producto + lote + ubicación) para dar de alta existencia.</p>
+        </field>
+    </record>
+
+    <!-- El menú nace colgado del root de Inventario (id estable) y la
+         <function> lo recoloca bajo Operaciones › Ajustes de inventario
+         buscando por NOMBRE: los XML ID internos de core cambian entre
+         builds (misma razón que la política de menús). -->
+    <menuitem id="menu_formato_adjustments"
+              name="Ajustes de Formatos"
+              parent="stock.menu_stock_root"
+              action="action_formato_adjustments"
+              sequence="86"/>
+
+    <function model="ir.ui.menu" name="_som_attach_formato_adjust_menu"/>
+</odoo>

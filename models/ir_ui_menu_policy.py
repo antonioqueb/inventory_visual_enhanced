@@ -160,3 +160,56 @@ class IrUiMenu(models.Model):
                 fn()
                 break
         return True
+
+    @api.model
+    def _som_attach_formato_adjust_menu(self):
+        """Cuelga 'Ajustes de Formatos' bajo Operaciones › Ajustes de
+        inventario buscando el padre por NOMBRE (los XML ID de los menús
+        internos de core cambian entre builds). Fallbacks: Operaciones y,
+        si nada aparece, se queda bajo el root de Inventario."""
+        menu = self.env.ref(
+            'inventory_visual_enhanced.menu_formato_adjustments',
+            raise_if_not_found=False)
+        root = self.env.ref('stock.menu_stock_root', raise_if_not_found=False)
+        if not menu or not root:
+            return False
+
+        Menu = self.sudo().with_context(active_test=False)
+        arbol = Menu.search([
+            ('id', 'child_of', root.id),
+            ('id', 'not in', [root.id, menu.id]),
+        ])
+
+        objetivos = (
+            ('ajustes de inventario', 'ajuste de inventario',
+             'inventario fisico', 'physical inventory',
+             'inventory adjustments'),
+            ('ajustes', 'adjustments'),
+            ('operaciones', 'operations'),
+        )
+        target = None
+        for aliases in objetivos:
+            for candidato in arbol:
+                if _norm(candidato.name) in aliases:
+                    target = candidato
+                    break
+            if target:
+                break
+
+        if target and menu.parent_id != target:
+            menu.sudo().parent_id = target.id
+            _logger.info(
+                '[inventory_visual_enhanced] Ajustes de Formatos colgado de '
+                '"%s".', target.complete_name or target.name)
+        elif not target:
+            _logger.warning(
+                '[inventory_visual_enhanced] No se encontró Ajustes de '
+                'inventario ni Operaciones; Ajustes de Formatos queda bajo '
+                'el root de Inventario.')
+
+        for meth in ('clear_cache', 'clear_caches'):
+            fn = getattr(self.env.registry, meth, None)
+            if callable(fn):
+                fn()
+                break
+        return True

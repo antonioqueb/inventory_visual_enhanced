@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Inventario Visual Avanzado',
-    'version': '19.0.7.5.0',
+    'version': '19.0.7.6.0',
     'category': 'Inventory/Inventory',
     'summary': 'Vista visual mejorada y agrupada del inventario por producto',
     'description': """
@@ -34,6 +34,7 @@
         'views/inventory_visual_views.xml',
         'views/menu_items.xml',
         'views/walkthrough_views.xml',
+        'views/stock_quant_formato_adjust_views.xml',
         'data/menu_policy.xml',
     ],
     'assets': {
