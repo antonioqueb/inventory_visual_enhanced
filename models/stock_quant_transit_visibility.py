@@ -85,8 +85,12 @@ class StockQuantTransitVisibility(models.Model):
 
     @api.model
     def _iv_get_transit_line(self, quant):
+        # sudo(): el grupo Tránsito es solo UI — el vendedor no tiene ACL de
+        # stock.transit.line y leerle campos (ETA) al registro sin sudo
+        # tronaba el detalle del inventario visual con AccessError. El
+        # fallback de búsqueda de abajo ya iba con sudo; este camino no.
         if "transit_line_id" in quant._fields and quant.transit_line_id:
-            return quant.transit_line_id
+            return quant.transit_line_id.sudo()
 
         if "stock.transit.line" not in self.env.registry.models:
             return False
