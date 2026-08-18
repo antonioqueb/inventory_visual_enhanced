@@ -171,6 +171,67 @@ class StockQuantWalkthrough(models.Model):
         return aggregates
 
     @api.model
+    def _walkthrough_reclassified_lot_ids(self, lot_ids):
+        """Lotes cuyo vaciado vino de una RECLASIFICACIÓN: el material sigue
+        vivo en el lote espejo, así que sus ajustes NO son bajas."""
+        if not lot_ids or 'stock.lot.reclassification.line' not in self.env:
+            return set()
+        lines = self.env['stock.lot.reclassification.line'].sudo().search([
+            ('lot_from_id', 'in', list(lot_ids)),
+        ])
+        return set(lines.mapped('lot_from_id').ids)
+
+    @api.model
+    def _walkthrough_adjustment_aggregates(self, common_domain):
+        """Bajas por AJUSTE DE INVENTARIO (sin stock.scrap): neto por lote de
+        lo que salió del stock hacia la contrapartida de ajustes menos lo que
+        regresó por ajustes positivos. {(lot, location_dest): qty_neta}.
+
+        Se excluyen los lotes vaciados por reclasificación (lote espejo
+        vivo). Antes los ajustes quedaban fuera por completo y un material
+        dado de baja con ajuste directo jamás aparecía en el Walkthrough."""
+        MoveLine = self.env['stock.move.line'].sudo()
+        base = [
+            ('state', '=', 'done'),
+            ('lot_id', '!=', False),
+            ('move_id.scrap_id', '=', False),
+        ]
+        if 'is_inventory' in self.env['stock.move']._fields:
+            base.append(('move_id.is_inventory', '=', True))
+
+        out_lines = MoveLine.search(base + [
+            ('location_id.usage', 'in', ('internal', 'transit')),
+            ('location_dest_id.usage', '=', 'inventory'),
+        ] + list(common_domain))
+        in_lines = MoveLine.search(base + [
+            ('location_id.usage', '=', 'inventory'),
+            ('location_dest_id.usage', 'in', ('internal', 'transit')),
+        ] + list(common_domain))
+
+        net = {}
+        loss_location = {}
+        for line in out_lines:
+            lot = line.lot_id
+            net[lot] = net.get(lot, 0.0) + (line.quantity or 0.0)
+            loss_location.setdefault(lot, line.location_dest_id)
+        for line in in_lines:
+            lot = line.lot_id
+            net[lot] = net.get(lot, 0.0) - (line.quantity or 0.0)
+
+        reclassified = self._walkthrough_reclassified_lot_ids(
+            [lot.id for lot in net])
+
+        aggregates = {}
+        for lot, qty in net.items():
+            if qty <= 0.0001 or lot.id in reclassified:
+                continue
+            location = loss_location.get(lot)
+            if not location:
+                continue
+            aggregates[(lot, location)] = qty
+        return aggregates
+
+    @api.model
     def _walkthrough_ensure_quant(self, lot, location):
         """Garantiza un stock.quant (aunque esté en cero) para usarlo como
         detail.id: el cron de vacuum borra los quants en cero, y el quant de
@@ -208,6 +269,12 @@ class StockQuantWalkthrough(models.Model):
 
         # Bajas: movimientos de stock.scrap.
         scrap_aggregates = self._walkthrough_scrap_aggregates(common_domain)
+
+        # Bajas por AJUSTE de inventario (sin scrap): también son salidas
+        # y deben quedar registradas en el Walkthrough.
+        for key, qty in self._walkthrough_adjustment_aggregates(
+                common_domain).items():
+            scrap_aggregates[key] = scrap_aggregates.get(key, 0.0) + qty
 
         # Excluir lotes que siguen teniendo stock (devoluciones/entregas
         # parciales: mientras quede material, viven en el Inventario Visual).
@@ -330,8 +397,28 @@ class StockQuantWalkthrough(models.Model):
                 out_domain.append(('move_id.scrap_id', '!=', False))
                 scrap_lines = MoveLine.search(
                     out_domain, order='date desc, id desc')
-                detail['quantity'] = sum(
-                    line.quantity or 0.0 for line in scrap_lines)
+                if scrap_lines:
+                    detail['quantity'] = sum(
+                        line.quantity or 0.0 for line in scrap_lines)
+                else:
+                    # Baja por AJUSTE de inventario (sin stock.scrap): la
+                    # cantidad es el NETO de los ajustes contra esta
+                    # ubicación (salidas menos regresos).
+                    adj_base = [
+                        ('lot_id', '=', quant.lot_id.id),
+                        ('state', '=', 'done'),
+                        ('move_id.scrap_id', '=', False),
+                    ]
+                    adj_out = MoveLine.search(adj_base + [
+                        ('location_dest_id', '=', quant.location_id.id),
+                    ], order='date desc, id desc')
+                    adj_in = MoveLine.search(adj_base + [
+                        ('location_id', '=', quant.location_id.id),
+                    ])
+                    detail['quantity'] = (
+                        sum(line.quantity or 0.0 for line in adj_out)
+                        - sum(line.quantity or 0.0 for line in adj_in))
+                    scrap_lines = adj_out
                 detail['reserved_quantity'] = 0.0
                 last_out = scrap_lines[:1]
             else:
