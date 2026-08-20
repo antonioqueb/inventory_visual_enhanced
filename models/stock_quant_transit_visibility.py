@@ -1057,6 +1057,18 @@ class StockQuantTransitVisibility(models.Model):
                     detail["en_orden_venta"] = True
                     if transit_line and transit_line.order_id:
                         detail["sale_order_ids"] = [transit_line.order_id.id]
+                    elif (
+                        transit_line
+                        and "workshop_sale_line_id" in transit_line._fields
+                        and transit_line.workshop_sale_line_id
+                    ):
+                        # Comprometido a TALLER: material de origen reservado
+                        # para un proceso de taller de una venta (asignado
+                        # desde Transit Allocation, filtro Taller).
+                        detail["en_taller"] = True
+                        detail["sale_order_ids"] = [
+                            transit_line.workshop_sale_line_id.order_id.id
+                        ]
 
                 result.append(detail)
                 continue
