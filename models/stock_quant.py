@@ -379,16 +379,37 @@ class StockQuant(models.Model):
                 product_groups[product_id]['stock_qty'] += qty
                 product_groups[product_id]['stock_plates'] += 1
 
+                # APARTADO PARCIAL (formato/pieza): el hold solo retiene su
+                # parcialidad. Antes el lote COMPLETO se iba al bucket On
+                # Hold y el remanente libre jamás llegaba a Disponible — el
+                # mismo lote debe contar en ambos: lo apartado en On Hold y
+                # el resto en Disponible (regla espejo del detalle, que ya
+                # pinta dos filas COMPROMETIDO/DISPONIBLE).
+                held_qty = 0.0
                 if has_hold:
-                    product_groups[product_id]['hold_qty'] += qty
+                    held_qty = qty
+                    lot_tipo = str(
+                        getattr(quant.lot_id, 'x_tipo', '') or '').lower()
+                    if lot_tipo in ('formato', 'pieza') and hasattr(
+                            quant, 'som_hold_held_qty'):
+                        try:
+                            partial = quant.som_hold_held_qty()
+                            if 0.0001 < partial < qty:
+                                held_qty = partial
+                        except Exception:
+                            pass
+                    product_groups[product_id]['hold_qty'] += held_qty
                     product_groups[product_id]['hold_plates'] += 1
 
                 if reserved > 0:
                     product_groups[product_id]['committed_qty'] += reserved
                     product_groups[product_id]['committed_plates'] += 1
 
-                if not has_hold and available > 0 and not is_workshop:
-                    product_groups[product_id]['available_qty'] += available
+                # Disponible = físico − reserva nativa − apartado. Un lote
+                # con hold PARCIAL sí aporta su remanente libre.
+                free_qty = qty - reserved - held_qty
+                if free_qty > 0.0001 and not is_workshop:
+                    product_groups[product_id]['available_qty'] += free_qty
                     product_groups[product_id]['available_plates'] += 1
         
         # === FILTRO DE PRECIOS POST-AGRUPACIÓN ===
