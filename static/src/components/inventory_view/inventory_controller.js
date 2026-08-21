@@ -186,7 +186,16 @@ class InventoryVisualController extends Component {
             this.state.productDetails[productId] = details;
         } catch (error) {
             console.error("Error al cargar detalles:", error);
-            this.notification.add("Error al cargar detalles del producto", { type: "danger" });
+            this.notification.add(
+                "Error al cargar detalles del producto: " +
+                ((error.data && error.data.message) || error.message || error),
+                { type: "danger", sticky: true });
+            // Sin esto, el spinner "Cargando detalles..." giraba PARA
+            // SIEMPRE tras un error (productDetails quedaba undefined y el
+            // template lo confundía con 'aún cargando'). Se colapsa la fila
+            // para poder reintentar con otro clic.
+            this.state.expandedProducts.delete(productId);
+            this.state.expandedProducts = new Set(this.state.expandedProducts);
         }
     }
 

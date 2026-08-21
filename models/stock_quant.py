@@ -448,6 +448,53 @@ class StockQuant(models.Model):
             [q.lot_id.id for q in quants if q.lot_id]
         )
 
+        # ------------------------------------------------------------------
+        # PREFETCH EN LOTE: las búsquedas por quant (move lines asignadas,
+        # líneas de venta con el lote y entregado por línea) costaban ~1 s
+        # POR QUANT — un producto con 100+ lotes tardaba minutos y el
+        # proxy cortaba la petición ("cargando y cargando" eterno). Todo se
+        # trae UNA vez y el bucle consulta mapas en memoria.
+        # ------------------------------------------------------------------
+        all_lot_ids = list({q.lot_id.id for q in quants if q.lot_id})
+
+        mls_by_lot_loc = {}
+        if all_lot_ids:
+            for ml in self.env['stock.move.line'].sudo().search([
+                ('lot_id', 'in', all_lot_ids),
+                ('state', '=', 'assigned'),
+                ('move_id.sale_line_id', '!=', False),
+            ]):
+                key = (ml.lot_id.id, ml.location_id.id)
+                mls_by_lot_loc.setdefault(key, []).append(ml)
+
+        sols_by_lot = {}
+        delivered_by_sol_lot = {}
+        SaleLine = self.env['sale.order.line'].sudo()
+        if all_lot_ids and 'lot_ids' in SaleLine._fields:
+            all_sols = SaleLine.search([
+                ('lot_ids', 'in', all_lot_ids),
+                ('state', '=', 'sale'),
+            ])
+            lot_id_set = set(all_lot_ids)
+            for sol in all_sols:
+                for _lot in sol.lot_ids:
+                    if _lot.id in lot_id_set:
+                        sols_by_lot.setdefault(_lot.id, []).append(sol)
+                # Entregado por (línea, lote): UNA pasada por línea, no una
+                # por cada quant que comparta el lote.
+                for dml in sol.move_ids.mapped('move_line_ids'):
+                    if (
+                        dml.state == 'done'
+                        and dml.lot_id
+                        and dml.lot_id.id in lot_id_set
+                        and dml.picking_id.picking_type_code == 'outgoing'
+                    ):
+                        dkey = (sol.id, dml.lot_id.id)
+                        dq = (dml.quantity or 0.0) if 'quantity' in dml._fields \
+                            else (getattr(dml, 'qty_done', 0.0) or 0.0)
+                        delivered_by_sol_lot[dkey] = \
+                            delivered_by_sol_lot.get(dkey, 0.0) + dq
+
         for quant in quants:
             tipo_display = ''
             if hasattr(quant, 'x_tipo') and quant.x_tipo:
@@ -534,12 +581,8 @@ class StockQuant(models.Model):
             #   y es el que sale desde Existencias.
             # ================================================================
             if quant.lot_id:
-                move_lines_with_lot = self.env['stock.move.line'].sudo().search([
-                    ('lot_id', '=', quant.lot_id.id),
-                    ('state', '=', 'assigned'),
-                    ('location_id', '=', quant.location_id.id),
-                    ('move_id.sale_line_id', '!=', False),
-                ])
+                move_lines_with_lot = mls_by_lot_loc.get(
+                    (quant.lot_id.id, quant.location_id.id), [])
 
                 sale_order_ids = set()
                 committed_by_line = {}
@@ -569,12 +612,8 @@ class StockQuant(models.Model):
                     lot_tipo = str(quant.lot_id.x_tipo).strip().lower()
                 is_segmentable = lot_tipo in ('formato', 'pieza')
 
-                SaleLine = self.env['sale.order.line'].sudo()
                 if 'lot_ids' in SaleLine._fields:
-                    sol_lines = SaleLine.search([
-                        ('lot_ids', 'in', quant.lot_id.id),
-                        ('state', '=', 'sale'),
-                    ])
+                    sol_lines = sols_by_lot.get(quant.lot_id.id, [])
                     for sol in sol_lines:
                         qty_bd = quant.quantity
                         if is_segmentable and hasattr(sol, '_tc_read_lot_breakdown'):
@@ -596,15 +635,10 @@ class StockQuant(models.Model):
                                 except Exception:
                                     pass
 
-                        # Descuenta lo ya entregado de ESTE lote en esa línea.
-                        delivered = 0.0
-                        for dml in sol.move_ids.mapped('move_line_ids'):
-                            if (
-                                dml.state == 'done'
-                                and dml.lot_id == quant.lot_id
-                                and dml.picking_id.picking_type_code == 'outgoing'
-                            ):
-                                delivered += _ml_qty(dml)
+                        # Descuenta lo ya entregado de ESTE lote en esa línea
+                        # (pre-calculado en lote arriba).
+                        delivered = delivered_by_sol_lot.get(
+                            (sol.id, quant.lot_id.id), 0.0)
 
                         remaining = max(0.0, qty_bd - delivered)
                         if remaining > 0.0001:
