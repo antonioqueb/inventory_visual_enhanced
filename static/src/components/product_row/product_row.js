@@ -312,6 +312,7 @@ ProductRow.props = {
     product: Object,
     isExpanded: Boolean,
     details: Array,
+    detailsLoaded: { type: Boolean, optional: true },
     stockMode: { type: String, optional: true },
     onToggle: Function,
     onPhotoClick: Function,

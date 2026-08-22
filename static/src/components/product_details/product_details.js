@@ -368,6 +368,7 @@ ProductDetails.template = "inventory_visual_enhanced.ProductDetails";
 
 ProductDetails.props = {
     details: Array,
+    detailsLoading: { type: Boolean, optional: true },
 
     areAllCurrentProductSelected: { type: Function, optional: true },
     isInCart: { type: Function, optional: true },

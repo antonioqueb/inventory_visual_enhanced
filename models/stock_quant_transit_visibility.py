@@ -969,6 +969,14 @@ class StockQuantTransitVisibility(models.Model):
             [q.lot_id.id for q in quants if q.lot_id]
         )
 
+        # Prefetch EN LOTE para el cálculo de parcialidades del inventario
+        # interno (venta/hold parcial de formato/pieza): ver helpers en
+        # stock_quant.py (_iv_build_partial_maps /
+        # _iv_apply_partial_commitment_rows).
+        partial_maps = self._iv_build_partial_maps(
+            [q for q in quants if q.location_id.usage != "transit"]
+        )
+
         for quant in quants:
             usage = quant.location_id.usage
             is_transit = usage == "transit"
@@ -1114,6 +1122,13 @@ class StockQuantTransitVisibility(models.Model):
                 detail["en_orden_venta"] = True
                 detail["sale_order_ids"] = sale_order_ids
 
-            result.append(detail)
+            # PARCIALIDADES: un lote FORMATO/PIEZA comprometido o apartado
+            # parcialmente se parte en DOS filas (COMPROMETIDO no
+            # seleccionable + DISPONIBLE remanente). Las placas van enteras.
+            result.extend(
+                self._iv_apply_partial_commitment_rows(
+                    quant, detail, partial_maps
+                )
+            )
 
         return result

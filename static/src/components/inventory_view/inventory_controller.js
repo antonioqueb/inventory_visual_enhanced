@@ -218,6 +218,12 @@ class InventoryVisualController extends Component {
         return this.state.productDetails[productId] || [];
     }
 
+    isProductDetailsLoaded(productId) {
+        // Distingue 'aún cargando' (spinner) de 'cargado pero el filtro no
+        // deja nada' (mensaje vacío): ambos llegan como [] a la vista.
+        return !!this.state.productDetails[productId];
+    }
+
     async onPhotoClick(detailId) {
         try {
             const photos = await this.orm.call(

@@ -1815,3 +1815,191 @@ class StockQuant(models.Model):
             'count': len(result),
             'orders': result,
         }
+    # ------------------------------------------------------------------
+    # PARCIALIDADES (formato/pieza) — helpers COMPARTIDOS del detalle.
+    #
+    # La implementación efectiva de get_quant_details vive en
+    # stock_quant_transit_visibility (reemplaza a la de este archivo sin
+    # super): el split de dos filas COMPROMETIDO/DISPONIBLE que se definió
+    # aquí quedó como código muerto y el inventario visual nunca partía
+    # los lotes. Estos helpers concentran esa lógica y la versión activa
+    # los invoca.
+    # ------------------------------------------------------------------
+
+    @api.model
+    def _iv_build_partial_maps(self, quants):
+        """Prefetch EN LOTE para el cálculo de parcialidades: sin esto cada
+        quant hacía sus propias búsquedas (~1 s por fila) y los productos
+        grandes se quedaban 'cargando' hasta que el proxy cortaba."""
+        all_lot_ids = list({q.lot_id.id for q in quants if q.lot_id})
+        maps = {'mls': {}, 'sols': {}, 'delivered': {}}
+        if not all_lot_ids:
+            return maps
+
+        for ml in self.env['stock.move.line'].sudo().search([
+            ('lot_id', 'in', all_lot_ids),
+            ('state', '=', 'assigned'),
+            ('move_id.sale_line_id', '!=', False),
+        ]):
+            key = (ml.lot_id.id, ml.location_id.id)
+            maps['mls'].setdefault(key, []).append(ml)
+
+        SaleLine = self.env['sale.order.line'].sudo()
+        if 'lot_ids' in SaleLine._fields:
+            lot_id_set = set(all_lot_ids)
+            for sol in SaleLine.search([
+                ('lot_ids', 'in', all_lot_ids),
+                ('state', '=', 'sale'),
+            ]):
+                for _lot in sol.lot_ids:
+                    if _lot.id in lot_id_set:
+                        maps['sols'].setdefault(_lot.id, []).append(sol)
+                for dml in sol.move_ids.mapped('move_line_ids'):
+                    if (
+                        dml.state == 'done'
+                        and dml.lot_id
+                        and dml.lot_id.id in lot_id_set
+                        and dml.picking_id.picking_type_code == 'outgoing'
+                    ):
+                        dkey = (sol.id, dml.lot_id.id)
+                        dq = (dml.quantity or 0.0) if 'quantity' in dml._fields \
+                            else (getattr(dml, 'qty_done', 0.0) or 0.0)
+                        maps['delivered'][dkey] = \
+                            maps['delivered'].get(dkey, 0.0) + dq
+        return maps
+
+    @api.model
+    def _iv_apply_partial_commitment_rows(self, quant, detail, maps):
+        """Devuelve la(s) fila(s) del quant para el detalle del visual.
+
+        REGLA DE NEGOCIO: un lote de FORMATO/PIEZA comprometido o apartado
+        PARCIALMENTE se ve DOS veces — una fila COMPROMETIDO (no
+        seleccionable) con lo comprometido/apartado y una fila DISPONIBLE
+        (seleccionable) con el remanente. Las PLACAS van enteras: jamás se
+        parten."""
+        detail.setdefault('qty_comprometida', 0.0)
+        detail.setdefault('qty_disponible', quant.quantity)
+        detail.setdefault('parcialmente_comprometido', False)
+
+        if not quant.lot_id:
+            return [detail]
+
+        lot_tipo = ''
+        if hasattr(quant.lot_id, 'x_tipo') and quant.lot_id.x_tipo:
+            lot_tipo = str(quant.lot_id.x_tipo).strip().lower()
+        is_segmentable = lot_tipo in ('formato', 'pieza')
+
+        def _ml_qty(ml):
+            if 'quantity' in ml._fields and ml.quantity:
+                return ml.quantity or 0.0
+            return getattr(ml, 'reserved_uom_qty', 0.0) or \
+                getattr(ml, 'qty_done', 0.0) or 0.0
+
+        committed_by_line = {}
+        sale_order_ids = set(detail.get('sale_order_ids') or [])
+
+        for move_line in maps['mls'].get(
+                (quant.lot_id.id, quant.location_id.id), []):
+            sale_line = move_line.move_id.sale_line_id
+            if sale_line.order_id.state in ('sale', 'done'):
+                sale_order_ids.add(sale_line.order_id.id)
+                committed_by_line[sale_line.id] = (
+                    committed_by_line.get(sale_line.id, 0.0)
+                    + _ml_qty(move_line)
+                )
+
+        for sol in maps['sols'].get(quant.lot_id.id, []):
+            qty_bd = quant.quantity
+            if is_segmentable and hasattr(sol, '_tc_read_lot_breakdown'):
+                breakdown = sol._tc_read_lot_breakdown() or {}
+                key = str(quant.lot_id.id)
+                if key in breakdown:
+                    try:
+                        qty_bd = float(breakdown.get(key) or 0.0)
+                    except Exception:
+                        qty_bd = 0.0
+                elif breakdown and hasattr(sol, '_som_breakdown_qty_for_lot'):
+                    try:
+                        rs = sol._som_breakdown_qty_for_lot(
+                            breakdown, quant.lot_id)
+                        if rs is not None:
+                            qty_bd = float(rs or 0.0)
+                    except Exception:
+                        pass
+
+            delivered = maps['delivered'].get((sol.id, quant.lot_id.id), 0.0)
+            remaining = max(0.0, qty_bd - delivered)
+            if remaining > 0.0001:
+                sale_order_ids.add(sol.order_id.id)
+                committed_by_line[sol.id] = max(
+                    committed_by_line.get(sol.id, 0.0), remaining)
+
+        committed_qty = min(quant.quantity, sum(committed_by_line.values()))
+
+        if sale_order_ids:
+            detail['en_orden_venta'] = True
+            detail['sale_order_ids'] = list(sale_order_ids)
+            detail['qty_comprometida'] = committed_qty
+            detail['qty_disponible'] = max(
+                0.0, quant.quantity - committed_qty)
+            detail['parcialmente_comprometido'] = bool(
+                is_segmentable
+                and committed_qty > 0.0001
+                and detail['qty_disponible'] > 0.0001
+            )
+
+        # APARTADO PARCIAL: el hold de un formato/pieza solo retiene su
+        # parcialidad — se suma a lo comprometido y el remanente queda
+        # disponible (y seleccionable).
+        if detail.get('tiene_hold') and is_segmentable \
+                and hasattr(quant, 'som_hold_held_qty'):
+            try:
+                held = quant.som_hold_held_qty()
+            except Exception:
+                held = 0.0
+            if held > 0.0001 and (quant.quantity - held) > 0.0001:
+                prev = detail.get('qty_comprometida') or 0.0
+                total_ret = min(quant.quantity, prev + held)
+                detail['qty_apartada'] = held
+                detail['qty_comprometida'] = total_ret
+                detail['qty_disponible'] = max(
+                    0.0, quant.quantity - total_ret)
+                detail['parcialmente_comprometido'] = (
+                    detail['qty_disponible'] > 0.0001)
+                detail['tiene_hold_parcial'] = True
+
+        # DOS FILAS por lote parcialmente retenido (venta y/o hold).
+        if detail.get('parcialmente_comprometido') \
+                and (detail.get('qty_comprometida') or 0.0) > 0.0001:
+            # La reserva física (entrega en curso) pertenece a la parte
+            # comprometida: si la hereda la fila DISPONIBLE, el filtro
+            # Disponible resta de más y el Comprometido la duplica.
+            reserved = detail.get('reserved_quantity') or 0.0
+            comp_reserved = min(reserved, detail['qty_comprometida'])
+
+            fila_comp = dict(detail)
+            fila_comp.update({
+                'id': '%s-comprometido' % quant.id,
+                'lot_name': '%s · COMPROMETIDO' % detail['lot_name'],
+                'quantity': detail['qty_comprometida'],
+                'reserved_quantity': comp_reserved,
+                'is_committed_row': True,
+                'en_orden_venta': True,
+                'parcialmente_comprometido': False,
+                'qty_disponible': 0.0,
+            })
+            fila_disp = dict(detail)
+            fila_disp.update({
+                'lot_name': '%s · DISPONIBLE' % detail['lot_name'],
+                'quantity': detail['qty_disponible'],
+                'reserved_quantity': max(0.0, reserved - comp_reserved),
+                'is_available_row': True,
+                'tiene_hold': False,
+                'hold_info': None,
+                'en_orden_venta': False,
+                'parcialmente_comprometido': False,
+                'qty_comprometida': 0.0,
+            })
+            return [fila_comp, fila_disp]
+
+        return [detail]

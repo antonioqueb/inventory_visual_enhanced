@@ -630,10 +630,13 @@ class StockQuantPackingList(models.Model):
         if not result:
             return result
 
+        # Las filas partidas por parcialidad traen id string
+        # ('123-comprometido'): NO son quants navegables y browse con un
+        # string aborta todo el detalle. Solo se enriquecen los ids reales.
         quant_ids_from_result = [
             item.get("id")
             for item in result
-            if item.get("id")
+            if isinstance(item.get("id"), int)
         ]
 
         quants_by_id = {
