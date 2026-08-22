@@ -145,6 +145,10 @@ export class WalkthroughController extends Component {
         } catch (error) {
             console.error("[WALKTHROUGH] Error al cargar detalles:", error);
             this.notification.add("Error al cargar detalles del producto", { type: "danger" });
+            // Sin esto el spinner giraba para siempre tras un error: se
+            // colapsa la fila para poder reintentar con otro clic.
+            this.state.expandedProducts.delete(productId);
+            this.state.expandedProducts = new Set(this.state.expandedProducts);
         }
     }
 
@@ -164,6 +168,12 @@ export class WalkthroughController extends Component {
 
     getProductDetails(productId) {
         return this.state.productDetails[productId] || [];
+    }
+
+    isProductDetailsLoaded(productId) {
+        // Distingue 'cargando' (spinner) de 'cargado pero vacio' (mensaje):
+        // ambos llegan como [] a la vista.
+        return !!this.state.productDetails[productId];
     }
 
     async reloadProductDetailsForDetail(detailId) {

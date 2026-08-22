@@ -16,6 +16,7 @@ export class WalkthroughRow extends ProductRow {
         product: Object,
         isExpanded: Boolean,
         details: Array,
+        detailsLoaded: { type: Boolean, optional: true },
         onToggle: Function,
         onPhotoClick: Function,
         onBlockPhotoClick: { type: Function, optional: true },

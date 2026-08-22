@@ -65,6 +65,7 @@
                                     product="product"
                                     isExpanded="isProductExpanded(product.product_id)"
                                     details="getProductDetails(product.product_id)"
+                                    detailsLoaded="isProductDetailsLoaded(product.product_id)"
                                     onToggle.bind="(quantIds) => this.toggleProduct(product.product_id, quantIds)"
                                     onPhotoClick.bind="onPhotoClick"
                                     onBlockPhotoClick.bind="onBlockPhotoClick"

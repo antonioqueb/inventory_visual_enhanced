@@ -183,9 +183,14 @@
                 </tbody>
             </table>
 
-            <div class="table-loading" t-if="props.details.length === 0">
+            <!-- Cargando != vacio: sin esta distincion, un filtro sin
+                 resultados dejaba el spinner girando para siempre. -->
+            <div class="table-loading" t-if="props.detailsLoading">
                 <div class="spinner"></div>
                 <div class="loading-text">Cargando detalles...</div>
+            </div>
+            <div class="table-loading" t-elif="props.details.length === 0">
+                <div class="loading-text">Sin lotes en este filtro.</div>
             </div>
         </div>
     </t>

@@ -82,6 +82,7 @@
             <td colspan="3" class="details-cell">
                 <WalkthroughDetails
                     details="filteredDetails"
+                    detailsLoading="!props.detailsLoaded"
                     onPhotoClick="props.onPhotoClick"
                     onBlockPhotoClick="props.onBlockPhotoClick"
                     onBlockReportClick="props.onBlockReportClick"

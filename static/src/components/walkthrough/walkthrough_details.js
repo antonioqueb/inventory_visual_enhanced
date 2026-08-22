@@ -13,6 +13,7 @@ export class WalkthroughDetails extends ProductDetails {
 
     static props = {
         details: Array,
+        detailsLoading: { type: Boolean, optional: true },
         onPhotoClick: { type: Function, optional: true },
         onBlockPhotoClick: { type: Function, optional: true },
         onBlockReportClick: { type: Function, optional: true },
