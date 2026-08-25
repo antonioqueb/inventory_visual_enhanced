@@ -770,10 +770,14 @@ class StockQuant(models.Model):
         if 'workshop.input.line' not in self.env:
             return {'error': 'Módulo de taller no instalado'}
 
+        # OTs VIVAS, no solo en proceso: una placa asignada a una OT en
+        # BORRADOR (p. ej. material recién recibido de tránsito, aún sin
+        # arrancar el taller) también está comprometida — el diálogo decía
+        # 'ya no está activa en ninguna orden de taller' y sí lo estaba.
         lines = self.env['workshop.input.line'].sudo().search([
             ('lot_id', '=', quant.lot_id.id),
             ('state', 'not in', ('done', 'cancelled', 'rejected')),
-            ('order_id.state', '=', 'in_workshop'),
+            ('order_id.state', 'in', ('draft', 'validated', 'in_workshop')),
         ], order='id desc')
 
         if not lines:
@@ -805,9 +809,14 @@ class StockQuant(models.Model):
         orders = []
         for line in lines:
             order = line.order_id
+            order_state_labels = dict(
+                order._fields['state'].selection)
+            state_label = order_state_labels.get(order.state, order.state)
             orders.append({
                 'order_id': order.id,
-                'order_name': order.name or '',
+                # El estado va pegado al folio: 'T-TALLER/2026/0005 (Borrador)'
+                # — sin él, una OT sin arrancar parecía ya activa.
+                'order_name': '%s (%s)' % (order.name or '', state_label),
                 'process_name': order.process_id.display_name if order.process_id else '',
                 'process_type': order.process_id.process_type if order.process_id and hasattr(order.process_id, 'process_type') else '',
                 'operation_mode': operation_mode_labels.get(order.operation_mode, order.operation_mode or ''),
