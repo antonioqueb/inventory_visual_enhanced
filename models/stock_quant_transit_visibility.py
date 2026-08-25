@@ -770,6 +770,9 @@ class StockQuantTransitVisibility(models.Model):
         if stock_mode == "transit":
             committed_quant_keys = set()
             partial_commit_map = {}
+            # HOTFIX: sin esto, la búsqueda SOLO-tránsito moría con
+            # NameError (la variable solo se definía en la rama interna).
+            workshop_committed_lot_ids = set()
         else:
             committed_quant_keys = self._iv_batch_get_committed_quant_keys(quants)
             # Lotes comprometidos a TALLER (selección activa, aún sin OT):
