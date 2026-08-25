@@ -29,14 +29,34 @@ class StockQuant(models.Model):
 
     @api.model
     def _iv_get_workshop_lot_ids(self, lot_ids):
-        if not lot_ids or 'workshop.input.line' not in self.env:
+        if not lot_ids:
             return set()
-        lines = self.env['workshop.input.line'].sudo().search([
+        out = set()
+        if 'workshop.input.line' in self.env:
+            lines = self.env['workshop.input.line'].sudo().search([
+                ('lot_id', 'in', list(lot_ids)),
+                ('state', 'not in', ('done', 'cancelled', 'rejected')),
+                ('order_id.state', '=', 'in_workshop'),
+            ])
+            out.update(lines.mapped('lot_id').ids)
+        out.update(self._iv_get_workshop_committed_lot_ids(lot_ids))
+        return out
+
+    @api.model
+    def _iv_get_workshop_committed_lot_ids(self, lot_ids):
+        """COMPROMISO PRE-OT: lotes asignados a demanda de TALLER desde la
+        venta/tránsito (selección activa con venta confirmada) que aún no
+        tienen OT. Al recibirse del embarque quedaban pintados LIBRES en el
+        visual y podían venderse (caso S78-11 / V/478). Defensivo: sin el
+        integrador de taller instalado, vacío."""
+        if not lot_ids or 'sale.stone.workshop.input.selection' not in self.env:
+            return set()
+        sels = self.env['sale.stone.workshop.input.selection'].sudo().search([
             ('lot_id', 'in', list(lot_ids)),
-            ('state', 'not in', ('done', 'cancelled', 'rejected')),
-            ('order_id.state', '=', 'in_workshop'),
+            ('state', 'in', ('selected', 'reserved', 'moved_to_workshop')),
+            ('sale_order_id.state', 'in', ('sale', 'done')),
         ])
-        return set(lines.mapped('lot_id').ids)
+        return set(sels.mapped('lot_id').ids)
     
     @api.model
     def _get_price_field_name(self, currency, level):

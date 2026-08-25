@@ -72,9 +72,9 @@
                                             type="checkbox"
                                             class="form-check-input cart-checkbox"
                                             t-att-checked="props.isInCart ? props.isInCart(detail.id) : false"
-                                            t-att-disabled="detail.tiene_hold or (detail.en_orden_venta and !detail.parcialmente_comprometido)"
+                                            t-att-disabled="detail.tiene_hold or detail.en_taller or (detail.en_orden_venta and !detail.parcialmente_comprometido)"
                                             t-on-change="() => props.toggleCartSelection ? props.toggleCartSelection(detail) : null"
-                                            t-att-title="detail.tiene_hold ? 'Lote con apartado activo' : (detail.en_orden_venta and !detail.parcialmente_comprometido ? 'Lote en orden de venta confirmada' : (detail.parcialmente_comprometido ? 'Parcialmente en orden de venta: puedes elegir la parte disponible' : ''))"
+                                            t-att-title="detail.tiene_hold ? 'Lote con apartado activo' : (detail.en_taller ? 'Comprometido a una orden de taller' : (detail.en_orden_venta and !detail.parcialmente_comprometido ? 'Lote en orden de venta confirmada' : (detail.parcialmente_comprometido ? 'Parcialmente en orden de venta: puedes elegir la parte disponible' : '')))"
                                         />
                                     </div>
                                 </td>

@@ -772,6 +772,10 @@ class StockQuantTransitVisibility(models.Model):
             partial_commit_map = {}
         else:
             committed_quant_keys = self._iv_batch_get_committed_quant_keys(quants)
+            # Lotes comprometidos a TALLER (selección activa, aún sin OT):
+            # cuentan como Committed y salen de Disponible.
+            workshop_committed_lot_ids = self._iv_get_workshop_committed_lot_ids(
+                list({q.lot_id.id for q in quants if q.lot_id}))
             partial_commit_map = self._iv_batch_get_partial_commit_map(quants)
 
         product_groups = {}
@@ -780,7 +784,10 @@ class StockQuantTransitVisibility(models.Model):
         for quant in quants:
             usage = quant.location_id.usage
             is_transit = usage == "transit"
-            is_workshop = usage == "production"
+            workshop_committed = bool(
+                quant.lot_id
+                and quant.lot_id.id in workshop_committed_lot_ids)
+            is_workshop = usage == "production" or workshop_committed
 
             if is_transit:
                 transit_state = self._iv_get_transit_state(quant)
@@ -915,7 +922,7 @@ class StockQuantTransitVisibility(models.Model):
                     product_groups[product_id]["available_qty"] += remainder
                     product_groups[product_id]["available_plates"] += 1
             else:
-                if is_committed_by_stock or is_committed_by_sale:
+                if is_committed_by_stock or is_committed_by_sale or workshop_committed:
                     committed_qty = reserved if reserved > 0 else qty
                     product_groups[product_id]["committed_qty"] += committed_qty
                     product_groups[product_id]["committed_plates"] += 1
