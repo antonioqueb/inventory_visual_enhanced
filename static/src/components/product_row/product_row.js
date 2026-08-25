@@ -270,7 +270,7 @@ export class ProductRow extends Component {
             }
 
             if (filter === "workshop") {
-                return isWorkshop || d.en_taller;
+                return isWorkshop;
             }
 
             if (filter === "transit_all") {

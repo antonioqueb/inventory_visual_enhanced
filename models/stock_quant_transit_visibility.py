@@ -983,6 +983,8 @@ class StockQuantTransitVisibility(models.Model):
         partial_maps = self._iv_build_partial_maps(
             [q for q in quants if q.location_id.usage != "transit"]
         )
+        workshop_committed_sale_map = self._iv_get_workshop_committed_sale_map(
+            [q.lot_id.id for q in quants if q.lot_id])
 
         for quant in quants:
             usage = quant.location_id.usage
@@ -1128,6 +1130,15 @@ class StockQuantTransitVisibility(models.Model):
             if sale_order_ids:
                 detail["en_orden_venta"] = True
                 detail["sale_order_ids"] = sale_order_ids
+
+            # COMPROMISO PRE-OT a taller: se reporta como COMMITTED ligado a
+            # su orden de venta (un solo estado; el clic abre la OV).
+            wk_so_id = workshop_committed_sale_map.get(
+                quant.lot_id.id) if quant.lot_id else None
+            if wk_so_id:
+                detail["en_orden_venta"] = True
+                detail["sale_order_ids"] = sorted(
+                    set(detail.get("sale_order_ids") or []) | {wk_so_id})
 
             # PARCIALIDADES: un lote FORMATO/PIEZA comprometido o apartado
             # parcialmente se parte en DOS filas (COMPROMETIDO no
