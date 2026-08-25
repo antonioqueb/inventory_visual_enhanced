@@ -256,7 +256,10 @@ export class ProductRow extends Component {
             }
 
             if (filter === "committed") {
-                return !isTransit && (d.reserved_quantity > 0 || d.en_orden_venta);
+                // HOMOLOGADO: taller vive dentro de Committed (un solo
+                // filtro); el chip 'En taller' de la fila dice el porqué.
+                return !isTransit && (d.reserved_quantity > 0
+                    || d.en_orden_venta || d.en_taller || isWorkshop);
             }
 
             if (filter === "available") {
@@ -267,10 +270,6 @@ export class ProductRow extends Component {
                 return !isTransit && !isWorkshop && !d.en_taller
                     && availableQty > 0 && !d.tiene_hold
                     && (!d.en_orden_venta || d.parcialmente_comprometido);
-            }
-
-            if (filter === "workshop") {
-                return isWorkshop;
             }
 
             if (filter === "transit_all") {

@@ -874,9 +874,9 @@ class StockQuantTransitVisibility(models.Model):
             # por eso suma al total de In Stock y además al bucket de taller.
             # NO se considera "disponible" porque está físicamente en proceso.
             # -----------------------------------------------------------------
-            if is_workshop:
-                product_groups[product_id]["workshop_qty"] += qty
-                product_groups[product_id]["workshop_plates"] += 1
+            # HOMOLOGADO (pedido explícito): el material de taller cuenta
+            # SOLO como Committed — un único filtro. El bucket de taller se
+            # queda en 0 y la pastilla desaparece sola en el frontend.
 
             # -----------------------------------------------------------------
             # Inventario interno normal (incluye taller en el total de stock)
@@ -922,7 +922,7 @@ class StockQuantTransitVisibility(models.Model):
                     product_groups[product_id]["available_qty"] += remainder
                     product_groups[product_id]["available_plates"] += 1
             else:
-                if is_committed_by_stock or is_committed_by_sale or workshop_committed:
+                if is_committed_by_stock or is_committed_by_sale or is_workshop:
                     committed_qty = reserved if reserved > 0 else qty
                     product_groups[product_id]["committed_qty"] += committed_qty
                     product_groups[product_id]["committed_plates"] += 1
@@ -1139,6 +1139,8 @@ class StockQuantTransitVisibility(models.Model):
                 detail["en_orden_venta"] = True
                 detail["sale_order_ids"] = sorted(
                     set(detail.get("sale_order_ids") or []) | {wk_so_id})
+                # Distintivo de la fila: el PORQUÉ del compromiso es taller.
+                detail["en_taller"] = True
 
             # PARCIALIDADES: un lote FORMATO/PIEZA comprometido o apartado
             # parcialmente se parte en DOS filas (COMPROMETIDO no
