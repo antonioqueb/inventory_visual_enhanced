@@ -911,12 +911,27 @@ class StockQuant(models.Model):
         general_logs = []
         min_date = datetime.min
         
-        # 1. COMPRAS
+        # 1. COMPRAS — SOLO la(s) compra(s) REALES de ESTE lote. Antes se
+        # listaban las últimas 5 OCs del PRODUCTO (sin relación con el
+        # lote) y el historial mostraba compras ajenas sin sentido.
         purchase_info = []
         if has_purchase_permissions:
-            purchase_lines = self.env['purchase.order.line'].search([
-                ('product_id', '=', lot.product_id.id)
-            ], limit=5, order='create_date desc')
+            purchase_lines = self.env['purchase.order.line'].browse()
+            # Vía directa: el movimiento de entrada del lote apunta a su
+            # línea de compra.
+            in_moves = move_lines.mapped('move_id')
+            purchase_lines = in_moves.filtered(
+                lambda m: 'purchase_line_id' in m._fields
+                and m.purchase_line_id
+            ).mapped('purchase_line_id')
+            if not purchase_lines:
+                # Fallback: recepción ligada a OC (picking.purchase_id) —
+                # cubre las recepciones a tránsito de Torre de Control.
+                pos = move_lines.mapped('picking_id').filtered(
+                    lambda p: 'purchase_id' in p._fields and p.purchase_id
+                ).mapped('purchase_id')
+                purchase_lines = pos.mapped('order_line').filtered(
+                    lambda l: l.product_id == lot.product_id)
             
             for pol in purchase_lines:
                 purchase_info.append({
