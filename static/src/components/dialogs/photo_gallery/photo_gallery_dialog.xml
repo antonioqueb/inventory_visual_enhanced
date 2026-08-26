@@ -27,7 +27,7 @@
                             >
                                 <i class="fa fa-download"></i>
                             </button>
-                            <button 
+                            <button
                                 type="button"
                                 class="btn btn-outline-light btn-sm"
                                 t-on-click="shareCurrentImage"
@@ -35,7 +35,16 @@
                             >
                                 <i class="fa fa-share-alt"></i>
                             </button>
-                            <button 
+                            <button
+                                t-if="!isBlockMode"
+                                type="button"
+                                class="btn btn-outline-danger btn-sm"
+                                t-on-click="deleteCurrentPhoto"
+                                title="Eliminar fotografía"
+                            >
+                                <i class="fa fa-trash"></i>
+                            </button>
+                            <button
                                 type="button"
                                 class="btn btn-light btn-sm"
                                 t-on-click="closeFullscreenViewer"
@@ -342,7 +351,7 @@
                                         <i class="fa fa-download me-1"></i>
                                         <span class="d-none d-md-inline">Descargar</span>
                                     </button>
-                                    <button 
+                                    <button
                                         type="button"
                                         class="btn btn-outline-success btn-sm"
                                         t-on-click="shareCurrentImage"
@@ -350,6 +359,15 @@
                                     >
                                         <i class="fa fa-share-alt me-1"></i>
                                         <span class="d-none d-md-inline">Compartir</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="btn btn-outline-danger btn-sm"
+                                        t-on-click="deleteCurrentPhoto"
+                                        title="Eliminar fotografía"
+                                    >
+                                        <i class="fa fa-trash me-1"></i>
+                                        <span class="d-none d-md-inline">Eliminar</span>
                                     </button>
                                 </div>
                             </div>

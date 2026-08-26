@@ -1454,7 +1454,25 @@ class StockQuant(models.Model):
                 'success': False,
                 'error': f'Error al guardar fotografía: {str(e)}'
             }
-    
+
+    @api.model
+    def delete_lot_photo(self, photo_id):
+        photo = self.env['stock.lot.image'].browse(photo_id)
+        if not photo.exists():
+            return {'success': False, 'error': 'Fotografía no encontrada'}
+        try:
+            name = photo.name or 'Fotografía'
+            photo.unlink()
+            return {
+                'success': True,
+                'message': f'Fotografía "{name}" eliminada'
+            }
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f'Error al eliminar fotografía: {str(e)}'
+            }
+
     @api.model
     def save_lot_notes(self, quant_id, notes):
         quant = self.browse(quant_id)

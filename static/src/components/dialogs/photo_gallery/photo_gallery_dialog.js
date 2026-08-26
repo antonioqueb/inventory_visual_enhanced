@@ -3,13 +3,17 @@
 import { Component, useState, useRef, onWillUnmount } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { Dialog } from "@web/core/dialog/dialog";
+import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 
 export class PhotoGalleryDialog extends Component {
     setup() {
-        this.photosData = this.props.photosData;
+        // useState: al eliminar una foto el visor debe re-renderear aunque el
+        // índice actual no cambie (splice sobre el arreglo de fotos).
+        this.photosData = useState(this.props.photosData);
         this.detailId = this.props.detailId;
         this.orm = useService("orm");
         this.notification = useService("notification");
+        this.dialogService = useService("dialog");
         
         this.canvasRef = useRef("drawingCanvas");
         this.previewRef = useRef("previewImage");
@@ -184,6 +188,48 @@ export class PhotoGalleryDialog extends Component {
         if (bytes < 1024) return bytes + ' B';
         if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
         return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    // === ELIMINAR FOTO ===
+
+    deleteCurrentPhoto() {
+        const photo = this.currentPhoto;
+        if (!photo || !photo.id || this.isBlockMode) return;
+        this.dialogService.add(ConfirmationDialog, {
+            title: "Eliminar fotografía",
+            body: `¿Eliminar "${photo.name || 'esta fotografía'}" del lote ${this.photosData.lot_name}? Esta acción no se puede deshacer.`,
+            confirmLabel: "Eliminar",
+            cancelLabel: "Cancelar",
+            confirm: async () => {
+                try {
+                    const result = await this.orm.call(
+                        "stock.quant",
+                        "delete_lot_photo",
+                        [],
+                        { photo_id: photo.id }
+                    );
+                    if (!result.success) {
+                        this.notification.add(result.error || "Error al eliminar la fotografía", { type: "danger" });
+                        return;
+                    }
+                    this.photosData.photos.splice(this.state.currentImageIndex, 1);
+                    if (this.state.currentImageIndex >= this.photosData.photos.length) {
+                        this.state.currentImageIndex = Math.max(0, this.photosData.photos.length - 1);
+                    }
+                    if (!this.photosData.photos.length && this.state.showFullscreenViewer) {
+                        this.closeFullscreenViewer();
+                    }
+                    this.notification.add(result.message, { type: "success" });
+                    if (this.props.onReload) {
+                        await this.props.onReload();
+                    }
+                } catch (error) {
+                    console.error("Error al eliminar foto:", error);
+                    this.notification.add("Error al eliminar la fotografía", { type: "danger" });
+                }
+            },
+            cancel: () => {},
+        });
     }
 
     // === DESCARGA Y COMPARTIR ===
