@@ -988,19 +988,26 @@ class StockQuant(models.Model):
                 'descripcion': f"De: {ml.location_id.name} -> A: {ml.location_dest_id.name}. Documento: {ref}. Cantidad: {ml.qty_done}"
             })
         
-        # 3. VENTAS
+        # 3. VENTAS — SOLO las de ESTE lote. Antes se tomaban las últimas
+        # 10 líneas confirmadas del PRODUCTO y se filtraban: la venta real
+        # del lote podía caer fuera de esa ventana y no salir, y todo el
+        # barrido era del producto, no del lote. Ahora se derivan directo:
+        # por movimientos que trazan a la línea de venta y por asignación
+        # comercial (lot_ids).
         sales_orders = []
-        sale_lines = self.env['sale.order.line'].search([
-            ('product_id', '=', lot.product_id.id),
-            ('order_id.state', 'in', ['sale', 'done'])
-        ], limit=10, order='create_date desc')
-        
+        SaleLine = self.env['sale.order.line']
+        sale_lines = move_lines.mapped('move_id').filtered(
+            lambda m: 'sale_line_id' in m._fields and m.sale_line_id
+        ).mapped('sale_line_id')
+        if 'lot_ids' in SaleLine._fields:
+            sale_lines |= SaleLine.search([('lot_ids', 'in', lot.id)])
+        sale_lines = sale_lines.filtered(
+            lambda l: l.order_id.state in ('sale', 'done')
+        ).sorted(key=lambda l: l.create_date or fields.Datetime.now(),
+                 reverse=True)
+
         for sol in sale_lines:
-            used_in_line = self.env['stock.move.line'].search([
-                ('lot_id', '=', lot.id),
-                ('move_id.sale_line_id', '=', sol.id)
-            ], limit=1)
-            
+            used_in_line = True
             if used_in_line:
                 statistics['total_ventas'] += 1
                 sales_orders.append({
