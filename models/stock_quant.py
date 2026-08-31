@@ -141,6 +141,31 @@ class StockQuant(models.Model):
         return filtered_groups
 
 
+    @staticmethod
+    def _som_norm_text(value):
+        """Sin acentos, sin mayúsculas, sin espacios sobrantes: 'MARMOL',
+        'Mármol' y ' marmol ' son la misma categoría."""
+        import unicodedata
+        txt = unicodedata.normalize('NFD', str(value or ''))
+        txt = ''.join(c for c in txt if unicodedata.category(c) != 'Mn')
+        return ' '.join(txt.casefold().split())
+
+    @api.model
+    def _som_categories_matching(self, name):
+        """Categorías del filtro por MATERIAL, en TODAS las ramas (Placas,
+        Formatos…) y sin importar mayúsculas ni acentos. Primero igualdad
+        del nombre corto (Mármol = MARMOL); si nada iguala, contención.
+        El llamador usa child_of, así que las subcategorías (MARMOL /
+        NACIONAL, Mármol / Mosaicos) entran solas."""
+        key = self._som_norm_text(name)
+        if not key:
+            return self.env['product.category']
+        cats = self.env['product.category'].sudo().search([])
+        exact = cats.filtered(lambda c: self._som_norm_text(c.name) == key)
+        if exact:
+            return exact
+        return cats.filtered(lambda c: key in self._som_norm_text(c.complete_name or c.name))
+
     @api.model
     def get_inventory_grouped_by_product(self, filters=None):
         if not filters:
@@ -196,26 +221,13 @@ class StockQuant(models.Model):
             domain.append(('product_id.product_tmpl_id.x_color', 'ilike', filters['color']))
         
         if filters.get('categoria_name'):
-            # Máximo de niveles expuestos en el filtro (contando la raíz).
-            MAX_CATEGORY_DEPTH = 3
-            all_cats = self.env['product.category'].search([
-                ('name', 'ilike', filters['categoria_name'])
-            ])
-            parent_ids = set(
-                self.env['product.category'].search([('parent_id', '!=', False)]).mapped('parent_id').ids
-            )
-            # Solo categorías que son opción del filtro: exactamente en el nivel
-            # tope, o una hoja real más superficial que el tope.
-            capped_cat_ids = []
-            for cat in all_cats:
-                depth = len((cat.complete_name or cat.name).split(' / '))
-                has_children = cat.id in parent_ids
-                if depth == MAX_CATEGORY_DEPTH or (depth < MAX_CATEGORY_DEPTH and not has_children):
-                    capped_cat_ids.append(cat.id)
-            if capped_cat_ids:
-                # child_of incluye la categoría y todo su subárbol, de modo que
-                # los productos asignados a niveles más profundos también se filtran.
-                domain.append(('product_id.categ_id', 'child_of', capped_cat_ids))
+            # Por material y sin acentos/mayúsculas, en todas las ramas
+            # (Placas y Formatos). Sin match = sin resultados, jamás 'todo'.
+            cats = self._som_categories_matching(filters['categoria_name'])
+            if cats:
+                domain.append(('product_id.categ_id', 'child_of', cats.ids))
+            else:
+                domain.append(('id', '=', 0))
 
         if filters.get('grupo'):
             grupo_search = filters['grupo']

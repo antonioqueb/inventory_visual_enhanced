@@ -3,6 +3,25 @@
 import { Component, useState, onWillStart, onMounted, useRef } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
+
+function normalizeText(value) {
+    return String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, " ");
+}
+
+// Preferencia de etiqueta: con acentos y sin ir todo en mayúsculas.
+function labelScore(name) {
+    const s = String(name || "");
+    let score = 0;
+    if (/[\u00C0-\u017F]/.test(s)) score += 2;
+    if (s !== s.toUpperCase()) score += 1;
+    return score;
+}
+
 export class SearchBar extends Component {
     setup() {
         this.orm = useService("orm");
@@ -125,11 +144,19 @@ export class SearchBar extends Component {
                 const isCappedLeaf = depth === MAX_CATEGORY_DEPTH
                     || (depth < MAX_CATEGORY_DEPTH && !hasChildren);
                 if (isCappedLeaf) {
-                    const shortName = cat.name;
-                    if (!categoriasMap.has(shortName)) {
-                        categoriasMap.set(shortName, { name: shortName, ids: [cat.id] });
+                    // Una sola opción por MATERIAL: 'MARMOL' (Placas) y
+                    // 'Mármol' (Formatos) se unifican sin importar
+                    // mayúsculas ni acentos; se muestra la variante mejor
+                    // escrita (con acento y sin todo en mayúsculas).
+                    const key = normalizeText(cat.name);
+                    if (!categoriasMap.has(key)) {
+                        categoriasMap.set(key, { name: cat.name, ids: [cat.id] });
                     } else {
-                        categoriasMap.get(shortName).ids.push(cat.id);
+                        const entry = categoriasMap.get(key);
+                        entry.ids.push(cat.id);
+                        if (labelScore(cat.name) > labelScore(entry.name)) {
+                            entry.name = cat.name;
+                        }
                     }
                 }
             });

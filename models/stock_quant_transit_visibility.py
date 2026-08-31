@@ -661,19 +661,12 @@ class StockQuantTransitVisibility(models.Model):
             domain.append(("product_id.product_tmpl_id.x_color", "ilike", filters["color"]))
 
         if filters.get("categoria_name"):
-            # SUBÁRBOL completo, no solo hojas: la versión anterior
-            # descartaba las categorías con hijas y, si el nombre elegido
-            # era (o se volvía) padre, la lista de hojas quedaba vacía y
-            # el filtro SE OMITÍA EN SILENCIO — mostraba todo. Bastaba
-            # que alguien creara una subcategoría para 'romperlo'.
-            cats = self.env["product.category"].search([
-                ("name", "ilike", filters["categoria_name"])
-            ])
+            # Por material, sin acentos/mayúsculas y en todas las ramas;
+            # subárbol completo. Sin match = sin resultados (jamás 'todo').
+            cats = self._som_categories_matching(filters["categoria_name"])
             if cats:
-                domain.append(
-                    ("product_id.categ_id", "child_of", cats.ids))
+                domain.append(("product_id.categ_id", "child_of", cats.ids))
             else:
-                # Sin match de categoría = sin resultados (jamás 'todo')
                 domain.append(("product_id.categ_id", "=", 0))
 
         if filters.get("grupo"):

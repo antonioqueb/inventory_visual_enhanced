@@ -64,10 +64,8 @@ class StockQuantWalkthrough(models.Model):
             domain.append(('product_id', 'ilike', filters['product_name']))
 
         if filters.get('categoria_name'):
-            domain.append((
-                'product_id.categ_id.complete_name', 'ilike',
-                filters['categoria_name'],
-            ))
+            cats = self._som_categories_matching(filters['categoria_name'])
+            domain.append(('product_id.categ_id', 'child_of', cats.ids) if cats else ('id', '=', 0))
 
         if filters.get('marca') and self._walkthrough_field_exists(
                 'product.template', 'x_marca'):
