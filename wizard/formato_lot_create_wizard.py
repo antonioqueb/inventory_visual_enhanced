@@ -117,8 +117,10 @@ class SomFormatoLotCreate(models.TransientModel):
                 'Ajusta la serie o el número inicial.'
             ) % ', '.join(sorted(existing.mapped('name'))))
 
-        company = self.env.company
-        Lot = self.env['stock.lot']
+        # Multiempresa: los lotes y quants nacen en la compañía de la
+        # ubicación elegida (la activa solo si la ubicación es compartida).
+        company = self.location_id.company_id or self.env.company
+        Lot = self.env['stock.lot'].with_company(company)
         lot_vals_list = []
         for name in names:
             vals = {
@@ -138,7 +140,8 @@ class SomFormatoLotCreate(models.TransientModel):
 
         lots = Lot.create(lot_vals_list)
 
-        Quant = self.env['stock.quant'].with_context(inventory_mode=True)
+        Quant = self.env['stock.quant'].with_company(company).with_context(
+            inventory_mode=True)
         for lot in lots:
             quant = Quant.create({
                 'product_id': self.product_id.id,

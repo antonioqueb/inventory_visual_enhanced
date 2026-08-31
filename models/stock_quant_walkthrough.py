@@ -55,7 +55,9 @@ class StockQuantWalkthrough(models.Model):
         (el material ya no está en un almacén)."""
         filters = filters or {}
         Lot = self.env['stock.lot']
-        domain = []
+        # Las búsquedas de abajo van con sudo(): se acotan a las compañías
+        # activas del usuario (listado). Aplica a quants y move lines.
+        domain = [('company_id', 'in', self.env.companies.ids)]
         missing_lots = []
 
         if filters.get('product_name'):
@@ -113,6 +115,10 @@ class StockQuantWalkthrough(models.Model):
                 except (ValueError, TypeError):
                     pass
 
+        # Lotes: propios de las compañías activas o compartidos (sudo).
+        lot_company_domain = [
+            ('company_id', 'in', self.env.companies.ids + [False])]
+
         if filters.get('numero_serie'):
             raw = str(filters['numero_serie'])
             names = [n.strip() for n in raw.split(',') if n.strip()]
@@ -120,7 +126,8 @@ class StockQuantWalkthrough(models.Model):
                 lot_domain.append(('name', 'in', names))
                 found = set(
                     Lot.sudo().with_context(active_test=False)
-                    .search([('name', 'in', names)]).mapped('name')
+                    .search([('name', 'in', names)] + lot_company_domain)
+                    .mapped('name')
                 )
                 missing_lots = [n for n in names if n not in found]
             elif names:
@@ -128,7 +135,7 @@ class StockQuantWalkthrough(models.Model):
 
         if lot_domain:
             lot_ids = Lot.sudo().with_context(active_test=False).search(
-                lot_domain).ids
+                lot_domain + lot_company_domain).ids
             domain.append(('lot_id', 'in', lot_ids))
 
         return domain, missing_lots

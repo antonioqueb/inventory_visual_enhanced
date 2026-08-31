@@ -1270,7 +1270,12 @@ class StockQuant(models.Model):
             return empty
 
         Lot = self.env['stock.lot'].sudo()
-        lots = Lot.search([('x_bloque', '=ilike', block_name)])
+        # sudo() salta las reglas: solo lotes de las compañías activas (o
+        # compartidos).
+        lots = Lot.search([
+            ('x_bloque', '=ilike', block_name),
+            ('company_id', 'in', self.env.companies.ids + [False]),
+        ])
         if not lots:
             return empty
 
@@ -1711,11 +1716,13 @@ class StockQuant(models.Model):
                                      project.name, project.partner_id.display_name)}
         
         if product_prices and isinstance(product_prices, dict):
+            # Escalera company_dependent: la de la compañía del material.
             auth_check = self.env['product.template'].check_price_authorization_needed(
-                product_prices, 
-                currency_code
+                product_prices,
+                currency_code,
+                company=quant.company_id or self.env.company,
             )
-            
+
             if auth_check['needs_authorization']:
                 product_groups = {}
                 pid = quant.product_id.id
@@ -1784,7 +1791,11 @@ class StockQuant(models.Model):
                 'notas': full_notes,
             }
             
-            hold_model = self.env['stock.lot.hold']
+            # El hold nace en la compañía del material (quant).
+            hold_company = quant.company_id or self.env.company
+            hold_model = self.env['stock.lot.hold'].with_company(hold_company)
+            if 'company_id' in hold_model._fields:
+                hold_vals['company_id'] = hold_company.id
             if 'quant_id' in hold_model._fields:
                 hold_vals['quant_id'] = quant.id
             if 'project_id' in hold_model._fields and project_id:
@@ -1816,8 +1827,20 @@ class StockQuant(models.Model):
         
         if isinstance(product_prices, dict):
             product_prices = {str(k): v for k, v in product_prices.items()}
-        
-        auth = self.env['price.authorization'].create({
+
+        # Compañía del material seleccionado (la solicitud nace ahí y la
+        # escalera company_dependent se lee con ella).
+        company = self.env.company
+        for qid in (selected_lots or []):
+            try:
+                quant = self.sudo().browse(int(qid)).exists()
+            except (TypeError, ValueError):
+                continue
+            if quant and quant.company_id:
+                company = quant.company_id
+                break
+
+        auth_vals = {
             'seller_id': self.env.user.id,
             'operation_type': operation_type,
             'partner_id': partner_id,
@@ -1830,18 +1853,22 @@ class StockQuant(models.Model):
                 'product_groups': product_groups,
                 'architect_id': architect_id
             }
-        })
-        
+        }
+        if 'company_id' in self.env['price.authorization']._fields:
+            auth_vals['company_id'] = company.id
+        auth = self.env['price.authorization'].create(auth_vals)
+
         for product_id_str, group in product_groups.items():
             product_id = int(product_id_str)
             product = self.env['product.product'].browse(product_id)
-            
+            tmpl = product.product_tmpl_id.with_company(company)
+
             if currency_code == 'USD':
-                medium_price = product.product_tmpl_id.x_price_usd_2
-                minimum_price = product.product_tmpl_id.x_price_usd_3
+                medium_price = tmpl.x_price_usd_2
+                minimum_price = tmpl.x_price_usd_3
             else:
-                medium_price = product.product_tmpl_id.x_price_mxn_2
-                minimum_price = product.product_tmpl_id.x_price_mxn_3
+                medium_price = tmpl.x_price_mxn_2
+                minimum_price = tmpl.x_price_mxn_3
             
             requested_price = float(product_prices.get(str(product_id), 0))
             

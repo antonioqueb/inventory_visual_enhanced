@@ -214,9 +214,12 @@ class StockQuantTransitVisibility(models.Model):
             ]
 
             if refs:
+                # Por NOMBRE (sudo): acotado a la compañía del movimiento —
+                # los folios de venta se repiten entre compañías.
                 orders |= SaleOrder.search([
                     ("name", "in", refs),
                     ("state", "in", ["sale", "done"]),
+                    ("company_id", "=", move_line.company_id.id),
                 ], limit=20)
 
         return orders.filtered(lambda order: order.state in ("sale", "done"))
@@ -417,9 +420,12 @@ class StockQuantTransitVisibility(models.Model):
                 if not keys.issubset(committed_keys)
             ]
             if candidate_refs:
+                # Por NOMBRE (sudo): solo compañías activas — los folios de
+                # venta se repiten entre compañías.
                 matched_orders = SaleOrder.search([
                     ("name", "in", candidate_refs),
                     ("state", "in", ["sale", "done"]),
+                    ("company_id", "in", self.env.companies.ids),
                 ])
                 matched_names = set(matched_orders.mapped("name"))
                 for ref in matched_names:
