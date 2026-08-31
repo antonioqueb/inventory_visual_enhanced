@@ -150,6 +150,19 @@ class StockQuant(models.Model):
         txt = ''.join(c for c in txt if unicodedata.category(c) != 'Mn')
         return ' '.join(txt.casefold().split())
 
+    def _som_pack_hint(self, quant):
+        """(nombre, m² por empaque) del empaque estándar del producto para
+        la compañía del material; ('', 0) si se vende libre."""
+        tmpl = quant.product_id.product_tmpl_id
+        if 'has_standard_pack' not in tmpl._fields or not tmpl.has_standard_pack:
+            return '', 0.0
+        packs = tmpl._som_standard_packs_for_company(quant.company_id or self.env.company) if hasattr(tmpl, '_som_standard_packs_for_company') else tmpl.sudo().standard_pack_ids.filtered('active')
+        if not packs:
+            return '', 0.0
+        default = tmpl.sudo().default_pack_id
+        pack = default if default and default in packs else packs[:1]
+        return pack.display_name or '', pack.qty_per_pack or 0.0
+
     @api.model
     def _som_categories_matching(self, name):
         """Categorías del filtro por MATERIAL, en TODAS las ramas (Placas,
@@ -350,12 +363,15 @@ class StockQuant(models.Model):
                     except:
                         tipo_display = ''
                 
+                pack_name, pack_qty = self._som_pack_hint(quant)
                 product_groups[product_id] = {
                     'product_id': product_id,
                     'product_name': quant.product_id.display_name,
                     'product_code': quant.product_id.default_code or '',
                     'categ_name': quant.product_id.categ_id.display_name,
                     'tipo': tipo_display,
+                    'pack_name': pack_name,
+                    'pack_qty': pack_qty,
                     'quant_ids': [],
                     'stock_qty': 0.0,
                     'stock_plates': 0,
