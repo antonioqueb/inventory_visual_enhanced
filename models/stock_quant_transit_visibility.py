@@ -824,6 +824,8 @@ class StockQuantTransitVisibility(models.Model):
                     "product_name": quant.product_id.display_name,
                     "product_code": quant.product_id.default_code or "",
                     "categ_name": quant.product_id.categ_id.display_name,
+                    'pack_name': self._som_pack_hint(quant)[0],
+                    'pack_qty': self._som_pack_hint(quant)[1],
                     "tipo": tipo_display,
                     "quant_ids": [],
                     "stock_qty": 0.0,
