@@ -130,7 +130,7 @@ class StockQuantPackingList(models.Model):
             "voyage_name": "",
         }
 
-        _logger.info(
+        _logger.debug(
             "[Inventario Visual][PL] Row encontrado | row=%s | packing=%s | shipment=%s",
             row.id,
             info["packing_id"],
@@ -539,7 +539,7 @@ class StockQuantPackingList(models.Model):
             try:
                 row = Row.search(domain, order="id desc", limit=1)
                 if row:
-                    _logger.info(
+                    _logger.debug(
                         "[Inventario Visual][PL] Row resuelto para quant %s con dominio %s",
                         quant.id,
                         domain,
@@ -667,7 +667,7 @@ class StockQuantPackingList(models.Model):
                 or item["packing_voyage_id"]
             )
 
-            _logger.info(
+            _logger.debug(
                 "[Inventario Visual][PL] quant=%s | has=%s | shipment=%s | packing=%s | row=%s | voyage=%s",
                 item.get("id"),
                 item["has_packing_list"],
