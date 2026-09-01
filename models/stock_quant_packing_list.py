@@ -630,6 +630,23 @@ class StockQuantPackingList(models.Model):
         if not result:
             return result
 
+        # La columna Packing List es información de COMPRAS (embarques,
+        # proveedor, viaje): solo la ve quien tiene permiso de compras. Sin
+        # el grupo, los campos ni se calculan ni viajan al navegador y la
+        # columna desaparece sola (el frontend se rige por has_packing_list).
+        if not (self.env.su or self.env.user.has_group('purchase.group_purchase_user')):
+            for item in result:
+                item['packing_list_id'] = False
+                item['packing_list_name'] = ''
+                item['packing_row_id'] = False
+                item['packing_shipment_id'] = False
+                item['packing_shipment_name'] = ''
+                item['packing_container_name'] = ''
+                item['packing_voyage_id'] = False
+                item['packing_voyage_name'] = ''
+                item['has_packing_list'] = False
+            return result
+
         # Las filas partidas por parcialidad traen id string
         # ('123-comprometido'): NO son quants navegables y browse con un
         # string aborta todo el detalle. Solo se enriquecen los ids reales.
