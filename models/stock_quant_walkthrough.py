@@ -57,7 +57,10 @@ class StockQuantWalkthrough(models.Model):
         Lot = self.env['stock.lot']
         # Las búsquedas de abajo van con sudo(): se acotan a las compañías
         # activas del usuario (listado). Aplica a quants y move lines.
-        domain = [('company_id', 'in', self.env.companies.ids)]
+        # Los quants de ubicaciones de CLIENTE (y otras compartidas) viven
+        # con company_id vacío: exigir compañía aquí borraba TODAS las
+        # entregas del Walkthrough (caso S121-15). El vacío también cuenta.
+        domain = [('company_id', 'in', self.env.companies.ids + [False])]
         missing_lots = []
 
         if filters.get('product_name'):
