@@ -738,6 +738,9 @@ class StockQuantTransitVisibility(models.Model):
                 pass
 
         quants = self.search(domain)
+        # Placas consumidas en una OT terminada: fuera del inventario vivo
+        # (su quant de producción es solo el rastro del consumo).
+        quants = self._iv_drop_workshop_consumed(quants)
 
         # Filtro: cantidad mínima por bloque
         if filters.get("cantidad_min_bloque"):
@@ -968,6 +971,8 @@ class StockQuantTransitVisibility(models.Model):
             return []
 
         quants = self.browse(quant_ids)
+        if not self.env.context.get('iv_keep_workshop_consumed'):
+            quants = self._iv_drop_workshop_consumed(quants)
         result = []
 
         is_sales_user = (

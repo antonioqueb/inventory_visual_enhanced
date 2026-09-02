@@ -31,7 +31,7 @@ aparte con active_test=False y los dominios reciben ('lot_id','in',ids).
 """
 import logging
 
-from odoo import api, models
+from odoo import api, fields, models
 
 _logger = logging.getLogger(__name__)
 
@@ -155,12 +155,27 @@ class StockQuantWalkthrough(models.Model):
             [
                 ('lot_id', 'in', list(lot_ids)),
                 ('quantity', '!=', 0),
-                ('location_id.usage', 'in', ['internal', 'transit', 'production']),
+                ('location_id.usage', 'in', ['internal', 'transit']),
             ],
             ['lot_id'],
             ['lot_id'],
         )
-        return {g['lot_id'][0] for g in groups if g.get('lot_id')}
+        alive = {g['lot_id'][0] for g in groups if g.get('lot_id')}
+        # En producción (taller): vivo solo si NO fue consumido en una OT ya
+        # terminada (ese quant es el rastro del consumo, no inventario).
+        prod_groups = self.sudo().read_group(
+            [
+                ('lot_id', 'in', list(lot_ids)),
+                ('quantity', '>', 0),
+                ('location_id.usage', '=', 'production'),
+            ],
+            ['lot_id'],
+            ['lot_id'],
+        )
+        prod_lots = {g['lot_id'][0] for g in prod_groups if g.get('lot_id')}
+        if prod_lots:
+            alive |= prod_lots - self._iv_get_workshop_consumed_lot_ids(list(prod_lots))
+        return alive
 
     @api.model
     def _walkthrough_scrap_aggregates(self, common_domain):
@@ -284,10 +299,24 @@ class StockQuantWalkthrough(models.Model):
                 common_domain).items():
             scrap_aggregates[key] = scrap_aggregates.get(key, 0.0) + qty
 
+        # Consumidas en TALLER: placas que entraron como ingrediente a una OT
+        # ya terminada (corte / cambio de acabado). Odoo deja su quant en la
+        # ubicación de producción; aquí se listan como salida "consumida en
+        # taller" y desaparecen del Inventario Visual.
+        workshop_quants = self.sudo().search([
+            ('quantity', '>', 0),
+            ('lot_id', '!=', False),
+            ('location_id.usage', '=', 'production'),
+        ] + list(common_domain), order='product_id, lot_id, id')
+        consumed_lot_ids = self._iv_get_workshop_consumed_lot_ids(
+            workshop_quants.mapped('lot_id').ids)
+        workshop_quants = workshop_quants.filtered(lambda q: q.lot_id.id in consumed_lot_ids)
+
         # Excluir lotes que siguen teniendo stock (devoluciones/entregas
         # parciales: mientras quede material, viven en el Inventario Visual).
         all_lot_ids = set(delivered_quants.mapped('lot_id').ids)
         all_lot_ids.update(lot.id for (lot, _loc) in scrap_aggregates)
+        all_lot_ids.update(workshop_quants.mapped('lot_id').ids)
         lots_alive = self._walkthrough_lots_with_current_stock(all_lot_ids)
 
         # Entradas normalizadas: (quant, lot, qty, kind).
@@ -301,6 +330,10 @@ class StockQuantWalkthrough(models.Model):
                 continue
             quant = self._walkthrough_ensure_quant(lot, location)
             entries.append((quant, lot, qty, 'scrap'))
+        for quant in workshop_quants:
+            if quant.lot_id.id in lots_alive:
+                continue
+            entries.append((quant, quant.lot_id, quant.quantity or 0.0, 'workshop'))
 
         product_groups = {}
         for quant, lot, qty, kind in entries:
@@ -347,7 +380,10 @@ class StockQuantWalkthrough(models.Model):
             first_lot = group_entries[0][1] if group_entries else None
             delivered = [e for e in group_entries if e[3] == 'delivery']
             scrapped = [e for e in group_entries if e[3] == 'scrap']
+            consumed = [e for e in group_entries if e[3] == 'workshop']
             products.append({
+                'workshop_qty': sum(e[2] for e in consumed),
+                'workshop_plates': len(consumed),
                 'product_id': pid,
                 'product_name': product.display_name,
                 'product_code': product.default_code or '',
@@ -373,7 +409,9 @@ class StockQuantWalkthrough(models.Model):
 
     @api.model
     def get_walkthrough_details(self, quant_ids):
-        details = self.get_quant_details(quant_ids=quant_ids)
+        # iv_keep_workshop_consumed: aquí SÍ queremos los quants de producción
+        # de placas consumidas (el Inventario Visual los descarta).
+        details = self.with_context(iv_keep_workshop_consumed=True).get_quant_details(quant_ids=quant_ids)
         if not isinstance(details, list):
             return details
 
@@ -391,7 +429,12 @@ class StockQuantWalkthrough(models.Model):
                 continue
 
             is_scrap = quant.location_id.usage == 'inventory'
-            detail['exit_type'] = 'scrap' if is_scrap else 'delivery'
+            is_workshop = quant.location_id.usage == 'production'
+            detail['exit_type'] = 'workshop' if is_workshop else ('scrap' if is_scrap else 'delivery')
+            if is_workshop:
+                # Consumida en taller: ya no está "en taller", se usó.
+                detail['en_taller'] = False
+                detail['reserved_quantity'] = 0.0
 
             out_domain = [
                 ('lot_id', '=', quant.lot_id.id),
@@ -460,6 +503,28 @@ class StockQuantWalkthrough(models.Model):
                     ).get(rec.reason_type, rec.reason_type or '')
                     exit_doc = rec.name
                     exit_partner = reason_label
+
+            # Consumida en taller: folio de la OT y proceso como "motivo".
+            if is_workshop and 'workshop.input.line' in self.env:
+                wline = self.env['workshop.input.line'].sudo().search([
+                    ('lot_id', '=', quant.lot_id.id),
+                    ('is_consumed', '=', True),
+                    ('order_id.state', '=', 'done'),
+                ], order='id desc', limit=1)
+                if wline:
+                    order = wline.order_id
+                    process = ''
+                    if 'process_id' in order._fields and order.process_id:
+                        process = order.process_id.display_name
+                    exit_doc = order.name
+                    exit_partner = 'Consumida en taller' + (' · %s' % process if process else '')
+                    if 'date_done' in order._fields and order.date_done:
+                        detail['exit_date'] = fields.Date.to_string(
+                            fields.Date.context_today(self, order.date_done))
+                    outputs = order.output_line_ids.filtered(lambda o: o.lot_id) \
+                        if 'output_line_ids' in order._fields else False
+                    if outputs:
+                        detail['workshop_outputs'] = ', '.join(outputs.mapped('lot_id.name'))
 
             detail['exit_doc'] = exit_doc
             detail['exit_partner'] = exit_partner

@@ -42,6 +42,41 @@ class StockQuant(models.Model):
         return set(lines.mapped('lot_id').ids)
 
     @api.model
+    def _iv_get_workshop_consumed_lot_ids(self, lot_ids):
+        """Lotes CONSUMIDOS en un proceso de taller YA TERMINADO. Odoo deja
+        el rastro del consumo como quant positivo en la ubicación de
+        producción (virtual) y nunca lo saca de ahí; ese quant NO es
+        inventario ni está "en taller": la placa ya no existe (se cortó o
+        cambió de acabado y salió con otro lote). Sale del Inventario
+        Visual y vive en el Walkthrough como 'consumida en taller'. Si el
+        mismo lote está en otra OT viva, sigue contando como en taller."""
+        if not lot_ids or 'workshop.input.line' not in self.env:
+            return set()
+        lines = self.env['workshop.input.line'].sudo().search([
+            ('lot_id', 'in', list(lot_ids)),
+            ('is_consumed', '=', True),
+            ('state', 'not in', ('cancelled', 'rejected')),
+            ('order_id.state', '=', 'done'),
+        ])
+        consumed = set(lines.mapped('lot_id').ids)
+        if consumed:
+            consumed -= self._iv_get_workshop_lot_ids(list(consumed))
+        return consumed
+
+    @api.model
+    def _iv_drop_workshop_consumed(self, quants):
+        """Quita de un recordset los quants de producción de lotes ya
+        consumidos en taller (ver _iv_get_workshop_consumed_lot_ids)."""
+        prod = quants.filtered(lambda q: q.location_id.usage == 'production' and q.lot_id)
+        if not prod:
+            return quants
+        consumed = self._iv_get_workshop_consumed_lot_ids(prod.mapped('lot_id').ids)
+        if not consumed:
+            return quants
+        return quants.filtered(
+            lambda q: not (q.location_id.usage == 'production' and q.lot_id.id in consumed))
+
+    @api.model
     def _iv_get_workshop_committed_sale_map(self, lot_ids):
         """COMPROMISO PRE-OT: {lot_id: sale_order_id} de lotes asignados a
         demanda de TALLER (selección activa con venta confirmada). Al
@@ -308,6 +343,8 @@ class StockQuant(models.Model):
                 pass
         
         quants = self.search(domain)
+        # Placas consumidas en una OT terminada: fuera del inventario vivo.
+        quants = self._iv_drop_workshop_consumed(quants)
         
         # =====================================================================
         # FILTRO: Cantidad mínima por bloque
@@ -490,6 +527,8 @@ class StockQuant(models.Model):
             return []
         
         quants = self.browse(quant_ids)
+        if not self.env.context.get('iv_keep_workshop_consumed'):
+            quants = self._iv_drop_workshop_consumed(quants)
         result = []
 
         is_sales_user = self.env.user.has_group('sales_team.group_sale_salesman') or \

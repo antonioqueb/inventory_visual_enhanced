@@ -57,6 +57,9 @@ export class WalkthroughRow extends ProductRow {
             if (filter === "scrapped") {
                 return d.exit_type === "scrap";
             }
+            if (filter === "workshop") {
+                return d.exit_type === "workshop";
+            }
             return true;
         });
     }

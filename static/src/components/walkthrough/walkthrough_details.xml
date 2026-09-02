@@ -44,14 +44,15 @@
                                 <td class="col-location">
                                     <div class="wt-exit-cell" t-att-title="getExitTitle(detail)">
                                         <span class="wt-exit-badge"
-                                              t-att-class="isDelivery(detail) ? 'wt-exit-delivery' : 'wt-exit-scrap'">
-                                            <i t-att-class="isDelivery(detail) ? 'fa fa-truck' : 'fa fa-trash'"></i>
+                                              t-att-class="exitBadgeClass(detail)">
+                                            <i t-att-class="exitIconClass(detail)"></i>
                                             <t t-esc="getExitLabel(detail)"/>
                                         </span>
                                         <div class="wt-exit-meta">
                                             <span t-if="detail.exit_date" t-esc="formatDate(detail.exit_date)"></span>
                                             <span t-if="detail.exit_doc" class="wt-exit-doc" t-esc="detail.exit_doc"></span>
                                             <span t-if="detail.exit_partner" class="wt-exit-partner" t-esc="detail.exit_partner"></span>
+                                            <span t-if="detail.workshop_outputs" class="wt-exit-partner">→ <t t-esc="detail.workshop_outputs"/></span>
                                         </div>
                                     </div>
                                 </td>

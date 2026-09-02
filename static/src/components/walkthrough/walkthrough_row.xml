@@ -69,6 +69,18 @@
                         </span>
                     </div>
 
+                    <div class="inventory-row clickable-stat"
+                         t-if="props.product.workshop_plates"
+                         t-att-class="{ 'active-filter': state.activeFilter === 'workshop' }"
+                         t-on-click.stop="() => this.handleFilterClick('workshop')"
+                         title="Placas consumidas como ingrediente en un proceso de taller (corte / cambio de acabado)">
+                        <span class="inventory-label text-primary">Consumido en taller</span>
+                        <span class="inventory-value inventory-units" t-esc="props.product.workshop_plates || 0"></span>
+                        <span class="inventory-value inventory-measure text-primary">
+                            <t t-esc="props.formatNumber(props.product.workshop_qty)"/> <t t-esc="unitLabel"/>
+                        </span>
+                    </div>
+
                 </div>
             </td>
 

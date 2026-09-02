@@ -40,8 +40,26 @@ export class WalkthroughDetails extends ProductDetails {
         return detail && detail.exit_type === "delivery";
     }
 
+    isWorkshop(detail) {
+        return detail && detail.exit_type === "workshop";
+    }
+
+    exitBadgeClass(detail) {
+        if (this.isDelivery(detail)) return "wt-exit-delivery";
+        if (this.isWorkshop(detail)) return "wt-exit-workshop";
+        return "wt-exit-scrap";
+    }
+
+    exitIconClass(detail) {
+        if (this.isDelivery(detail)) return "fa fa-truck";
+        if (this.isWorkshop(detail)) return "fa fa-cut";
+        return "fa fa-trash";
+    }
+
     getExitLabel(detail) {
-        return this.isDelivery(detail) ? "Entregado" : "Baja";
+        if (this.isDelivery(detail)) return "Entregado";
+        if (this.isWorkshop(detail)) return "Taller";
+        return "Baja";
     }
 
     getExitTitle(detail) {
@@ -52,6 +70,10 @@ export class WalkthroughDetails extends ProductDetails {
         if (this.isDelivery(detail)) {
             parts.push("Entregado a cliente");
             if (detail.exit_partner) parts.push(`Cliente: ${detail.exit_partner}`);
+        } else if (this.isWorkshop(detail)) {
+            parts.push("Consumida como ingrediente en un proceso de taller");
+            if (detail.exit_partner) parts.push(detail.exit_partner);
+            if (detail.workshop_outputs) parts.push(`Salió como: ${detail.workshop_outputs}`);
         } else {
             parts.push("Dado de baja / desecho");
             if (detail.exit_partner) parts.push(`Motivo: ${detail.exit_partner}`);
