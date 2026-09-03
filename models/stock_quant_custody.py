@@ -16,7 +16,7 @@ del pago que completó el 100 % o la de la autorización de entrega (la más
 antigua si hay ambas); para las solo asignadas, desde la asignación.
 """
 from collections import defaultdict
-from datetime import date
+from datetime import date, datetime
 
 from odoo import api, fields, models
 from odoo.tools.misc import format_date
@@ -143,9 +143,10 @@ class StockQuant(models.Model):
             [(r[0], orders[r[3]].name) for r in raw])
 
         def to_date(value):
+            # datetime ES subclase de date: comparar con isinstance(datetime)
             if not value:
                 return False
-            if hasattr(value, 'date') and not isinstance(value, date):
+            if isinstance(value, datetime):
                 return value.date()
             return value
 
