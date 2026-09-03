@@ -1950,10 +1950,13 @@ class StockQuant(models.Model):
                 'minimum_price': minimum_price
             })
         
+        notice = auth.som_duplicate_notice if 'som_duplicate_notice' in auth._fields else ''
         return {
             'success': True,
             'authorization_id': auth.id,
-            'authorization_name': auth.name
+            'authorization_name': auth.name,
+            'duplicate': bool(notice),
+            'message': notice or '',
         }
     
     @api.model
