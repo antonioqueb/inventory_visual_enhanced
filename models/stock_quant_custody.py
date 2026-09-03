@@ -274,12 +274,23 @@ class StockQuant(models.Model):
         customers_out = sorted(
             [pack(c, {'id': cid, 'name': c['name'], 'max_days': c['max_days']}) for cid, c in by_customer.items()],
             key=lambda x: (-x['qty'], x['name']))[:12]
-        aging_out = [{
-            'key': k, 'label': ('%d-%d días' % (lo, hi)) if hi < 10 ** 6 else 'más de %d días' % (lo - 1),
-            'by_status': {s: pack(by_aging[k][s]) for s in STATUS_ORDER},
-            **pack({kk: (sum((by_aging[k][s][kk] for s in STATUS_ORDER), set()) if kk in ('orders', 'customers')
-                         else sum(by_aging[k][s][kk] for s in STATUS_ORDER)) for kk in bucket()}),
-        } for k, lo, hi in AGING_BUCKETS]
+        aging_out = []
+        for k, lo, hi in AGING_BUCKETS:
+            tot = bucket()
+            for s in STATUS_ORDER:
+                b = by_aging[k][s]
+                tot['plates'] += b['plates']
+                tot['qty'] += b['qty']
+                tot['value'] += b['value']
+                tot['days_sum'] += b['days_sum']
+                tot['orders'] |= b['orders']
+                tot['customers'] |= b['customers']
+            aging_out.append({
+                'key': k,
+                'label': ('%d-%d días' % (lo, hi)) if hi < 10 ** 6 else 'más de %d días' % (lo - 1),
+                'by_status': {s: pack(by_aging[k][s]) for s in STATUS_ORDER},
+                **pack(tot),
+            })
         return {
             'today': format_date(self.env, today, date_format='dd MMM yyyy'),
             'currency_symbol': ccur.symbol or '$',
