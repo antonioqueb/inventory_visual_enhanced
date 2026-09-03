@@ -102,12 +102,12 @@ $cty-crit: #dc2626;
     .o_cty_zone_track { display: flex; height: 16px; border-radius: 999px; overflow: hidden; background: #eef3fa; min-width: 6px; }
     .o_cty_zone_seg { height: 100%; }
     .o_cty_zone_sub { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 4px; font-size: 0.74rem; color: $cty-mut; }
-    .o_cty_svg { width: 100%; height: 240px; display: block; padding: 4px 10px 0; }
+    .o_cty_svg { width: 100%; height: auto; max-height: 340px; display: block; padding: 4px 12px 0; }
     .o_cty_grid { stroke: #e9eef6; stroke-width: 1; }
-    .o_cty_tick { font-size: 10px; fill: $cty-mut; }
-    .o_cty_axis { font-size: 11px; font-weight: 700; fill: $cty-ink; }
-    .o_cty_axis_sub { font-size: 9.5px; fill: $cty-mut; }
-    .o_cty_bar_val { font-size: 10.5px; font-weight: 800; fill: $cty-ink; }
+    .o_cty_tick { font-size: 13px; fill: $cty-mut; }
+    .o_cty_axis { font-size: 14px; font-weight: 700; fill: $cty-ink; }
+    .o_cty_axis_sub { font-size: 12px; fill: $cty-mut; }
+    .o_cty_bar_val { font-size: 13px; font-weight: 800; fill: $cty-ink; }
     .o_cty_legend { display: flex; gap: 14px; flex-wrap: wrap; padding: 6px 16px 12px; font-size: 0.76rem; color: $cty-mut;
         i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; } }
     .o_cty_empty { padding: 26px 16px; color: $cty-mut; text-align: center; }

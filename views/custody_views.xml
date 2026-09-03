@@ -19,8 +19,6 @@
                 <field name="mask_name" optional="hide"/>
                 <field name="block" optional="show"/>
                 <field name="thickness" optional="hide"/>
-                <field name="largo" optional="show"/>
-                <field name="alto" optional="show"/>
                 <field name="zone_id"/>
                 <field name="location_id" optional="show"/>
                 <field name="qty" sum="m²"/>

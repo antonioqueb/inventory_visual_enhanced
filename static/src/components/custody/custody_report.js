@@ -183,7 +183,9 @@ export class CustodyReport extends Component {
     get agingChart() {
         const buckets = this.state.data ? this.state.data.aging : [];
         const rows = this.rows;
-        const W = 640, H = 230, padL = 46, padB = 34, padT = 18, gap = 14;
+        // Lienzo ancho (la tarjeta ocupa todo el ancho) y proporción fija:
+        // sin esto el SVG se estiraba y las barras/letras salían aplastadas.
+        const W = 1200, H = 300, padL = 64, padB = 44, padT = 26, gap = 28;
         const n = buckets.length || 1;
         const bw = (W - padL - 10 - gap * (n - 1)) / n;
         const sums = buckets.map((b) => {

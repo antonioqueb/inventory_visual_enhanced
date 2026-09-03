@@ -160,10 +160,10 @@
                     <div class="o_cty_card_head"><div><h2>Antigüedad en custodia</h2><span class="o_cty_muted">m² por rango de días, apilados por estado</span></div></div>
                     <t t-set="ag" t-value="agingChart"/>
                     <div class="o_cty_empty" t-if="ag.empty">Sin material en custodia con estos filtros.</div>
-                    <svg t-else="" t-attf-viewBox="0 0 #{ag.W} #{ag.H}" class="o_cty_svg" preserveAspectRatio="none">
+                    <svg t-else="" t-attf-viewBox="0 0 #{ag.W} #{ag.H}" class="o_cty_svg" preserveAspectRatio="xMidYMid meet">
                         <t t-foreach="ag.ticks" t-as="tk" t-key="tk_index">
                             <line t-att-x1="ag.padL" t-att-x2="ag.W - 10" t-att-y1="tk.y" t-att-y2="tk.y" class="o_cty_grid"/>
-                            <text t-att-x="ag.padL - 6" t-att-y="tk.y + 4" class="o_cty_tick" text-anchor="end" t-esc="fmtShort(tk.v)"/>
+                            <text t-att-x="ag.padL - 6" t-att-y="tk.y + 5" class="o_cty_tick" text-anchor="end" t-esc="fmtShort(tk.v)"/>
                         </t>
                         <t t-foreach="ag.bars" t-as="b" t-key="b.key">
                             <t t-foreach="b.segments" t-as="sg" t-key="sg.status">
@@ -171,9 +171,9 @@
                                     <title><t t-esc="statusLabel(sg.status)"/>: <t t-esc="fmt(sg.qty)"/> m²</title>
                                 </rect>
                             </t>
-                            <text t-if="b.total" t-att-x="b.labelX" t-att-y="b.top - 5" class="o_cty_bar_val" text-anchor="middle" t-esc="fmtShort(b.total) + ' m²'"/>
-                            <text t-att-x="b.labelX" t-att-y="ag.baseY + 16" class="o_cty_axis" text-anchor="middle" t-esc="b.label"/>
-                            <text t-att-x="b.labelX" t-att-y="ag.baseY + 28" class="o_cty_axis_sub" text-anchor="middle" t-esc="b.plates ? b.plates + ' placa(s)' : ''"/>
+                            <text t-if="b.total" t-att-x="b.labelX" t-att-y="b.top - 8" class="o_cty_bar_val" text-anchor="middle" t-esc="fmtShort(b.total) + ' m²'"/>
+                            <text t-att-x="b.labelX" t-att-y="ag.baseY + 20" class="o_cty_axis" text-anchor="middle" t-esc="b.label"/>
+                            <text t-att-x="b.labelX" t-att-y="ag.baseY + 37" class="o_cty_axis_sub" text-anchor="middle" t-esc="b.plates ? b.plates + ' placa(s)' : ''"/>
                         </t>
                     </svg>
                 </div>
