@@ -95,32 +95,17 @@
                 </div>
             </div>
 
-            <!-- ══ Gráficas ══ -->
+            <!-- ══ Gráficas (Chart.js, mismo motor que SOM Analytics) ══ -->
             <div class="o_cty_charts" t-if="showCharts">
 
                 <!-- POR BODEGA -->
                 <div class="o_cty_card o_cty_chart_zones">
-                    <div class="o_cty_card_head"><div><h2>Por bodega</h2><span class="o_cty_muted">m² en custodia por ubicación padre · apilado por estado · clic para filtrar</span></div></div>
-                    <div class="o_cty_empty" t-if="!zonesChart.length">Sin material en custodia con estos filtros.</div>
-                    <div class="o_cty_zones">
-                        <t t-foreach="zonesChart" t-as="z" t-key="z.name">
-                            <div t-att-class="'o_cty_zone ' + (z.active ? 'active' : '') + (state.zone and !z.active ? ' dim' : '')" t-on-click="() => this.setZone(z.name)">
-                                <div class="o_cty_zone_head">
-                                    <span class="o_cty_zone_name" t-esc="z.name"/>
-                                    <span class="o_cty_zone_qty"><t t-esc="fmt(z.qty)"/> m²</span>
-                                </div>
-                                <div class="o_cty_zone_track" t-att-style="barStyle(z.width)">
-                                    <t t-foreach="z.segments" t-as="sg" t-key="sg.status">
-                                        <div class="o_cty_zone_seg" t-att-style="segStyle(sg)" t-att-title="statusLabel(sg.status) + ': ' + fmt(sg.qty) + ' m²'"/>
-                                    </t>
-                                </div>
-                                <div class="o_cty_zone_sub">
-                                    <span><t t-esc="z.plates"/> placa(s) · <t t-esc="z.orders"/> orden(es) · <t t-esc="state.data.currency_symbol"/><t t-esc="fmtShort(z.value)"/></span>
-                                    <span t-att-class="'o_cty_days ' + daysClass(z.avgDays)"><t t-esc="fmt(z.avgDays, 0)"/> d prom</span>
-                                </div>
-                            </div>
-                        </t>
+                    <div class="o_cty_card_head">
+                        <div><h2>Por bodega</h2><span class="o_cty_muted">m² en custodia por ubicación padre · apilado por estado · clic en una barra para filtrar</span></div>
+                        <button class="o_cty_link" t-if="state.zone" t-on-click="() => this.setZone('')">Quitar filtro <t t-esc="state.zone"/></button>
                     </div>
+                    <div class="o_cty_empty" t-if="!zonesData.length">Sin material en custodia con estos filtros.</div>
+                    <div class="o_cty_canvas" t-else="" t-att-style="zonesHeight"><canvas id="o_cty_c_zones"/></div>
                     <div class="o_cty_legend">
                         <t t-foreach="statusOrder" t-as="k" t-key="k"><span><i t-att-style="dot(k)"/><t t-esc="statusLabel(k)"/></span></t>
                     </div>
@@ -128,83 +113,45 @@
 
                 <!-- DONA POR ESTADO -->
                 <div class="o_cty_card o_cty_chart_donut">
-                    <div class="o_cty_card_head"><div><h2>Reparto por estado</h2><span class="o_cty_muted">m² en custodia</span></div></div>
-                    <t t-set="dn" t-value="donut"/>
-                    <div class="o_cty_donut_wrap">
-                        <svg viewBox="0 0 140 140" class="o_cty_donut">
-                            <circle cx="70" cy="70" t-att-r="dn.r" fill="none" stroke="#e6eef8" stroke-width="18"/>
-                            <t t-foreach="dn.segs" t-as="sg" t-key="sg.key">
-                                <circle cx="70" cy="70" t-att-r="dn.r" fill="none" t-att-stroke="sg.color" stroke-width="18"
-                                        t-att-stroke-dasharray="sg.dash" t-att-stroke-dashoffset="sg.offset" transform="rotate(-90 70 70)">
-                                    <title><t t-esc="sg.label"/>: <t t-esc="pct(sg.pct)"/></title>
-                                </circle>
-                            </t>
-                            <text x="70" y="66" text-anchor="middle" class="o_cty_donut_val" t-esc="fmtShort(kpis.qty)"/>
-                            <text x="70" y="82" text-anchor="middle" class="o_cty_donut_lbl">m² totales</text>
-                        </svg>
-                        <div class="o_cty_donut_legend">
-                            <t t-foreach="statusStats" t-as="s" t-key="s.key">
-                                <div class="o_cty_donut_item" t-if="s.qty">
-                                    <i t-att-style="dot(s.key)"/>
-                                    <span class="o_cty_donut_name" t-esc="s.label"/>
-                                    <span class="o_cty_donut_pct" t-esc="pct(s.pct)"/>
-                                    <span class="o_cty_muted"><t t-esc="fmt(s.qty)"/> m² · <t t-esc="state.data.currency_symbol"/><t t-esc="fmtShort(s.value)"/></span>
-                                </div>
-                            </t>
-                        </div>
+                    <div class="o_cty_card_head"><div><h2>Reparto por estado</h2><span class="o_cty_muted">m² en custodia según qué tan del cliente es ya el material</span></div></div>
+                    <div class="o_cty_empty" t-if="!kpis.qty">Sin material en custodia con estos filtros.</div>
+                    <div class="o_cty_canvas o_cty_canvas_donut" t-else=""><canvas id="o_cty_c_donut"/></div>
+                    <div class="o_cty_donut_legend">
+                        <t t-foreach="statusStats" t-as="s" t-key="s.key">
+                            <div class="o_cty_donut_item" t-if="s.qty">
+                                <i t-att-style="dot(s.key)"/>
+                                <span class="o_cty_donut_name" t-esc="s.label"/>
+                                <span class="o_cty_donut_pct" t-esc="pct(s.pct)"/>
+                                <span class="o_cty_muted"><t t-esc="fmt(s.qty)"/> m² · <t t-esc="s.plates"/> placa(s) · <t t-esc="state.data.currency_symbol"/><t t-esc="fmtShort(s.value)"/></span>
+                            </div>
+                        </t>
                     </div>
                 </div>
 
                 <!-- ANTIGÜEDAD -->
                 <div class="o_cty_card o_cty_chart_aging">
-                    <div class="o_cty_card_head"><div><h2>Antigüedad en custodia</h2><span class="o_cty_muted">m² por rango de días, apilados por estado</span></div></div>
-                    <t t-set="ag" t-value="agingChart"/>
-                    <div class="o_cty_empty" t-if="ag.empty">Sin material en custodia con estos filtros.</div>
-                    <svg t-else="" t-attf-viewBox="0 0 #{ag.W} #{ag.H}" class="o_cty_svg" preserveAspectRatio="xMidYMid meet">
-                        <t t-foreach="ag.ticks" t-as="tk" t-key="tk_index">
-                            <line t-att-x1="ag.padL" t-att-x2="ag.W - 10" t-att-y1="tk.y" t-att-y2="tk.y" class="o_cty_grid"/>
-                            <text t-att-x="ag.padL - 6" t-att-y="tk.y + 5" class="o_cty_tick" text-anchor="end" t-esc="fmtShort(tk.v)"/>
-                        </t>
-                        <t t-foreach="ag.bars" t-as="b" t-key="b.key">
-                            <t t-foreach="b.segments" t-as="sg" t-key="sg.status">
-                                <rect t-att-x="sg.x" t-att-y="sg.y" t-att-width="sg.w" t-att-height="sg.h" t-att-fill="sg.color" rx="3">
-                                    <title><t t-esc="statusLabel(sg.status)"/>: <t t-esc="fmt(sg.qty)"/> m²</title>
-                                </rect>
-                            </t>
-                            <text t-if="b.total" t-att-x="b.labelX" t-att-y="b.top - 8" class="o_cty_bar_val" text-anchor="middle" t-esc="fmtShort(b.total) + ' m²'"/>
-                            <text t-att-x="b.labelX" t-att-y="ag.baseY + 20" class="o_cty_axis" text-anchor="middle" t-esc="b.label"/>
-                            <text t-att-x="b.labelX" t-att-y="ag.baseY + 37" class="o_cty_axis_sub" text-anchor="middle" t-esc="b.plates ? b.plates + ' placa(s)' : ''"/>
-                        </t>
-                    </svg>
+                    <div class="o_cty_card_head"><div><h2>Antigüedad en custodia</h2><span class="o_cty_muted">m² por rango de días desde que dejó de ser mío, apilados por estado</span></div></div>
+                    <div class="o_cty_empty" t-if="!rows.length">Sin material en custodia con estos filtros.</div>
+                    <div class="o_cty_canvas o_cty_canvas_tall" t-else=""><canvas id="o_cty_c_aging"/></div>
                 </div>
 
                 <!-- MATERIALES -->
                 <div class="o_cty_card o_cty_chart_materials">
-                    <div class="o_cty_card_head"><div><h2>Materiales en custodia</h2><span class="o_cty_muted">top 10 por m² · placas · bodegas donde están</span></div></div>
-                    <div class="o_cty_empty" t-if="!materialsChart.length">Sin datos.</div>
-                    <div class="o_cty_hbars">
-                        <t t-foreach="materialsChart" t-as="p" t-key="p.name">
-                            <div class="o_cty_hbar">
-                                <div class="o_cty_hbar_name" t-att-title="p.name"><t t-esc="p.name"/><small><t t-esc="p.plates"/> placa(s) · <t t-esc="p.zones"/></small></div>
-                                <div class="o_cty_hbar_track"><div t-att-class="'o_cty_hbar_fill ' + daysClass(p.avgDays)" t-att-style="barStyle(p.width)"/></div>
-                                <div class="o_cty_hbar_val"><strong><t t-esc="fmt(p.qty)"/> m²</strong><span t-att-class="'o_cty_days ' + daysClass(p.avgDays)"><t t-esc="fmt(p.avgDays, 0)"/> d prom · máx <t t-esc="p.max"/></span></div>
-                            </div>
-                        </t>
+                    <div class="o_cty_card_head"><div><h2>Materiales en custodia</h2><span class="o_cty_muted">top 10 por m² · el color es la antigüedad promedio</span></div></div>
+                    <div class="o_cty_empty" t-if="!materialsData.length">Sin datos.</div>
+                    <div class="o_cty_canvas" t-else="" t-att-style="materialsHeight"><canvas id="o_cty_c_materials"/></div>
+                    <div class="o_cty_legend o_cty_legend_aging">
+                        <span><i class="ok"/>hasta 15 días</span><span><i class="warn"/>16 a 30</span><span><i class="hot"/>31 a 60</span><span><i class="crit"/>más de 60</span>
                     </div>
                 </div>
 
                 <!-- CLIENTES -->
                 <div class="o_cty_card o_cty_chart_customers">
-                    <div class="o_cty_card_head"><div><h2>Clientes con más material en mi almacén</h2><span class="o_cty_muted">top 10 por m² · promedio de días en custodia</span></div></div>
-                    <div class="o_cty_empty" t-if="!customersChart.length">Sin datos.</div>
-                    <div class="o_cty_hbars">
-                        <t t-foreach="customersChart" t-as="c" t-key="c.name">
-                            <div class="o_cty_hbar">
-                                <div class="o_cty_hbar_name" t-att-title="c.name"><t t-esc="c.name"/><small><t t-esc="c.orders"/> orden(es) · <t t-esc="c.plates"/> placa(s)</small></div>
-                                <div class="o_cty_hbar_track"><div t-att-class="'o_cty_hbar_fill ' + daysClass(c.avgDays)" t-att-style="barStyle(c.width)"/></div>
-                                <div class="o_cty_hbar_val"><strong><t t-esc="fmt(c.qty)"/> m²</strong><span t-att-class="'o_cty_days ' + daysClass(c.avgDays)"><t t-esc="fmt(c.avgDays, 0)"/> d prom · máx <t t-esc="c.max"/></span></div>
-                            </div>
-                        </t>
+                    <div class="o_cty_card_head"><div><h2>Clientes con más material en mi almacén</h2><span class="o_cty_muted">top 10 por m² · el color es la antigüedad promedio</span></div></div>
+                    <div class="o_cty_empty" t-if="!customersData.length">Sin datos.</div>
+                    <div class="o_cty_canvas" t-else="" t-att-style="customersHeight"><canvas id="o_cty_c_customers"/></div>
+                    <div class="o_cty_legend o_cty_legend_aging">
+                        <span><i class="ok"/>hasta 15 días</span><span><i class="warn"/>16 a 30</span><span><i class="hot"/>31 a 60</span><span><i class="crit"/>más de 60</span>
                     </div>
                 </div>
             </div>
