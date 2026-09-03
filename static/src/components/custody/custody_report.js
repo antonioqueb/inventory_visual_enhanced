@@ -69,7 +69,18 @@ export class CustodyReport extends Component {
     setTableMode(m) { this.state.tableMode = m; this.state.limit = 100; this.state.sortKey = "days"; this.state.sortDir = -1; }
     get showCharts() { return this.state.view !== "table"; }
     get showTable() { return this.state.view !== "charts"; }
-    get zoneNames() { return (this.state.data ? this.state.data.zones : []).map((z) => z.name); }
+    // Orden NATURAL de bodegas (BODEGA 1, 2, 3 … 10), no por m².
+    _zoneKey(name) {
+        const m = /(\d+)/.exec(name || "");
+        return [m ? parseInt(m[1], 10) : 9999, name || ""];
+    }
+    _zoneSort(a, b) {
+        const [na, sa] = this._zoneKey(a), [nb, sb] = this._zoneKey(b);
+        return na !== nb ? na - nb : sa.localeCompare(sb);
+    }
+    get zoneNames() {
+        return (this.state.data ? this.state.data.zones : []).map((z) => z.name).sort((a, b) => this._zoneSort(a, b));
+    }
 
     _match(r, q) {
         return [r.lot, r.product, r.block, r.order, r.customer, r.salesperson, r.project, r.zone, r.locations]
@@ -159,7 +170,7 @@ export class CustodyReport extends Component {
             const z = map[r.zone] || (map[r.zone] = { name: r.zone, qty: 0, value: 0, plates: 0, days: 0, orders: new Set(), seg: Object.fromEntries(STATUS_ORDER.map((s) => [s, 0])) });
             z.qty += r.qty; z.value += r.value; z.plates += 1; z.days += r.days; z.orders.add(r.order_id); z.seg[r.status] += r.qty;
         }
-        const list = Object.values(map).sort((a, b) => b.qty - a.qty);
+        const list = Object.values(map).sort((a, b) => this._zoneSort(a.name, b.name));
         const max = Math.max(...list.map((z) => z.qty), 1);
         return list.map((z) => ({
             ...z, orders: z.orders.size, avgDays: z.plates ? z.days / z.plates : 0, width: (z.qty / max) * 100,

@@ -1,2 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_som_formato_lot_create_stock_user,som.formato.lot.create stock user,model_som_formato_lot_create,stock.group_stock_user,1,1,1,1
+access_inventory_custody_line_user,inventory.custody.line user,model_inventory_custody_line,base.group_user,1,0,0,0
+access_inventory_custody_zone_user,inventory.custody.zone user,model_inventory_custody_zone,base.group_user,1,0,0,0
+access_inventory_custody_zone_manager,inventory.custody.zone manager,model_inventory_custody_zone,stock.group_stock_manager,1,1,1,1

@@ -6,4 +6,5 @@ from . import stock_quant_sale_order_popup
 from . import stock_quant_packing_list
 from . import stock_quant_walkthrough
 from . import stock_quant_custody
+from . import inventory_custody
 from . import ir_ui_menu_policy

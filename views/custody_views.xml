@@ -1,17 +1,169 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Custodia de terceros: material vendido (pagado y/o con entrega
-         autorizada) que sigue ocupando mi almacén, con días en custodia. -->
+    <!-- ══════════ Custodia de terceros: vista NATIVA ══════════
+         Material vendido (asignado, pagado y/o con entrega autorizada) que
+         sigue en mi almacén, con días en custodia. Lista con filtros y
+         agrupaciones libres; Indicadores (pivote + gráfica) en submenú. -->
+
+    <record id="view_custody_line_list" model="ir.ui.view">
+        <field name="name">inventory.custody.line.list</field>
+        <field name="model">inventory.custody.line</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0" delete="0" default_order="days desc, lot_name"
+                  decoration-danger="days &gt; 60" decoration-warning="days &gt; 30 and days &lt;= 60">
+                <field name="status" widget="badge"
+                       decoration-info="status == 'assigned'" decoration-success="status == 'paid'"
+                       decoration-primary="status == 'paid_auth'" decoration-warning="status == 'auth'"/>
+                <field name="lot_name"/>
+                <field name="product_id"/>
+                <field name="mask_name" optional="hide"/>
+                <field name="block" optional="show"/>
+                <field name="thickness" optional="hide"/>
+                <field name="largo" optional="show"/>
+                <field name="alto" optional="show"/>
+                <field name="zone_id"/>
+                <field name="location_id" optional="show"/>
+                <field name="qty" sum="m²"/>
+                <field name="value" sum="Valor" optional="show"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="order_id"/>
+                <field name="partner_id"/>
+                <field name="user_id" optional="show" widget="many2one_avatar_user"/>
+                <field name="project_id" optional="hide"/>
+                <field name="paid_pct" optional="show" widget="progressbar"/>
+                <field name="paid_date" optional="hide"/>
+                <field name="auth_date" optional="hide"/>
+                <field name="assigned_date" optional="hide"/>
+                <field name="base_date"/>
+                <field name="days"/>
+                <field name="bucket" optional="hide"/>
+                <field name="m2_days" optional="hide" sum="m²·día"/>
+                <field name="company_id" optional="hide" groups="base.group_multi_company"/>
+                <button name="action_open_order" type="object" icon="fa-external-link" title="Abrir la orden de venta"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custody_line_search" model="ir.ui.view">
+        <field name="name">inventory.custody.line.search</field>
+        <field name="model">inventory.custody.line</field>
+        <field name="arch" type="xml">
+            <search string="Custodia de terceros">
+                <field name="lot_name" string="Lote"/>
+                <field name="product_id"/>
+                <field name="block"/>
+                <field name="zone_id"/>
+                <field name="location_id"/>
+                <field name="order_id"/>
+                <field name="partner_id"/>
+                <field name="user_id"/>
+                <field name="project_id"/>
+                <filter name="st_paid_auth" string="Pagada + autorizada" domain="[('status', '=', 'paid_auth')]"/>
+                <filter name="st_paid" string="Pagada" domain="[('status', '=', 'paid')]"/>
+                <filter name="st_auth" string="Autorizada sin pago" domain="[('status', '=', 'auth')]"/>
+                <filter name="st_assigned" string="Solo asignada" domain="[('status', '=', 'assigned')]"/>
+                <filter name="not_mine" string="Ya no es mío (pagado y/o autorizado)" domain="[('status', '!=', 'assigned')]"/>
+                <separator/>
+                <filter name="d15" string="Más de 15 días" domain="[('days', '&gt;', 15)]"/>
+                <filter name="d30" string="Más de 30 días" domain="[('days', '&gt;', 30)]"/>
+                <filter name="d60" string="Más de 60 días" domain="[('days', '&gt;', 60)]"/>
+                <filter name="d90" string="Más de 90 días" domain="[('days', '&gt;', 90)]"/>
+                <separator/>
+                <filter name="group_zone" string="Bodega" context="{'group_by': 'zone_id'}"/>
+                <filter name="group_status" string="Estado" context="{'group_by': 'status'}"/>
+                <filter name="group_bucket" string="Antigüedad" context="{'group_by': 'bucket'}"/>
+                <filter name="group_product" string="Material" context="{'group_by': 'product_id'}"/>
+                <filter name="group_partner" string="Cliente" context="{'group_by': 'partner_id'}"/>
+                <filter name="group_user" string="Vendedor" context="{'group_by': 'user_id'}"/>
+                <filter name="group_order" string="Orden" context="{'group_by': 'order_id'}"/>
+                <filter name="group_location" string="Ubicación" context="{'group_by': 'location_id'}"/>
+                <filter name="group_company" string="Compañía" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_custody_line_pivot" model="ir.ui.view">
+        <field name="name">inventory.custody.line.pivot</field>
+        <field name="model">inventory.custody.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Custodia por bodega" sample="0">
+                <field name="zone_id" type="row"/>
+                <field name="status" type="col"/>
+                <field name="qty" type="measure"/>
+                <field name="value" type="measure"/>
+                <field name="days" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_custody_line_graph" model="ir.ui.view">
+        <field name="name">inventory.custody.line.graph</field>
+        <field name="model">inventory.custody.line</field>
+        <field name="arch" type="xml">
+            <graph string="m² en custodia por bodega" type="bar" stacked="1" sample="0">
+                <field name="zone_id"/>
+                <field name="status"/>
+                <field name="qty" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Lista (raíz del submenú) -->
+    <record id="action_custody_lines" model="ir.actions.act_window">
+        <field name="name">Placas en custodia</field>
+        <field name="res_model">inventory.custody.line</field>
+        <field name="view_mode">list,pivot,graph</field>
+        <field name="search_view_id" ref="view_custody_line_search"/>
+        <field name="context">{'search_default_group_zone': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Sin material de terceros en almacén</p>
+            <p>Aquí aparece cada placa asignada a una orden confirmada que sigue en una ubicación
+               interna, con su estado (asignada, pagada, autorizada) y los días en custodia.</p>
+        </field>
+    </record>
+    <!-- Abrir la lista refrescando el catálogo de bodegas (por si nació una nueva) -->
+    <record id="action_custody_open" model="ir.actions.server">
+        <field name="name">Placas en custodia</field>
+        <field name="model_id" ref="model_inventory_custody_line"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_open_custody()</field>
+    </record>
+
+    <!-- Indicadores: pivote + gráfica -->
+    <record id="action_custody_indicators" model="ir.actions.act_window">
+        <field name="name">Indicadores de custodia</field>
+        <field name="res_model">inventory.custody.line</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="search_view_id" ref="view_custody_line_search"/>
+        <field name="context">{'search_default_not_mine': 1}</field>
+    </record>
+
+    <!-- Tablero visual (OWL) -->
     <record id="action_inventory_custody_report" model="ir.actions.client">
-        <field name="name">Custodia de terceros</field>
+        <field name="name">Tablero de custodia</field>
         <field name="tag">inventory_custody_report</field>
         <field name="target">current</field>
     </record>
 
-    <menuitem id="menu_inventory_custody_report"
+    <!-- Menús: raíz propia en Inventario con submenús -->
+    <menuitem id="menu_inventory_custody_root"
         name="Custodia de terceros"
         parent="stock.menu_stock_root"
-        action="action_inventory_custody_report"
         sequence="-8"
         groups="stock.group_stock_manager,sales_team.group_sale_manager"/>
+    <menuitem id="menu_inventory_custody_lines"
+        name="Placas en custodia"
+        parent="menu_inventory_custody_root"
+        action="action_custody_open"
+        sequence="1"/>
+    <menuitem id="menu_inventory_custody_indicators"
+        name="Indicadores"
+        parent="menu_inventory_custody_root"
+        action="action_custody_indicators"
+        sequence="2"/>
+    <menuitem id="menu_inventory_custody_report"
+        name="Tablero"
+        parent="menu_inventory_custody_root"
+        action="action_inventory_custody_report"
+        sequence="3"/>
 </odoo>
