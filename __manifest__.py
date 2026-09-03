@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Inventario Visual Avanzado',
-    'version': '19.0.7.29.0',
+    'version': '19.0.7.30.0',
     'category': 'Inventory/Inventory',
     'summary': 'Vista visual mejorada y agrupada del inventario por producto',
     'description': """
@@ -35,6 +35,7 @@
         'views/inventory_visual_views.xml',
         'views/menu_items.xml',
         'views/walkthrough_views.xml',
+        'views/custody_views.xml',
         # La acción del wizard debe cargar ANTES de la lista de ajustes,
         # que la referencia con %(...)d en su botón de header.
         'views/formato_lot_create_wizard_views.xml',
@@ -63,6 +64,7 @@
             'inventory_visual_enhanced/static/src/scss/components/_block-report-dialog.scss',
             'inventory_visual_enhanced/static/src/scss/components/_workshop-info-dialog.scss',
             'inventory_visual_enhanced/static/src/components/walkthrough/walkthrough.scss',
+            'inventory_visual_enhanced/static/src/components/custody/custody_report.scss',
             # Capa MÓVIL: SOLO media queries — carga al final para ganar cascada.
             'inventory_visual_enhanced/static/src/scss/components/_mobile.scss',
 
@@ -76,6 +78,7 @@
             'inventory_visual_enhanced/static/src/components/walkthrough/walkthrough_details.js',
             'inventory_visual_enhanced/static/src/components/walkthrough/walkthrough_row.js',
             'inventory_visual_enhanced/static/src/components/walkthrough/walkthrough_controller.js',
+            'inventory_visual_enhanced/static/src/components/custody/custody_report.js',
             'inventory_visual_enhanced/static/src/components/dialogs/photo_gallery/photo_gallery_dialog.js',
             'inventory_visual_enhanced/static/src/components/dialogs/block_report/block_report_dialog.js',
             'inventory_visual_enhanced/static/src/components/dialogs/notes/notes_dialog.js',
@@ -93,6 +96,7 @@
             'inventory_visual_enhanced/static/src/components/walkthrough/walkthrough_details.xml',
             'inventory_visual_enhanced/static/src/components/walkthrough/walkthrough_row.xml',
             'inventory_visual_enhanced/static/src/components/walkthrough/walkthrough_controller.xml',
+            'inventory_visual_enhanced/static/src/components/custody/custody_report.xml',
             'inventory_visual_enhanced/static/src/components/dialogs/photo_gallery/photo_gallery_dialog.xml',
             'inventory_visual_enhanced/static/src/components/dialogs/block_report/block_report_dialog.xml',
             'inventory_visual_enhanced/static/src/components/dialogs/notes/notes_dialog.xml',

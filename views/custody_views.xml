@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Custodia de terceros: material vendido (pagado y/o con entrega
+         autorizada) que sigue ocupando mi almacén, con días en custodia. -->
+    <record id="action_inventory_custody_report" model="ir.actions.client">
+        <field name="name">Custodia de terceros</field>
+        <field name="tag">inventory_custody_report</field>
+        <field name="target">current</field>
+    </record>
+
+    <menuitem id="menu_inventory_custody_report"
+        name="Custodia de terceros"
+        parent="stock.menu_stock_root"
+        action="action_inventory_custody_report"
+        sequence="-8"
+        groups="stock.group_stock_manager,sales_team.group_sale_manager"/>
+</odoo>
