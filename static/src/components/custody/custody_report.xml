@@ -12,13 +12,13 @@
                 </div>
                 <div>
                     <h1>Custodia de terceros</h1>
-                    <span class="o_cty_sub">Material vendido que sigue en mi almacén · días contados desde que dejó de ser mío<t t-if="state.data"> · al <t t-esc="state.data.today"/></t></span>
+                    <span class="o_cty_sub">Material vendido que sigue en mi almacén · por bodega y por placa · días contados desde que dejó de ser mío<t t-if="state.data"> · al <t t-esc="state.data.today"/></t></span>
                 </div>
             </div>
             <div class="o_cty_tools" t-if="state.data">
                 <div class="o_cty_search">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.5" y2="16.5"/></svg>
-                    <input type="search" placeholder="Orden, cliente, vendedor, producto…" t-att-value="state.search" t-on-input="onSearch"/>
+                    <input type="search" placeholder="Lote, material, bloque, bodega, orden, cliente…" t-att-value="state.search" t-on-input="onSearch"/>
                 </div>
                 <div class="o_cty_seg">
                     <button t-att-class="'o_cty_seg_btn ' + (state.view === 'both' ? 'active' : '')" t-on-click="() => this.setView('both')">Gráficas + tabla</button>
@@ -55,12 +55,28 @@
                 <button class="o_cty_link" t-on-click="allStatus">Ver todos</button>
             </div>
 
+            <!-- ══ Filtros rápidos: bodega y antigüedad ══ -->
+            <div class="o_cty_chips">
+                <span class="o_cty_chips_label">Bodega:</span>
+                <button t-att-class="'o_cty_chip ' + (!state.zone ? 'active' : '')" t-on-click="() => this.setZone('')">Todas</button>
+                <t t-foreach="zoneNames" t-as="z" t-key="z">
+                    <button t-att-class="'o_cty_chip ' + (state.zone === z ? 'active' : '')" t-on-click="() => this.setZone(z)" t-esc="z"/>
+                </t>
+                <span class="o_cty_chips_sep"/>
+                <span class="o_cty_chips_label">Antigüedad mínima:</span>
+                <t t-foreach="[0, 15, 30, 60, 90]" t-as="d" t-key="d">
+                    <button t-att-class="'o_cty_chip ' + (state.minDays === d ? 'active' : '')" t-on-click="() => this.setMinDays(d)">
+                        <t t-if="d === 0">Todo</t><t t-else="">+<t t-esc="d"/> días</t>
+                    </button>
+                </t>
+            </div>
+
             <!-- ══ KPIs ══ -->
             <div class="o_cty_kpis">
                 <div class="o_cty_kpi">
-                    <span class="o_cty_kpi_label">En custodia</span>
+                    <span class="o_cty_kpi_label">En custodia<t t-if="state.zone"> · <t t-esc="state.zone"/></t></span>
                     <span class="o_cty_kpi_value"><t t-esc="fmt(kpis.qty)"/> <small>m²</small></span>
-                    <span class="o_cty_kpi_sub"><t t-esc="kpis.plates"/> placa(s) · <t t-esc="kpis.orders"/> orden(es) · <t t-esc="kpis.customers"/> cliente(s)</span>
+                    <span class="o_cty_kpi_sub"><t t-esc="kpis.plates"/> placa(s) · <t t-esc="kpis.products"/> material(es) · <t t-esc="kpis.orders"/> orden(es)</span>
                 </div>
                 <div class="o_cty_kpi">
                     <span class="o_cty_kpi_label">Valor del material</span>
@@ -79,45 +95,40 @@
                 </div>
             </div>
 
-            <!-- ══ Filtro rápido de antigüedad ══ -->
-            <div class="o_cty_chips">
-                <span class="o_cty_chips_label">Antigüedad mínima:</span>
-                <t t-foreach="[0, 15, 30, 60, 90]" t-as="d" t-key="d">
-                    <button t-att-class="'o_cty_chip ' + (state.minDays === d ? 'active' : '')" t-on-click="() => this.setMinDays(d)">
-                        <t t-if="d === 0">Todo</t><t t-else="">+<t t-esc="d"/> días</t>
-                    </button>
-                </t>
-            </div>
-
             <!-- ══ Gráficas ══ -->
             <div class="o_cty_charts" t-if="showCharts">
-                <div class="o_cty_card o_cty_chart_aging">
-                    <div class="o_cty_card_head"><h2>Antigüedad en custodia</h2><span class="o_cty_muted">m² por rango de días, apilados por estado</span></div>
-                    <t t-set="ag" t-value="agingChart"/>
-                    <div class="o_cty_empty" t-if="ag.empty">Sin material en custodia con estos filtros.</div>
-                    <svg t-else="" t-attf-viewBox="0 0 #{ag.W} #{ag.H}" class="o_cty_svg" preserveAspectRatio="none">
-                        <t t-foreach="ag.ticks" t-as="tk" t-key="tk_index">
-                            <line t-att-x1="ag.padL" t-att-x2="ag.W - 10" t-att-y1="tk.y" t-att-y2="tk.y" class="o_cty_grid"/>
-                            <text t-att-x="ag.padL - 6" t-att-y="tk.y + 4" class="o_cty_tick" text-anchor="end" t-esc="fmtShort(tk.v)"/>
+
+                <!-- POR BODEGA -->
+                <div class="o_cty_card o_cty_chart_zones">
+                    <div class="o_cty_card_head"><div><h2>Por bodega</h2><span class="o_cty_muted">m² en custodia por ubicación padre · apilado por estado · clic para filtrar</span></div></div>
+                    <div class="o_cty_empty" t-if="!zonesChart.length">Sin material en custodia con estos filtros.</div>
+                    <div class="o_cty_zones">
+                        <t t-foreach="zonesChart" t-as="z" t-key="z.name">
+                            <div t-att-class="'o_cty_zone ' + (z.active ? 'active' : '') + (state.zone and !z.active ? ' dim' : '')" t-on-click="() => this.setZone(z.name)">
+                                <div class="o_cty_zone_head">
+                                    <span class="o_cty_zone_name" t-esc="z.name"/>
+                                    <span class="o_cty_zone_qty"><t t-esc="fmt(z.qty)"/> m²</span>
+                                </div>
+                                <div class="o_cty_zone_track" t-att-style="barStyle(z.width)">
+                                    <t t-foreach="z.segments" t-as="sg" t-key="sg.status">
+                                        <div class="o_cty_zone_seg" t-att-style="segStyle(sg)" t-att-title="statusLabel(sg.status) + ': ' + fmt(sg.qty) + ' m²'"/>
+                                    </t>
+                                </div>
+                                <div class="o_cty_zone_sub">
+                                    <span><t t-esc="z.plates"/> placa(s) · <t t-esc="z.orders"/> orden(es) · <t t-esc="state.data.currency_symbol"/><t t-esc="fmtShort(z.value)"/></span>
+                                    <span t-att-class="'o_cty_days ' + daysClass(z.avgDays)"><t t-esc="fmt(z.avgDays, 0)"/> d prom</span>
+                                </div>
+                            </div>
                         </t>
-                        <t t-foreach="ag.bars" t-as="b" t-key="b.key">
-                            <t t-foreach="b.segments" t-as="sg" t-key="sg.status">
-                                <rect t-att-x="sg.x" t-att-y="sg.y" t-att-width="sg.w" t-att-height="sg.h" t-att-fill="sg.color" rx="3">
-                                    <title><t t-esc="statusLabel(sg.status)"/>: <t t-esc="fmt(sg.qty)"/> m²</title>
-                                </rect>
-                            </t>
-                            <text t-if="b.total" t-att-x="b.labelX" t-att-y="b.top - 5" class="o_cty_bar_val" text-anchor="middle" t-esc="fmtShort(b.total) + ' m²'"/>
-                            <text t-att-x="b.labelX" t-att-y="ag.baseY + 16" class="o_cty_axis" text-anchor="middle" t-esc="b.label"/>
-                            <text t-att-x="b.labelX" t-att-y="ag.baseY + 28" class="o_cty_axis_sub" text-anchor="middle" t-esc="b.plates ? b.plates + ' placa(s)' : ''"/>
-                        </t>
-                    </svg>
+                    </div>
                     <div class="o_cty_legend">
                         <t t-foreach="statusOrder" t-as="k" t-key="k"><span><i t-att-style="dot(k)"/><t t-esc="statusLabel(k)"/></span></t>
                     </div>
                 </div>
 
+                <!-- DONA POR ESTADO -->
                 <div class="o_cty_card o_cty_chart_donut">
-                    <div class="o_cty_card_head"><h2>Reparto por estado</h2><span class="o_cty_muted">m² en custodia</span></div>
+                    <div class="o_cty_card_head"><div><h2>Reparto por estado</h2><span class="o_cty_muted">m² en custodia</span></div></div>
                     <t t-set="dn" t-value="donut"/>
                     <div class="o_cty_donut_wrap">
                         <svg viewBox="0 0 140 140" class="o_cty_donut">
@@ -144,8 +155,47 @@
                     </div>
                 </div>
 
+                <!-- ANTIGÜEDAD -->
+                <div class="o_cty_card o_cty_chart_aging">
+                    <div class="o_cty_card_head"><div><h2>Antigüedad en custodia</h2><span class="o_cty_muted">m² por rango de días, apilados por estado</span></div></div>
+                    <t t-set="ag" t-value="agingChart"/>
+                    <div class="o_cty_empty" t-if="ag.empty">Sin material en custodia con estos filtros.</div>
+                    <svg t-else="" t-attf-viewBox="0 0 #{ag.W} #{ag.H}" class="o_cty_svg" preserveAspectRatio="none">
+                        <t t-foreach="ag.ticks" t-as="tk" t-key="tk_index">
+                            <line t-att-x1="ag.padL" t-att-x2="ag.W - 10" t-att-y1="tk.y" t-att-y2="tk.y" class="o_cty_grid"/>
+                            <text t-att-x="ag.padL - 6" t-att-y="tk.y + 4" class="o_cty_tick" text-anchor="end" t-esc="fmtShort(tk.v)"/>
+                        </t>
+                        <t t-foreach="ag.bars" t-as="b" t-key="b.key">
+                            <t t-foreach="b.segments" t-as="sg" t-key="sg.status">
+                                <rect t-att-x="sg.x" t-att-y="sg.y" t-att-width="sg.w" t-att-height="sg.h" t-att-fill="sg.color" rx="3">
+                                    <title><t t-esc="statusLabel(sg.status)"/>: <t t-esc="fmt(sg.qty)"/> m²</title>
+                                </rect>
+                            </t>
+                            <text t-if="b.total" t-att-x="b.labelX" t-att-y="b.top - 5" class="o_cty_bar_val" text-anchor="middle" t-esc="fmtShort(b.total) + ' m²'"/>
+                            <text t-att-x="b.labelX" t-att-y="ag.baseY + 16" class="o_cty_axis" text-anchor="middle" t-esc="b.label"/>
+                            <text t-att-x="b.labelX" t-att-y="ag.baseY + 28" class="o_cty_axis_sub" text-anchor="middle" t-esc="b.plates ? b.plates + ' placa(s)' : ''"/>
+                        </t>
+                    </svg>
+                </div>
+
+                <!-- MATERIALES -->
+                <div class="o_cty_card o_cty_chart_materials">
+                    <div class="o_cty_card_head"><div><h2>Materiales en custodia</h2><span class="o_cty_muted">top 10 por m² · placas · bodegas donde están</span></div></div>
+                    <div class="o_cty_empty" t-if="!materialsChart.length">Sin datos.</div>
+                    <div class="o_cty_hbars">
+                        <t t-foreach="materialsChart" t-as="p" t-key="p.name">
+                            <div class="o_cty_hbar">
+                                <div class="o_cty_hbar_name" t-att-title="p.name"><t t-esc="p.name"/><small><t t-esc="p.plates"/> placa(s) · <t t-esc="p.zones"/></small></div>
+                                <div class="o_cty_hbar_track"><div t-att-class="'o_cty_hbar_fill ' + daysClass(p.avgDays)" t-att-style="barStyle(p.width)"/></div>
+                                <div class="o_cty_hbar_val"><strong><t t-esc="fmt(p.qty)"/> m²</strong><span t-att-class="'o_cty_days ' + daysClass(p.avgDays)"><t t-esc="fmt(p.avgDays, 0)"/> d prom · máx <t t-esc="p.max"/></span></div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
+                <!-- CLIENTES -->
                 <div class="o_cty_card o_cty_chart_customers">
-                    <div class="o_cty_card_head"><h2>Clientes con más material en mi almacén</h2><span class="o_cty_muted">top 10 por m² · promedio de días en custodia</span></div>
+                    <div class="o_cty_card_head"><div><h2>Clientes con más material en mi almacén</h2><span class="o_cty_muted">top 10 por m² · promedio de días en custodia</span></div></div>
                     <div class="o_cty_empty" t-if="!customersChart.length">Sin datos.</div>
                     <div class="o_cty_hbars">
                         <t t-foreach="customersChart" t-as="c" t-key="c.name">
@@ -162,18 +212,70 @@
             <!-- ══ Tabla ══ -->
             <div class="o_cty_card o_cty_table_card" t-if="showTable">
                 <div class="o_cty_card_head">
-                    <div><h2>Órdenes con material en custodia <span class="o_cty_count" t-esc="orders.length"/></h2><span class="o_cty_muted">Toca una orden para ver sus placas · el folio abre la venta</span></div>
+                    <div>
+                        <h2><t t-if="state.tableMode === 'lots'">Placas en custodia <span class="o_cty_count" t-esc="rows.length"/></t><t t-else="">Órdenes con material en custodia <span class="o_cty_count" t-esc="orders.length"/></t></h2>
+                        <span class="o_cty_muted"><t t-if="state.tableMode === 'lots'">Una fila por placa · el folio abre la venta</t><t t-else="">Toca una orden para ver sus placas · el folio abre la venta</t></span>
+                    </div>
+                    <div class="o_cty_seg">
+                        <button t-att-class="'o_cty_seg_btn ' + (state.tableMode === 'lots' ? 'active' : '')" t-on-click="() => this.setTableMode('lots')">Por placa</button>
+                        <button t-att-class="'o_cty_seg_btn ' + (state.tableMode === 'orders' ? 'active' : '')" t-on-click="() => this.setTableMode('orders')">Por orden</button>
+                    </div>
                 </div>
-                <div class="o_cty_empty" t-if="!orders.length">Nada que mostrar con estos filtros.</div>
-                <div class="o_cty_scroll" t-if="orders.length">
+                <div class="o_cty_empty" t-if="!rows.length">Nada que mostrar con estos filtros.</div>
+
+                <!-- POR PLACA -->
+                <div class="o_cty_scroll" t-if="rows.length and state.tableMode === 'lots'">
+                    <table class="o_cty_table">
+                        <thead>
+                            <tr>
+                                <th class="o_cty_sort" t-on-click="() => this.sortBy('status')">Estado <i t-esc="sortIcon('status')"/></th>
+                                <th class="o_cty_sort" t-on-click="() => this.sortBy('lot')">Lote <i t-esc="sortIcon('lot')"/></th>
+                                <th class="o_cty_sort" t-on-click="() => this.sortBy('product')">Material <i t-esc="sortIcon('product')"/></th>
+                                <th>Bloque</th>
+                                <th>Medidas</th>
+                                <th class="o_cty_sort" t-on-click="() => this.sortBy('zone')">Bodega <i t-esc="sortIcon('zone')"/></th>
+                                <th>Ubicación</th>
+                                <th class="num o_cty_sort" t-on-click="() => this.sortBy('qty')">m² <i t-esc="sortIcon('qty')"/></th>
+                                <th class="num o_cty_sort" t-on-click="() => this.sortBy('value')">Valor <i t-esc="sortIcon('value')"/></th>
+                                <th class="o_cty_sort" t-on-click="() => this.sortBy('order')">Orden <i t-esc="sortIcon('order')"/></th>
+                                <th class="o_cty_sort" t-on-click="() => this.sortBy('customer')">Cliente <i t-esc="sortIcon('customer')"/></th>
+                                <th>Desde</th>
+                                <th class="num o_cty_sort" t-on-click="() => this.sortBy('days')">Días <i t-esc="sortIcon('days')"/></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="visibleLots" t-as="r" t-key="r.lot_id + '-' + r.order_id + '-' + r.zone">
+                                <td><span class="o_cty_badge" t-att-style="'background:' + statusColor(r.status)" t-esc="r.status_label"/></td>
+                                <td class="mono strong" t-esc="r.lot"/>
+                                <td class="ell" t-att-title="r.product" t-esc="r.product"/>
+                                <td class="o_cty_muted" t-esc="r.block"/>
+                                <td class="mono" t-esc="r.dims"/>
+                                <td><span class="o_cty_zone_tag" t-esc="r.zone"/></td>
+                                <td class="ell o_cty_muted" t-att-title="r.locations" t-esc="r.sublocation"/>
+                                <td class="num strong" t-esc="fmt(r.qty)"/>
+                                <td class="num"><t t-esc="state.data.currency_symbol"/><t t-esc="fmt(r.value)"/></td>
+                                <td><a href="#" class="o_cty_order" t-on-click.prevent="() => this.openOrder(r.order_id)" t-esc="r.order"/></td>
+                                <td class="ell o_cty_muted" t-att-title="r.customer" t-esc="r.customer"/>
+                                <td class="o_cty_muted" t-att-title="'Pago: ' + (r.paid_date || '—') + ' · Autorización: ' + (r.auth_date || '—') + ' · Asignación: ' + (r.assigned_date || '—')" t-esc="r.base_date"/>
+                                <td class="num"><span t-att-class="'o_cty_days ' + daysClass(r.days)" t-esc="r.days"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="o_cty_more" t-if="state.tableMode === 'lots' and rows.length > visibleLots.length">
+                    <button class="o_cty_btn" t-on-click="showMore">Mostrar más (<t t-esc="rows.length - visibleLots.length"/> restantes)</button>
+                </div>
+
+                <!-- POR ORDEN -->
+                <div class="o_cty_scroll" t-if="rows.length and state.tableMode === 'orders'">
                     <table class="o_cty_table">
                         <thead>
                             <tr>
                                 <th class="o_cty_sort" t-on-click="() => this.sortBy('status')">Estado <i t-esc="sortIcon('status')"/></th>
                                 <th class="o_cty_sort" t-on-click="() => this.sortBy('order')">Orden <i t-esc="sortIcon('order')"/></th>
                                 <th class="o_cty_sort" t-on-click="() => this.sortBy('customer')">Cliente <i t-esc="sortIcon('customer')"/></th>
-                                <th>Vendedor</th>
                                 <th>Material</th>
+                                <th>Bodega(s)</th>
                                 <th class="num o_cty_sort" t-on-click="() => this.sortBy('plates')">Placas <i t-esc="sortIcon('plates')"/></th>
                                 <th class="num o_cty_sort" t-on-click="() => this.sortBy('qty')">m² <i t-esc="sortIcon('qty')"/></th>
                                 <th class="num o_cty_sort" t-on-click="() => this.sortBy('value')">Valor <i t-esc="sortIcon('value')"/></th>
@@ -188,8 +290,8 @@
                                     <td><span class="o_cty_badge" t-att-style="'background:' + statusColor(o.status)" t-esc="o.status_label"/></td>
                                     <td><a href="#" class="o_cty_order" t-on-click.prevent.stop="() => this.openOrder(o.order_id)" t-esc="o.order"/><small t-if="o.project" class="o_cty_muted"> · <t t-esc="o.project"/></small></td>
                                     <td class="ell" t-att-title="o.customer" t-esc="o.customer"/>
-                                    <td class="ell o_cty_muted" t-esc="o.salesperson"/>
                                     <td class="ell" t-att-title="o.products.join(', ')"><t t-esc="o.products[0]"/><small t-if="o.product_count > 1" class="o_cty_muted"> +<t t-esc="o.product_count - 1"/></small></td>
+                                    <td><t t-foreach="o.zones" t-as="z" t-key="z"><span class="o_cty_zone_tag" t-esc="z"/></t></td>
                                     <td class="num" t-esc="o.plates"/>
                                     <td class="num strong"><t t-esc="fmt(o.qty)"/></td>
                                     <td class="num"><t t-esc="state.data.currency_symbol"/><t t-esc="fmt(o.value)"/></td>
@@ -199,8 +301,7 @@
                                             <span t-esc="pct(o.paid_pct)"/>
                                         </div>
                                     </td>
-                                    <td class="o_cty_muted">
-                                        <t t-esc="o.base_date"/>
+                                    <td class="o_cty_muted"><t t-esc="o.base_date"/>
                                         <small t-if="o.status === 'paid_auth'"> (pago <t t-esc="o.paid_date"/> · aut. <t t-esc="o.auth_date"/>)</small>
                                         <small t-elif="o.status === 'paid'"> (pago)</small>
                                         <small t-elif="o.status === 'auth'"> (autorización)</small>
@@ -211,16 +312,17 @@
                                 <tr t-if="isExpanded(o.order_id)" class="o_cty_detail">
                                     <td colspan="11">
                                         <table class="o_cty_mini">
-                                            <thead><tr><th>Lote</th><th>Producto</th><th>Bloque</th><th>Medidas</th><th class="num">m²</th><th class="num">Valor</th><th>Ubicación</th><th>Asignada</th><th class="num">Días</th></tr></thead>
+                                            <thead><tr><th>Lote</th><th>Material</th><th>Bloque</th><th>Medidas</th><th>Bodega</th><th>Ubicación</th><th class="num">m²</th><th class="num">Valor</th><th>Asignada</th><th class="num">Días</th></tr></thead>
                                             <tbody>
-                                                <tr t-foreach="o.lots" t-as="r" t-key="r.lot_id">
+                                                <tr t-foreach="o.lots" t-as="r" t-key="r.lot_id + '-' + r.zone">
                                                     <td class="mono" t-esc="r.lot"/>
                                                     <td class="ell" t-att-title="r.product" t-esc="r.product"/>
                                                     <td t-esc="r.block"/>
                                                     <td class="mono" t-esc="r.dims"/>
+                                                    <td><span class="o_cty_zone_tag" t-esc="r.zone"/></td>
+                                                    <td class="ell o_cty_muted" t-att-title="r.locations" t-esc="r.sublocation"/>
                                                     <td class="num strong" t-esc="fmt(r.qty)"/>
                                                     <td class="num"><t t-esc="state.data.currency_symbol"/><t t-esc="fmt(r.value)"/></td>
-                                                    <td class="ell o_cty_muted" t-att-title="r.locations" t-esc="r.locations"/>
                                                     <td class="o_cty_muted" t-esc="r.assigned_date"/>
                                                     <td class="num"><span t-att-class="'o_cty_days ' + daysClass(r.days)" t-esc="r.days"/></td>
                                                 </tr>
@@ -232,7 +334,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="o_cty_more" t-if="orders.length > visibleOrders.length">
+                <div class="o_cty_more" t-if="state.tableMode === 'orders' and orders.length > visibleOrders.length">
                     <button class="o_cty_btn" t-on-click="showMore">Mostrar más (<t t-esc="orders.length - visibleOrders.length"/> restantes)</button>
                 </div>
             </div>

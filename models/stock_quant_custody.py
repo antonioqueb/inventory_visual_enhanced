@@ -114,17 +114,20 @@ class StockQuant(models.Model):
         company = self.env.company
         ccur = company.currency_id
 
+        # BODEGA = tercer nivel de la ruta de ubicación (SOM/Existencias/BODEGA 1/...);
+        # si la ubicación no tiene tercer nivel, la propia ubicación.
         self.env.cr.execute("""
             SELECT q.lot_id, q.product_id, sol.id, so.id,
                    SUM(q.quantity), SUM(q.reserved_quantity),
-                   STRING_AGG(DISTINCT loc.complete_name, ' · ')
+                   STRING_AGG(DISTINCT loc.complete_name, ' · '),
+                   COALESCE(NULLIF(split_part(loc.complete_name, '/', 3), ''), loc.complete_name) AS zone
               FROM stock_quant q
               JOIN stock_location loc ON loc.id = q.location_id AND loc.usage = 'internal'
               JOIN sale_order_line_stock_lot_rel rel ON rel.stock_lot_id = q.lot_id
               JOIN sale_order_line sol ON sol.id = rel.sale_order_line_id
               JOIN sale_order so ON so.id = sol.order_id AND so.state = 'sale'
              WHERE q.quantity > 0 AND q.company_id IN %s AND q.lot_id IS NOT NULL
-             GROUP BY q.lot_id, q.product_id, sol.id, so.id
+             GROUP BY q.lot_id, q.product_id, sol.id, so.id, zone
         """, (company_ids,))
         raw = self.env.cr.fetchall()
         if not raw:
@@ -151,7 +154,7 @@ class StockQuant(models.Model):
             return value
 
         rows = []
-        for lot_id, product_id, line_id, order_id, qty, reserved, locations in raw:
+        for lot_id, product_id, line_id, order_id, qty, reserved, locations, zone in raw:
             lot, line, so = lots.get(lot_id), lines.get(line_id), orders.get(order_id)
             if not (lot and line and so):
                 continue
@@ -200,7 +203,10 @@ class StockQuant(models.Model):
                 'project': (so.x_project_id.name if 'x_project_id' in so._fields and so.x_project_id else ''),
                 'qty': round(qty or 0.0, 2),
                 'reserved': round(reserved or 0.0, 2),
+                'zone': zone or '',
                 'locations': locations or '',
+                'sublocation': ' · '.join(
+                    p.strip().split('/')[-1] for p in (locations or '').split('·') if p.strip()),
                 'value': round(value, 2),
                 'status': status,
                 'status_label': STATUS_LABELS[status],
@@ -231,7 +237,17 @@ class StockQuant(models.Model):
         by_aging = {k: {s: bucket() for s in STATUS_ORDER} for k, _lo, _hi in AGING_BUCKETS}
         by_customer = {}
         by_order = {}
+        by_zone = {}
+        by_product = {}
         for r in rows:
+            z = by_zone.setdefault(r['zone'], {s: bucket() for s in STATUS_ORDER})
+            zb = z[r['status']]
+            zb['plates'] += 1; zb['qty'] += r['qty']; zb['value'] += r['value']; zb['days_sum'] += r['days']
+            zb['orders'].add(r['order_id']); zb['customers'].add(r['customer_id'])
+            p = by_product.setdefault(r['product_id'], dict(bucket(), name=r['product'], max_days=0, zones=set()))
+            p['plates'] += 1; p['qty'] += r['qty']; p['value'] += r['value']; p['days_sum'] += r['days']
+            p['orders'].add(r['order_id']); p['customers'].add(r['customer_id'])
+            p['max_days'] = max(p['max_days'], r['days']); p['zones'].add(r['zone'])
             for b in (totals, by_status[r['status']], by_aging[r['bucket']][r['status']]):
                 b['plates'] += 1
                 b['qty'] += r['qty']
@@ -291,12 +307,27 @@ class StockQuant(models.Model):
                 'by_status': {s: pack(by_aging[k][s]) for s in STATUS_ORDER},
                 **pack(tot),
             })
+        zones_out = []
+        for zname, per_status in by_zone.items():
+            tot = bucket()
+            for s in STATUS_ORDER:
+                b = per_status[s]
+                tot['plates'] += b['plates']; tot['qty'] += b['qty']; tot['value'] += b['value']
+                tot['days_sum'] += b['days_sum']; tot['orders'] |= b['orders']; tot['customers'] |= b['customers']
+            zones_out.append({'name': zname, 'by_status': {s: pack(per_status[s]) for s in STATUS_ORDER}, **pack(tot)})
+        zones_out.sort(key=lambda z: (-z['qty'], z['name']))
+        products_out = sorted(
+            [pack(p, {'id': pid, 'name': p['name'], 'max_days': p['max_days'], 'zones': sorted(p['zones'])})
+             for pid, p in by_product.items()],
+            key=lambda x: (-x['qty'], x['name']))
         return {
             'today': format_date(self.env, today, date_format='dd MMM yyyy'),
             'currency_symbol': ccur.symbol or '$',
             'statuses': [{'key': s, 'label': STATUS_LABELS[s], **pack(by_status[s])} for s in STATUS_ORDER],
             'kpis': pack(totals),
             'aging': aging_out,
+            'zones': zones_out,
+            'products': products_out,
             'customers': customers_out,
             'orders': orders_out,
             'rows': rows,

@@ -2,10 +2,11 @@
 /**
  * Custodia de terceros — material vendido que sigue en mi almacén.
  *
- * Reporte de consulta rápida: KPIs + gráficas (antigüedad apilada por
- * estado, reparto por estado, clientes con más material) + tabla por orden
- * con detalle de placas. Todo el cálculo pesado viene del servidor
- * (stock.quant.get_custody_report); aquí solo se filtra, ordena y dibuja.
+ * Reporte de consulta rápida: KPIs + gráficas (por BODEGA, antigüedad
+ * apilada por estado, reparto por estado, materiales y clientes) + tabla
+ * por PLACA (lote, material, bodega, ubicación, días) con la orden como
+ * dato más; vista alterna agrupada por orden. El cálculo pesado viene del
+ * servidor (stock.quant.get_custody_report); aquí se filtra, ordena y dibuja.
  * Gráficas en SVG a mano (sin librerías); OWL no expone Math en las
  * plantillas, así que toda geometría se calcula en métodos.
  */
@@ -31,18 +32,19 @@ export class CustodyReport extends Component {
         this.orm = useService("orm");
         this.action = useService("action");
         this.statusOrder = STATUS_ORDER;
-        this.statusMeta = STATUS_META;
         this.state = useState({
             loading: true,
             data: null,
             view: "both",          // both | charts | table
+            tableMode: "lots",     // lots | orders
             status: { paid_auth: true, paid: true, auth: true, assigned: true },
+            zone: "",              // bodega seleccionada ("" = todas)
             search: "",
             minDays: 0,
             sortKey: "days",
             sortDir: -1,
             expanded: {},
-            limit: 60,
+            limit: 100,
         });
         onWillStart(() => this.load());
     }
@@ -58,82 +60,115 @@ export class CustodyReport extends Component {
 
     // ── Filtros ──
     toggleStatus(key) { this.state.status[key] = !this.state.status[key]; }
-    onlyStatus(key) {
-        for (const k of STATUS_ORDER) this.state.status[k] = k === key;
-    }
+    onlyStatus(key) { for (const k of STATUS_ORDER) this.state.status[k] = k === key; }
     allStatus() { for (const k of STATUS_ORDER) this.state.status[k] = true; }
-    onSearch(ev) { this.state.search = ev.target.value || ""; this.state.limit = 60; }
+    onSearch(ev) { this.state.search = ev.target.value || ""; this.state.limit = 100; }
     setMinDays(d) { this.state.minDays = this.state.minDays === d ? 0 : d; }
+    setZone(z) { this.state.zone = this.state.zone === z ? "" : z; this.state.limit = 100; }
     setView(v) { this.state.view = v; }
+    setTableMode(m) { this.state.tableMode = m; this.state.limit = 100; this.state.sortKey = "days"; this.state.sortDir = -1; }
     get showCharts() { return this.state.view !== "table"; }
     get showTable() { return this.state.view !== "charts"; }
+    get zoneNames() { return (this.state.data ? this.state.data.zones : []).map((z) => z.name); }
 
-    get orders() {
+    _match(r, q) {
+        return [r.lot, r.product, r.block, r.order, r.customer, r.salesperson, r.project, r.zone, r.locations]
+            .some((v) => (v || "").toLowerCase().includes(q));
+    }
+    // Filas con todos los filtros salvo bodega (para la gráfica de bodegas)
+    get rowsNoZone() {
         const d = this.state.data;
         if (!d) return [];
         const q = this.state.search.trim().toLowerCase();
-        return d.orders.filter((o) => {
-            if (!this.state.status[o.status]) return false;
-            if (o.days < this.state.minDays) return false;
-            if (!q) return true;
-            return [o.order, o.customer, o.salesperson, o.project, ...(o.products || [])]
-                .some((v) => (v || "").toLowerCase().includes(q));
+        return d.rows.filter((r) => this.state.status[r.status] && r.days >= this.state.minDays && (!q || this._match(r, q)));
+    }
+    get rows() {
+        const z = this.state.zone;
+        return z ? this.rowsNoZone.filter((r) => r.zone === z) : this.rowsNoZone;
+    }
+
+    // ── Tabla de placas ──
+    get sortedLots() {
+        const k = this.state.sortKey, dir = this.state.sortDir;
+        return this.rows.slice().sort((a, b) => {
+            const va = a[k], vb = b[k];
+            if (typeof va === "string" || typeof vb === "string") return String(va || "").localeCompare(String(vb || ""), "es", { numeric: true }) * dir;
+            return ((va || 0) - (vb || 0)) * dir;
         });
+    }
+    get visibleLots() { return this.sortedLots.slice(0, this.state.limit); }
+
+    // ── Tabla por orden (derivada de las filas filtradas) ──
+    get orders() {
+        const map = {};
+        for (const r of this.rows) {
+            const o = map[r.order_id] || (map[r.order_id] = {
+                order_id: r.order_id, order: r.order, customer: r.customer, salesperson: r.salesperson, project: r.project,
+                status: r.status, status_label: r.status_label, paid_pct: r.paid_pct, paid_amount: r.paid_amount,
+                amount_total: r.amount_total, paid_date: r.paid_date, auth_date: r.auth_date, base_date: r.base_date,
+                days: 0, plates: 0, qty: 0, value: 0, products: new Set(), zones: new Set(), lots: [],
+            });
+            o.plates += 1; o.qty += r.qty; o.value += r.value; o.days = Math.max(o.days, r.days);
+            o.products.add(r.product); o.zones.add(r.zone); o.lots.push(r);
+        }
+        return Object.values(map).map((o) => ({ ...o, products: [...o.products], product_count: o.products.size, zones: [...o.zones].sort() }));
     }
     get sortedOrders() {
         const k = this.state.sortKey, dir = this.state.sortDir;
         return this.orders.slice().sort((a, b) => {
             const va = a[k], vb = b[k];
-            if (typeof va === "string" || typeof vb === "string") return String(va || "").localeCompare(String(vb || "")) * dir;
+            if (typeof va === "string" || typeof vb === "string") return String(va || "").localeCompare(String(vb || ""), "es", { numeric: true }) * dir;
             return ((va || 0) - (vb || 0)) * dir;
         });
     }
     get visibleOrders() { return this.sortedOrders.slice(0, this.state.limit); }
-    showMore() { this.state.limit += 60; }
+    showMore() { this.state.limit += 100; }
     sortBy(key) {
         if (this.state.sortKey === key) this.state.sortDir = -this.state.sortDir;
-        else { this.state.sortKey = key; this.state.sortDir = key === "order" || key === "customer" ? 1 : -1; }
+        else { this.state.sortKey = key; this.state.sortDir = ["days", "qty", "value", "plates", "paid_pct"].includes(key) ? -1 : 1; }
     }
     sortIcon(key) { return this.state.sortKey === key ? (this.state.sortDir < 0 ? "▼" : "▲") : ""; }
     toggleExpand(id) { this.state.expanded[id] = !this.state.expanded[id]; }
     isExpanded(id) { return !!this.state.expanded[id]; }
 
-    get rows() {
-        const ids = new Set(this.orders.map((o) => o.order_id));
-        return (this.state.data ? this.state.data.rows : []).filter((r) => ids.has(r.order_id));
-    }
-
     // ── KPIs sobre lo filtrado ──
     get kpis() {
         const rows = this.rows;
-        const t = { plates: rows.length, qty: 0, value: 0, days: 0, orders: new Set(), customers: new Set(), over30: 0, over60: 0 };
+        const t = { plates: rows.length, qty: 0, value: 0, days: 0, orders: new Set(), customers: new Set(), products: new Set(), over30: 0, over60: 0, m2days: 0 };
         for (const r of rows) {
-            t.qty += r.qty; t.value += r.value; t.days += r.days;
-            t.orders.add(r.order_id); t.customers.add(r.customer_id);
+            t.qty += r.qty; t.value += r.value; t.days += r.days; t.m2days += r.qty * r.days;
+            t.orders.add(r.order_id); t.customers.add(r.customer_id); t.products.add(r.product_id);
             if (r.days > 30) t.over30 += r.qty;
             if (r.days > 60) t.over60 += r.qty;
         }
-        return {
-            plates: t.plates, qty: t.qty, value: t.value,
-            orders: t.orders.size, customers: t.customers.size,
-            avgDays: t.plates ? t.days / t.plates : 0,
-            over30: t.over30, over60: t.over60,
-            m2days: rows.reduce((a, r) => a + r.qty * r.days, 0),
-        };
+        return { plates: t.plates, qty: t.qty, value: t.value, orders: t.orders.size, customers: t.customers.size, products: t.products.size,
+                 avgDays: t.plates ? t.days / t.plates : 0, over30: t.over30, over60: t.over60, m2days: t.m2days };
     }
     get statusStats() {
-        const rows = this.rows;
         const out = STATUS_ORDER.map((k) => ({ key: k, ...STATUS_META[k], plates: 0, qty: 0, value: 0, days: 0, orders: new Set(), active: this.state.status[k] }));
         const map = Object.fromEntries(out.map((s) => [s.key, s]));
-        for (const r of rows) {
-            const s = map[r.status]; if (!s) continue;
-            s.plates += 1; s.qty += r.qty; s.value += r.value; s.days += r.days; s.orders.add(r.order_id);
-        }
+        for (const r of this.rows) { const s = map[r.status]; if (!s) continue; s.plates += 1; s.qty += r.qty; s.value += r.value; s.days += r.days; s.orders.add(r.order_id); }
         const totalQty = out.reduce((a, s) => a + s.qty, 0);
         return out.map((s) => ({ ...s, orders: s.orders.size, avgDays: s.plates ? s.days / s.plates : 0, pct: totalQty ? (s.qty / totalQty) * 100 : 0 }));
     }
 
-    // ── Gráfica 1: antigüedad apilada por estado (SVG) ──
+    // ── Gráfica: por BODEGA (barras horizontales apiladas por estado) ──
+    get zonesChart() {
+        const map = {};
+        for (const r of this.rowsNoZone) {
+            const z = map[r.zone] || (map[r.zone] = { name: r.zone, qty: 0, value: 0, plates: 0, days: 0, orders: new Set(), seg: Object.fromEntries(STATUS_ORDER.map((s) => [s, 0])) });
+            z.qty += r.qty; z.value += r.value; z.plates += 1; z.days += r.days; z.orders.add(r.order_id); z.seg[r.status] += r.qty;
+        }
+        const list = Object.values(map).sort((a, b) => b.qty - a.qty);
+        const max = Math.max(...list.map((z) => z.qty), 1);
+        return list.map((z) => ({
+            ...z, orders: z.orders.size, avgDays: z.plates ? z.days / z.plates : 0, width: (z.qty / max) * 100,
+            active: this.state.zone === z.name,
+            segments: STATUS_ORDER.filter((s) => z.seg[s] > 0).map((s) => ({ status: s, color: STATUS_META[s].color, qty: z.seg[s], width: (z.seg[s] / z.qty) * 100 })),
+        }));
+    }
+
+    // ── Gráfica: antigüedad apilada por estado (SVG) ──
     get agingChart() {
         const buckets = this.state.data ? this.state.data.aging : [];
         const rows = this.rows;
@@ -162,7 +197,7 @@ export class CustodyReport extends Component {
         return { W, H, padL, padB, bars, ticks, baseY: H - padB, empty: !rows.length };
     }
 
-    // ── Gráfica 2: dona por estado ──
+    // ── Gráfica: dona por estado ──
     get donut() {
         const stats = this.statusStats.filter((s) => s.qty > 0);
         let offset = 0;
@@ -175,7 +210,19 @@ export class CustodyReport extends Component {
         return { r: DONUT_R, c: DONUT_C, segs };
     }
 
-    // ── Gráfica 3: clientes con más m² en custodia ──
+    // ── Gráfica: materiales con más m² en custodia ──
+    get materialsChart() {
+        const map = {};
+        for (const r of this.rows) {
+            const p = map[r.product_id] || (map[r.product_id] = { name: r.product, qty: 0, value: 0, plates: 0, days: 0, max: 0, zones: new Set() });
+            p.qty += r.qty; p.value += r.value; p.plates += 1; p.days += r.days; p.max = Math.max(p.max, r.days); p.zones.add(r.zone);
+        }
+        const list = Object.values(map).sort((a, b) => b.qty - a.qty).slice(0, 10);
+        const max = Math.max(...list.map((p) => p.qty), 1);
+        return list.map((p) => ({ ...p, zones: [...p.zones].sort().join(", "), avgDays: p.plates ? p.days / p.plates : 0, width: (p.qty / max) * 100 }));
+    }
+
+    // ── Gráfica: clientes con más m² ──
     get customersChart() {
         const map = {};
         for (const r of this.rows) {
@@ -206,6 +253,7 @@ export class CustodyReport extends Component {
     statusColor(k) { return (STATUS_META[k] || {}).color || "#94a3b8"; }
     statusLabel(k) { return (STATUS_META[k] || {}).label || k; }
     barStyle(w) { return "width:" + Math.max(w || 0, 0) + "%"; }
+    segStyle(sg) { return "width:" + Math.max(sg.width || 0, 0) + "%;background:" + sg.color; }
     dot(k) { return "background:" + this.statusColor(k); }
 
     // ── Navegación / exportación ──
@@ -213,11 +261,11 @@ export class CustodyReport extends Component {
         this.action.doAction({ type: "ir.actions.act_window", res_model: "sale.order", res_id: id, views: [[false, "form"]], target: "current" });
     }
     exportCsv() {
-        const head = ["Estado", "Orden", "Cliente", "Vendedor", "Proyecto", "Producto", "Lote", "Bloque", "Medidas", "m2", "Valor", "Ubicación", "Pagado %", "Fecha pago", "Fecha autorización", "Fecha asignación", "Desde", "Días en custodia"];
+        const head = ["Estado", "Lote", "Material", "Bloque", "Medidas", "Bodega", "Ubicación", "m2", "Valor", "Orden", "Cliente", "Vendedor", "Proyecto", "Pagado %", "Fecha pago", "Fecha autorización", "Fecha asignación", "Desde", "Días en custodia"];
         const esc = (v) => `"${String(v === undefined || v === null ? "" : v).replace(/"/g, '""')}"`;
         const lines = [head.join(",")];
-        for (const r of this.rows) {
-            lines.push([r.status_label, r.order, r.customer, r.salesperson, r.project, r.product, r.lot, r.block, r.dims, r.qty, r.value, r.locations, r.paid_pct, r.paid_date, r.auth_date, r.assigned_date, r.base_date, r.days].map(esc).join(","));
+        for (const r of this.sortedLots) {
+            lines.push([r.status_label, r.lot, r.product, r.block, r.dims, r.zone, r.locations, r.qty, r.value, r.order, r.customer, r.salesperson, r.project, r.paid_pct, r.paid_date, r.auth_date, r.assigned_date, r.base_date, r.days].map(esc).join(","));
         }
         const blob = new Blob(["﻿" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
         const a = document.createElement("a");
