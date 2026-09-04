@@ -148,7 +148,7 @@
         name="Custodia de terceros"
         parent="stock.menu_stock_root"
         sequence="-8"
-        groups="stock.group_stock_manager,sales_team.group_sale_manager"/>
+        groups="stock.group_stock_user,stock.group_stock_manager,sales_team.group_sale_manager"/>
     <menuitem id="menu_inventory_custody_lines"
         name="Placas en custodia"
         parent="menu_inventory_custody_root"
