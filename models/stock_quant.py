@@ -2008,8 +2008,9 @@ class StockQuant(models.Model):
 
         for ml in self.env['stock.move.line'].sudo().search([
             ('lot_id', 'in', all_lot_ids),
-            ('state', '=', 'assigned'),
+            ('state', 'in', ('assigned', 'partially_available')),
             ('move_id.sale_line_id', '!=', False),
+            ('company_id', 'in', self.env.companies.ids),
         ]):
             key = (ml.lot_id.id, ml.location_id.id)
             maps['mls'].setdefault(key, []).append(ml)
@@ -2019,7 +2020,8 @@ class StockQuant(models.Model):
             lot_id_set = set(all_lot_ids)
             for sol in SaleLine.search([
                 ('lot_ids', 'in', all_lot_ids),
-                ('state', '=', 'sale'),
+                ('order_id.state', 'in', ('draft', 'sent', 'sale')),
+                ('company_id', 'in', self.env.companies.ids),
             ]):
                 for _lot in sol.lot_ids:
                     if _lot.id in lot_id_set:
