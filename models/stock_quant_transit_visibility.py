@@ -518,18 +518,32 @@ class StockQuantTransitVisibility(models.Model):
         if not sale_lines:
             return partial_map
 
-        # Entregado por (línea, lote) en UNA sola consulta — nunca por línea
-        # (con miles de lotes el N+1 congelaba la vista completa).
+        # Entregado NETO por (línea, lote) en UNA sola consulta — nunca por
+        # línea (con miles de lotes el N+1 congelaba la vista completa).
+        #
+        # NETO = salidas − devoluciones. Antes solo se sumaban las salidas
+        # ('outgoing') y una devolución al cliente quedaba contada como
+        # entregada para siempre: el lote parecía haber cumplido su desglose,
+        # remaining caía a 0 y el tablero pintaba Committed 0 / todo
+        # Disponible aunque la orden siguiera con cantidad pendiente.
+        # (Caso V/737 · 21230-9: salió 50.40, se devolvió 50.40, volvió a
+        # salir 40.32 → el código veía 90.72 entregados de un desglose de
+        # 50.40 y ocultaba los 10.08 que la venta aún esperaba.)
         delivered_map = {}
         done_mls = self.env["stock.move.line"].sudo().search([
             ("move_id.sale_line_id", "in", sale_lines.ids),
             ("lot_id", "in", list(seg_lot_ids)),
             ("state", "=", "done"),
-            ("picking_id.picking_type_code", "=", "outgoing"),
+            ("picking_id.picking_type_code", "in", ["outgoing", "incoming"]),
         ])
         for dml in done_mls:
             k = (dml.move_id.sale_line_id.id, dml.lot_id.id)
-            delivered_map[k] = delivered_map.get(k, 0.0) + _ml_qty(dml)
+            signo = -1.0 if dml.picking_id.picking_type_code == "incoming" else 1.0
+            delivered_map[k] = delivered_map.get(k, 0.0) + signo * _ml_qty(dml)
+        # Una devolución nunca deja el entregado por debajo de cero.
+        for k in list(delivered_map):
+            if delivered_map[k] < 0.0:
+                delivered_map[k] = 0.0
 
         for sl in sale_lines:
             breakdown = {}
