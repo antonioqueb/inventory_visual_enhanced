@@ -2110,12 +2110,25 @@ class StockQuant(models.Model):
                     except Exception:
                         pass
 
-            delivered = maps['delivered'].get((sol.id, quant.lot_id.id), 0.0)
-            remaining = max(0.0, qty_bd - delivered)
+            # El compromiso pendiente es POR LOTE, no por quant. Si el lote
+            # está repartido en varias ubicaciones, se CONSUME a medida que
+            # se recorren sus quants (igual que hace el encabezado en
+            # _iv_batch_get_partial_commit_map); si no, cada quant se
+            # descontaba el compromiso íntegro y el detalle mostraba menos
+            # disponible que el encabezado (21230-9: 10.08 debidos, 12.96 en
+            # Linea 6-1 y 10.08 en Existencias → antes quedaban 2.88 + 0;
+            # ahora 2.88 + 10.08, que sí suma lo que dice el total).
+            consumed = maps.setdefault('consumed', {})
+            ckey = (sol.id, quant.lot_id.id)
+            delivered = maps['delivered'].get(ckey, 0.0)
+            remaining = max(0.0, qty_bd - delivered - consumed.get(ckey, 0.0))
             if remaining > 0.0001:
+                take = min(remaining, quant.quantity or 0.0) if is_segmentable else remaining
                 sale_order_ids.add(sol.order_id.id)
                 committed_by_line[sol.id] = max(
-                    committed_by_line.get(sol.id, 0.0), remaining)
+                    committed_by_line.get(sol.id, 0.0), take)
+                if is_segmentable:
+                    consumed[ckey] = consumed.get(ckey, 0.0) + take
 
         committed_qty = min(quant.quantity, sum(committed_by_line.values()))
 
