@@ -2026,18 +2026,29 @@ class StockQuant(models.Model):
                 for _lot in sol.lot_ids:
                     if _lot.id in lot_id_set:
                         maps['sols'].setdefault(_lot.id, []).append(sol)
+                # Entregado NETO por (línea, lote): salidas menos devoluciones.
+                # Solo con 'outgoing' una devolución seguía contando como
+                # entrega, el lote "cumplía" su desglose y la fila perdía
+                # todo compromiso (misma falla que se corrigió en el
+                # encabezado, _iv_batch_get_partial_commit_map).
                 for dml in sol.move_ids.mapped('move_line_ids'):
+                    ptype = dml.picking_id.picking_type_code
                     if (
                         dml.state == 'done'
                         and dml.lot_id
                         and dml.lot_id.id in lot_id_set
-                        and dml.picking_id.picking_type_code == 'outgoing'
+                        and ptype in ('outgoing', 'incoming')
                     ):
                         dkey = (sol.id, dml.lot_id.id)
                         dq = (dml.quantity or 0.0) if 'quantity' in dml._fields \
                             else (getattr(dml, 'qty_done', 0.0) or 0.0)
+                        if ptype == 'incoming':
+                            dq = -dq
                         maps['delivered'][dkey] = \
                             maps['delivered'].get(dkey, 0.0) + dq
+        for dkey in list(maps['delivered']):
+            if maps['delivered'][dkey] < 0.0:
+                maps['delivered'][dkey] = 0.0
         return maps
 
     @api.model
@@ -2107,6 +2118,21 @@ class StockQuant(models.Model):
                     committed_by_line.get(sol.id, 0.0), remaining)
 
         committed_qty = min(quant.quantity, sum(committed_by_line.values()))
+
+        # FORMATO/PIEZA con desglose ya entregado: el lote sigue en lot_ids
+        # de la venta (la selección no se depura al entregar) pero ya no le
+        # debe nada. Marcarlo en_orden_venta lo ESCONDÍA de la pestaña
+        # Disponible —el filtro exige !en_orden_venta || parcialmente—
+        # aunque el encabezado lo sumara como disponible. Sin compromiso
+        # vivo, la fila es libre. Las placas conservan su regla: seleccionadas
+        # en venta = comprometidas enteras.
+        if is_segmentable and sale_order_ids and committed_qty <= 0.0001:
+            detail['sale_order_ids'] = list(sale_order_ids)
+            detail['qty_comprometida'] = 0.0
+            detail['qty_disponible'] = quant.quantity
+            detail['parcialmente_comprometido'] = False
+            detail['en_orden_venta'] = False
+            sale_order_ids = set()
 
         if sale_order_ids:
             detail['en_orden_venta'] = True
