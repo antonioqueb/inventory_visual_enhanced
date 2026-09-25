@@ -778,6 +778,9 @@ class StockQuant(models.Model):
                 fila_comp = dict(detail)
                 fila_comp.update({
                     'id': '%s-comprometido' % quant.id,
+                    # id REAL para los botones (P/N/D/E, venta, apartado): el
+                    # id sintético no es un quant y tronaba int() en el servidor.
+                    'quant_id': quant.id,
                     'lot_name': '%s · COMPROMETIDO' % detail['lot_name'],
                     'quantity': detail['qty_comprometida'],
                     'is_committed_row': True,
@@ -2191,6 +2194,9 @@ class StockQuant(models.Model):
             fila_comp = dict(detail)
             fila_comp.update({
                 'id': '%s-comprometido' % quant.id,
+                # id REAL para los botones (P/N/D/E, venta, apartado): el
+                # id sintético no es un quant y tronaba int() en el servidor.
+                'quant_id': quant.id,
                 'lot_name': '%s · COMPROMETIDO' % detail['lot_name'],
                 'quantity': detail['qty_comprometida'],
                 'reserved_quantity': comp_reserved,

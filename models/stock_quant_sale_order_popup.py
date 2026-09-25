@@ -94,7 +94,14 @@ class StockQuantSaleOrderPopup(models.Model):
         if not quant_id:
             return {}
 
-        quant = self.sudo().browse(int(quant_id))
+        # La fila COMPROMETIDO de un formato/pieza parcial trae id
+        # '<quant>-comprometido': int() tronaba y el diálogo de la venta no
+        # abría. El contexto del lote es opcional: jamás tumba la consulta.
+        try:
+            quant_id = int(str(quant_id).split('-')[0])
+        except (TypeError, ValueError):
+            return {}
+        quant = self.sudo().browse(quant_id)
         if not quant.exists():
             return {}
 

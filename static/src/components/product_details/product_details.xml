@@ -191,7 +191,7 @@
                                         type="button"
                                         class="icon-btn"
                                         t-att-class="{ 'has-photos': detail.cantidad_fotos > 0, 'no-content': detail.cantidad_fotos === 0 }"
-                                        t-on-click="() => props.onPhotoClick(detail.id)"
+                                        t-on-click="() => props.onPhotoClick(detail.quant_id || detail.id)"
                                     >
                                         <i class="fa fa-camera"></i>
                                     </button>
@@ -202,7 +202,7 @@
                                         type="button"
                                         class="icon-btn"
                                         t-att-class="{ 'has-notes': detail.detalles_placa, 'no-content': !detail.detalles_placa }"
-                                        t-on-click="() => props.onNotesClick(detail.id)"
+                                        t-on-click="() => props.onNotesClick(detail.quant_id || detail.id)"
                                     >
                                         <i class="fa fa-info-circle"></i>
                                     </button>
@@ -213,7 +213,7 @@
                                         t-if="props.hasSalesPermissions or props.hasInventoryPermissions"
                                         type="button"
                                         class="icon-btn has-details"
-                                        t-on-click="() => props.onDetailsClick(detail.id)"
+                                        t-on-click="() => props.onDetailsClick(detail.quant_id || detail.id)"
                                     >
                                         <i class="fa fa-history"></i>
                                     </button>
@@ -227,7 +227,7 @@
                                         t-if="detail.en_taller"
                                         type="button"
                                         class="status-badge-btn status-workshop"
-                                        t-on-click="() => props.onWorkshopClick(detail.id)"
+                                        t-on-click="() => props.onWorkshopClick(detail.quant_id || detail.id)"
                                         title="Ver información de la orden de taller"
                                     >
                                         <i class="fa fa-industry"></i>
@@ -238,7 +238,7 @@
                                         t-elif="detail.tiene_hold"
                                         type="button"
                                         class="status-badge-btn status-hold-active"
-                                        t-on-click="() => props.hasSalesPermissions ? props.onHoldClick(detail.id, detail.hold_info) : null"
+                                        t-on-click="() => props.hasSalesPermissions ? props.onHoldClick(detail.quant_id || detail.id, detail.hold_info) : null"
                                         t-att-title="props.hasSalesPermissions ? 'Ver información del apartado' : 'Lote con apartado activo'"
                                         t-att-style="!props.hasSalesPermissions ? 'cursor: default;' : ''"
                                     >
@@ -250,7 +250,7 @@
                                         t-elif="detail.en_orden_venta"
                                         type="button"
                                         class="status-badge-btn status-sale-order"
-                                        t-on-click="() => props.onSaleOrderClick(detail.id, detail.sale_order_ids)"
+                                        t-on-click="() => props.onSaleOrderClick(detail.quant_id || detail.id, detail.sale_order_ids)"
                                         t-att-title="detail.parcialmente_comprometido ? 'Parcialmente en orden de venta (queda disponible ' + props.formatNumber(detail.qty_disponible) + ')' : 'Ver orden de venta'"
                                     >
                                         <i class="fa fa-usd"></i>
