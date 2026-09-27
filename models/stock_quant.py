@@ -1839,15 +1839,11 @@ class StockQuant(models.Model):
                     except Exception as e:
                         _logger.warning(f"Error procesando precio del producto {product_id_str}: {e}")
             
-            from datetime import datetime, timedelta
-            fecha_inicio = datetime.now()
-            fecha_expiracion = fecha_inicio
-            dias_agregados = 0
-            
-            while dias_agregados < 5:
-                fecha_expiracion += timedelta(days=1)
-                if fecha_expiracion.weekday() < 5:
-                    dias_agregados += 1
+            # Hora de Monterrey (calculador canónico); antes datetime.now()
+            # del servidor + weekday() en UTC: vencía un día hábil antes.
+            from odoo.addons.stock_lot_dimensions.models.utils.business_days import BusinessDaysCalculator
+            fecha_inicio = fields.Datetime.now()
+            fecha_expiracion = BusinessDaysCalculator.get_expiration_date(fecha_inicio, 5)
             
             if 'stock.lot.hold' not in self.env:
                 return {'error': 'El modelo stock.lot.hold no está disponible.'}
