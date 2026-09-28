@@ -126,6 +126,11 @@ class StockQuant(models.Model):
               JOIN sale_order_line_stock_lot_rel rel ON rel.stock_lot_id = q.lot_id
               JOIN sale_order_line sol ON sol.id = rel.sale_order_line_id
               JOIN sale_order so ON so.id = sol.order_id AND so.state = 'sale'
+              -- Solo material en m² (placas/formatos): lo que va por pieza o
+              -- unidad no es m² y se sumaba en la columna de m² (28 sep 2026).
+              JOIN product_product pp ON pp.id = q.product_id
+              JOIN product_template pt ON pt.id = pp.product_tmpl_id
+              JOIN uom_uom uom ON uom.id = pt.uom_id AND uom.name::text ~* '(m²|m2)'
              WHERE q.quantity > 0 AND q.company_id IN %s AND q.lot_id IS NOT NULL
              GROUP BY q.lot_id, q.product_id, sol.id, so.id, zone
         """, (company_ids,))
