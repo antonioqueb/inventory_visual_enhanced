@@ -847,7 +847,7 @@ class StockQuant(models.Model):
         lines = self.env['workshop.input.line'].sudo().search([
             ('lot_id', '=', quant.lot_id.id),
             ('state', 'not in', ('done', 'cancelled', 'rejected')),
-            ('order_id.state', 'in', ('draft', 'validated', 'in_workshop')),
+            ('order_id.state', 'in', ('draft', 'confirmed', 'validated', 'in_workshop')),
         ], order='id desc')
 
         if not lines:
