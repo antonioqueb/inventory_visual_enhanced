@@ -6,7 +6,7 @@
             <div class="o_notes_dialog">
 
                 <!-- Botón de cierre propio -->
-                <button class="ivh-notes-close" type="button" t-on-click="props.close" title="Cerrar">
+                <button class="ivh-notes-close" type="button" t-on-click="closeDialog" title="Cerrar">
                     <i class="fa fa-times"></i>
                 </button>
 
@@ -98,12 +98,70 @@
                         </div>
                     </div>
                 </t>
+
+                <!-- FOTOS DE DETALLE (defectos). No aparecen en la galería
+                     comercial: solo aquí, junto a las notas. -->
+                <div class="ivh-notes-card ivh-detail-photos">
+                    <div class="ivh-notes-card__header">
+                        <h5>
+                            <i class="fa fa-camera"></i>
+                            Fotos de detalle
+                            <span class="ivh-detail-photos__count" t-if="state.detailPhotos.length">
+                                <t t-esc="state.detailPhotos.length"/>
+                            </span>
+                        </h5>
+                    </div>
+                    <div class="ivh-notes-card__body">
+                        <div class="ivh-detail-photos__empty" t-if="!state.detailPhotos.length">
+                            Este lote no tiene fotos de detalle. Se capturan desde la app móvil
+                            (modo Detalle) o se agregan aquí.
+                        </div>
+                        <div class="ivh-detail-photos__grid" t-if="state.detailPhotos.length">
+                            <div class="ivh-detail-photo" t-foreach="state.detailPhotos" t-as="photo" t-key="photo.id"
+                                 t-on-click="() => this.openPreview(photo)">
+                                <img t-att-src="photoSrc(photo)" alt="Foto de detalle"/>
+                                <div class="ivh-detail-photo__meta">
+                                    <div class="ivh-detail-photo__note" t-if="photo.notas" t-esc="photo.notas"/>
+                                    <div class="ivh-detail-photo__who">
+                                        <t t-esc="photo.user"/> · <t t-esc="photo.fecha_captura"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ivh-detail-photos__add">
+                            <input type="text" class="form-control" placeholder="Comentario de la foto (opcional)"
+                                   t-att-value="state.photoComment" t-on-input="onPhotoCommentInput"/>
+                            <label class="btn ivh-notes-primary-btn mb-0" t-att-class="{ disabled: state.isUploading }">
+                                <i t-attf-class="fa #{state.isUploading ? 'fa-spinner fa-spin' : 'fa-plus'}"></i>
+                                Agregar foto de detalle
+                                <input type="file" accept="image/*" multiple="multiple" class="d-none"
+                                       t-on-change="onDetailFileChange"/>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ivh-detail-preview" t-if="state.preview" t-on-click="closePreview">
+                    <img t-att-src="photoSrc(state.preview)" alt="Foto de detalle"/>
+                    <div class="ivh-detail-preview__bar" t-on-click.stop="">
+                        <div>
+                            <div t-if="state.preview.notas" class="ivh-detail-preview__note" t-esc="state.preview.notas"/>
+                            <small><t t-esc="state.preview.user"/> · <t t-esc="state.preview.fecha_captura"/></small>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-outline-light me-2" t-on-click="(ev) => this.deleteDetailPhoto(state.preview, ev)">
+                                <i class="fa fa-trash"></i> Eliminar
+                            </button>
+                            <button class="btn btn-sm btn-light" t-on-click="closePreview">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <t t-set-slot="footer">
                 <!-- Modo visualización -->
                 <t t-if="hasNotes and !state.isEditing">
-                    <button class="btn ivh-notes-secondary-btn" t-on-click="props.close">
+                    <button class="btn ivh-notes-secondary-btn" t-on-click="closeDialog">
                         <i class="fa fa-times"></i>
                         Cerrar
                     </button>
@@ -113,7 +171,7 @@
                 <t t-if="!hasNotes or state.isEditing">
                     <button
                         class="btn ivh-notes-secondary-btn"
-                        t-on-click="hasNotes ? toggleEdit : props.close"
+                        t-on-click="hasNotes ? toggleEdit : closeDialog"
                     >
                         <i class="fa fa-times"></i>
                         Cancelar

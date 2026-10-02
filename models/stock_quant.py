@@ -622,6 +622,7 @@ class StockQuant(models.Model):
                 'numero_placa': quant.lot_id.x_numero_placa if quant.lot_id and hasattr(quant.lot_id, 'x_numero_placa') else '',
                 'cantidad_fotos': 0,
                 'detalles_placa': quant.x_detalles_placa if hasattr(quant, 'x_detalles_placa') else '',
+                'tiene_detalles': bool(getattr(quant, 'x_tiene_detalles', False)),
                 'tiene_hold': False,
                 'hold_info': None,
                 'en_orden_venta': False,
@@ -1503,7 +1504,55 @@ class StockQuant(models.Model):
             'lot_name': lot.name,
             'product_name': lot.product_id.display_name,
             'notes': lot.x_detalles_placa if hasattr(lot, 'x_detalles_placa') else '',
+            'detail_photos': self._ive_detail_photos(lot),
         }
+
+    def _ive_detail_photos(self, lot):
+        """Fotos de DETALLE (defectos) del lote. Van con las notas, no en la
+        galería comercial."""
+        if 'x_detalle_foto_ids' not in lot._fields:
+            return []
+        return [{
+            'id': photo.id,
+            'name': photo.name or '',
+            'image': photo.image,
+            'notas': photo.notas or '',
+            'fecha_captura': som_format_date(
+                photo.fecha_captura, empty='', with_time=True),
+            'user': photo.user_id.name or '',
+        } for photo in lot.sudo().x_detalle_foto_ids]
+
+    @api.model
+    def save_lot_detail_photo(self, quant_id, photo_name, photo_data, notas=''):
+        quant = self.browse(quant_id)
+        if not quant.exists() or not quant.lot_id:
+            return {'success': False, 'error': 'Lote no encontrado'}
+        try:
+            self.env['stock.lot'].som_add_detail_photo(
+                quant.lot_id.id, photo_data, name=photo_name, notas=notas)
+            return {
+                'success': True,
+                'message': 'Foto de detalle guardada',
+                'detail_photos': self._ive_detail_photos(quant.lot_id),
+            }
+        except Exception as e:
+            return {'success': False, 'error': f'Error al guardar la foto de detalle: {str(e)}'}
+
+    @api.model
+    def delete_lot_detail_photo(self, photo_id):
+        photo = self.env['stock.lot.detail.image'].browse(photo_id)
+        if not photo.exists():
+            return {'success': False, 'error': 'Foto de detalle no encontrada'}
+        lot = photo.lot_id
+        try:
+            photo.unlink()
+            return {
+                'success': True,
+                'message': 'Foto de detalle eliminada',
+                'detail_photos': self._ive_detail_photos(lot),
+            }
+        except Exception as e:
+            return {'success': False, 'error': f'Error al eliminar la foto de detalle: {str(e)}'}
     
     @api.model
     def save_lot_photo(self, quant_id, photo_name, photo_data, sequence=10, notas=''):

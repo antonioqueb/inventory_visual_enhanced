@@ -215,3 +215,37 @@
     border-color: $iv-blue;
   }
 }
+
+
+// ── Fotos de detalle (defectos) dentro de las notas del lote ──
+.ivh-detail-photos { margin-top: 16px; }
+.ivh-detail-photos__count {
+  margin-left: 6px; padding: 1px 8px; border-radius: 999px;
+  font-size: 12px; background: rgba(220, 38, 38, 0.12); color: #b91c1c;
+}
+.ivh-detail-photos__empty { color: #64748b; font-size: 13px; margin-bottom: 12px; }
+.ivh-detail-photos__grid {
+  display: grid; gap: 12px; margin-bottom: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+.ivh-detail-photo {
+  cursor: pointer; border-radius: 12px; overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.35); background: #fff;
+  img { display: block; width: 100%; height: 130px; object-fit: cover; }
+}
+.ivh-detail-photo__meta { padding: 8px 10px; }
+.ivh-detail-photo__note { font-size: 12.5px; color: #1e293b; margin-bottom: 2px; }
+.ivh-detail-photo__who { font-size: 11px; color: #64748b; }
+.ivh-detail-photos__add { display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  .form-control { flex: 1 1 220px; }
+}
+.ivh-detail-preview {
+  position: fixed; inset: 0; z-index: 1100; background: rgba(2, 6, 23, 0.92);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  img { max-width: 94vw; max-height: 82vh; object-fit: contain; }
+}
+.ivh-detail-preview__bar {
+  width: 94vw; margin-top: 12px; color: #fff;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+}
+.ivh-detail-preview__note { font-size: 14px; }

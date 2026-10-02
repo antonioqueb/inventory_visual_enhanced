@@ -1067,6 +1067,7 @@ class StockQuantTransitVisibility(models.Model):
                 ),
                 "cantidad_fotos": 0,
                 "detalles_placa": quant.x_detalles_placa if hasattr(quant, "x_detalles_placa") else "",
+                "tiene_detalles": bool(getattr(quant, "x_tiene_detalles", False)),
                 "tiene_hold": False,
                 "hold_info": None,
                 "en_orden_venta": False,

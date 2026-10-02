@@ -201,7 +201,7 @@
                                     <button 
                                         type="button"
                                         class="icon-btn"
-                                        t-att-class="{ 'has-notes': detail.detalles_placa, 'no-content': !detail.detalles_placa }"
+                                        t-att-class="{ 'has-notes': detail.detalles_placa or detail.tiene_detalles, 'no-content': !detail.detalles_placa and !detail.tiene_detalles }"
                                         t-on-click="() => props.onNotesClick(detail.quant_id || detail.id)"
                                     >
                                         <i class="fa fa-info-circle"></i>
